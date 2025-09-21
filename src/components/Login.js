@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { loginUser } from '../lib/api'; // Import the loginUser function
-import { supabase } from '../lib/supabaseClient'; // Import the Supabase client
+import { useAuth } from '../contexts/AuthContext';
 import './Auth.css';
 
 const Login = () => {
-<<<<<<< HEAD
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     role: ''
   });
+  const [error, setError] = useState('');
   const [roleError, setRoleError] = useState('');
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const roles = [
     {
@@ -20,12 +20,6 @@ const Login = () => {
       title: 'Advocate',
       icon: '⚖️',
       route: '/advocate/dashboard'
-    },
-    {
-      id: 'clerk',
-      title: 'Legal Clerk',
-      icon: '📋',
-      route: '/clerk/dashboard'
     },
     {
       id: 'student',
@@ -45,61 +39,26 @@ const Login = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    setRoleError('');
     
     if (!formData.role) {
       setRoleError('Please select your role');
       return;
     }
 
-    // Add your authentication logic here
-    console.log('Login attempt with:', formData);
-    
-    // Store user data
-    localStorage.setItem('userData', JSON.stringify({
-      email: formData.email,
-      role: formData.role
-    }));
-    
-    // Get the selected role's route
-    const selectedRole = roles.find(role => role.id === formData.role);
-    // Redirect to appropriate dashboard
-    navigate(selectedRole.route);
-=======
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState(''); // State for error messages
-  const navigate = useNavigate();
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError(''); // Clear previous errors
     try {
-      // 1. Authenticate with Supabase
-      const { data: supabaseAuthData, error: supabaseAuthError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (supabaseAuthError) {
-        throw supabaseAuthError;
-      }
-
-      const supabaseToken = supabaseAuthData.session.access_token;
-
-      // 2. Send Supabase JWT to your backend
-      const backendResponse = await loginUser(supabaseToken);
-      console.log('Backend Login successful:', backendResponse);
-
-      // Store token or user info in localStorage/sessionStorage if needed
-      localStorage.setItem('token', supabaseToken); // Store the Supabase token
-      navigate('/dashboard');
+      await login(formData);
+      
+      // Get the selected role's route
+      const selectedRole = roles.find(role => role.id === formData.role);
+      navigate(selectedRole.route);
     } catch (err) {
       console.error('Login failed:', err);
       setError(err.message || 'Login failed. Please check your credentials.');
     }
->>>>>>> cde8218252e5c5496e3c9509cc58099b69c51082
   };
 
   return (
@@ -153,7 +112,7 @@ const Login = () => {
             Log In
           </button>
         </form>
-        {error && <p className="error-message">{error}</p>} {/* Display error message */}
+        {error && <p className="error-message">{error}</p>}
         <p className="auth-link">
           Don't have an account? <span onClick={() => navigate('/register')}>Register now</span>
         </p>
