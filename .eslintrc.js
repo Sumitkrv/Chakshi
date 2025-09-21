@@ -1,0 +1,16 @@
+module.exports = {
+  extends: [
+    'react-app',
+    'react-app/jest'
+  ],
+  rules: {
+    'react-hooks/exhaustive-deps': 'warn',
+    'jsx-a11y/anchor-is-valid': 'warn',
+    'no-unused-vars': 'warn'
+  },
+  env: {
+    browser: true,
+    es2021: true,
+    node: true
+  }
+};
