@@ -1,95 +1,141 @@
 import React, { useState, useEffect } from "react";
-import "./FreeTools.css";
+import { 
+  Search,
+  X,
+  Grid3X3,
+  List,
+  ChevronDown,
+  ArrowRight,
+  Eye,
+  Clock,
+  Star,
+  Award,
+  BookOpen,
+  FileText,
+  Shield,
+  Zap,
+  Download,
+  Bookmark,
+  TrendingUp,
+  Filter,
+  Users,
+  Target,
+  CheckCircle
+} from 'lucide-react';
 
 const FreeTools = () => {
   const freeTools = [
     {
       id: 1,
       title: "RTI Application",
-      icon: "📄",
-      description: "Draft a Right to Information application to get information from government authorities.",
+      icon: FileText,
+      description: "Draft a comprehensive Right to Information application to obtain information from government authorities with proper legal formatting.",
       category: "Government",
       isNew: false,
       popularity: 95,
       timeEstimate: "10-15 min",
-      uses: 12540
+      uses: 12540,
+      difficulty: "Beginner",
+      successRate: 98,
+      tags: ["Information", "Government", "Transparency"]
     },
     {
       id: 2,
       title: "Police Complaint",
-      icon: "👮",
-      description: "File a formal police complaint for various offenses and incidents.",
+      icon: Shield,
+      description: "File a formal police complaint for various offenses and incidents with proper legal format and required details.",
       category: "Criminal",
       isNew: true,
       popularity: 87,
       timeEstimate: "15-20 min",
-      uses: 8765
+      uses: 8765,
+      difficulty: "Intermediate",
+      successRate: 94,
+      tags: ["Crime", "Police", "Complaint"]
     },
     {
       id: 3,
       title: "Consumer Court",
-      icon: "🛒",
-      description: "Draft a complaint for defective products, services, or unfair trade practices.",
+      icon: Users,
+      description: "Draft a comprehensive complaint for defective products, poor services, or unfair trade practices with legal backing.",
       category: "Consumer",
       isNew: false,
       popularity: 92,
       timeEstimate: "20-25 min",
-      uses: 11230
+      uses: 11230,
+      difficulty: "Intermediate",
+      successRate: 96,
+      tags: ["Consumer Rights", "Products", "Services"]
     },
     {
       id: 4,
       title: "Rental Agreement",
-      icon: "🏠",
-      description: "Create a basic rental agreement for residential property leasing.",
+      icon: BookOpen,
+      description: "Create a legally sound rental agreement for residential property leasing with all essential clauses and protections.",
       category: "Property",
       isNew: false,
       popularity: 98,
       timeEstimate: "25-30 min",
-      uses: 18760
+      uses: 18760,
+      difficulty: "Advanced",
+      successRate: 99,
+      tags: ["Property", "Rental", "Agreement"]
     },
     {
       id: 5,
       title: "Will Template",
-      icon: "📝",
-      description: "Create a simple last will and testament to distribute your assets.",
+      icon: Award,
+      description: "Create a simple yet comprehensive last will and testament to distribute your assets according to your wishes.",
       category: "Personal",
       isNew: true,
       popularity: 85,
       timeEstimate: "30-35 min",
-      uses: 6540
+      uses: 6540,
+      difficulty: "Advanced",
+      successRate: 97,
+      tags: ["Will", "Assets", "Testament"]
     },
     {
       id: 6,
       title: "Legal Notice",
-      icon: "⚖️",
-      description: "Draft a formal legal notice before initiating court proceedings.",
+      icon: Target,
+      description: "Draft a formal legal notice before initiating court proceedings with proper legal language and format.",
       category: "Civil",
       isNew: false,
       popularity: 90,
       timeEstimate: "15-20 min",
-      uses: 14320
+      uses: 14320,
+      difficulty: "Intermediate",
+      successRate: 95,
+      tags: ["Notice", "Legal", "Court"]
     },
     {
       id: 7,
       title: "FIR Copy Application",
-      icon: "📋",
-      description: "Apply for a copy of your First Information Report from police station.",
+      icon: FileText,
+      description: "Apply for a certified copy of your First Information Report from the police station with proper documentation.",
       category: "Criminal",
       isNew: false,
       popularity: 82,
       timeEstimate: "10-15 min",
-      uses: 7650
+      uses: 7650,
+      difficulty: "Beginner",
+      successRate: 99,
+      tags: ["FIR", "Police", "Copy"]
     },
     {
       id: 8,
       title: "Property Verification",
-      icon: "🔍",
-      description: "Basic checklist for verifying property documents before purchase.",
+      icon: CheckCircle,
+      description: "Comprehensive checklist for verifying property documents before purchase to avoid legal complications.",
       category: "Property",
       isNew: true,
       popularity: 88,
       timeEstimate: "20-25 min",
-      uses: 9870
+      uses: 9870,
+      difficulty: "Intermediate",
+      successRate: 93,
+      tags: ["Property", "Verification", "Documents"]
     }
   ];
 
@@ -97,7 +143,7 @@ const FreeTools = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("default");
-  const [viewMode, setViewMode] = useState("grid"); // 'grid' or 'list'
+  const [viewMode, setViewMode] = useState("grid");
   const [selectedTool, setSelectedTool] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -106,272 +152,454 @@ const FreeTools = () => {
     .filter(tool => 
       (selectedCategory === "All" || tool.category === selectedCategory) &&
       (tool.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-       tool.description.toLowerCase().includes(searchQuery.toLowerCase()))
+       tool.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+       tool.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())))
     )
     .sort((a, b) => {
       if (sortBy === "popularity") return b.popularity - a.popularity;
       if (sortBy === "name") return a.title.localeCompare(b.title);
       if (sortBy === "uses") return b.uses - a.uses;
-      return 0; // default order
+      if (sortBy === "success") return b.successRate - a.successRate;
+      return 0;
     });
 
-  // Open tool details modal
   const openToolDetails = (tool) => {
     setSelectedTool(tool);
     setIsModalOpen(true);
   };
 
-  // Close modal
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedTool(null);
   };
 
-  // Effect to disable body scroll when modal is open
   useEffect(() => {
     if (isModalOpen) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
     }
-
     return () => {
       document.body.style.overflow = 'unset';
     };
   }, [isModalOpen]);
 
+  const getCategoryColor = (category) => {
+    switch (category) {
+      case 'Government': return 'bg-blue-100 text-blue-700 border-blue-200';
+      case 'Criminal': return 'bg-red-100 text-red-700 border-red-200';
+      case 'Consumer': return 'bg-green-100 text-green-700 border-green-200';
+      case 'Property': return 'bg-purple-100 text-purple-700 border-purple-200';
+      case 'Personal': return 'bg-orange-100 text-orange-700 border-orange-200';
+      case 'Civil': return 'bg-indigo-100 text-indigo-700 border-indigo-200';
+      default: return 'bg-gray-100 text-gray-700 border-gray-200';
+    }
+  };
+
+  const getDifficultyColor = (difficulty) => {
+    switch (difficulty) {
+      case 'Beginner': return 'bg-green-100 text-green-700';
+      case 'Intermediate': return 'bg-yellow-100 text-yellow-700';
+      case 'Advanced': return 'bg-red-100 text-red-700';
+      default: return 'bg-gray-100 text-gray-700';
+    }
+  };
+
+  const getPopularityColor = (popularity) => {
+    if (popularity >= 95) return 'from-green-500 to-emerald-600';
+    if (popularity >= 85) return 'from-blue-500 to-cyan-600';
+    if (popularity >= 75) return 'from-yellow-500 to-orange-600';
+    return 'from-gray-400 to-gray-500';
+  };
+
   return (
-    <section className="free-tools">
-      <div className="container">
-        <div className="section-header">
-          <div className="header-content">
-            <div className="header-decoration">
-              <div className="decoration-circle"></div>
-              <div className="decoration-circle"></div>
-              <div className="decoration-circle"></div>
-            </div>
-            <h2>Create Legal Documents in Minutes</h2>
-            <p>Free templates to help you with common legal procedures and documentation</p>
+    <section className="pro-section bg-gradient-to-br from-gray-50 to-blue-50">
+      <div className="pro-container">
+        
+        {/* Header */}
+        <div className="text-center mb-16">
+          <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-blue-600 pro-rounded-xl pro-flex-center mx-auto mb-6">
+            <BookOpen className="w-8 h-8 text-white" />
           </div>
-          <div className="header-stats">
-            <div className="stat-item">
-              <span className="stat-number">{freeTools.length}+</span>
-              <span className="stat-label">Templates</span>
+          <h2 className="pro-heading-section text-gray-900 mb-4">
+            Free Legal Document Templates
+          </h2>
+          <p className="pro-text-lead text-gray-600 max-w-3xl mx-auto mb-8">
+            Create professional legal documents in minutes with our comprehensive template library. 
+            No legal expertise required - just follow our guided process.
+          </p>
+          
+          {/* Stats */}
+          <div className="pro-grid md:grid-cols-3 pro-gap-8 max-w-3xl mx-auto">
+            <div className="text-center">
+              <div className="w-12 h-12 bg-blue-100 pro-rounded-lg pro-flex-center mx-auto mb-3">
+                <FileText className="w-6 h-6 text-blue-600" />
+              </div>
+              <div className="pro-heading-lg font-bold text-gray-900">{freeTools.length}+</div>
+              <div className="pro-text-sm text-gray-600">Templates Available</div>
             </div>
-            <div className="stat-item">
-              <span className="stat-number">98%</span>
-              <span className="stat-label">Success Rate</span>
+            <div className="text-center">
+              <div className="w-12 h-12 bg-green-100 pro-rounded-lg pro-flex-center mx-auto mb-3">
+                <TrendingUp className="w-6 h-6 text-green-600" />
+              </div>
+              <div className="pro-heading-lg font-bold text-gray-900">98%</div>
+              <div className="pro-text-sm text-gray-600">Success Rate</div>
             </div>
-            <div className="stat-item">
-              <span className="stat-number">50K+</span>
-              <span className="stat-label">Users</span>
+            <div className="text-center">
+              <div className="w-12 h-12 bg-purple-100 pro-rounded-lg pro-flex-center mx-auto mb-3">
+                <Users className="w-6 h-6 text-purple-600" />
+              </div>
+              <div className="pro-heading-lg font-bold text-gray-900">50K+</div>
+              <div className="pro-text-sm text-gray-600">Happy Users</div>
             </div>
           </div>
         </div>
 
-        {/* Search and Filter Bar */}
-        <div className="tools-controls">
-          <div className="search-box">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            <input 
-              type="text" 
-              placeholder="Search templates..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            {searchQuery && (
-              <button className="clear-search" onClick={() => setSearchQuery("")}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </button>
-            )}
-          </div>
-          
-          <div className="controls-right">
-            <div className="view-toggle">
-              <button 
-                className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
-                onClick={() => setViewMode('grid')}
-                aria-label="Grid view"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
-                  <rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
-                  <rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
-                  <rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
-                </svg>
-              </button>
-              <button 
-                className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
-                onClick={() => setViewMode('list')}
-                aria-label="List view"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <line x1="3" y1="6" x2="21" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                  <line x1="3" y1="12" x2="21" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                  <line x1="3" y1="18" x2="21" y2="18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                </svg>
-              </button>
+        {/* Search and Controls */}
+        <div className="pro-dashboard-card mb-8">
+          <div className="pro-flex flex-col lg:flex-row lg:items-center pro-gap-6">
+            
+            {/* Search */}
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input 
+                  type="text" 
+                  placeholder="Search templates, categories, or keywords..." 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pro-p-4 pl-12 pr-12 border border-gray-300 pro-rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                {searchQuery && (
+                  <button 
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 w-6 h-6 pro-flex-center hover:bg-gray-100 pro-rounded-lg"
+                    onClick={() => setSearchQuery("")}
+                  >
+                    <X className="w-4 h-4 text-gray-400" />
+                  </button>
+                )}
+              </div>
             </div>
             
-            <div className="sort-filter">
-              <label htmlFor="sort-select">Sort by:</label>
-              <select 
-                id="sort-select"
-                value={sortBy} 
-                onChange={(e) => setSortBy(e.target.value)}
-              >
-                <option value="default">Default</option>
-                <option value="popularity">Popularity</option>
-                <option value="name">Name</option>
-                <option value="uses">Most Used</option>
-              </select>
+            {/* Controls */}
+            <div className="pro-flex items-center pro-gap-4">
+              
+              {/* View Toggle */}
+              <div className="pro-flex bg-gray-100 pro-rounded-lg pro-p-1">
+                <button 
+                  className={`pro-flex items-center pro-gap-2 px-3 py-2 pro-rounded-lg transition-all duration-200 ${
+                    viewMode === 'grid' 
+                      ? 'bg-white text-blue-600 shadow-sm' 
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                  onClick={() => setViewMode('grid')}
+                >
+                  <Grid3X3 className="w-4 h-4" />
+                  Grid
+                </button>
+                <button 
+                  className={`pro-flex items-center pro-gap-2 px-3 py-2 pro-rounded-lg transition-all duration-200 ${
+                    viewMode === 'list' 
+                      ? 'bg-white text-blue-600 shadow-sm' 
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                  onClick={() => setViewMode('list')}
+                >
+                  <List className="w-4 h-4" />
+                  List
+                </button>
+              </div>
+              
+              {/* Sort */}
+              <div className="relative">
+                <select 
+                  value={sortBy} 
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="appearance-none bg-white border border-gray-300 pro-rounded-lg px-4 py-2 pr-8 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="default">Default</option>
+                  <option value="popularity">Popularity</option>
+                  <option value="name">Name</option>
+                  <option value="uses">Most Used</option>
+                  <option value="success">Success Rate</option>
+                </select>
+                <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+              </div>
             </div>
           </div>
         </div>
 
         {/* Category Filter */}
-        <div className="category-filter">
-          <div className="filter-scroll">
+        <div className="mb-8">
+          <div className="pro-flex items-center pro-gap-2 mb-4">
+            <Filter className="w-4 h-4 text-gray-600" />
+            <span className="pro-text-sm font-medium text-gray-700">Filter by Category:</span>
+          </div>
+          <div className="pro-flex flex-wrap pro-gap-3">
             {categories.map(category => (
               <button
                 key={category}
-                className={`filter-btn ${selectedCategory === category ? 'active' : ''}`}
+                className={`pro-flex items-center pro-gap-2 px-4 py-2 pro-rounded-lg border transition-all duration-200 ${
+                  selectedCategory === category 
+                    ? 'bg-blue-500 text-white border-blue-500' 
+                    : 'bg-white text-gray-700 border-gray-300 hover:border-blue-300 hover:bg-blue-50'
+                }`}
                 onClick={() => setSelectedCategory(category)}
               >
                 {category}
-                {selectedCategory === category && <span className="filter-indicator"></span>}
+                {category !== 'All' && (
+                  <span className={`pro-text-xs px-2 py-0.5 pro-rounded-lg font-medium ${
+                    selectedCategory === category 
+                      ? 'bg-blue-400 text-white' 
+                      : 'bg-gray-100 text-gray-600'
+                  }`}>
+                    {freeTools.filter(tool => tool.category === category).length}
+                  </span>
+                )}
               </button>
             ))}
           </div>
         </div>
 
         {/* Results Count */}
-        <div className="results-count">
-          <p>
-            {filteredTools.length} {filteredTools.length === 1 ? 'template' : 'templates'} 
-            {selectedCategory !== 'All' ? ` in ${selectedCategory}` : ''}
-            {searchQuery ? ` matching "${searchQuery}"` : ''}
+        <div className="pro-flex items-center justify-between mb-6">
+          <p className="pro-text-sm text-gray-600">
+            Showing {filteredTools.length} of {freeTools.length} templates
+            {selectedCategory !== 'All' && ` in ${selectedCategory}`}
+            {searchQuery && ` matching "${searchQuery}"`}
           </p>
-        </div>
-
-        {/* Tools Grid/List */}
-        <div className={`tools-container ${viewMode}`}>
-          {filteredTools.length > 0 ? (
-            filteredTools.map(tool => (
-              <div key={tool.id} className="tool-card" onClick={() => openToolDetails(tool)}>
-                {tool.isNew && <span className="new-badge">NEW</span>}
-                <div className="card-header">
-                  <div className="tool-icon">{tool.icon}</div>
-                  <div className="tool-meta">
-                    <div className="popularity-meter">
-                      <div className="meter-bar">
-                        <div 
-                          className="meter-fill" 
-                          style={{width: `${tool.popularity}%`}}
-                        ></div>
-                      </div>
-                      <span className="popularity-text">{tool.popularity}%</span>
-                    </div>
-                    <div className="tool-uses">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 4.5C7 4.5 2.73 7.61 1 12C2.73 16.39 7 19.5 12 19.5C17 19.5 21.27 16.39 23 12C21.27 7.61 17 4.5 12 4.5ZM12 17C9.24 17 7 14.76 7 12C7 9.24 9.24 7 12 7C14.76 7 17 9.24 17 12C17 14.76 14.76 17 12 17ZM12 9C10.34 9 9 10.34 9 12C9 13.66 10.34 15 12 15C13.66 15 15 13.66 15 12C15 10.34 13.66 9 12 9Z" fill="currentColor"/>
-                      </svg>
-                      {tool.uses.toLocaleString()}
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="tool-content">
-                  <h3>{tool.title}</h3>
-                  <p>{tool.description}</p>
-                  <div className="tool-footer">
-                    <span className="tool-category">{tool.category}</span>
-                    <span className="time-estimate">{tool.timeEstimate}</span>
-                  </div>
-                </div>
-                
-                <button className="use-template-btn">
-                  <span>Use Template</span>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </button>
-              </div>
-            ))
-          ) : (
-            <div className="no-results">
-              <div className="no-results-icon">🔍</div>
-              <h3>No templates found</h3>
-              <p>Try a different search term or category</p>
+          {filteredTools.length > 0 && (
+            <div className="pro-flex items-center pro-gap-2 pro-text-sm text-gray-500">
+              <Zap className="w-4 h-4" />
+              Average completion: 15-25 minutes
             </div>
           )}
         </div>
 
-        {/* View All Button */}
-        <div className="view-all-container">
-          <button className="view-all-btn">
-            View All Templates ({freeTools.length}+)
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
+        {/* Tools Grid/List */}
+        {filteredTools.length > 0 ? (
+          <div className={`pro-grid pro-gap-6 mb-12 ${
+            viewMode === 'grid' ? 'lg:grid-cols-3 md:grid-cols-2' : 'grid-cols-1'
+          }`}>
+            {filteredTools.map(tool => {
+              const IconComponent = tool.icon;
+              return (
+                <div 
+                  key={tool.id} 
+                  className={`pro-card group cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-105 ${
+                    viewMode === 'list' ? 'pro-flex items-center pro-gap-6' : ''
+                  }`}
+                  onClick={() => openToolDetails(tool)}
+                >
+                  {tool.isNew && (
+                    <div className="absolute top-4 right-4 bg-green-500 text-white pro-text-xs px-2 py-1 pro-rounded-lg font-semibold">
+                      NEW
+                    </div>
+                  )}
+                  
+                  <div className={`${viewMode === 'list' ? 'flex-shrink-0' : 'mb-4'}`}>
+                    <div className="w-16 h-16 bg-gradient-to-r from-blue-100 to-purple-100 pro-rounded-xl pro-flex-center mx-auto group-hover:scale-110 transition-transform duration-300">
+                      <IconComponent className="w-8 h-8 text-blue-600" />
+                    </div>
+                  </div>
+                  
+                  <div className={`${viewMode === 'list' ? 'flex-1' : ''}`}>
+                    <div className="pro-flex items-start justify-between mb-3">
+                      <h3 className="pro-heading-md text-gray-900 group-hover:text-blue-600 transition-colors duration-300">
+                        {tool.title}
+                      </h3>
+                      <div className="pro-flex items-center pro-gap-1">
+                        <Star className="w-4 h-4 text-yellow-500" />
+                        <span className="pro-text-sm font-medium text-gray-700">{tool.popularity}%</span>
+                      </div>
+                    </div>
+                    
+                    <p className="pro-text-sm text-gray-600 mb-4 line-clamp-2">{tool.description}</p>
+                    
+                    <div className="pro-flex flex-wrap items-center pro-gap-2 mb-4">
+                      <span className={`pro-text-xs px-2 py-1 pro-rounded-lg border font-medium ${getCategoryColor(tool.category)}`}>
+                        {tool.category}
+                      </span>
+                      <span className={`pro-text-xs px-2 py-1 pro-rounded-lg font-medium ${getDifficultyColor(tool.difficulty)}`}>
+                        {tool.difficulty}
+                      </span>
+                    </div>
+                    
+                    <div className="pro-flex items-center justify-between">
+                      <div className="pro-flex items-center pro-gap-4 pro-text-xs text-gray-500">
+                        <div className="pro-flex items-center pro-gap-1">
+                          <Clock className="w-3 h-3" />
+                          {tool.timeEstimate}
+                        </div>
+                        <div className="pro-flex items-center pro-gap-1">
+                          <Eye className="w-3 h-3" />
+                          {tool.uses.toLocaleString()}
+                        </div>
+                      </div>
+                      
+                      <button className="pro-btn pro-btn-primary pro-btn-sm group-hover:bg-blue-600 transition-colors duration-300">
+                        Use Template
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="text-center py-16">
+            <div className="w-16 h-16 bg-gray-100 pro-rounded-xl pro-flex-center mx-auto mb-4">
+              <Search className="w-8 h-8 text-gray-400" />
+            </div>
+            <h3 className="pro-heading-lg text-gray-900 mb-2">No templates found</h3>
+            <p className="pro-text-body text-gray-600 mb-6">
+              Try adjusting your search terms or filters to find what you're looking for.
+            </p>
+            <button 
+              className="pro-btn pro-btn-ghost"
+              onClick={() => {
+                setSearchQuery("");
+                setSelectedCategory("All");
+              }}
+            >
+              Clear All Filters
+            </button>
+          </div>
+        )}
+
+        {/* CTA Section */}
+        <div className="bg-gradient-to-r from-blue-100 to-purple-100 border border-blue-200 pro-rounded-xl pro-p-8 text-center">
+          <div className="w-12 h-12 bg-blue-500 pro-rounded-xl pro-flex-center mx-auto mb-4">
+            <Zap className="w-6 h-6 text-white" />
+          </div>
+          <h3 className="pro-heading-lg text-gray-900 mb-3">
+            Need Custom Legal Documents?
+          </h3>
+          <p className="pro-text-body text-gray-700 mb-6 max-w-2xl mx-auto">
+            Our AI-powered document generator can create customized legal documents tailored to your 
+            specific requirements. Get professional-grade documents with expert guidance.
+          </p>
+          <div className="pro-flex flex-wrap justify-center items-center pro-gap-4">
+            <button className="pro-btn pro-btn-primary">
+              Try AI Document Generator
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </button>
+            <button className="pro-btn pro-btn-ghost">
+              <Download className="w-4 h-4 mr-2" />
+              Download All Templates
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Tool Detail Modal */}
+      {/* Enhanced Modal */}
       {isModalOpen && selectedTool && (
-        <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close" onClick={closeModal}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </button>
-            
-            <div className="modal-header">
-              <div className="modal-icon">{selectedTool.icon}</div>
-              <div className="modal-title-section">
-                <h2>{selectedTool.title}</h2>
-                <span className="modal-category">{selectedTool.category}</span>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 pro-flex items-center justify-center pro-p-4">
+          <div className="bg-white pro-rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="relative pro-p-6 border-b border-gray-200">
+              <button 
+                className="absolute top-6 right-6 w-8 h-8 pro-flex-center hover:bg-gray-100 pro-rounded-lg transition-colors duration-200"
+                onClick={closeModal}
+              >
+                <X className="w-5 h-5 text-gray-400" />
+              </button>
+              
+              <div className="pro-flex items-start pro-gap-4">
+                <div className="w-16 h-16 bg-gradient-to-r from-blue-100 to-purple-100 pro-rounded-xl pro-flex-center flex-shrink-0">
+                  <selectedTool.icon className="w-8 h-8 text-blue-600" />
+                </div>
+                <div className="flex-1">
+                  <div className="pro-flex items-center pro-gap-3 mb-2">
+                    <h2 className="pro-heading-xl text-gray-900">{selectedTool.title}</h2>
+                    {selectedTool.isNew && (
+                      <span className="bg-green-500 text-white pro-text-xs px-2 py-1 pro-rounded-lg font-semibold">
+                        NEW
+                      </span>
+                    )}
+                  </div>
+                  <div className="pro-flex items-center pro-gap-3">
+                    <span className={`pro-text-sm px-3 py-1 pro-rounded-lg border font-medium ${getCategoryColor(selectedTool.category)}`}>
+                      {selectedTool.category}
+                    </span>
+                    <span className={`pro-text-sm px-3 py-1 pro-rounded-lg font-medium ${getDifficultyColor(selectedTool.difficulty)}`}>
+                      {selectedTool.difficulty}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
             
-            <div className="modal-body">
-              <p>{selectedTool.description}</p>
+            <div className="pro-p-6">
+              <p className="pro-text-body text-gray-700 mb-6 leading-relaxed">
+                {selectedTool.description}
+              </p>
               
-              <div className="modal-stats">
-                <div className="modal-stat">
-                  <span className="stat-value">{selectedTool.popularity}%</span>
-                  <span className="stat-label">Popularity</span>
+              {/* Stats */}
+              <div className="pro-grid md:grid-cols-4 pro-gap-4 mb-6">
+                <div className="text-center pro-p-4 bg-blue-50 pro-rounded-lg">
+                  <div className="pro-heading-lg font-bold text-blue-600">{selectedTool.popularity}%</div>
+                  <div className="pro-text-sm text-blue-700">Popularity</div>
                 </div>
-                <div className="modal-stat">
-                  <span className="stat-value">{selectedTool.uses.toLocaleString()}</span>
-                  <span className="stat-label">Times Used</span>
+                <div className="text-center pro-p-4 bg-green-50 pro-rounded-lg">
+                  <div className="pro-heading-lg font-bold text-green-600">{selectedTool.successRate}%</div>
+                  <div className="pro-text-sm text-green-700">Success Rate</div>
                 </div>
-                <div className="modal-stat">
-                  <span className="stat-value">{selectedTool.timeEstimate}</span>
-                  <span className="stat-label">Completion Time</span>
+                <div className="text-center pro-p-4 bg-purple-50 pro-rounded-lg">
+                  <div className="pro-heading-lg font-bold text-purple-600">{selectedTool.uses.toLocaleString()}</div>
+                  <div className="pro-text-sm text-purple-700">Times Used</div>
+                </div>
+                <div className="text-center pro-p-4 bg-orange-50 pro-rounded-lg">
+                  <div className="pro-heading-lg font-bold text-orange-600">{selectedTool.timeEstimate}</div>
+                  <div className="pro-text-sm text-orange-700">Completion</div>
                 </div>
               </div>
               
-              <div className="modal-features">
-                <h3>What You'll Get</h3>
-                <ul>
-                  <li>Customizable template tailored to your needs</li>
-                  <li>Step-by-step guidance through the process</li>
-                  <li>Legal tips and best practices</li>
-                  <li>Export options (PDF, Word, etc.)</li>
-                </ul>
+              {/* Features */}
+              <div className="mb-6">
+                <h3 className="pro-heading-md text-gray-900 mb-4 pro-flex items-center pro-gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  What You'll Get
+                </h3>
+                <div className="pro-grid md:grid-cols-2 pro-gap-3">
+                  {[
+                    "Customizable template tailored to your needs",
+                    "Step-by-step guidance through the process", 
+                    "Legal tips and best practices included",
+                    "Multiple export formats (PDF, Word, etc.)",
+                    "Professional legal formatting",
+                    "Compliance with current regulations"
+                  ].map((feature, index) => (
+                    <div key={index} className="pro-flex items-center pro-gap-3">
+                      <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
+                      <span className="pro-text-sm text-gray-700">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Tags */}
+              <div className="mb-6">
+                <h4 className="pro-text-sm font-semibold text-gray-900 mb-3">Related Keywords:</h4>
+                <div className="pro-flex flex-wrap pro-gap-2">
+                  {selectedTool.tags.map((tag, index) => (
+                    <span key={index} className="pro-text-xs px-3 py-1 bg-gray-100 text-gray-700 pro-rounded-lg">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
             
-            <div className="modal-actions">
-              <button className="btn-secondary">Save for Later</button>
-              <button className="btn-primary">Use This Template</button>
+            <div className="pro-p-6 border-t border-gray-200 pro-flex items-center pro-gap-4">
+              <button className="pro-btn pro-btn-ghost pro-flex items-center pro-gap-2">
+                <Bookmark className="w-4 h-4" />
+                Save for Later
+              </button>
+              <button className="pro-btn pro-btn-primary flex-1">
+                Use This Template
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </button>
             </div>
           </div>
         </div>

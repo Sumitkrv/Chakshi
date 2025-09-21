@@ -1,402 +1,409 @@
 import React, { useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, Cell } from 'recharts';
-import './Dashboard.css';
+import { useAuth } from '../contexts/AuthContext';
+import { 
+  BookOpen, 
+  FileText, 
+  Clock, 
+  TrendingUp,
+  Calendar,
+  Award,
+  Target,
+  Users,
+  CheckCircle,
+  AlertCircle,
+  Star,
+  Plus,
+  ArrowRight,
+  BarChart3,
+  Brain,
+  Trophy
+} from 'lucide-react';
 
-// Icons (using Font Awesome for professional look)
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faFire,
-  faCalendarAlt,
-  faGraduationCap,
-  faChartLine,
-  faBook,
-  faClipboardList,
-  faBalanceScale,
-  faNewspaper,
-  faDownload,
-  faBookmark,
-  faUsers,
-  faChevronRight,
-  faFilePdf,
-  faUpload,
-  faSpinner
-} from '@fortawesome/free-solid-svg-icons';
-
-// Sample data for charts
-const subjectProgressData = [
-  { subject: 'Contract Law', progress: 85 },
-  { subject: 'Constitutional Law', progress: 70 },
-  { subject: 'Criminal Law', progress: 60 },
-  { subject: 'Tort Law', progress: 90 },
-  { subject: 'Property Law', progress: 45 }
-];
-
-const weeklyStudyData = [
-  { day: 'Mon', hours: 4.5 },
-  { day: 'Tue', hours: 3.2 },
-  { day: 'Wed', hours: 5.1 },
-  { day: 'Thu', hours: 2.8 },
-  { day: 'Fri', hours: 6.2 },
-  { day: 'Sat', hours: 7.5 },
-  { day: 'Sun', hours: 5.0 }
-];
-
-const COLORS = ['#0A2342', '#1E3A8A', '#4A6FA5', '#166088', '#4FC3A1'];
-
-// Dashboard Component
 const StudentDashboard = () => {
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const [summary, setSummary] = useState(null);
-  const [error, setError] = useState(null);
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState('overview');
 
-  const handleFileChange = (event) => {
-    setSelectedFile(event.target.files[0]);
-    setSummary(null);
-    setError(null);
+  const stats = [
+    { 
+      title: 'Courses Enrolled', 
+      value: '8', 
+      icon: BookOpen, 
+      color: 'from-blue-500 to-cyan-400',
+      change: '+2 this semester',
+      trend: 'up'
+    },
+    { 
+      title: 'Assignments Due', 
+      value: '3', 
+      icon: FileText, 
+      color: 'from-orange-500 to-amber-400',
+      change: '2 due this week',
+      trend: 'neutral'
+    },
+    { 
+      title: 'Study Hours', 
+      value: '42', 
+      icon: Clock, 
+      color: 'from-green-500 to-emerald-400',
+      change: '+8 this week',
+      trend: 'up'
+    },
+    { 
+      title: 'Overall Progress', 
+      value: '75%', 
+      icon: TrendingUp, 
+      color: 'from-purple-500 to-indigo-400',
+      change: '+5% this month',
+      trend: 'up'
+    }
+  ];
+
+  const recentActivities = [
+    { 
+      activity: 'Submitted Constitutional Law Assignment', 
+      time: '2 hours ago',
+      type: 'assignment',
+      status: 'completed',
+      icon: CheckCircle
+    },
+    { 
+      activity: 'Completed Contract Law Quiz', 
+      time: '1 day ago',
+      type: 'quiz',
+      status: 'completed',
+      icon: CheckCircle
+    },
+    { 
+      activity: 'Attended Moot Court Session', 
+      time: '2 days ago',
+      type: 'session',
+      status: 'attended',
+      icon: Users
+    },
+    { 
+      activity: 'Downloaded Civil Procedure Notes', 
+      time: '3 days ago',
+      type: 'resource',
+      status: 'downloaded',
+      icon: FileText
+    }
+  ];
+
+  const upcomingTasks = [
+    { 
+      task: 'Criminal Law Assignment', 
+      dueDate: 'Tomorrow',
+      priority: 'high',
+      course: 'Criminal Law',
+      status: 'pending'
+    },
+    { 
+      task: 'Legal Research Project', 
+      dueDate: 'Friday',
+      priority: 'medium',
+      course: 'Legal Research',
+      status: 'in-progress'
+    },
+    { 
+      task: 'Jurisprudence Quiz', 
+      dueDate: 'Next Week',
+      priority: 'low',
+      course: 'Jurisprudence',
+      status: 'not-started'
+    }
+  ];
+
+  const achievements = [
+    { name: 'Consistent Learner', icon: Award, earned: true },
+    { name: 'Legal Research Pro', icon: Brain, earned: true },
+    { name: 'Moot Court Star', icon: Trophy, earned: true },
+    { name: 'Top Performer', icon: Star, earned: false }
+  ];
+
+  const getPriorityColor = (priority) => {
+    switch (priority) {
+      case 'high': return 'pro-status-error';
+      case 'medium': return 'pro-status-warning';
+      case 'low': return 'pro-status-success';
+      default: return 'pro-status-info';
+    }
   };
 
-  const handleSummarize = async () => {
-    if (!selectedFile) {
-      setError('Please select a PDF file first');
-      return;
-    }
-
-    setIsUploading(true);
-    setError(null);
-
-    const formData = new FormData();
-    formData.append('file1', selectedFile);
-
-    try {
-      const response = await fetch('https://n8n.srv983857.hstgr.cloud/webhook/12ac51e5-e395-4c18-b5f9-ddd9516e6ed3', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error(`Server returned ${response.status}: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      setSummary(data.summary || data);
-    } catch (err) {
-      setError(err.message || 'Failed to summarize document');
-      console.error('Error:', err);
-    } finally {
-      setIsUploading(false);
+  const getActivityColor = (type) => {
+    switch (type) {
+      case 'assignment': return 'text-blue-500';
+      case 'quiz': return 'text-green-500';
+      case 'session': return 'text-purple-500';
+      case 'resource': return 'text-indigo-500';
+      default: return 'text-gray-500';
     }
   };
 
   return (
-    <div className="legal-education-dashboard">
-      {/* Header */}
-      <header className="dashboard-header">
-        <div className="header-content">
-          <h1>Legal Education Dashboard</h1>
-          <p>Welcome back, your study session starts now</p>
-        </div>
-        <div className="user-profile">
-          <div className="user-avatar">
-            <img src="https://i.pravatar.cc/40" alt="User Avatar" />
-          </div>
-          <div className="user-info">
-            <span className="user-name">John Doe</span>
-            <span className="user-role">Law Student</span>
-          </div>
-        </div>
-      </header>
-
-      {/* Quick Stats Cards */}
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-icon" style={{background: '#0A2342'}}>
-            <FontAwesomeIcon icon={faFire} />
-          </div>
-          <div className="stat-content">
-            <h3>Study Streak</h3>
-            <p className="stat-value">15 days active</p>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon" style={{background: '#1E3A8A'}}>
-            <FontAwesomeIcon icon={faGraduationCap} />
-          </div>
-          <div className="stat-content">
-            <h3>Current Semester</h3>
-            <p className="stat-value">4th Semester (65% complete)</p>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon" style={{background: '#0A2342'}}>
-            <FontAwesomeIcon icon={faCalendarAlt} />
-          </div>
-          <div className="stat-content">
-            <h3>Upcoming Deadlines</h3>
-            <p className="stat-value">3 assignments due</p>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon" style={{background: '#1E3A8A'}}>
-            <FontAwesomeIcon icon={faChartLine} />
-          </div>
-          <div className="stat-content">
-            <h3>Mock Test Score</h3>
-            <p className="stat-value">Last attempt 78%</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content Area */}
-      <div className="dashboard-content">
-        {/* Left Column */}
-        <div className="content-left">
-          {/* Document Summarizer Widget */}
-          <div className="widget document-summarizer">
-            <div className="widget-header">
-              <h2>Document Summarizer</h2>
+    <div className="pro-dashboard-layout">
+      <div className="pro-main-content lg:ml-64">
+        
+        {/* Professional Header */}
+        <header className="pro-header">
+          <div className="pro-flex-between w-full">
+            <div className="pro-flex-col">
+              <h1 className="pro-heading-lg text-gray-900">
+                Welcome back, {user ? user.name || user.email.split('@')[0] : 'Student'}! 👋
+              </h1>
+              <p className="pro-text-body text-gray-600">
+                Ready to continue your legal education journey?
+              </p>
             </div>
-            <div className="summarizer-content">
-              <div className="file-upload-area">
-                <div className="upload-icon">
-                  <FontAwesomeIcon icon={faFilePdf} />
-                </div>
-                <p>Upload a legal document to generate a summary</p>
-                <label htmlFor="file-upload" className="upload-button">
-                  <FontAwesomeIcon icon={faUpload} /> Choose PDF File
-                </label>
-                <input
-                  id="file-upload"
-                  type="file"
-                  accept=".pdf"
-                  onChange={handleFileChange}
-                  style={{ display: 'none' }}
-                />
-                {selectedFile && (
-                  <div className="file-info">
-                    <FontAwesomeIcon icon={faFilePdf} />
-                    <span>{selectedFile.name}</span>
-                  </div>
-                )}
-                <button 
-                  className="summarize-button"
-                  onClick={handleSummarize}
-                  disabled={isUploading || !selectedFile}
-                >
-                  {isUploading ? (
-                    <>
-                      <FontAwesomeIcon icon={faSpinner} spin /> Processing...
-                    </>
-                  ) : (
-                    'Summarize Document'
-                  )}
-                </button>
+            
+            <div className="pro-flex items-center pro-gap-4">
+              <div className="pro-flex items-center pro-gap-2 pro-text-sm text-gray-600">
+                <Calendar className="w-4 h-4" />
+                <span>{new Date().toLocaleDateString('en-US', { 
+                  weekday: 'long', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })}</span>
               </div>
-              
-              {error && (
-                <div className="error-message">
-                  {error}
-                </div>
-              )}
-              
-              {summary && (
-                <div className="summary-results">
-                  <h4>Document Summary:</h4>
-                  <div className="summary-content">
-                    {typeof summary === 'string' ? (
-                      <p>{summary}</p>
-                    ) : (
-                      <ul>
-                        {Object.entries(summary).map(([key, value]) => (
-                          <li key={key}><strong>{key}:</strong> {value}</li>
-                        ))}
-                      </ul>
-                    )}
+            </div>
+          </div>
+        </header>
+
+        {/* Dashboard Content */}
+        <div className="pro-p-6 lg:p-8">
+          
+          {/* Stats Grid */}
+          <div className="pro-grid pro-grid-4 mb-8">
+            {stats.map((stat, index) => (
+              <div 
+                key={index} 
+                className="pro-stat-card group pro-animate-fade-in pro-hover-lift"
+                style={{animationDelay: `${0.1 * index}s`}}
+              >
+                <div className="pro-flex-between items-start mb-4">
+                  <div className={`w-12 h-12 pro-rounded-xl bg-gradient-to-r ${stat.color} pro-flex-center pro-shadow-glow group-hover:scale-110 transition-transform duration-300`}>
+                    <stat.icon className="w-6 h-6 text-white" />
+                  </div>
+                  <div className={`pro-flex items-center pro-gap-1 pro-text-xs ${stat.trend === 'up' ? 'text-green-600' : 'text-gray-500'}`}>
+                    <TrendingUp className="w-3 h-3" />
+                    <span>{stat.change}</span>
                   </div>
                 </div>
-              )}
-            </div>
-          </div>
-
-          {/* Today's Focus Widget */}
-          <div className="widget today-focus">
-            <div className="widget-header">
-              <h2>Today's Focus</h2>
-              <button className="view-all-btn">View All <FontAwesomeIcon icon={faChevronRight} /></button>
-            </div>
-            <div className="focus-item">
-              <div className="focus-icon-container">
-                <FontAwesomeIcon icon={faBook} className="focus-icon" />
-              </div>
-              <div className="focus-details">
-                <h4>Scheduled Study Topics</h4>
-                <p>Contract Law - Chapter 4 & 5</p>
-              </div>
-            </div>
-            <div className="focus-item">
-              <div className="focus-icon-container">
-                <FontAwesomeIcon icon={faClipboardList} className="focus-icon" />
-              </div>
-              <div className="focus-details">
-                <h4>Pending Assignments</h4>
-                <p>Case Analysis - Due tomorrow</p>
-              </div>
-            </div>
-            <div className="focus-item">
-              <div className="focus-icon-container">
-                <FontAwesomeIcon icon={faBalanceScale} className="focus-icon" />
-              </div>
-              <div className="focus-details">
-                <h4>Upcoming Moot Court Practice</h4>
-                <p>9:00 AM - Courtroom B</p>
-              </div>
-            </div>
-            <div className="focus-item">
-              <div className="focus-icon-container">
-                <FontAwesomeIcon icon={faNewspaper} className="focus-icon" />
-              </div>
-              <div className="focus-details">
-                <h4>Recommended Articles</h4>
-                <p>Recent Supreme Court Judgements</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Recent Activity Feed */}
-          <div className="widget activity-feed">
-            <div className="widget-header">
-              <h2>Recent Activity</h2>
-              <button className="view-all-btn">View All <FontAwesomeIcon icon={faChevronRight} /></button>
-            </div>
-            <div className="activity-item">
-              <div className="activity-icon-container">
-                <FontAwesomeIcon icon={faDownload} className="activity-icon" />
-              </div>
-              <div className="activity-details">
-                <h4>Downloaded Materials</h4>
-                <p>Contract Law case studies - 2 hours ago</p>
-              </div>
-            </div>
-            <div className="activity-item">
-              <div className="activity-icon-container">
-                <FontAwesomeIcon icon={faChartLine} className="activity-icon" />
-              </div>
-              <div className="activity-details">
-                <h4>Mock Test Attempted</h4>
-                <p>Criminal Law - Score: 78% - Yesterday</p>
-              </div>
-            </div>
-            <div className="activity-item">
-              <div className="activity-icon-container">
-                <FontAwesomeIcon icon={faBookmark} className="activity-icon" />
-              </div>
-              <div className="activity-details">
-                <h4>Bookmarked Cases</h4>
-                <p>Added 3 new landmark cases - 2 days ago</p>
-              </div>
-            </div>
-            <div className="activity-item">
-              <div className="activity-icon-container">
-                <FontAwesomeIcon icon={faUsers} className="activity-icon" />
-              </div>
-              <div className="activity-details">
-                <h4>Study Group Updates</h4>
-                <p>New discussion started on Property Law - 2 days ago</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Right Column */}
-        <div className="content-right">
-          {/* Progress Overview */}
-          <div className="widget progress-overview">
-            <h2>Progress Overview</h2>
-            
-            {/* Semester Completion */}
-            <div className="progress-item">
-              <h4>Semester Completion</h4>
-              <div className="progress-bar-container">
-                <div className="progress-bar">
-                  <div className="progress-fill" style={{width: '65%'}}></div>
+                
+                <div className="pro-flex-col">
+                  <h3 className="pro-heading-xl font-bold text-gray-900 mb-1">
+                    {stat.value}
+                  </h3>
+                  <p className="pro-text-sm font-medium text-gray-600">
+                    {stat.title}
+                  </p>
                 </div>
-                <span>65%</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Main Dashboard Grid */}
+          <div className="pro-grid lg:grid-cols-3 pro-gap-8">
+            
+            {/* Recent Activities */}
+            <div className="lg:col-span-2">
+              <div className="pro-dashboard-card">
+                <div className="pro-flex-between items-center mb-6">
+                  <h2 className="pro-heading-lg text-gray-900">Recent Activities</h2>
+                  <button className="pro-btn pro-btn-ghost pro-text-sm">
+                    See All
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </button>
+                </div>
+                
+                <div className="space-y-4">
+                  {recentActivities.map((item, index) => (
+                    <div 
+                      key={index} 
+                      className="pro-flex items-start pro-gap-4 pro-p-4 pro-rounded-lg hover:bg-gray-50 transition-colors duration-200 border border-transparent hover:border-gray-200"
+                    >
+                      <div className={`w-10 h-10 pro-rounded-lg bg-gray-100 pro-flex-center ${getActivityColor(item.type)}`}>
+                        <item.icon className="w-5 h-5" />
+                      </div>
+                      
+                      <div className="flex-1 min-w-0">
+                        <p className="pro-text-body font-medium text-gray-900 mb-1">
+                          {item.activity}
+                        </p>
+                        <p className="pro-text-sm text-gray-500">
+                          {item.time}
+                        </p>
+                      </div>
+                      
+                      <div className={`pro-status-badge pro-status-success`}>
+                        {item.status}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-            
-            {/* Subject-wise Progress */}
-            <div className="progress-item">
-              <h4>Subject-wise Progress</h4>
-              <div className="chart-container">
-                <ResponsiveContainer width="100%" height={200}>
-                  <BarChart data={subjectProgressData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#EEEEEE" />
-                    <XAxis dataKey="subject" stroke="#444444" />
-                    <YAxis stroke="#444444" />
-                    <Tooltip 
-                      contentStyle={{
-                        backgroundColor: '#0A2342',
-                        border: 'none',
-                        borderRadius: '4px',
-                        color: 'white'
-                      }} 
-                    />
-                    <Bar dataKey="progress">
-                      {subjectProgressData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
+
+            {/* Upcoming Tasks */}
+            <div>
+              <div className="pro-dashboard-card">
+                <div className="pro-flex-between items-center mb-6">
+                  <h2 className="pro-heading-lg text-gray-900">Upcoming Tasks</h2>
+                  <button className="pro-btn pro-btn-primary pro-btn-sm">
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
+                
+                <div className="space-y-3">
+                  {upcomingTasks.map((item, index) => (
+                    <div 
+                      key={index} 
+                      className="pro-p-4 pro-rounded-lg border border-gray-200 hover:border-blue-300 transition-colors duration-200 hover:bg-blue-50/50"
+                    >
+                      <div className="pro-flex-between items-start mb-2">
+                        <h4 className="pro-text-body font-semibold text-gray-900">
+                          {item.task}
+                        </h4>
+                        <div className={`pro-status-badge ${getPriorityColor(item.priority)}`}>
+                          {item.priority}
+                        </div>
+                      </div>
+                      
+                      <p className="pro-text-sm text-gray-600 mb-2">
+                        {item.course}
+                      </p>
+                      
+                      <div className="pro-flex-between items-center">
+                        <span className="pro-text-xs text-gray-500">
+                          Due: {item.dueDate}
+                        </span>
+                        <button className="pro-btn pro-btn-ghost pro-btn-xs">
+                          View
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
+          </div>
+
+          {/* Progress and Achievements */}
+          <div className="pro-grid lg:grid-cols-2 pro-gap-8 mt-8">
             
-            {/* Weekly Study Hours */}
-            <div className="progress-item">
-              <h4>Weekly Study Hours</h4>
-              <div className="chart-container">
-                <ResponsiveContainer width="100%" height={200}>
-                  <LineChart data={weeklyStudyData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#EEEEEE" />
-                    <XAxis dataKey="day" stroke="#444444" />
-                    <YAxis stroke="#444444" />
-                    <Tooltip 
-                      contentStyle={{
-                        backgroundColor: '#0A2342',
-                        border: 'none',
-                        borderRadius: '4px',
-                        color: 'white'
-                      }} 
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="hours" 
-                      stroke="#1E3A8A" 
-                      strokeWidth={2} 
-                      activeDot={{ r: 6, fill: '#0A2342' }} 
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
+            {/* Academic Progress */}
+            <div className="pro-dashboard-card">
+              <div className="pro-flex-between items-center mb-6">
+                <h2 className="pro-heading-lg text-gray-900">Academic Progress</h2>
+                <BarChart3 className="w-5 h-5 text-gray-400" />
+              </div>
+              
+              <div className="space-y-6">
+                {/* Overall Progress */}
+                <div>
+                  <div className="pro-flex-between items-center mb-2">
+                    <span className="pro-text-body font-medium text-gray-700">Overall Progress</span>
+                    <span className="pro-text-body font-bold text-gray-900">75%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 pro-rounded-full h-3 overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-blue-500 to-purple-600 pro-rounded-full transition-all duration-1000 ease-out"
+                      style={{width: '75%'}}
+                    ></div>
+                  </div>
+                </div>
+
+                {/* Subject Progress */}
+                {[
+                  { subject: 'Constitutional Law', progress: 85 },
+                  { subject: 'Contract Law', progress: 70 },
+                  { subject: 'Criminal Law', progress: 90 },
+                  { subject: 'Civil Procedure', progress: 65 }
+                ].map((item, index) => (
+                  <div key={index}>
+                    <div className="pro-flex-between items-center mb-1">
+                      <span className="pro-text-sm font-medium text-gray-600">{item.subject}</span>
+                      <span className="pro-text-sm font-semibold text-gray-700">{item.progress}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 pro-rounded-full h-2 overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-green-400 to-green-600 pro-rounded-full transition-all duration-1000 ease-out"
+                        style={{width: `${item.progress}%`, animationDelay: `${0.2 * index}s`}}
+                      ></div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-            
+
             {/* Achievement Badges */}
-            <div className="progress-item">
-              <h4>Achievement Badges Earned</h4>
-              <div className="badges-container">
-                <div className="badge">Consistent Learner</div>
-                <div className="badge">Legal Research Pro</div>
-                <div className="badge">Moot Court Star</div>
+            <div className="pro-dashboard-card">
+              <div className="pro-flex-between items-center mb-6">
+                <h2 className="pro-heading-lg text-gray-900">Achievements</h2>
+                <Target className="w-5 h-5 text-gray-400" />
               </div>
+              
+              <div className="pro-grid pro-grid-2 pro-gap-4">
+                {achievements.map((achievement, index) => (
+                  <div 
+                    key={index} 
+                    className={`pro-p-4 pro-rounded-lg border-2 transition-all duration-300 ${
+                      achievement.earned 
+                        ? 'border-green-200 bg-green-50 hover:border-green-300' 
+                        : 'border-gray-200 bg-gray-50 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="pro-flex-col items-center pro-text-center">
+                      <div className={`w-12 h-12 pro-rounded-xl pro-flex-center mb-3 ${
+                        achievement.earned 
+                          ? 'bg-green-100 text-green-600' 
+                          : 'bg-gray-100 text-gray-400'
+                      }`}>
+                        <achievement.icon className="w-6 h-6" />
+                      </div>
+                      <span className={`pro-text-sm font-medium ${
+                        achievement.earned ? 'text-green-700' : 'text-gray-600'
+                      }`}>
+                        {achievement.name}
+                      </span>
+                      {achievement.earned && (
+                        <CheckCircle className="w-4 h-4 text-green-500 mt-2" />
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="pro-dashboard-card mt-8">
+            <h2 className="pro-heading-lg text-gray-900 mb-6">Quick Actions</h2>
+            
+            <div className="pro-grid pro-grid-4 pro-gap-4">
+              {[
+                { title: 'Browse Courses', icon: BookOpen, color: 'from-blue-500 to-blue-600' },
+                { title: 'View Calendar', icon: Calendar, color: 'from-purple-500 to-purple-600' },
+                { title: 'Study Materials', icon: FileText, color: 'from-green-500 to-green-600' },
+                { title: 'Moot Court', icon: Users, color: 'from-orange-500 to-orange-600' }
+              ].map((action, index) => (
+                <button 
+                  key={index}
+                  className="pro-p-4 pro-rounded-lg border border-gray-200 hover:border-blue-300 bg-white hover:bg-blue-50 transition-all duration-300 pro-hover-lift group"
+                >
+                  <div className="pro-flex-col items-center pro-text-center">
+                    <div className={`w-12 h-12 pro-rounded-xl bg-gradient-to-r ${action.color} pro-flex-center mb-3 group-hover:scale-110 transition-transform duration-300 pro-shadow-glow`}>
+                      <action.icon className="w-6 h-6 text-white" />
+                    </div>
+                    <span className="pro-text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors duration-300">
+                      {action.title}
+                    </span>
+                  </div>
+                </button>
+              ))}
             </div>
           </div>
         </div>
       </div>
-      
-
     </div>
   );
 };

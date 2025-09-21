@@ -1,433 +1,577 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 
 export default function Research() {
-  const [activeTab, setActiveTab] = useState('caselaw');
+  const [activeTab, setActiveTab] = useState('ai-research');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCourt, setSelectedCourt] = useState('supreme');
-  const [selectedYear, setSelectedYear] = useState('2023');
-  const [selectedCase, setSelectedCase] = useState(null);
+  const [isListening, setIsListening] = useState(false);
+  const [analysisResults, setAnalysisResults] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const fileInputRef = useRef();
 
-  // Mock data for case law search results
-  const caseLawResults = [
-    {
-      id: 1,
-      title: 'Kesavananda Bharati vs State of Kerala',
-      citation: 'AIR 1973 SC 1461',
-      court: 'Supreme Court',
-      year: '1973',
-      judges: 'Sikri, S.M., Shelat, J.M., Hegde, K.S., Grover, A.N., Ray, A.N., Palekar, D.G., Beg, M.H., Dwivedi, S.N., Chandrachud, Y.V., Reddy, P.J., Khanna, H.R., Mathew, K.K., Mukherjea, A.K.',
-      summary: 'Established the Basic Structure Doctrine of the Constitution',
-      importance: 'Landmark',
-      tags: ['Constitutional Law', 'Basic Structure Doctrine']
-    },
-    {
-      id: 2,
-      title: 'Maneka Gandhi vs Union of India',
-      citation: 'AIR 1978 SC 597',
-      court: 'Supreme Court',
-      year: '1978',
-      judges: 'Bhagwati, P.N., Untwalia, N.L., Fazal Ali, S.M.',
-      summary: 'Expanded the scope of Article 21 (Right to Life and Personal Liberty)',
-      importance: 'Landmark',
-      tags: ['Constitutional Law', 'Fundamental Rights']
-    },
-    {
-      id: 3,
-      title: 'Shayara Bano vs Union of India',
-      citation: 'AIR 2017 SC 4609',
-      court: 'Supreme Court',
-      year: '2017',
-      judges: 'Khehar, J.S., Nariman, R.F., Lalit, U.U., Joseph, K., Goel, R.',
-      summary: 'Declared instant triple talaq (talaq-e-biddat) unconstitutional',
-      importance: 'Landmark',
-      tags: ['Muslim Law', 'Gender Justice']
+  // Mock AI analysis
+  const handleInstantAnalysis = async () => {
+    if (!searchQuery) {
+      alert('Please enter a case description or legal query');
+      return;
     }
+
+    setLoading(true);
+    // Simulate AI analysis
+    setTimeout(() => {
+      setAnalysisResults({
+        type: 'Case Analysis',
+        confidence: '87%',
+        legalPathways: [
+          'Constitutional Law - Article 14 (Right to Equality)',
+          'Administrative Law - Judicial Review',
+          'Contract Law - Breach of Contract'
+        ],
+        precedents: [
+          'Maneka Gandhi vs Union of India (1978)',
+          'Kesavananda Bharati vs State of Kerala (1973)',
+          'I.R. Coelho vs State of Tamil Nadu (2007)'
+        ],
+        riskAssessment: {
+          successProbability: '75%',
+          timeEstimate: '6-12 months',
+          complexity: 'Medium'
+        },
+        recommendations: [
+          'File a writ petition under Article 226',
+          'Include fundamental rights violation arguments',
+          'Prepare documentary evidence of procedural lapses'
+        ]
+      });
+      setLoading(false);
+    }, 2000);
+  };
+
+  const handleVoiceSearch = () => {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
+      const recognition = new SpeechRecognition();
+      
+      recognition.onstart = () => setIsListening(true);
+      recognition.onend = () => setIsListening(false);
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        setSearchQuery(transcript);
+      };
+      
+      recognition.start();
+    } else {
+      alert('Voice recognition not supported in this browser');
+    }
+  };
+
+  const tabs = [
+    { id: 'ai-research', name: 'AI Research Assistant', icon: '🤖' },
+    { id: 'precedent-matching', name: 'Precedent Matching', icon: '🔍' },
+    { id: 'case-monitoring', name: 'Live Case Monitoring', icon: '📡' },
+    { id: 'comparative-analysis', name: 'Comparative Analysis', icon: '📊' },
+    { id: 'specialized-research', name: 'Specialized Research', icon: '📚' }
   ];
 
-  // Mock data for judgment evolution
-  const judgmentEvolution = [
-    {
-      id: 1,
-      year: '1950',
-      title: 'Initial Interpretation',
-      description: 'Early constitutional interpretations established foundational principles'
-    },
-    {
-      id: 2,
-      year: '1973',
-      title: 'Basic Structure Doctrine',
-      description: 'Kesavananda Bharati case established the basic structure doctrine'
-    },
-    {
-      id: 3,
-      year: '1978',
-      title: 'Expansion of Article 21',
-      description: 'Maneka Gandhi case expanded the scope of right to life and personal liberty'
-    },
-    {
-      id: 4,
-      year: '2017',
-      title: 'Privacy as Fundamental Right',
-      description: 'Puttaswamy case declared privacy as a fundamental right'
-    },
-    {
-      id: 5,
-      year: '2023',
-      title: 'Modern Interpretations',
-      description: 'Recent judgments addressing digital rights and contemporary issues'
-    }
-  ];
-
-  // Mock data for cause list
-  const causeList = [
-    {
-      id: 1,
-      caseNo: 'Crl.A. No. 1234/2023',
-      petitioner: 'State of Maharashtra',
-      respondent: 'Rajesh Kumar',
-      purpose: 'Hearing',
-      time: '10:30 AM',
-      bench: 'Court No. 5',
-      status: 'Upcoming'
-    },
-    {
-      id: 2,
-      caseNo: 'W.P.(C) No. 5678/2023',
-      petitioner: 'Sunita Sharma',
-      respondent: 'Delhi Municipal Corporation',
-      purpose: 'Arguments',
-      time: '11:45 AM',
-      bench: 'Court No. 2',
-      status: 'Upcoming'
-    },
-    {
-      id: 3,
-      caseNo: 'Civil Appeal No. 9012/2023',
-      petitioner: 'Reliance Industries Ltd.',
-      respondent: 'Competition Commission of India',
-      purpose: 'Judgment',
-      time: '02:15 PM',
-      bench: 'Chief Justice Court',
-      status: 'Upcoming'
-    }
-  ];
-
-  return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header */}
-      <div className="flex items-center mb-8">
-        <div className="bg-blue-600 p-3 rounded-full mr-4">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4" />
-          </svg>
-        </div>
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Research & Intelligence</h1>
-          <p className="text-gray-600">Advanced legal research tools and case law analysis</p>
-        </div>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white rounded-lg shadow p-6 flex items-center">
-          <div className="bg-blue-100 p-3 rounded-full mr-4">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-            </svg>
+  const renderAIResearch = () => (
+    <div className="space-y-6">
+      {/* Voice Legal Assistant */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Voice Legal Assistant</h3>
+        <div className="flex space-x-4 mb-4">
+          <div className="flex-1">
+            <textarea
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Describe your case or legal query... (e.g., 'Employment termination without proper notice period')"
+              className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 h-24 resize-none"
+            />
           </div>
-          <div>
-            <h3 className="text-2xl font-bold text-gray-800">12,487</h3>
-            <p className="text-gray-600">Cases in Database</p>
-          </div>
-        </div>
-        <div className="bg-white rounded-lg shadow p-6 flex items-center">
-          <div className="bg-blue-100 p-3 rounded-full mr-4">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-          </div>
-          <div>
-            <h3 className="text-2xl font-bold text-gray-800">2,341</h3>
-            <p className="text-gray-600">Supreme Court Cases</p>
-          </div>
-        </div>
-        <div className="bg-white rounded-lg shadow p-6 flex items-center">
-          <div className="bg-blue-100 p-3 rounded-full mr-4">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-            </svg>
-          </div>
-          <div>
-            <h3 className="text-2xl font-bold text-gray-800">8,642</h3>
-            <p className="text-gray-600">High Court Cases</p>
-          </div>
-        </div>
-        <div className="bg-white rounded-lg shadow p-6 flex items-center">
-          <div className="bg-blue-100 p-3 rounded-full mr-4">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-          </div>
-          <div>
-            <h3 className="text-2xl font-bold text-gray-800">Daily</h3>
-            <p className="text-gray-600">Database Updates</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Tabs */}
-      <div className="flex border-b border-gray-200 mb-6">
-        <button
-          className={`py-3 px-6 font-medium ${activeTab === 'caselaw' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
-          onClick={() => setActiveTab('caselaw')}
-        >
-          Case Law Search
-        </button>
-        <button
-          className={`py-3 px-6 font-medium ${activeTab === 'evolution' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
-          onClick={() => setActiveTab('evolution')}
-        >
-          Judgment Evolution
-        </button>
-        <button
-          className={`py-3 px-6 font-medium ${activeTab === 'causelist' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
-          onClick={() => setActiveTab('causelist')}
-        >
-          Cause List Monitoring
-        </button>
-      </div>
-
-      {/* Tab Content */}
-      <div className="bg-white rounded-lg shadow-md p-6">
-        {/* Case Law Search */}
-        {activeTab === 'caselaw' && (
-          <div className="space-y-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-gray-800">Case Law Search</h2>
-              <div className="flex space-x-2">
-                <button
-                  className={`px-4 py-2 rounded-lg text-sm ${selectedCourt === 'supreme' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}
-                  onClick={() => setSelectedCourt('supreme')}
-                >
-                  Supreme Court
-                </button>
-                <button
-                  className={`px-4 py-2 rounded-lg text-sm ${selectedCourt === 'high' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}
-                  onClick={() => setSelectedCourt('high')}
-                >
-                  High Courts
-                </button>
-              </div>
-            </div>
-            
-            <div className="mb-6">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search by case name, citation, judge, or keywords..."
-                  className="w-full border border-gray-300 rounded-lg py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 text-gray-400 absolute left-3 top-3.5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <select
-                className="border border-gray-300 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={selectedCourt}
-                onChange={(e) => setSelectedCourt(e.target.value)}
-              >
-                <option value="supreme">Supreme Court of India</option>
-                <option value="delhi">Delhi High Court</option>
-                <option value="bombay">Bombay High Court</option>
-                <option value="madras">Madras High Court</option>
-              </select>
-              <select
-                className="border border-gray-300 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={selectedYear}
-                onChange={(e) => setSelectedYear(e.target.value)}
-              >
-                <option value="2023">2023</option>
-                <option value="2022">2022</option>
-                <option value="2021">2021</option>
-                <option value="2020">2020</option>
-                <option value="2019">2019</option>
-              </select>
-            </div>
-            
-            <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors">
-              Search Case Law
+          <div className="flex flex-col space-y-2">
+            <button
+              onClick={handleVoiceSearch}
+              className={`p-3 rounded-md transition-colors ${
+                isListening 
+                  ? 'bg-red-600 text-white' 
+                  : 'bg-blue-600 text-white hover:bg-blue-700'
+              }`}
+            >
+              {isListening ? '🔴' : '🎤'}
             </button>
+            <span className="text-xs text-gray-500 text-center">
+              {isListening ? 'Listening...' : 'Voice Search'}
+            </span>
+          </div>
+        </div>
+        
+        <div className="flex space-x-4">
+          <button
+            onClick={handleInstantAnalysis}
+            disabled={loading}
+            className="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 disabled:opacity-50"
+          >
+            {loading ? 'Analyzing...' : '⚡ Instant Case Analysis'}
+          </button>
+          
+          <button className="bg-purple-600 text-white px-6 py-2 rounded-md hover:bg-purple-700">
+            📄 Upload Case Files
+          </button>
+        </div>
+      </div>
 
-            {/* Search Results */}
-            <div className="mt-8">
-              <h3 className="text-lg font-medium text-gray-800 mb-4">Search Results</h3>
-              <div className="space-y-4">
-                {caseLawResults.map((caseItem) => (
-                  <div
-                    key={caseItem.id}
-                    className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer transition-colors"
-                    onClick={() => setSelectedCase(caseItem)}
-                  >
-                    <div className="flex justify-between items-start">
-                      <h4 className="font-medium text-gray-800">{caseItem.title}</h4>
-                      <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">
-                        {caseItem.importance}
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-600 mt-1">{caseItem.citation} | {caseItem.court} | {caseItem.year}</p>
-                    <p className="text-gray-700 mt-2">{caseItem.summary}</p>
-                    <div className="flex flex-wrap gap-2 mt-3">
-                      {caseItem.tags.map((tag, index) => (
-                        <span
-                          key={index}
-                          className="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
+      {/* Analysis Results */}
+      {analysisResults && (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">AI Analysis Results</h3>
+            <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+              Confidence: {analysisResults.confidence}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h4 className="font-medium text-gray-900 mb-3">Suggested Legal Pathways</h4>
+              <ul className="space-y-2">
+                {analysisResults.legalPathways.map((pathway, index) => (
+                  <li key={index} className="flex items-start space-x-2">
+                    <span className="text-blue-600">•</span>
+                    <span className="text-gray-700">{pathway}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-medium text-gray-900 mb-3">Relevant Precedents</h4>
+              <ul className="space-y-2">
+                {analysisResults.precedents.map((precedent, index) => (
+                  <li key={index} className="flex items-start space-x-2">
+                    <span className="text-green-600">⚖️</span>
+                    <span className="text-gray-700">{precedent}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-medium text-gray-900 mb-3">Risk Assessment</h4>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Success Probability:</span>
+                  <span className="font-medium text-green-600">{analysisResults.riskAssessment.successProbability}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Time Estimate:</span>
+                  <span className="font-medium">{analysisResults.riskAssessment.timeEstimate}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Complexity:</span>
+                  <span className="font-medium text-orange-600">{analysisResults.riskAssessment.complexity}</span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="font-medium text-gray-900 mb-3">Recommendations</h4>
+              <ul className="space-y-2">
+                {analysisResults.recommendations.map((rec, index) => (
+                  <li key={index} className="flex items-start space-x-2">
+                    <span className="text-yellow-600">💡</span>
+                    <span className="text-gray-700">{rec}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Quick Tools */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h4 className="font-medium text-gray-900 mb-3">📋 Document Auto-Drafting</h4>
+          <p className="text-sm text-gray-600 mb-4">Generate legal documents with clause-level suggestions and risk scoring</p>
+          <button className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700">
+            Start Drafting
+          </button>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h4 className="font-medium text-gray-900 mb-3">🧠 Alternative Arguments</h4>
+          <p className="text-sm text-gray-600 mb-4">AI-generated multiple legal strategies and counter-arguments</p>
+          <button className="w-full bg-purple-600 text-white py-2 rounded-md hover:bg-purple-700">
+            Generate Arguments
+          </button>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h4 className="font-medium text-gray-900 mb-3">📊 Case Strength Analysis</h4>
+          <p className="text-sm text-gray-600 mb-4">Automated evaluation with success probability scoring</p>
+          <button className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700">
+            Analyze Strength
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderPrecedentMatching = () => (
+    <div className="space-y-6">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">AI-Driven Precedent Matching</h3>
+        
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">Case Facts or Legal Issue</label>
+          <textarea
+            className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 h-32"
+            placeholder="Enter case facts, legal issues, or specific legal questions..."
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <select className="p-2 border border-gray-300 rounded-md">
+            <option>All Jurisdictions</option>
+            <option>Supreme Court</option>
+            <option>High Courts</option>
+            <option>Tribunals</option>
+          </select>
+          
+          <select className="p-2 border border-gray-300 rounded-md">
+            <option>All Practice Areas</option>
+            <option>Constitutional Law</option>
+            <option>Corporate Law</option>
+            <option>Criminal Law</option>
+            <option>Family Law</option>
+          </select>
+          
+          <select className="p-2 border border-gray-300 rounded-md">
+            <option>Last 10 Years</option>
+            <option>Last 5 Years</option>
+            <option>Last 2 Years</option>
+            <option>All Time</option>
+          </select>
+        </div>
+
+        <button className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700">
+          🔍 Find Similar Cases
+        </button>
+      </div>
+
+      {/* Sample Results */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h4 className="font-medium text-gray-900 mb-4">Similar Cases Found (AI Confidence: 92%)</h4>
+        <div className="space-y-4">
+          {[
+            {
+              title: 'ABC Corp vs State of Delhi',
+              citation: '(2023) 5 SCC 234',
+              similarity: '94%',
+              outcome: 'Petitioner Favored',
+              keyPoints: ['Administrative overreach', 'Due process violation', 'Natural justice']
+            },
+            {
+              title: 'XYZ Industries vs Municipal Corporation',
+              citation: '(2022) 3 SCC 156',
+              similarity: '87%',
+              outcome: 'Partially Favored',
+              keyPoints: ['Procedural irregularity', 'Proportionality test', 'Public interest']
+            }
+          ].map((case_item, index) => (
+            <div key={index} className="border border-gray-200 rounded-lg p-4">
+              <div className="flex justify-between items-start mb-2">
+                <h5 className="font-medium text-gray-900">{case_item.title}</h5>
+                <div className="flex space-x-2">
+                  <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">
+                    {case_item.similarity} Match
+                  </span>
+                  <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">
+                    {case_item.outcome}
+                  </span>
+                </div>
+              </div>
+              <p className="text-sm text-gray-600 mb-2">{case_item.citation}</p>
+              <div className="flex flex-wrap gap-2">
+                {case_item.keyPoints.map((point, pointIndex) => (
+                  <span key={pointIndex} className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">
+                    {point}
+                  </span>
                 ))}
               </div>
             </div>
-          </div>
-        )}
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 
-        {/* Judgment Evolution */}
-        {activeTab === 'evolution' && (
-          <div className="space-y-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-6">Judgment Evolution Tracker</h2>
-            
-            <div className="relative">
-              {/* Timeline */}
-              <div className="absolute left-4 top-0 h-full w-0.5 bg-blue-200"></div>
-              
-              {/* Timeline Items */}
-              <div className="space-y-10 pl-16">
-                {judgmentEvolution.map((item) => (
-                  <div key={item.id} className="relative">
-                    <div className="absolute -left-11 top-1.5 h-6 w-6 rounded-full bg-blue-600 border-4 border-white"></div>
-                    <div className="bg-gray-50 rounded-lg p-5 border border-gray-200">
-                      <div className="flex justify-between items-start">
-                        <h3 className="text-lg font-medium text-gray-800">{item.title}</h3>
-                        <span className="bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded">
-                          {item.year}
-                        </span>
-                      </div>
-                      <p className="text-gray-600 mt-2">{item.description}</p>
-                      <button className="mt-4 text-blue-600 hover:text-blue-800 text-sm font-medium">
-                        View Related Judgments →
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Cause List Monitoring */}
-        {activeTab === 'causelist' && (
-          <div className="space-y-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-gray-800">Cause List Live Monitoring</h2>
-              <div className="flex items-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 text-green-500 mr-1.5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-                <span className="text-sm text-green-600">Last updated: Today, 09:45 AM</span>
-              </div>
-            </div>
-
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-              <div className="flex items-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 text-blue-600 mr-2"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                <p className="text-blue-700">Cause lists are updated daily at 6:00 AM. Real-time updates provided during court hours.</p>
-              </div>
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full table-auto">
-                <thead>
-                  <tr className="bg-gray-100 text-left text-gray-700 font-medium">
-                    <th className="px-4 py-3">Case No.</th>
-                    <th className="px-4 py-3">Petitioner vs Respondent</th>
-                    <th className="px-4 py-3">Purpose</th>
-                    <th className="px-4 py-3">Time</th>
-                    <th className="px-4 py-3">Bench</th>
-                    <th className="px-4 py-3">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {causeList.map((item) => (
-                    <tr key={item.id} className="border-b border-gray-200 hover:bg-gray-50">
-                      <td className="px-4 py-3 font-medium text-gray-800">{item.caseNo}</td>
-                      <td className="px-4 py-3">
-                        <div>{item.petitioner}</div>
-                        <div className="text-sm text-gray-600">vs {item.respondent}</div>
-                      </td>
-                      <td className="px-4 py-3">{item.purpose}</td>
-                      <td className="px-4 py-3">{item.time}</td>
-                      <td className="px-4 py-3">{item.bench}</td>
-                      <td className="px-4 py-3">
-                        <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">
-                          {item.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            <div className="flex justify-between items-center pt-4">
-              <p className="text-sm text-gray-600">Showing 3 of 247 cases listed today</p>
-              <button className="text-blue-600 hover:text-blue-800 font-medium">
-                View Full Cause List →
+  const renderCaseMonitoring = () => (
+    <div className="space-y-6">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Live Case Law Monitoring</h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div>
+            <h4 className="font-medium text-gray-900 mb-3">Custom Alert Setup</h4>
+            <div className="space-y-3">
+              <input
+                type="text"
+                placeholder="Keywords (e.g., 'data protection', 'employment law')"
+                className="w-full p-2 border border-gray-300 rounded-md"
+              />
+              <select className="w-full p-2 border border-gray-300 rounded-md">
+                <option>All Courts</option>
+                <option>Supreme Court Only</option>
+                <option>High Courts Only</option>
+              </select>
+              <button className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700">
+                Set Alert
               </button>
             </div>
           </div>
-        )}
+
+          <div>
+            <h4 className="font-medium text-gray-900 mb-3">Recent Updates (Last 24 hours)</h4>
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2 text-sm">
+                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                <span>3 new Supreme Court judgments</span>
+              </div>
+              <div className="flex items-center space-x-2 text-sm">
+                <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                <span>15 High Court orders</span>
+              </div>
+              <div className="flex items-center space-x-2 text-sm">
+                <span className="w-2 h-2 bg-yellow-500 rounded-full"></span>
+                <span>7 tribunal decisions</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="border-t pt-6">
+          <h4 className="font-medium text-gray-900 mb-4">Today's Significant Developments</h4>
+          <div className="space-y-4">
+            {[
+              {
+                court: 'Supreme Court',
+                case: 'Privacy Rights in Digital Age',
+                impact: 'High',
+                summary: 'Landmark judgment on data protection and digital privacy rights'
+              },
+              {
+                court: 'Delhi High Court',
+                case: 'Environmental Clearance Guidelines',
+                impact: 'Medium',
+                summary: 'New guidelines for environmental impact assessment procedures'
+              }
+            ].map((update, index) => (
+              <div key={index} className="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg">
+                <div className={`w-3 h-3 rounded-full mt-2 ${
+                  update.impact === 'High' ? 'bg-red-500' : 'bg-yellow-500'
+                }`}></div>
+                <div className="flex-1">
+                  <div className="flex justify-between items-start">
+                    <h5 className="font-medium text-gray-900">{update.case}</h5>
+                    <span className="text-sm text-gray-600">{update.court}</span>
+                  </div>
+                  <p className="text-sm text-gray-600 mt-1">{update.summary}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderComparativeAnalysis = () => (
+    <div className="space-y-6">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Side-by-Side Case Comparison</h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h4 className="font-medium text-gray-900 mb-3">Case A</h4>
+            <textarea
+              className="w-full p-3 border border-gray-300 rounded-md h-32"
+              placeholder="Enter case details, citation, or upload case document..."
+            />
+            <button className="w-full mt-2 bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700">
+              Upload Case Document
+            </button>
+          </div>
+          
+          <div>
+            <h4 className="font-medium text-gray-900 mb-3">Case B</h4>
+            <textarea
+              className="w-full p-3 border border-gray-300 rounded-md h-32"
+              placeholder="Enter case details, citation, or upload case document..."
+            />
+            <button className="w-full mt-2 bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700">
+              Upload Case Document
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-6 text-center">
+          <button className="bg-green-600 text-white px-8 py-3 rounded-md hover:bg-green-700">
+            📊 Compare Cases
+          </button>
+        </div>
+      </div>
+
+      {/* Comparison Results */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h4 className="font-medium text-gray-900 mb-4">Doctrine Evolution Tracking</h4>
+        <div className="space-y-4">
+          <div className="p-4 bg-blue-50 rounded-lg">
+            <h5 className="font-medium text-blue-900 mb-2">Right to Privacy Evolution</h5>
+            <div className="text-sm text-blue-800">
+              1950: No explicit privacy right → 2017: Fundamental right (Puttaswamy) → 2023: Digital privacy expansion
+            </div>
+          </div>
+          
+          <div className="p-4 bg-green-50 rounded-lg">
+            <h5 className="font-medium text-green-900 mb-2">Environmental Law Development</h5>
+            <div className="text-sm text-green-800">
+              1980s: Basic pollution control → 1990s: Sustainable development → 2020s: Climate change litigation
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderSpecializedResearch = () => (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {[
+          { title: 'Matrimonial Law', icon: '💑', cases: '1,247', recent: '23 new cases' },
+          { title: 'Property Law', icon: '🏘️', cases: '2,156', recent: '45 new cases' },
+          { title: 'Commercial Law', icon: '💼', cases: '3,428', recent: '67 new cases' },
+          { title: 'Criminal Law', icon: '⚖️', cases: '4,532', recent: '89 new cases' },
+          { title: 'Constitutional Law', icon: '📜', cases: '1,876', recent: '34 new cases' },
+          { title: 'Corporate Law', icon: '🏢', cases: '2,943', recent: '56 new cases' }
+        ].map((module, index) => (
+          <div key={index} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer">
+            <div className="text-center">
+              <div className="text-4xl mb-3">{module.icon}</div>
+              <h4 className="font-medium text-gray-900 mb-2">{module.title}</h4>
+              <p className="text-2xl font-bold text-blue-600 mb-1">{module.cases}</p>
+              <p className="text-sm text-gray-600">total cases</p>
+              <p className="text-sm text-green-600 mt-2">{module.recent}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Research Tools */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Advanced Research Tools</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <h4 className="font-medium text-gray-900">Research Automation</h4>
+            <div className="space-y-2">
+              <button className="w-full text-left p-3 border border-gray-300 rounded-md hover:bg-gray-50">
+                📚 Citation Generator & Checker
+              </button>
+              <button className="w-full text-left p-3 border border-gray-300 rounded-md hover:bg-gray-50">
+                🔗 Cross-Reference Builder
+              </button>
+              <button className="w-full text-left p-3 border border-gray-300 rounded-md hover:bg-gray-50">
+                📊 Legal Trend Analysis
+              </button>
+            </div>
+          </div>
+          
+          <div className="space-y-4">
+            <h4 className="font-medium text-gray-900">Intelligence Reports</h4>
+            <div className="space-y-2">
+              <button className="w-full text-left p-3 border border-gray-300 rounded-md hover:bg-gray-50">
+                📈 Judge Decision Patterns
+              </button>
+              <button className="w-full text-left p-3 border border-gray-300 rounded-md hover:bg-gray-50">
+                🎯 Success Rate Predictions
+              </button>
+              <button className="w-full text-left p-3 border border-gray-300 rounded-md hover:bg-gray-50">
+                ⏱️ Case Duration Analytics
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b border-gray-200 p-6">
+        <h1 className="text-3xl font-bold text-gray-900">AI Research & Intelligence Dashboard</h1>
+        <p className="text-gray-600">Advanced legal research with AI-powered analysis and real-time monitoring</p>
+      </div>
+
+      {/* Stats Overview */}
+      <div className="p-6">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
+          {[
+            { name: 'Cases Analyzed Today', value: '156', icon: '🔍' },
+            { name: 'AI Predictions Made', value: '89', icon: '🎯' },
+            { name: 'Precedents Found', value: '2,341', icon: '⚖️' },
+            { name: 'Live Alerts Active', value: '45', icon: '🔔' },
+            { name: 'Success Rate', value: '87%', icon: '📈' }
+          ].map((stat, index) => (
+            <div key={index} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">{stat.name}</p>
+                  <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                </div>
+                <div className="text-2xl">{stat.icon}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Navigation Tabs */}
+        <div className="bg-white border-b border-gray-200 rounded-t-lg">
+          <div className="px-6">
+            <nav className="flex space-x-8 overflow-x-auto">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center space-x-2 py-4 px-2 border-b-2 font-medium text-sm whitespace-nowrap ${
+                    activeTab === tab.id
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  <span>{tab.icon}</span>
+                  <span>{tab.name}</span>
+                </button>
+              ))}
+            </nav>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="bg-white rounded-b-lg p-6">
+          {loading && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg p-6 flex items-center space-x-4">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                <span>AI Analysis in Progress...</span>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'ai-research' && renderAIResearch()}
+          {activeTab === 'precedent-matching' && renderPrecedentMatching()}
+          {activeTab === 'case-monitoring' && renderCaseMonitoring()}
+          {activeTab === 'comparative-analysis' && renderComparativeAnalysis()}
+          {activeTab === 'specialized-research' && renderSpecializedResearch()}
+        </div>
       </div>
     </div>
   );

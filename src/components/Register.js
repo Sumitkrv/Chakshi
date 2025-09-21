@@ -1,800 +1,462 @@
-import React, { useState } from 'react';import React, { useState } from 'react';import React, { useState } from 'react';import React, { useState } from 'react';import React, { useState } from 'react';
-
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-import { useAuth } from '../contexts/AuthContext';import { useNavigate } from 'react-router-dom';
-
-import './Auth.css';
-
-import { useAuth } from '../contexts/AuthContext';import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { 
+  User, 
+  Mail, 
+  Lock, 
+  Eye, 
+  EyeOff, 
+  Scale, 
+  GraduationCap, 
+  FileText, 
+  ArrowRight, 
+  AlertCircle,
+  CheckCircle,
+  Shield,
+  Loader,
+  Star,
+  Home,
+  UserPlus,
+  Check,
+  X
+} from 'lucide-react';
 
 const Register = () => {
-
-  const [formData, setFormData] = useState({import './Auth.css';
-
+  const [formData, setFormData] = useState({
     name: '',
-
-    email: '',import { useAuth } from '../contexts/AuthContext';import { useNavigate } from 'react-router-dom';import { useNavigate } from 'react-router-dom';
-
+    email: '',
     password: '',
-
-    confirmPassword: '',const Register = () => {
-
+    confirmPassword: '',
     role: ''
-
-  });  const [formData, setFormData] = useState({import './Auth.css';
-
+  });
   const [error, setError] = useState('');
-
-  const [roleError, setRoleError] = useState('');    name: '',
-
+  const [roleError, setRoleError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
-  const { register } = useAuth();    email: '',import { useAuth } from '../contexts/AuthContext';import { useAuth } from '../contexts/AuthContext';
-
-
-
-  const roles = [    password: '',
-
+  const roles = [
     {
-
-      id: 'advocate',    confirmPassword: '',const Register = () => {
-
+      id: 'advocate',
       title: 'Advocate',
-
-      icon: '⚖️',    role: ''
-
-      route: '/advocate/dashboard'
-
-    },  });  const [formData, setFormData] = useState({import './Auth.css';import './Auth.css';
-
+      icon: Scale,
+      description: 'Legal professional managing cases and clients',
+      route: '/advocate/dashboard',
+      gradient: 'from-blue-500 to-indigo-600'
+    },
     {
-
-      id: 'student',  const [error, setError] = useState('');
-
+      id: 'student',
       title: 'Law Student',
-
-      icon: '🎓',  const [roleError, setRoleError] = useState('');    name: '',
-
-      route: '/student/dashboard'
-
-    }  const navigate = useNavigate();
-
+      icon: GraduationCap,
+      description: 'Student pursuing legal education',
+      route: '/student/dashboard',
+      gradient: 'from-green-500 to-emerald-600'
+    },
+    {
+      id: 'clerk',
+      title: 'Court Clerk',
+      icon: FileText,
+      description: 'Court administrative professional',
+      route: '/clerk/dashboard',
+      gradient: 'from-purple-500 to-violet-600'
+    }
   ];
-
-  const { register } = useAuth();    email: '',
 
   const handleChange = (e) => {
-
     setFormData({
-
       ...formData,
-
-      [e.target.name]: e.target.value  const roles = [    password: '',
-
+      [e.target.name]: e.target.value
     });
-
-    if (e.target.name === 'role') {    {
-
+    if (e.target.name === 'role') {
       setRoleError('');
-
-    }      id: 'advocate',    confirmPassword: '',const Register = () => {const Register = () => {
-
+    }
+    setError('');
   };
 
-      title: 'Advocate',
+  const getPasswordStrength = (password) => {
+    if (!password) return { strength: 0, text: '', color: 'gray' };
+    
+    let score = 0;
+    const checks = {
+      length: password.length >= 8,
+      lowercase: /[a-z]/.test(password),
+      uppercase: /[A-Z]/.test(password),
+      numbers: /\d/.test(password),
+      special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+    };
+    
+    score = Object.values(checks).filter(Boolean).length;
+    
+    if (score < 2) return { strength: score, text: 'Weak', color: 'red' };
+    if (score < 4) return { strength: score, text: 'Medium', color: 'yellow' };
+    return { strength: score, text: 'Strong', color: 'green' };
+  };
+
+  const passwordStrength = getPasswordStrength(formData.password);
+
+  const validateForm = () => {
+    if (!formData.name.trim()) {
+      setError('Name is required');
+      return false;
+    }
+    if (!formData.email.trim()) {
+      setError('Email is required');
+      return false;
+    }
+    if (!formData.email.includes('@')) {
+      setError('Please enter a valid email address');
+      return false;
+    }
+    if (!formData.password) {
+      setError('Password is required');
+      return false;
+    }
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      return false;
+    }
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      return false;
+    }
+    if (!formData.role) {
+      setRoleError('Please select your role');
+      return false;
+    }
+    return true;
+  };
+
+  // Demo registration - replace with actual API call
+  const registerUser = async (userData) => {
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    // For demo purposes, accept any valid data
+    // In production, this should make a real API call
+    if (userData.name && userData.email && userData.password && userData.role) {
+      return {
+        id: Date.now(),
+        name: userData.name,
+        email: userData.email,
+        role: userData.role,
+        token: `demo-token-${Date.now()}`,
+        isAuthenticated: true,
+        registeredAt: new Date().toISOString()
+      };
+    } else {
+      throw new Error('Registration failed');
+    }
+  };
 
   const handleSubmit = async (e) => {
-
-    e.preventDefault();      icon: '⚖️',    role: ''
-
+    e.preventDefault();
     setError('');
-
-    setRoleError('');      route: '/advocate/dashboard'
-
-
-
-    if (!formData.role) {    },  });  const [formData, setFormData] = useState({  const [formData, setFormData] = useState({
-
-      setRoleError('Please select your role');
-
-      return;    {
-
-    }
-
-      id: 'student',  const [error, setError] = useState('');
-
-    if (formData.password !== formData.confirmPassword) {
-
-      setError('Passwords do not match');      title: 'Law Student',
-
+    setRoleError('');
+    setLoading(true);
+    
+    if (!validateForm()) {
+      setLoading(false);
       return;
-
-    }      icon: '🎓',  const [roleError, setRoleError] = useState('');    name: '',    name: '',
-
-
-
-    if (formData.password.length < 6) {      route: '/student/dashboard'
-
-      setError('Password must be at least 6 characters long');
-
-      return;    }  const navigate = useNavigate();
-
     }
-
-  ];
 
     try {
-
-      await register(formData);  const { register } = useAuth();    email: '',    email: '',
-
+      // Register user (replace with actual API call)
+      const userData = await registerUser(formData);
+      
+      // Store user data in context and localStorage
+      login(userData);
+      
+      // Get the selected role's route
       const selectedRole = roles.find(role => role.id === formData.role);
-
-      navigate(selectedRole.route);  const handleChange = (e) => {
-
+      navigate(selectedRole.route);
+      
     } catch (err) {
-
-      console.error('Registration failed:', err);    setFormData({
-
+      console.error('Registration failed:', err);
       setError(err.message || 'Registration failed. Please try again.');
-
-    }      ...formData,
-
+    } finally {
+      setLoading(false);
+    }
   };
 
-      [e.target.name]: e.target.value  const roles = [    password: '',    password: '',
-
-  return React.createElement('div', { className: 'auth-container' },
-
-    React.createElement('div', { className: 'auth-form' },    });
-
-      React.createElement('h2', null, 'Create Your Account'),
-
-      React.createElement('form', { onSubmit: handleSubmit },    if (e.target.name === 'role') {    {
-
-        React.createElement('div', { className: 'form-group' },
-
-          React.createElement('label', { htmlFor: 'name' }, 'Full Name'),      setRoleError('');
-
-          React.createElement('input', {
-
-            type: 'text',    }      id: 'advocate',    confirmPassword: '',    confirmPassword: '',
-
-            id: 'name',
-
-            name: 'name',  };
-
-            value: formData.name,
-
-            onChange: handleChange,      title: 'Advocate',
-
-            required: true,
-
-            placeholder: 'Enter your full name',  const handleSubmit = async (e) => {
-
-            className: 'auth-input'
-
-          })    e.preventDefault();      icon: '⚖️',    role: ''    role: ''
-
-        ),
-
-        React.createElement('div', { className: 'form-group' },    setError('');
-
-          React.createElement('label', { htmlFor: 'email' }, 'Email'),
-
-          React.createElement('input', {    setRoleError('');      route: '/advocate/dashboard'
-
-            type: 'email',
-
-            id: 'email',
-
-            name: 'email',
-
-            value: formData.email,    // Basic validation    },  });  });
-
-            onChange: handleChange,
-
-            required: true,    if (!formData.role) {
-
-            placeholder: 'Enter your email',
-
-            className: 'auth-input'      setRoleError('Please select your role');    {
-
-          })
-
-        ),      return;
-
-        React.createElement('div', { className: 'form-group' },
-
-          React.createElement('label', { htmlFor: 'password' }, 'Password'),    }      id: 'student',  const [error, setError] = useState('');  const [error, setError] = useState('');
-
-          React.createElement('input', {
-
-            type: 'password',
-
-            id: 'password',
-
-            name: 'password',    if (formData.password !== formData.confirmPassword) {      title: 'Law Student',
-
-            value: formData.password,
-
-            onChange: handleChange,      setError('Passwords do not match');
-
-            required: true,
-
-            minLength: 6,      return;      icon: '🎓',  const [roleError, setRoleError] = useState('');  const [roleError, setRoleError] = useState('');
-
-            placeholder: 'Create a password (min. 6 characters)',
-
-            className: 'auth-input'    }
-
-          })
-
-        ),      route: '/student/dashboard'
-
-        React.createElement('div', { className: 'form-group' },
-
-          React.createElement('label', { htmlFor: 'confirmPassword' }, 'Confirm Password'),    if (formData.password.length < 6) {
-
-          React.createElement('input', {
-
-            type: 'password',      setError('Password must be at least 6 characters long');    }  const navigate = useNavigate();  const navigate = useNavigate();
-
-            id: 'confirmPassword',
-
-            name: 'confirmPassword',      return;
-
-            value: formData.confirmPassword,
-
-            onChange: handleChange,    }  ];
-
-            required: true,
-
-            placeholder: 'Confirm your password',
-
-            className: 'auth-input'
-
-          })    try {  const { register } = useAuth();  const { register } = useAuth();
-
-        ),
-
-        React.createElement('div', { className: 'form-group' },      await register(formData);
-
-          React.createElement('label', null, 'Select Your Role'),
-
-          React.createElement('div', { className: 'role-options' },        const handleChange = (e) => {
-
-            roles.map(role =>
-
-              React.createElement('div', {      // Find selected role and redirect to appropriate dashboard
-
-                key: role.id,
-
-                className: `role-option ${formData.role === role.id ? 'selected' : ''}`,      const selectedRole = roles.find(role => role.id === formData.role);    setFormData({
-
-                onClick: () => handleChange({ target: { name: 'role', value: role.id } })
-
-              },      navigate(selectedRole.route);
-
-                React.createElement('span', { className: 'role-icon' }, role.icon),
-
-                React.createElement('span', { className: 'role-title' }, role.title)    } catch (err) {      ...formData,
-
-              )
-
-            )      console.error('Registration failed:', err);
-
-          ),
-
-          roleError && React.createElement('p', { className: 'error-message' }, roleError)      setError(err.message || 'Registration failed. Please try again.');      [e.target.name]: e.target.value  const roles = [  const roles = [
-
-        ),
-
-        React.createElement('button', { type: 'submit', className: 'auth-btn' }, 'Register Now')    }
-
-      ),
-
-      error && React.createElement('p', { className: 'error-message' }, error),  };    });
-
-      React.createElement('p', { className: 'auth-link' },
-
-        'Already have an account? ',
-
-        React.createElement('span', { onClick: () => navigate('/login') }, 'Log in')
-
-      )  return (    if (e.target.name === 'role') {    {    {
-
-    )
-
-  );    <div className="auth-container">
-
-};
-
-      <div className="auth-form">      setRoleError('');
-
-export default Register;
-        <h2>Create Your Account</h2>
-
-        <form onSubmit={handleSubmit}>    }      id: 'advocate',      id: 'advocate',
-
-          <div className="form-group">
-
-            <label htmlFor="name">Full Name</label>  };
-
-            <input
-
-              type="text"      title: 'Advocate',      title: 'Advocate',
-
-              id="name"
-
-              name="name"  const handleSubmit = async (e) => {
-
-              value={formData.name}
-
-              onChange={handleChange}    e.preventDefault();      icon: '⚖️',      icon: '⚖️',
-
-              required
-
-              placeholder="Enter your full name"    setError('');
-
-              className="auth-input"
-
-            />    setRoleError('');      route: '/advocate/dashboard'      route: '/advocate/dashboard'
-
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 pro-flex items-center justify-center pro-p-4">
+      
+      {/* Background Pattern */}
+      <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none"></div>
+      
+      <div className="w-full max-w-md relative z-10">
+        
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-blue-600 pro-rounded-xl pro-flex-center mx-auto mb-4">
+            <UserPlus className="w-8 h-8 text-white" />
           </div>
+          <h1 className="pro-heading-xl text-gray-900 mb-2">Create Your Account</h1>
+          <p className="pro-text-body text-gray-600">Join our legal platform and get started</p>
+        </div>
 
-          <div className="form-group">
-
-            <label htmlFor="email">Email</label>
-
-            <input    // Basic validation    },    },
-
-              type="email"
-
-              id="email"    if (!formData.role) {
-
-              name="email"
-
-              value={formData.email}      setRoleError('Please select your role');    {    {
-
-              onChange={handleChange}
-
-              required      return;
-
-              placeholder="Enter your email"
-
-              className="auth-input"    }      id: 'student',      id: 'student',
-
-            />
-
-          </div>
-
-          <div className="form-group">
-
-            <label htmlFor="password">Password</label>    if (formData.password !== formData.confirmPassword) {      title: 'Law Student',      title: 'Law Student',
-
-            <input
-
-              type="password"      setError('Passwords do not match');
-
-              id="password"
-
-              name="password"      return;      icon: '🎓',      icon: '🎓',
-
-              value={formData.password}
-
-              onChange={handleChange}    }
-
-              required
-
-              minLength="6"      route: '/student/dashboard'      route: '/student/dashboard'
-
-              placeholder="Create a password (min. 6 characters)"
-
-              className="auth-input"    if (formData.password.length < 6) {
-
-            />
-
-          </div>      setError('Password must be at least 6 characters long');    }    }
-
-          <div className="form-group">
-
-            <label htmlFor="confirmPassword">Confirm Password</label>      return;
-
-            <input
-
-              type="password"    }  ];  ];  const handleSubmit = async (e) => {
-
-              id="confirmPassword"
-
-              name="confirmPassword"
-
-              value={formData.confirmPassword}
-
-              onChange={handleChange}    try {    e.preventDefault();
-
-              required
-
-              placeholder="Confirm your password"      await register(formData);
-
-              className="auth-input"
-
-            />        const handleChange = (e) => {    setError('');
-
-          </div>
-
-          <div className="form-group">      // Find selected role and redirect to appropriate dashboard
-
-            <label>Select Your Role</label>
-
-            <div className="role-options">      const selectedRole = roles.find(role => role.id === formData.role);    setFormData({    setRoleError('');
-
-              {roles.map((role) => (
-
-                <div      navigate(selectedRole.route);
-
-                  key={role.id}
-
-                  className={`role-option ${formData.role === role.id ? 'selected' : ''}`}    } catch (err) {      ...formData,
-
-                  onClick={() => handleChange({ target: { name: 'role', value: role.id } })}
-
-                >      console.error('Registration failed:', err);
-
-                  <span className="role-icon">{role.icon}</span>
-
-                  <span className="role-title">{role.title}</span>      setError(err.message || 'Registration failed. Please try again.');      [e.target.name]: e.target.value    // Validation
-
-                </div>
-
-              ))}    }
-
+        {/* Main Form Card */}
+        <div className="pro-dashboard-card pro-p-8 mb-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            
+            {/* Name Field */}
+            <div>
+              <label htmlFor="name" className="block pro-text-sm font-medium text-gray-700 mb-2">
+                Full Name
+              </label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                  placeholder="Enter your full name"
+                  className="w-full pro-p-3 pl-12 border border-gray-300 pro-rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
+                  disabled={loading}
+                />
+              </div>
             </div>
 
-            {roleError && <p className="error-message">{roleError}</p>}  };    });    if (formData.password !== formData.confirmPassword) {
-
-          </div>
-
-          <button type="submit" className="auth-btn">
-
-            Register Now
-
-          </button>  return (    if (e.target.name === 'role') {      setError('Passwords do not match');
-
-        </form>
-
-        {error && <p className="error-message">{error}</p>}    <div className="auth-container">
-
-        <p className="auth-link">
-
-          Already have an account? <span onClick={() => navigate('/login')}>Log in</span>      <div className="auth-form">      setRoleError('');      return;
-
-        </p>
-
-      </div>        <h2>Create Your Account</h2>
-
-    </div>
-
-  );        <form onSubmit={handleSubmit}>    }    }
-
-};
-
-          <div className="form-group">
-
-export default Register;
-            <label htmlFor="name">Full Name</label>  };
-
-            <input
-
-              type="text"    if (!formData.role) {
-
-              id="name"
-
-              name="name"  const handleSubmit = async (e) => {      setRoleError('Please select a role');
-
-              value={formData.name}
-
-              onChange={handleChange}    e.preventDefault();      return;
-
-              required
-
-              placeholder="Enter your full name"    setError('');    }
-
-              className="auth-input"
-
-            />    setRoleError('');
-
-          </div>
-
-          <div className="form-group">    try {
-
-            <label htmlFor="email">Email</label>
-
-            <input    // Basic validation      await register(formData);
-
-              type="email"
-
-              id="email"    if (!formData.role) {      
-
-              name="email"
-
-              value={formData.email}      setRoleError('Please select your role');      // Find selected role and redirect to appropriate dashboard
-
-              onChange={handleChange}
-
-              required      return;      const selectedRole = roles.find(role => role.id === formData.role);
-
-              placeholder="Enter your email"
-
-              className="auth-input"    }      navigate(selectedRole.route);
-
-            />
-
-          </div>    } catch (err) {
-
-          <div className="form-group">
-
-            <label htmlFor="password">Password</label>    if (formData.password !== formData.confirmPassword) {      console.error('Registration failed:', err);
-
-            <input
-
-              type="password"      setError('Passwords do not match');      setError(err.message || 'Registration failed. Please try again.');
-
-              id="password"
-
-              name="password"      return;    }
-
-              value={formData.password}
-
-              onChange={handleChange}    }  };
-
-              required
-
-              minLength="6"
-
-              placeholder="Create a password (min. 6 characters)"
-
-              className="auth-input"    if (formData.password.length < 6) {  const handleChange = (e) => {
-
-            />
-
-          </div>      setError('Password must be at least 6 characters long');    setFormData({
-
-          <div className="form-group">
-
-            <label htmlFor="confirmPassword">Confirm Password</label>      return;      ...formData,
-
-            <input
-
-              type="password"    }      [e.target.name]: e.target.value
-
-              id="confirmPassword"
-
-              name="confirmPassword"    });
-
-              value={formData.confirmPassword}
-
-              onChange={handleChange}    try {    if (e.target.name === 'role') {
-
-              required
-
-              placeholder="Confirm your password"      await register(formData);      setRoleError('');
-
-              className="auth-input"
-
-            />          }
-
-          </div>
-
-          <div className="form-group">      // Find selected role and redirect to appropriate dashboard  };
-
-            <label>Select Your Role</label>
-
-            <div className="role-options">      const selectedRole = roles.find(role => role.id === formData.role);
-
-              {roles.map((role) => (
-
-                <div      navigate(selectedRole.route);  return (
-
-                  key={role.id}
-
-                  className={`role-option ${formData.role === role.id ? 'selected' : ''}`}    } catch (err) {    <div className="auth-container">
-
-                  onClick={() => handleChange({ target: { name: 'role', value: role.id } })}
-
-                >      console.error('Registration failed:', err);      <div className="auth-form">
-
-                  <span className="role-icon">{role.icon}</span>
-
-                  <span className="role-title">{role.title}</span>      setError(err.message || 'Registration failed. Please try again.');        <h2>Create Your Account</h2>
-
-                </div>
-
-              ))}    }        <form onSubmit={handleSubmit}>
-
+            {/* Email Field */}
+            <div>
+              <label htmlFor="email" className="block pro-text-sm font-medium text-gray-700 mb-2">
+                Email Address
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  placeholder="Enter your email address"
+                  className="w-full pro-p-3 pl-12 border border-gray-300 pro-rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
+                  disabled={loading}
+                />
+              </div>
             </div>
 
-            {roleError && <p className="error-message">{roleError}</p>}  };          <div className="form-group">
+            {/* Password Field */}
+            <div>
+              <label htmlFor="password" className="block pro-text-sm font-medium text-gray-700 mb-2">
+                Password
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  placeholder="Create a password (min 6 characters)"
+                  className="w-full pro-p-3 pl-12 pr-12 border border-gray-300 pro-rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
+                  disabled={loading}
+                  minLength="6"
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 hover:text-gray-600"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+              
+              {/* Password Strength Indicator */}
+              {formData.password && (
+                <div className="mt-2">
+                  <div className="pro-flex items-center justify-between mb-1">
+                    <span className="pro-text-xs text-gray-600">Password Strength</span>
+                    <span className={`pro-text-xs font-medium ${
+                      passwordStrength.color === 'red' ? 'text-red-600' :
+                      passwordStrength.color === 'yellow' ? 'text-yellow-600' : 'text-green-600'
+                    }`}>
+                      {passwordStrength.text}
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 pro-rounded-lg h-2">
+                    <div 
+                      className={`h-2 pro-rounded-lg transition-all duration-300 ${
+                        passwordStrength.color === 'red' ? 'bg-red-500' :
+                        passwordStrength.color === 'yellow' ? 'bg-yellow-500' : 'bg-green-500'
+                      }`}
+                      style={{ width: `${(passwordStrength.strength / 5) * 100}%` }}
+                    ></div>
+                  </div>
+                </div>
+              )}
+            </div>
 
+            {/* Confirm Password Field */}
+            <div>
+              <label htmlFor="confirmPassword" className="block pro-text-sm font-medium text-gray-700 mb-2">
+                Confirm Password
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  required
+                  placeholder="Confirm your password"
+                  className="w-full pro-p-3 pl-12 pr-12 border border-gray-300 pro-rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
+                  disabled={loading}
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 hover:text-gray-600"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+              
+              {/* Password Match Indicator */}
+              {formData.confirmPassword && (
+                <div className="mt-2 pro-flex items-center pro-gap-2">
+                  {formData.password === formData.confirmPassword ? (
+                    <>
+                      <Check className="w-4 h-4 text-green-500" />
+                      <span className="pro-text-xs text-green-600">Passwords match</span>
+                    </>
+                  ) : (
+                    <>
+                      <X className="w-4 h-4 text-red-500" />
+                      <span className="pro-text-xs text-red-600">Passwords don't match</span>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Role Selection */}
+            <div>
+              <label className="block pro-text-sm font-medium text-gray-700 mb-3">
+                Select Your Role
+              </label>
+              <div className="space-y-3">
+                {roles.map((role) => {
+                  const IconComponent = role.icon;
+                  return (
+                    <div
+                      key={role.id}
+                      className={`pro-p-4 border-2 pro-rounded-lg cursor-pointer transition-all duration-300 ${
+                        formData.role === role.id 
+                          ? `border-green-500 bg-green-50 ring-2 ring-green-200` 
+                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                      } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      onClick={() => !loading && handleChange({ target: { name: 'role', value: role.id } })}
+                    >
+                      <div className="pro-flex items-center pro-gap-3">
+                        <div className={`w-12 h-12 bg-gradient-to-r ${role.gradient} pro-rounded-lg pro-flex-center flex-shrink-0`}>
+                          <IconComponent className="w-6 h-6 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="pro-flex items-center justify-between mb-1">
+                            <h4 className="pro-heading-sm text-gray-900">{role.title}</h4>
+                            {formData.role === role.id && (
+                              <CheckCircle className="w-5 h-5 text-green-500" />
+                            )}
+                          </div>
+                          <p className="pro-text-xs text-gray-600">{role.description}</p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              {roleError && (
+                <div className="mt-2 pro-flex items-center pro-gap-2 pro-text-sm text-red-600">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                  {roleError}
+                </div>
+              )}
+            </div>
+
+            {/* Submit Button */}
+            <button 
+              type="submit" 
+              className={`w-full pro-btn pro-btn-primary bg-gradient-to-r from-green-500 to-blue-600 border-0 hover:from-green-600 hover:to-blue-700 pro-flex items-center justify-center pro-gap-2 ${
+                loading ? 'opacity-75 cursor-not-allowed' : ''
+              }`}
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <Loader className="w-5 h-5 animate-spin" />
+                  Creating Account...
+                </>
+              ) : (
+                <>
+                  <UserPlus className="w-5 h-5" />
+                  Create Account
+                  <ArrowRight className="w-5 h-5" />
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* Error Message */}
+          {error && (
+            <div className="mt-4 pro-p-3 bg-red-50 border border-red-200 pro-rounded-lg pro-flex items-center pro-gap-2">
+              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+              <p className="pro-text-sm text-red-700">{error}</p>
+            </div>
+          )}
+        </div>
+
+        {/* Login Link */}
+        <div className="text-center pro-p-4 bg-white border border-gray-200 pro-rounded-lg">
+          <p className="pro-text-sm text-gray-600">
+            Already have an account? {' '}
+            <button 
+              className="text-green-600 hover:text-green-700 font-medium hover:underline transition-colors duration-200"
+              onClick={() => !loading && navigate('/login')}
+              disabled={loading}
+            >
+              Sign in here
+            </button>
+          </p>
+        </div>
+
+        {/* Demo Notice */}
+        <div className="mt-6 pro-p-4 bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 pro-rounded-lg">
+          <div className="pro-flex items-start pro-gap-3">
+            <div className="w-8 h-8 bg-green-500 pro-rounded-lg pro-flex-center flex-shrink-0">
+              <Star className="w-4 h-4 text-white" />
+            </div>
+            <div>
+              <h4 className="pro-text-sm font-semibold text-green-900 mb-1">Demo Mode Active</h4>
+              <p className="pro-text-xs text-green-700 leading-relaxed">
+                Registration will create a demo account. Fill in all fields and select your role to get started exploring the platform.
+              </p>
+            </div>
           </div>
-
-          <button type="submit" className="auth-btn">            <label htmlFor="name">Full Name</label>
-
-            Register Now
-
-          </button>  return (            <input
-
-        </form>
-
-        {error && <p className="error-message">{error}</p>}    <div className="auth-container">              type="text"
-
-        <p className="auth-link">
-
-          Already have an account? <span onClick={() => navigate('/login')}>Log in</span>      <div className="auth-form">              id="name"
-
-        </p>
-
-      </div>        <h2>Create Your Account</h2>              name="name"
-
-    </div>
-
-  );        <form onSubmit={handleSubmit}>              value={formData.name}
-
-};
-
-          <div className="form-group">              onChange={handleChange}
-
-export default Register;
-            <label htmlFor="name">Full Name</label>              required
-
-            <input              placeholder="Enter your full name"
-
-              type="text"              className="auth-input"
-
-              id="name"            />
-
-              name="name"          </div>
-
-              value={formData.name}          <div className="form-group">
-
-              onChange={handleChange}            <label htmlFor="email">Email</label>
-
-              required            <input
-
-              placeholder="Enter your full name"              type="email"
-
-              className="auth-input"              id="email"
-
-            />              name="email"
-
-          </div>              value={formData.email}
-
-          <div className="form-group">              onChange={handleChange}
-
-            <label htmlFor="email">Email</label>              required
-
-            <input              placeholder="Enter your email"
-
-              type="email"              className="auth-input"
-
-              id="email"            />
-
-              name="email"          </div>
-
-              value={formData.email}          <div className="form-group">
-
-              onChange={handleChange}            <label htmlFor="password">Password</label>
-
-              required            <input
-
-              placeholder="Enter your email"              type="password"
-
-              className="auth-input"              id="password"
-
-            />              name="password"
-
-          </div>              value={formData.password}
-
-          <div className="form-group">              onChange={handleChange}
-
-            <label htmlFor="password">Password</label>              required
-
-            <input              minLength="6"
-
-              type="password"              placeholder="Create a password (min. 6 characters)"
-
-              id="password"              className="auth-input"
-
-              name="password"            />
-
-              value={formData.password}          </div>
-
-              onChange={handleChange}          <div className="form-group">
-
-              required            <label htmlFor="confirmPassword">Confirm Password</label>
-
-              minLength="6"            <input
-
-              placeholder="Create a password (min. 6 characters)"              type="password"
-
-              className="auth-input"              id="confirmPassword"
-
-            />              name="confirmPassword"
-
-          </div>              value={formData.confirmPassword}
-
-          <div className="form-group">              onChange={handleChange}
-
-            <label htmlFor="confirmPassword">Confirm Password</label>              required
-
-            <input              placeholder="Confirm your password"
-
-              type="password"              className="auth-input"
-
-              id="confirmPassword"            />
-
-              name="confirmPassword"          </div>
-
-              value={formData.confirmPassword}          <div className="form-group">
-
-              onChange={handleChange}            <label>Select Your Role</label>
-
-              required            <div className="role-options">
-
-              placeholder="Confirm your password"              {roles.map((role) => (
-
-              className="auth-input"                <div
-
-            />                  key={role.id}
-
-          </div>                  className={`role-option ${formData.role === role.id ? 'selected' : ''}`}
-
-          <div className="form-group">                  onClick={() => handleChange({ target: { name: 'role', value: role.id } })}
-
-            <label>Select Your Role</label>                >
-
-            <div className="role-options">                  <span className="role-icon">{role.icon}</span>
-
-              {roles.map((role) => (                  <span className="role-title">{role.title}</span>
-
-                <div                </div>
-
-                  key={role.id}              ))}
-
-                  className={`role-option ${formData.role === role.id ? 'selected' : ''}`}            </div>
-
-                  onClick={() => handleChange({ target: { name: 'role', value: role.id } })}            {roleError && <p className="error-message">{roleError}</p>}
-
-                >          </div>
-
-                  <span className="role-icon">{role.icon}</span>          <button type="submit" className="auth-btn">
-
-                  <span className="role-title">{role.title}</span>            Register Now
-
-                </div>          </button>
-
-              ))}        </form>
-
-            </div>        {error && <p className="error-message">{error}</p>}
-
-            {roleError && <p className="error-message">{roleError}</p>}        <p className="auth-link">
-
-          </div>          Already have an account? <span onClick={() => navigate('/login')}>Log in</span>
-
-          <button type="submit" className="auth-btn">        </p>
-
-            Register Now      </div>
-
-          </button>    </div>
-
-        </form>  );
-
-        {error && <p className="error-message">{error}</p>}};
-
-        <p className="auth-link">
-
-          Already have an account? <span onClick={() => navigate('/login')}>Log in</span>export default Register;
-        </p>
+        </div>
+
+        {/* Quick Access */}
+        <div className="mt-4 text-center">
+          <button 
+            className="pro-text-sm text-gray-500 hover:text-gray-700 pro-flex items-center pro-gap-1 mx-auto transition-colors duration-200"
+            onClick={() => navigate('/')}
+          >
+            <Home className="w-4 h-4" />
+            Back to Home
+          </button>
+        </div>
       </div>
     </div>
   );

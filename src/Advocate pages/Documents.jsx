@@ -1,485 +1,493 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
+import { 
+  FileText, 
+  Upload, 
+  Download, 
+  Search,
+  Filter,
+  MoreHorizontal,
+  Eye,
+  Edit,
+  Trash2,
+  Share2,
+  Clock,
+  User,
+  Calendar,
+  Tag,
+  FolderOpen,
+  Star,
+  Archive,
+  Lock,
+  Unlock,
+  Copy,
+  ExternalLink,
+  AlertCircle,
+  CheckCircle,
+  File,
+  FileImage,
+  FileVideo,
+  Paperclip
+} from 'lucide-react';
 
-// Comparison Results Component
-const ComparisonResults = ({ results, file1, file2 }) => {
-  if (!results) return null;
+const DocumentsPage = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedStatus, setSelectedStatus] = useState('All');
+  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
 
-  // If results is a string (raw text response), display it directly
-  if (typeof results === 'string') {
-    return (
-      <div className="mt-6 bg-gray-100 p-6 rounded-lg">
-        <h3 className="text-xl font-semibold text-gray-800 mb-4">Comparison Results</h3>
-        <pre className="whitespace-pre-wrap text-sm text-gray-700 bg-white p-4 rounded">
-          {results}
-        </pre>
-      </div>
-    );
-  }
+  // Sample documents data
+  const [documents] = useState([
+    {
+      id: 1,
+      name: 'Contract Agreement - Smith Industries.pdf',
+      type: 'pdf',
+      size: '2.4 MB',
+      category: 'Contracts',
+      status: 'Active',
+      author: 'John Doe',
+      lastModified: '2023-10-20',
+      createdDate: '2023-10-15',
+      tags: ['Contract', 'Corporate', 'High Priority'],
+      version: '1.3',
+      downloads: 12,
+      views: 45,
+      isStarred: true,
+      isLocked: false,
+      description: 'Main contract agreement with Smith Industries for Q4 2023',
+      caseId: 'CASE-001'
+    },
+    {
+      id: 2,
+      name: 'Legal Brief - Williams Case.docx',
+      type: 'docx',
+      size: '1.8 MB',
+      category: 'Legal Briefs',
+      status: 'Draft',
+      author: 'Jane Smith',
+      lastModified: '2023-10-19',
+      createdDate: '2023-10-18',
+      tags: ['Brief', 'Civil', 'Draft'],
+      version: '2.1',
+      downloads: 8,
+      views: 23,
+      isStarred: false,
+      isLocked: true,
+      description: 'Legal brief for Williams vs Anderson Corporation case',
+      caseId: 'CASE-002'
+    },
+    {
+      id: 3,
+      name: 'Evidence Photos - Peterson Case.zip',
+      type: 'zip',
+      size: '15.7 MB',
+      category: 'Evidence',
+      status: 'Active',
+      author: 'Mike Johnson',
+      lastModified: '2023-10-18',
+      createdDate: '2023-10-17',
+      tags: ['Evidence', 'Criminal', 'Photos'],
+      version: '1.0',
+      downloads: 5,
+      views: 18,
+      isStarred: true,
+      isLocked: true,
+      description: 'Crime scene and evidence photographs for State vs Peterson',
+      caseId: 'CASE-003'
+    },
+    {
+      id: 4,
+      name: 'Deposition Transcript - Davis.pdf',
+      type: 'pdf',
+      size: '3.2 MB',
+      category: 'Depositions',
+      status: 'Archived',
+      author: 'Sarah Williams',
+      lastModified: '2023-10-15',
+      createdDate: '2023-10-10',
+      tags: ['Deposition', 'Transcript', 'Archived'],
+      version: '1.0',
+      downloads: 15,
+      views: 67,
+      isStarred: false,
+      isLocked: false,
+      description: 'Complete deposition transcript for Davis vs Tech Solutions',
+      caseId: 'CASE-004'
+    },
+    {
+      id: 5,
+      name: 'Research Notes - IP Law.docx',
+      type: 'docx',
+      size: '0.9 MB',
+      category: 'Research',
+      status: 'Draft',
+      author: 'Emily Davis',
+      lastModified: '2023-10-22',
+      createdDate: '2023-10-20',
+      tags: ['Research', 'IP', 'Notes'],
+      version: '1.5',
+      downloads: 3,
+      views: 12,
+      isStarred: false,
+      isLocked: false,
+      description: 'Comprehensive research notes on intellectual property law precedents',
+      caseId: 'CASE-005'
+    },
+    {
+      id: 6,
+      name: 'Court Filing - Motion to Dismiss.pdf',
+      type: 'pdf',
+      size: '1.1 MB',
+      category: 'Court Filings',
+      status: 'Filed',
+      author: 'Robert Brown',
+      lastModified: '2023-10-21',
+      createdDate: '2023-10-21',
+      tags: ['Motion', 'Court Filing', 'Filed'],
+      version: '1.0',
+      downloads: 7,
+      views: 28,
+      isStarred: true,
+      isLocked: false,
+      description: 'Motion to dismiss filed in Thompson IP case',
+      caseId: 'CASE-006'
+    }
+  ]);
 
-  // Helper functions to check if data exists
-  const hasContent = (value) => {
-    return value && Array.isArray(value) && value.length > 0;
+  // Categories for filtering
+  const categories = ['All', 'Contracts', 'Legal Briefs', 'Evidence', 'Depositions', 'Research', 'Court Filings'];
+  const statuses = ['All', 'Active', 'Draft', 'Filed', 'Archived'];
+
+  // Filter documents
+  const filteredDocuments = documents.filter(doc => {
+    const matchesSearch = doc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         doc.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         doc.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    const matchesCategory = selectedCategory === 'All' || doc.category === selectedCategory;
+    const matchesStatus = selectedStatus === 'All' || doc.status === selectedStatus;
+    
+    return matchesSearch && matchesCategory && matchesStatus;
+  });
+
+  // Calculate metrics
+  const metrics = {
+    totalDocuments: documents.length,
+    activeDocuments: documents.filter(d => d.status === 'Active').length,
+    totalSize: documents.reduce((sum, d) => sum + parseFloat(d.size), 0),
+    starredDocuments: documents.filter(d => d.isStarred).length
   };
 
-  const hasText = (value) => {
-    return value && typeof value === 'string' && value.trim().length > 0;
+  const getFileIcon = (type) => {
+    switch (type.toLowerCase()) {
+      case 'pdf': return FileText;
+      case 'docx': case 'doc': return FileText;
+      case 'zip': case 'rar': return Archive;
+      case 'jpg': case 'png': case 'gif': return FileImage;
+      case 'mp4': case 'avi': case 'mov': return FileVideo;
+      default: return File;
+    }
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'Active': return 'pro-status-success';
+      case 'Draft': return 'pro-status-warning';
+      case 'Filed': return 'pro-status-info';
+      case 'Archived': return 'pro-status-error';
+      default: return 'pro-status-info';
+    }
+  };
+
+  const formatFileSize = (sizeStr) => {
+    const size = parseFloat(sizeStr);
+    if (size < 1) return `${(size * 1024).toFixed(0)} KB`;
+    return sizeStr;
+  };
+
+  const handleDocumentAction = (action, documentId) => {
+    console.log(`${action} document:`, documentId);
   };
 
   return (
-    <div className="mt-6 bg-gray-100 p-6 rounded-lg">
-      <h3 className="text-xl font-semibold text-gray-800 mb-4">Comparison Results</h3>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <div className="bg-white p-4 rounded-lg shadow-sm">
-          <h4 className="font-medium text-gray-700 mb-2">Document 1:</h4>
-          <p className="text-gray-600">{file1?.name || 'Unknown file'}</p>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm">
-          <h4 className="font-medium text-gray-700 mb-2">Document 2:</h4>
-          <p className="text-gray-600">{file2?.name || 'Unknown file'}</p>
+    <div className="pro-dashboard-layout">
+      <div className="pro-main-content lg:ml-64">
+        
+        {/* Professional Header */}
+        <header className="pro-header">
+          <div className="pro-flex-between w-full">
+            <div className="pro-flex-col">
+              <h1 className="pro-heading-xl text-gray-900">Document Management</h1>
+              <p className="pro-text-body text-gray-600">
+                Organize, manage, and track all your legal documents
+              </p>
+            </div>
+            
+            <div className="pro-flex items-center pro-gap-4">
+              <button className="pro-btn pro-btn-ghost">
+                <Download className="w-4 h-4 mr-2" />
+                Export
+              </button>
+              <button className="pro-btn pro-btn-primary">
+                <Upload className="w-4 h-4 mr-2" />
+                Upload Document
+              </button>
+            </div>
+          </div>
+        </header>
+
+        {/* Dashboard Content */}
+        <div className="pro-p-6 lg:p-8">
+          
+          {/* Metrics Grid */}
+          <div className="pro-grid lg:grid-cols-4 md:grid-cols-2 pro-gap-6 mb-8">
+            <div className="pro-stat-card pro-animate-fade-in">
+              <div className="pro-flex-between items-start mb-4">
+                <div className="w-12 h-12 pro-rounded-xl bg-gradient-to-r from-blue-500 to-cyan-400 pro-flex-center pro-shadow-glow">
+                  <FileText className="w-6 h-6 text-white" />
+                </div>
+                <span className="pro-text-xs text-green-600 font-medium">+15%</span>
+              </div>
+              <h3 className="pro-heading-xl font-bold text-gray-900 mb-1">
+                {metrics.totalDocuments}
+              </h3>
+              <p className="pro-text-sm font-medium text-gray-600">Total Documents</p>
+            </div>
+
+            <div className="pro-stat-card pro-animate-fade-in" style={{animationDelay: '0.1s'}}>
+              <div className="pro-flex-between items-start mb-4">
+                <div className="w-12 h-12 pro-rounded-xl bg-gradient-to-r from-green-500 to-emerald-400 pro-flex-center pro-shadow-glow">
+                  <CheckCircle className="w-6 h-6 text-white" />
+                </div>
+                <span className="pro-text-xs text-green-600 font-medium">+8%</span>
+              </div>
+              <h3 className="pro-heading-xl font-bold text-gray-900 mb-1">
+                {metrics.activeDocuments}
+              </h3>
+              <p className="pro-text-sm font-medium text-gray-600">Active Documents</p>
+            </div>
+
+            <div className="pro-stat-card pro-animate-fade-in" style={{animationDelay: '0.2s'}}>
+              <div className="pro-flex-between items-start mb-4">
+                <div className="w-12 h-12 pro-rounded-xl bg-gradient-to-r from-purple-500 to-indigo-400 pro-flex-center pro-shadow-glow">
+                  <Archive className="w-6 h-6 text-white" />
+                </div>
+                <span className="pro-text-xs text-blue-600 font-medium">{metrics.totalSize.toFixed(1)} MB</span>
+              </div>
+              <h3 className="pro-heading-xl font-bold text-gray-900 mb-1">
+                {(metrics.totalSize / 1024).toFixed(1)} GB
+              </h3>
+              <p className="pro-text-sm font-medium text-gray-600">Total Storage</p>
+            </div>
+
+            <div className="pro-stat-card pro-animate-fade-in" style={{animationDelay: '0.3s'}}>
+              <div className="pro-flex-between items-start mb-4">
+                <div className="w-12 h-12 pro-rounded-xl bg-gradient-to-r from-orange-500 to-amber-400 pro-flex-center pro-shadow-glow">
+                  <Star className="w-6 h-6 text-white" />
+                </div>
+                <span className="pro-text-xs text-orange-600 font-medium">Favorites</span>
+              </div>
+              <h3 className="pro-heading-xl font-bold text-gray-900 mb-1">
+                {metrics.starredDocuments}
+              </h3>
+              <p className="pro-text-sm font-medium text-gray-600">Starred Documents</p>
+            </div>
+          </div>
+
+          {/* Document Management Interface */}
+          <div className="pro-dashboard-card">
+            
+            {/* Search and Filter Controls */}
+            <div className="pro-flex flex-col lg:flex-row items-start lg:items-center justify-between pro-gap-4 mb-6">
+              <h2 className="pro-heading-lg text-gray-900">Document Library</h2>
+              
+              <div className="pro-flex items-center pro-gap-4 w-full lg:w-auto">
+                <div className="pro-search relative flex-1 lg:w-80">
+                  <Search className="pro-search-icon" />
+                  <input
+                    type="text"
+                    placeholder="Search documents..."
+                    className="pro-search-input"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+                
+                <select 
+                  className="pro-form-select min-w-[140px]"
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                >
+                  {categories.map(category => (
+                    <option key={category} value={category}>{category}</option>
+                  ))}
+                </select>
+                
+                <select 
+                  className="pro-form-select min-w-[120px]"
+                  value={selectedStatus}
+                  onChange={(e) => setSelectedStatus(e.target.value)}
+                >
+                  {statuses.map(status => (
+                    <option key={status} value={status}>{status}</option>
+                  ))}
+                </select>
+                
+                <button className="pro-btn pro-btn-ghost">
+                  <Filter className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Documents Grid */}
+            <div className="pro-grid lg:grid-cols-2 xl:grid-cols-3 pro-gap-6">
+              {filteredDocuments.map((document, index) => {
+                const FileIcon = getFileIcon(document.type);
+                
+                return (
+                  <div 
+                    key={document.id} 
+                    className="pro-card border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all duration-300 pro-hover-lift pro-animate-fade-in"
+                    style={{animationDelay: `${0.1 * index}s`}}
+                  >
+                    {/* Document Header */}
+                    <div className="pro-flex-between items-start mb-4">
+                      <div className="pro-flex items-center pro-gap-3">
+                        <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 pro-rounded-xl pro-flex-center pro-shadow-glow">
+                          <FileIcon className="w-6 h-6 text-white" />
+                        </div>
+                        <div className="pro-flex-col flex-1 min-w-0">
+                          <h3 className="pro-text-body font-semibold text-gray-900 truncate">
+                            {document.name}
+                          </h3>
+                          <p className="pro-text-xs text-gray-500">
+                            {document.size} • v{document.version}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="pro-flex items-center pro-gap-2">
+                        {document.isStarred && (
+                          <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                        )}
+                        {document.isLocked && (
+                          <Lock className="w-4 h-4 text-gray-400" />
+                        )}
+                        <button className="pro-btn pro-btn-ghost pro-btn-sm">
+                          <MoreHorizontal className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Document Info */}
+                    <div className="space-y-3 mb-4">
+                      <p className="pro-text-sm text-gray-600 line-clamp-2">
+                        {document.description}
+                      </p>
+                      
+                      <div className="pro-flex items-center justify-between">
+                        <span className={`pro-status-badge ${getStatusColor(document.status)}`}>
+                          {document.status}
+                        </span>
+                        <span className="pro-text-xs text-gray-500 bg-gray-100 px-2 py-1 pro-rounded-lg">
+                          {document.category}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Document Metadata */}
+                    <div className="space-y-2 mb-4 pro-p-3 bg-gray-50 pro-rounded-lg">
+                      <div className="pro-flex items-center justify-between pro-text-xs text-gray-600">
+                        <div className="pro-flex items-center pro-gap-1">
+                          <User className="w-3 h-3" />
+                          <span>{document.author}</span>
+                        </div>
+                        <div className="pro-flex items-center pro-gap-1">
+                          <Clock className="w-3 h-3" />
+                          <span>{new Date(document.lastModified).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                      
+                      <div className="pro-flex items-center justify-between pro-text-xs text-gray-600">
+                        <div className="pro-flex items-center pro-gap-1">
+                          <Eye className="w-3 h-3" />
+                          <span>{document.views} views</span>
+                        </div>
+                        <div className="pro-flex items-center pro-gap-1">
+                          <Download className="w-3 h-3" />
+                          <span>{document.downloads} downloads</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Document Tags */}
+                    <div className="pro-flex flex-wrap pro-gap-1 mb-4">
+                      {document.tags.slice(0, 3).map((tag, tagIndex) => (
+                        <span 
+                          key={tagIndex}
+                          className="pro-text-xs bg-blue-100 text-blue-700 px-2 py-1 pro-rounded-lg"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                      {document.tags.length > 3 && (
+                        <span className="pro-text-xs text-gray-500">
+                          +{document.tags.length - 3} more
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="pro-flex items-center pro-gap-2 pt-4 border-t border-gray-200">
+                      <button 
+                        className="pro-btn pro-btn-primary flex-1"
+                        onClick={() => handleDocumentAction('view', document.id)}
+                      >
+                        <Eye className="w-4 h-4 mr-2" />
+                        View
+                      </button>
+                      <button 
+                        className="pro-btn pro-btn-ghost"
+                        onClick={() => handleDocumentAction('download', document.id)}
+                      >
+                        <Download className="w-4 h-4" />
+                      </button>
+                      <button 
+                        className="pro-btn pro-btn-ghost"
+                        onClick={() => handleDocumentAction('share', document.id)}
+                      >
+                        <Share2 className="w-4 h-4" />
+                      </button>
+                      <button 
+                        className="pro-btn pro-btn-ghost"
+                        onClick={() => handleDocumentAction('edit', document.id)}
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Empty State */}
+            {filteredDocuments.length === 0 && (
+              <div className="pro-text-center pro-py-12">
+                <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <h3 className="pro-heading-lg text-gray-500 mb-2">No documents found</h3>
+                <p className="pro-text-body text-gray-400 mb-6">
+                  {searchQuery ? 'Try adjusting your search criteria' : 'Get started by uploading your first document'}
+                </p>
+                <button className="pro-btn pro-btn-primary">
+                  <Upload className="w-4 h-4 mr-2" />
+                  Upload Document
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-      
-      {hasText(results.summary) && (
-        <div className="mb-6">
-          <h4 className="font-medium text-gray-700 mb-2">Summary:</h4>
-          <p className="text-gray-600">{results.summary}</p>
-        </div>
-      )}
-      
-      {hasContent(results.differences) && (
-        <div className="mb-6">
-          <h4 className="font-medium text-gray-700 mb-2">Key Differences:</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-white p-4 rounded-lg">
-              <h5 className="font-medium text-red-600 mb-2">In {file1?.name}:</h5>
-              <ul className="list-disc pl-5 text-gray-600">
-                {results.differences
-                  .filter(diff => typeof diff === 'string' && diff.includes('only in Document 1'))
-                  .map((diff, index) => (
-                    <li key={index} className="mb-1">{diff}</li>
-                  ))}
-              </ul>
-            </div>
-            <div className="bg-white p-4 rounded-lg">
-              <h5 className="font-medium text-red-600 mb-2">In {file2?.name}:</h5>
-              <ul className="list-disc pl-5 text-gray-600">
-                {results.differences
-                  .filter(diff => typeof diff === 'string' && diff.includes('only in Document 2'))
-                  .map((diff, index) => (
-                    <li key={index} className="mb-1">{diff}</li>
-                  ))}
-              </ul>
-            </div>
-          </div>
-          {/* General differences that don't belong to a specific document */}
-          <div className="mt-4 bg-white p-4 rounded-lg">
-            <h5 className="font-medium text-red-600 mb-2">General Differences:</h5>
-            <ul className="list-disc pl-5 text-gray-600">
-              {results.differences
-                .filter(diff => typeof diff === 'string' && 
-                  !diff.includes('only in Document 1') && 
-                  !diff.includes('only in Document 2'))
-                .map((diff, index) => (
-                  <li key={index} className="mb-1">{diff}</li>
-                ))}
-            </ul>
-          </div>
-        </div>
-      )}
-      
-      {hasContent(results.similarities) && (
-        <div className="mb-6">
-          <h4 className="font-medium text-gray-700 mb-2">Similarities:</h4>
-          <ul className="list-disc pl-5 text-gray-600">
-            {results.similarities.map((similarity, index) => (
-              <li key={index} className="mb-1">{similarity}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-      
-      {hasText(results.riskAssessment) && (
-        <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-          <h4 className="font-medium text-yellow-800 mb-2">Risk Assessment:</h4>
-          <p className="text-yellow-700">{results.riskAssessment}</p>
-        </div>
-      )}
-      
-      {/* If the API returns an unexpected format, show raw data for debugging */}
-      {!hasText(results.summary) && !hasContent(results.differences) && 
-       !hasContent(results.similarities) && !hasText(results.riskAssessment) && (
-        <div className="bg-white p-4 rounded-lg">
-          <h4 className="font-medium text-gray-700 mb-2">Raw API Response:</h4>
-          <pre className="whitespace-pre-wrap text-sm mt-2 text-gray-700 overflow-auto max-h-60">
-            {JSON.stringify(results, null, 2)}
-          </pre>
-        </div>
-      )}
     </div>
   );
 };
 
-// Main Documents Component
-export default function Documents() {
-  const [uploadedFiles, setUploadedFiles] = useState([]);
-  const [comparisonResult, setComparisonResult] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [comparisonStatus, setComparisonStatus] = useState("");
-  const [isDragging, setIsDragging] = useState(false);
-
-  // File size limit (10MB)
-  const MAX_FILE_SIZE = 10 * 1024 * 1024;
-
-  // Handle file upload
-  const handleFileUpload = (files) => {
-    if (files.length > 0) {
-      const newFiles = Array.from(files);
-      // Filter only PDF files for contract comparison
-      const pdfFiles = newFiles.filter(file => 
-        file.type === 'application/pdf' && file.size <= MAX_FILE_SIZE
-      );
-      
-      const nonPdfFiles = newFiles.filter(file => file.type !== 'application/pdf');
-      const oversizedFiles = newFiles.filter(file => 
-        file.type === 'application/pdf' && file.size > MAX_FILE_SIZE
-      );
-      
-      if (nonPdfFiles.length > 0) {
-        alert(`${nonPdfFiles.length} non-PDF file(s) were uploaded but only PDF files can be used for comparison.`);
-      }
-      
-      if (oversizedFiles.length > 0) {
-        alert(`${oversizedFiles.length} PDF file(s) exceed the maximum size limit of ${formatFileSize(MAX_FILE_SIZE)}.`);
-      }
-      
-      if (pdfFiles.length > 0) {
-        setUploadedFiles([...uploadedFiles, ...pdfFiles]);
-        // Clear previous comparison results when new files are uploaded
-        setComparisonResult(null);
-        setError(null);
-      }
-    }
-  };
-
-  // Handle file input change
-  const handleFileInputChange = (e) => {
-    handleFileUpload(e.target.files);
-  };
-
-  // Handle drag events
-  const handleDrag = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
-  const handleDragIn = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(true);
-  };
-
-  const handleDragOut = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-    const files = e.dataTransfer.files;
-    handleFileUpload(files);
-  };
-
-  // Process comparison data from API
-  const processComparisonData = (data) => {
-    // If the data is already in the expected format, return it as is
-    if (data.summary || data.differences || data.similarities) {
-      return data;
-    }
-    
-    // If it's a string, try to parse it
-    if (typeof data === 'string') {
-      try {
-        return JSON.parse(data);
-      } catch (e) {
-        // If it's not JSON, return it as a raw text response
-        return data;
-      }
-    }
-    
-    // If it's in a different format, transform it
-    // This part depends on your API's response format
-    if (data.comparison_results) {
-      return {
-        summary: data.comparison_summary,
-        differences: data.comparison_results.differences || [],
-        similarities: data.comparison_results.similarities || [],
-        riskAssessment: data.risk_assessment
-      };
-    }
-    
-    // Fallback: return the data as is
-    return data;
-  };
-
-  // API call for Contract Comparison
-  const handleCompareContracts = async () => {
-    if (uploadedFiles.length < 2) {
-      setError("Please upload exactly 2 PDF contracts to compare.");
-      return;
-    }
-
-    // Check if files are PDFs
-    if (uploadedFiles[0].type !== 'application/pdf' || uploadedFiles[1].type !== 'application/pdf') {
-      setError("Only PDF files can be compared. Please upload PDF documents.");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("file1", uploadedFiles[0]);
-    formData.append("file2", uploadedFiles[1]);
-
-    setLoading(true);
-    setError(null);
-    setComparisonStatus("Preparing documents for comparison...");
-    
-    try {
-      // Replace with your actual API endpoint
-      const response = await fetch(
-        "https://n8n.srv983857.hstgr.cloud/webhook/a027ab82-e53c-4246-9982-c41c79ac9bca",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Server error: ${response.status} - ${errorText}`);
-      }
-
-      let data = await response.json();
-      
-      // Handle string responses
-      if (typeof data === "string") {
-        try {
-          data = JSON.parse(data);
-        } catch {
-          data = { rawResponse: data };
-        }
-      }
-      
-      const processedData = processComparisonData(data);
-      setComparisonResult(processedData);
-      setComparisonStatus("Comparison completed successfully!");
-      
-      // Clear status after 3 seconds
-      setTimeout(() => setComparisonStatus(""), 3000);
-    } catch (err) {
-      console.error("Error comparing contracts:", err);
-      
-      // Provide more specific error messages
-      if (err.message.includes("Failed to fetch")) {
-        setError("Network error: Could not connect to the comparison service. Please check your internet connection.");
-      } else if (err.message.includes("Server error")) {
-        setError(`Server error: ${err.message}`);
-      } else {
-        setError("Failed to compare contracts. The service might be temporarily unavailable.");
-      }
-      
-      setComparisonStatus("Comparison failed!");
-    }
-    setLoading(false);
-  };
-
-  // Clear comparison results
-  const clearComparison = () => {
-    setComparisonResult(null);
-    setError(null);
-    setComparisonStatus("");
-  };
-
-  // Remove uploaded file
-  const removeFile = (index) => {
-    const newFiles = [...uploadedFiles];
-    newFiles.splice(index, 1);
-    setUploadedFiles(newFiles);
-    // Clear comparison when files change
-    setComparisonResult(null);
-    setError(null);
-    setComparisonStatus("");
-  };
-
-  // Format file size
-  const formatFileSize = (bytes) => {
-    if (bytes === 0) return "0 Bytes";
-    const k = 1024;
-    const sizes = ["Bytes", "KB", "MB", "GB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-  };
-
-  return (
-    <div className="max-w-6xl mx-auto p-6 bg-gray-50 min-h-screen">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-        <span className="mr-2">📂</span> Contract Comparison Tool
-      </h2>
-
-      {/* Upload Section */}
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <div className="space-y-6">
-          <div
-            className={`border-2 border-dashed rounded-lg p-12 text-center transition-colors ${
-              isDragging ? 'border-blue-400 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
-            }`}
-            onDragEnter={handleDragIn}
-            onDragLeave={handleDragOut}
-            onDragOver={handleDrag}
-            onDrop={handleDrop}
-          >
-            <input
-              type="file"
-              id="file-upload"
-              multiple
-              accept=".pdf"
-              onChange={handleFileInputChange}
-              className="hidden"
-            />
-            <label htmlFor="file-upload" className="cursor-pointer">
-              <div className="text-5xl mb-4">📁</div>
-              <p className="text-lg font-medium text-gray-700">
-                Drag & drop PDF files here or click to browse
-              </p>
-              <p className="text-gray-500 mt-2">Only PDF files supported for contract comparison</p>
-              <p className="text-gray-400 text-sm mt-1">Max file size: {formatFileSize(MAX_FILE_SIZE)}</p>
-              <button className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors">
-                Browse PDF Files
-              </button>
-            </label>
-          </div>
-
-          {uploadedFiles.length > 0 && (
-            <div className="mt-6">
-              <h3 className="text-lg font-medium text-gray-800 mb-3">Uploaded PDF Files</h3>
-              <ul className="divide-y divide-gray-200">
-                {uploadedFiles.map((file, index) => (
-                  <li key={index} className="py-3 flex items-center justify-between">
-                    <div className="flex items-center">
-                      <span className="mr-3">📄</span>
-                      <div>
-                        <span className="block font-medium">{file.name}</span>
-                        <span className="text-sm text-gray-500">
-                          {formatFileSize(file.size)} • PDF Document
-                        </span>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => removeFile(index)}
-                      className="text-red-500 hover:text-red-700 text-sm bg-red-50 px-2 py-1 rounded"
-                    >
-                      Remove
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Compare Contracts Section */}
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-            <h3 className="text-lg font-medium text-blue-800 mb-2">Contract Comparison Tool</h3>
-            <p className="text-blue-700 mb-4">
-              Compare two PDF contracts to identify differences and similarities. 
-              Only the first two uploaded PDFs will be compared.
-            </p>
-            
-            <div className="flex items-center">
-              <button
-                onClick={handleCompareContracts}
-                disabled={loading || uploadedFiles.length < 2}
-                className="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center"
-              >
-                {loading ? (
-                  <>
-                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Comparing...
-                  </>
-                ) : (
-                  "Compare Contracts"
-                )}
-              </button>
-              
-              <button
-                onClick={() => {
-                  setComparisonResult({
-                    summary: "The contracts have 5 significant differences and 3 similarities.",
-                    differences: [
-                      "Clause 4.2: Payment terms are 30 days in Document 1 but 45 days in Document 2",
-                      "Clause 7.1: Liability cap is $100,000 in Document 1 but unlimited in Document 2",
-                      "Document 1 includes a non-compete clause missing in Document 2",
-                      "Document 2 includes an arbitration clause missing in Document 1"
-                    ],
-                    similarities: [
-                      "Both contracts have identical confidentiality clauses",
-                      "Termination conditions are the same in both documents",
-                      "Intellectual property rights allocation is identical"
-                    ],
-                    riskAssessment: "Document 2 presents higher financial risk due to unlimited liability cap."
-                  });
-                }}
-                className="ml-4 bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors"
-              >
-                Test with Sample Data
-              </button>
-              
-              {comparisonResult && (
-                <button
-                  onClick={clearComparison}
-                  className="ml-4 bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors"
-                >
-                  Clear Results
-                </button>
-              )}
-            </div>
-            
-            {comparisonStatus && (
-              <div className="mt-4 p-3 bg-blue-100 rounded-md">
-                <p className="text-blue-700">{comparisonStatus}</p>
-              </div>
-            )}
-          </div>
-
-          {/* Error Display */}
-          {error && (
-            <div className="mt-6 bg-red-100 p-4 rounded-lg">
-              <h3 className="font-semibold text-red-800 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-                Error:
-              </h3>
-              <p className="text-red-700 mt-2">{error}</p>
-              <p className="text-red-700 mt-2 text-sm">
-                Please ensure you've uploaded exactly two PDF files and try again.
-              </p>
-            </div>
-          )}
-
-          {/* Show Comparison Results using our component */}
-          <ComparisonResults 
-            results={comparisonResult} 
-            file1={uploadedFiles[0]} 
-            file2={uploadedFiles[1]} 
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
+export default DocumentsPage;

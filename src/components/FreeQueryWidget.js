@@ -1,5 +1,27 @@
 import React, { useState, useRef, useEffect } from "react";
-import "./FreeQueryWidget.css";
+import { 
+  Send,
+  Mic,
+  MicOff,
+  X,
+  MessageSquare,
+  CheckCircle,
+  Copy,
+  Search,
+  FileText,
+  ChevronDown,
+  ChevronUp,
+  Globe,
+  Clock,
+  Target,
+  Award,
+  Zap,
+  Crown,
+  Sparkles,
+  AlertCircle,
+  BookOpen,
+  Shield
+} from 'lucide-react';
 
 const FreeQueryWidget = () => {
   const [query, setQuery] = useState("");
@@ -13,19 +35,35 @@ const FreeQueryWidget = () => {
   const textareaRef = useRef(null);
   const widgetRef = useRef(null);
 
-  // Quick question templates
+  // Enhanced quick question templates
   const quickQuestions = [
-    "My landlord is not returning my deposit.",
-    "How to file a complaint against a noisy neighbor?",
-    "What are my rights if a product is defective?",
-    "Check Guideline Value of a Property"
+    {
+      text: "My landlord is not returning my deposit",
+      category: "Property",
+      difficulty: "Beginner"
+    },
+    {
+      text: "How to file a complaint against a noisy neighbor?",
+      category: "Civil",
+      difficulty: "Intermediate"
+    },
+    {
+      text: "What are my rights if a product is defective?",
+      category: "Consumer",
+      difficulty: "Beginner"
+    },
+    {
+      text: "Check Guideline Value of a Property",
+      category: "Property",
+      difficulty: "Advanced"
+    }
   ];
 
   // Auto-resize textarea
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
     }
   }, [query]);
 
@@ -35,29 +73,24 @@ const FreeQueryWidget = () => {
 
     setIsLoading(true);
     
-    // Simulate API call
+    // Simulate API call with realistic delay
     setTimeout(() => {
       setIsLoading(false);
       setResponse({
-        text: `Based on your query about "${query}", here is our analysis:\n\nIn Indian law, the specific provisions that would apply are... [AI-generated legal analysis would appear here]. This response has been cross-verified by our legal AI agents for accuracy.`,
-        relevantSections: ["IPC Section 420", "Consumer Protection Act 2019", "Transfer of Property Act"]
+        text: `Based on your query about "${query}", here is our comprehensive legal analysis:\n\nIn Indian law, the specific provisions that would apply are governed by multiple statutes and precedents. Our AI has analyzed thousands of similar cases and relevant legal documents to provide you with this guidance.\n\nKey considerations include procedural requirements, statutory timelines, and potential remedies available under current legislation. This analysis has been cross-verified by our advanced legal AI agents for accuracy and completeness.`,
+        relevantSections: ["IPC Section 420", "Consumer Protection Act 2019", "Transfer of Property Act", "Civil Procedure Code"],
+        confidence: 96,
+        category: "Civil Law",
+        complexity: "Intermediate"
       });
       setRemainingQueries(prev => prev - 1);
       setQuery("");
       setIsExpanded(true);
-    }, 2000);
+    }, 2500);
   };
 
   const handleQuickQuestion = (question) => {
-    setQuery(question);
-    // Animate the quick button
-    const buttons = document.querySelectorAll('.quick-btn');
-    buttons.forEach(btn => {
-      if (btn.textContent === question) {
-        btn.classList.add('quick-selected');
-        setTimeout(() => btn.classList.remove('quick-selected'), 1000);
-      }
-    });
+    setQuery(question.text);
   };
 
   const startVoiceInput = () => {
@@ -110,259 +143,338 @@ const FreeQueryWidget = () => {
     setIsExpanded(!isExpanded);
   };
 
+  const copyResponse = () => {
+    if (response) {
+      navigator.clipboard.writeText(response.text);
+    }
+  };
+
+  const getProgressColor = () => {
+    if (remainingQueries >= 4) return 'from-green-500 to-emerald-600';
+    if (remainingQueries >= 2) return 'from-yellow-500 to-orange-600';
+    return 'from-red-500 to-rose-600';
+  };
+
+  const getCategoryColor = (category) => {
+    switch (category) {
+      case 'Property': return 'bg-blue-100 text-blue-700 border-blue-200';
+      case 'Civil': return 'bg-purple-100 text-purple-700 border-purple-200';
+      case 'Consumer': return 'bg-green-100 text-green-700 border-green-200';
+      default: return 'bg-gray-100 text-gray-700 border-gray-200';
+    }
+  };
+
+  const getDifficultyColor = (difficulty) => {
+    switch (difficulty) {
+      case 'Beginner': return 'bg-green-100 text-green-700';
+      case 'Intermediate': return 'bg-yellow-100 text-yellow-700';
+      case 'Advanced': return 'bg-red-100 text-red-700';
+      default: return 'bg-gray-100 text-gray-700';
+    }
+  };
+
   return (
-    <section className="free-query-widget" ref={widgetRef}>
-      {/* Bubble Background */}
-      <div className="bubble-background">
-        <div className="bubble"></div>
-        <div className="bubble"></div>
-        <div className="bubble"></div>
-        <div className="bubble"></div>
-        <div className="bubble"></div>
-        <div className="bubble"></div>
-        <div className="bubble"></div>
-        <div className="bubble"></div>
-        <div className="bubble"></div>
-        <div className="bubble"></div>
-      </div>
+    <section className="pro-section bg-gradient-to-br from-blue-50 to-indigo-100 relative overflow-hidden">
+      {/* Background Effects */}
+      <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]"></div>
+      <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-96 h-96 bg-blue-400/20 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-0 right-0 w-64 h-64 bg-purple-400/20 rounded-full blur-3xl"></div>
       
-      {/* Circuit lines for tech effect */}
-      <div className="circuit-line horizontal" style={{top: '30%'}}></div>
-      <div className="circuit-line horizontal" style={{top: '60%'}}></div>
-      <div className="circuit-line horizontal" style={{top: '80%'}}></div>
-      <div className="circuit-line vertical" style={{left: '20%'}}></div>
-      <div className="circuit-line vertical" style={{left: '50%'}}></div>
-      <div className="circuit-line vertical" style={{left: '80%'}}></div>
-      <div className="circuit-line diagonal" style={{top: '40%', left: '-20%'}}></div>
-      <div className="circuit-line diagonal" style={{top: '70%', left: '-50%'}}></div>
-      
-      <div className="container">
-        <div className="query-header">
-          <div className="header-icon">
-            <div className="icon-wrapper">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="2"/>
-                <path d="M8 14C8 14 9.5 16 12 16C14.5 16 16 14 16 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                <path d="M9 9H9.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                <path d="M15 9H15.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              </svg>
-            </div>
+      <div className="pro-container relative z-10" ref={widgetRef}>
+        
+        {/* Header */}
+        <div className="text-center mb-12">
+          <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 pro-rounded-xl pro-flex-center mx-auto mb-6">
+            <MessageSquare className="w-8 h-8 text-white" />
           </div>
-          <h2>Instant Legal Guidance(FreeQuery)</h2>
-          <p>Ask any legal question in plain English or Tamil - our AI will analyze and provide relevant legal information</p>
+          <h2 className="pro-heading-section text-gray-900 mb-4">
+            Instant Legal Guidance
+          </h2>
+          <p className="pro-text-lead text-gray-600 max-w-3xl mx-auto">
+            Ask any legal question in plain English or Tamil. Our advanced AI will analyze your query 
+            and provide comprehensive legal guidance with relevant statutes and precedents.
+          </p>
         </div>
 
-        <div className="query-counter">
-          <div className="counter-badge">
-            <div 
-              className="counter-progress"
-              style={{width: `${(remainingQueries/5) * 100}%`}}
-            ></div>
-            <div className="counter-content">
-              <span className="counter-number">{remainingQueries}</span>
-              <span className="counter-text">free queries remaining</span>
+        {/* Query Counter */}
+        <div className="pro-dashboard-card mb-8">
+          <div className="pro-flex items-center justify-between mb-4">
+            <h3 className="pro-heading-md text-gray-900">Free Query Balance</h3>
+            <div className="pro-flex items-center pro-gap-2">
+              <Zap className="w-4 h-4 text-yellow-500" />
+              <span className="pro-text-sm font-semibold text-gray-700">
+                {remainingQueries} remaining
+              </span>
+            </div>
+          </div>
+          
+          <div className="relative">
+            <div className="w-full bg-gray-200 pro-rounded-full h-3">
+              <div 
+                className={`h-3 pro-rounded-full bg-gradient-to-r ${getProgressColor()} transition-all duration-300`}
+                style={{ width: `${(remainingQueries / 5) * 100}%` }}
+              ></div>
+            </div>
+            <div className="pro-flex justify-between pro-text-xs text-gray-500 mt-2">
+              <span>0 queries</span>
+              <span>5 free queries</span>
             </div>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="query-form">
-          <div className="language-toggle">
-            <button
-              type="button"
-              className={language === 'english' ? 'active' : ''}
-              onClick={() => setLanguage('english')}
-            >
-              <span className="language-flag">🇬🇧</span> English
-            </button>
-            <button
-              type="button"
-              className={language === 'tamil' ? 'active' : ''}
-              onClick={() => setLanguage('tamil')}
-            >
-              <span className="language-flag">🇮🇳</span> Tamil
-            </button>
-          </div>
-
-          <div className="input-container">
-            <div className="input-wrapper">
-              <textarea
-                ref={textareaRef}
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder={`Describe your legal issue in ${language === 'english' ? 'English' : 'Tamil'}...`}
-                rows="1"
-                disabled={remainingQueries <= 0}
-                className="query-textarea"
-              />
-              {query && (
-                <button
-                  type="button"
-                  className="clear-btn"
-                  onClick={clearQuery}
-                  aria-label="Clear text"
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </button>
-              )}
-            </div>
-            <div className="input-actions">
+        {/* Main Query Interface */}
+        <div className="pro-dashboard-card mb-8">
+          
+          {/* Language Toggle */}
+          <div className="pro-flex items-center justify-center mb-6">
+            <div className="pro-flex bg-gray-100 pro-rounded-lg pro-p-1">
               <button
                 type="button"
-                className={`voice-input-btn ${isRecording ? 'recording' : ''}`}
-                onClick={isRecording ? stopVoiceInput : startVoiceInput}
-                disabled={remainingQueries <= 0}
-                aria-label={isRecording ? "Stop recording" : "Start voice input"}
+                className={`pro-flex items-center pro-gap-2 px-4 py-2 pro-rounded-lg transition-all duration-200 ${
+                  language === 'english' 
+                    ? 'bg-white text-blue-600 shadow-sm' 
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+                onClick={() => setLanguage('english')}
               >
-                {isRecording ? (
-                  <div className="recording-pulse">
-                    <span className="pulse-dot"></span>
-                  </div>
-                ) : (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 2C11.2044 2 10.4413 2.31607 9.87868 2.87868C9.31607 3.44129 9 4.20435 9 5V12C9 12.7956 9.31607 13.5587 9.87868 14.1213C10.4413 14.6839 11.2044 15 12 15C12.7956 15 13.5587 14.6839 14.1213 14.1213C14.6839 13.5587 15 12.7956 15 12V5C15 4.20435 14.6839 3.44129 14.1213 2.87868C13.5587 2.31607 12.7956 2 12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M19 10V12C19 13.8565 18.2625 15.637 16.9497 16.9497C15.637 18.2625 13.8565 19 12 19C10.1435 19 8.36301 18.2625 7.05025 16.9497C5.7375 15.637 5 13.8565 5 12V10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M12 19V22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                )}
+                <Globe className="w-4 h-4" />
+                English
               </button>
-              <div className="char-count">{query.length}/500</div>
+              <button
+                type="button"
+                className={`pro-flex items-center pro-gap-2 px-4 py-2 pro-rounded-lg transition-all duration-200 ${
+                  language === 'tamil' 
+                    ? 'bg-white text-blue-600 shadow-sm' 
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+                onClick={() => setLanguage('tamil')}
+              >
+                <Globe className="w-4 h-4" />
+                தமிழ்
+              </button>
             </div>
           </div>
 
-          <div className="quick-questions">
-            <p className="quick-questions-title">Try these examples:</p>
-            <div className="quick-buttons">
-              {quickQuestions.map((question, index) => (
-                <button
-                  key={index}
-                  type="button"
-                  className="quick-btn"
-                  onClick={() => handleQuickQuestion(question)}
+          {/* Query Form */}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="relative">
+              <div className="relative">
+                <textarea
+                  ref={textareaRef}
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder={`Describe your legal issue in ${language === 'english' ? 'English' : 'Tamil'}...`}
+                  rows="3"
+                  maxLength="500"
                   disabled={remainingQueries <= 0}
-                >
-                  {question}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            className={`submit-btn ${isLoading ? 'loading' : ''}`}
-            disabled={!query.trim() || remainingQueries <= 0 || isLoading}
-          >
-            {isLoading ? (
-              <>
-                <span className="spinner"></span>
-                Analyzing your legal question...
-              </>
-            ) : (
-              `Ask Legal Expert (${remainingQueries} left)`
-            )}
-          </button>
-        </form>
-
-        {response && (
-          <div className={`response-container ${isExpanded ? 'expanded' : ''}`}>
-            <button className="expand-toggle" onClick={toggleExpand}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d={isExpanded ? "M6 9L12 15L18 9" : "M9 6L15 12L9 18"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </button>
-            
-            <div className="response-header">
-              <h3>AI Legal Analysis</h3>
-              <div className="response-meta">
-                <span className="response-time">Generated just now</span>
-                <span className="confidence-level">98% confidence</span>
+                  className="w-full pro-p-4 border border-gray-300 pro-rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none transition-all duration-200 pr-24"
+                />
+                
+                {/* Input Actions */}
+                <div className="absolute bottom-3 right-3 pro-flex items-center pro-gap-2">
+                  {query && (
+                    <button
+                      type="button"
+                      className="w-8 h-8 pro-flex-center pro-rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                      onClick={clearQuery}
+                      aria-label="Clear text"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                  
+                  <button
+                    type="button"
+                    className={`w-8 h-8 pro-flex-center pro-rounded-lg transition-all duration-200 ${
+                      isRecording 
+                        ? 'bg-red-100 text-red-600 animate-pulse' 
+                        : 'hover:bg-blue-100 text-gray-400 hover:text-blue-600'
+                    }`}
+                    onClick={isRecording ? stopVoiceInput : startVoiceInput}
+                    disabled={remainingQueries <= 0}
+                    aria-label={isRecording ? "Stop recording" : "Start voice input"}
+                  >
+                    {isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+              
+              <div className="pro-flex justify-between items-center mt-2">
+                <span className="pro-text-xs text-gray-500">
+                  {query.length}/500 characters
+                </span>
+                {isRecording && (
+                  <div className="pro-flex items-center pro-gap-2 text-red-600">
+                    <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
+                    <span className="pro-text-xs font-medium">Recording...</span>
+                  </div>
+                )}
               </div>
             </div>
-            
-            <div className="response-content">
-              <div className="legal-analysis">
-                <div className="analysis-text">
-                  {response.text.split('\n').map((paragraph, i) => (
-                    <p key={i}>{paragraph}</p>
+
+            {/* Quick Questions */}
+            <div>
+              <h4 className="pro-heading-sm text-gray-900 mb-4">Quick Examples:</h4>
+              <div className="pro-grid md:grid-cols-2 pro-gap-3">
+                {quickQuestions.map((question, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    className="text-left pro-p-4 border border-gray-200 pro-rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 group"
+                    onClick={() => handleQuickQuestion(question)}
+                    disabled={remainingQueries <= 0}
+                  >
+                    <p className="pro-text-sm text-gray-900 mb-3">{question.text}</p>
+                    <div className="pro-flex items-center pro-gap-2">
+                      <span className={`pro-text-xs px-2 py-1 pro-rounded-lg border font-medium ${getCategoryColor(question.category)}`}>
+                        {question.category}
+                      </span>
+                      <span className={`pro-text-xs px-2 py-1 pro-rounded-lg font-medium ${getDifficultyColor(question.difficulty)}`}>
+                        {question.difficulty}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              className={`w-full pro-btn pro-btn-primary pro-btn-lg pro-flex items-center justify-center pro-gap-3 ${
+                isLoading ? 'animate-pulse' : ''
+              }`}
+              disabled={!query.trim() || remainingQueries <= 0 || isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Analyzing your legal question...
+                </>
+              ) : (
+                <>
+                  <Send className="w-5 h-5" />
+                  Ask Legal Expert ({remainingQueries} left)
+                </>
+              )}
+            </button>
+          </form>
+        </div>
+
+        {/* Response Display */}
+        {response && (
+          <div className="pro-dashboard-card">
+            <div className="pro-flex items-center justify-between mb-6">
+              <div className="pro-flex items-center pro-gap-3">
+                <div className="w-10 h-10 bg-green-100 pro-rounded-lg pro-flex-center">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                </div>
+                <div>
+                  <h3 className="pro-heading-md text-gray-900">AI Legal Analysis</h3>
+                  <div className="pro-flex items-center pro-gap-4 mt-1">
+                    <div className="pro-flex items-center pro-gap-1">
+                      <Clock className="w-3 h-3 text-gray-400" />
+                      <span className="pro-text-xs text-gray-500">Generated just now</span>
+                    </div>
+                    <div className="pro-flex items-center pro-gap-1">
+                      <Target className="w-3 h-3 text-green-500" />
+                      <span className="pro-text-xs text-green-600 font-medium">{response.confidence}% confidence</span>
+                    </div>
+                    <span className={`pro-text-xs px-2 py-1 pro-rounded-lg border font-medium ${getCategoryColor(response.category)}`}>
+                      {response.category}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              <button 
+                className="pro-btn pro-btn-ghost pro-btn-sm"
+                onClick={toggleExpand}
+              >
+                {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              </button>
+            </div>
+
+            <div className={`transition-all duration-300 ${isExpanded ? 'max-h-none' : 'max-h-32 overflow-hidden'}`}>
+              <div className="prose max-w-none mb-6">
+                {response.text.split('\n').map((paragraph, i) => (
+                  paragraph.trim() && <p key={i} className="pro-text-body text-gray-700 mb-3">{paragraph}</p>
+                ))}
+              </div>
+
+              {/* Relevant Sections */}
+              <div className="mb-6">
+                <h4 className="pro-heading-sm text-gray-900 mb-3 pro-flex items-center pro-gap-2">
+                  <BookOpen className="w-4 h-4" />
+                  Relevant Legal Provisions
+                </h4>
+                <div className="pro-flex flex-wrap pro-gap-2">
+                  {response.relevantSections.map((section, index) => (
+                    <div key={index} className="pro-flex items-center pro-gap-2 bg-blue-50 border border-blue-200 pro-rounded-lg pro-p-3">
+                      <Shield className="w-4 h-4 text-blue-600" />
+                      <span className="pro-text-sm font-medium text-blue-900">{section}</span>
+                    </div>
                   ))}
                 </div>
-                <div className="relevant-sections">
-                  <h4>Relevant Legal Provisions:</h4>
-                  <div className="section-tags">
-                    {response.relevantSections.map((section, index) => (
-                      <span key={index} className="section-tag">
-                        {section}
-                        <button className="section-info" aria-label="More information">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M12 16V12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M12 8H12.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                        </button>
-                      </span>
-                    ))}
+              </div>
+
+              {/* Verification Badge */}
+              <div className="bg-green-50 border border-green-200 pro-rounded-lg pro-p-4 mb-6">
+                <div className="pro-flex items-center pro-gap-3">
+                  <div className="w-8 h-8 bg-green-100 pro-rounded-lg pro-flex-center">
+                    <Award className="w-4 h-4 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="pro-text-sm font-semibold text-green-900">Verified by Multiple AI Legal Agents</p>
+                    <p className="pro-text-xs text-green-700">Cross-referenced with thousands of legal documents and precedents</p>
                   </div>
                 </div>
               </div>
-            </div>
-            
-            <div className="verification-badge">
-              <span className="verification-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M22 11.08V12C21.9988 14.1564 21.3005 16.2547 20.0093 17.9818C18.7182 19.709 16.9033 20.9725 14.8354 21.5839C12.7674 22.1953 10.5573 22.1219 8.53447 21.3746C6.51168 20.6273 4.78465 19.2461 3.61096 17.4371C2.43727 15.628 1.87979 13.4881 2.02168 11.3363C2.16356 9.18455 2.99721 7.13631 4.39828 5.49706C5.79935 3.85781 7.69279 2.71537 9.79619 2.24013C11.8996 1.7649 14.1003 1.98232 16.07 2.85999" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M22 4L12 14.01L9 11.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </span>
-              Verified by multiple AI legal agents
-            </div>
-            
-            <div className="response-actions">
-              <button className="action-btn">
-                <span className="action-icon">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M16 1H4C2.9 1 2 1.9 2 3V17H4V3H16V1ZM19 5H8C6.9 5 6 5.9 6 7V21C6 22.1 6.9 23 8 23H19C20.1 23 21 22.1 21 21V7C21 5.9 20.1 5 19 5ZM19 21H8V7H19V21Z" fill="currentColor"/>
-                  </svg>
-                </span>
-                Copy Response
-              </button>
-              <button className="action-btn">
-                <span className="action-icon">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </span>
-                Deep Research
-              </button>
-              <button className="action-btn">
-                <span className="action-icon">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M14 2H6C4.9 2 4.01 2.9 4.01 4L4 20C4 21.1 4.89 22 5.99 22H18C19.1 22 20 21.1 20 20V8L14 2ZM16 18H8V16H16V18ZM16 14H8V12H16V14ZM13 9V3.5L18.5 9H13Z" fill="currentColor"/>
-                  </svg>
-                </span>
-                Generate Document
-              </button>
+
+              {/* Action Buttons */}
+              <div className="pro-flex flex-wrap pro-gap-3">
+                <button 
+                  className="pro-btn pro-btn-ghost pro-btn-sm"
+                  onClick={copyResponse}
+                >
+                  <Copy className="w-4 h-4 mr-2" />
+                  Copy Response
+                </button>
+                <button className="pro-btn pro-btn-ghost pro-btn-sm">
+                  <Search className="w-4 h-4 mr-2" />
+                  Deep Research
+                </button>
+                <button className="pro-btn pro-btn-ghost pro-btn-sm">
+                  <FileText className="w-4 h-4 mr-2" />
+                  Generate Document
+                </button>
+              </div>
             </div>
           </div>
         )}
 
+        {/* Queries Exhausted */}
         {remainingQueries <= 0 && (
-          <div className="queries-exhausted">
-            <div className="exhausted-icon">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="2"/>
-                <path d="M12 8V12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                <path d="M12 16H12.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              </svg>
+          <div className="pro-dashboard-card text-center">
+            <div className="w-16 h-16 bg-gradient-to-r from-orange-100 to-red-100 pro-rounded-xl pro-flex-center mx-auto mb-6">
+              <AlertCircle className="w-8 h-8 text-orange-600" />
             </div>
-            <h3>You've used all your free queries!</h3>
-            <p>Upgrade to LawMaster Pro for unlimited legal queries, detailed analysis, and document generation.</p>
-            <div className="upgrade-options">
-              <button className="upgrade-btn primary">
-                Upgrade to Pro - $29/mo
+            <h3 className="pro-heading-lg text-gray-900 mb-3">
+              You've Used All Your Free Queries!
+            </h3>
+            <p className="pro-text-body text-gray-600 mb-8 max-w-2xl mx-auto">
+              Upgrade to Chakshi Pro for unlimited legal queries, detailed analysis, document generation, 
+              and access to our complete legal research platform.
+            </p>
+            
+            <div className="pro-flex flex-wrap justify-center items-center pro-gap-4">
+              <button className="pro-btn pro-btn-primary pro-btn-lg">
+                <Crown className="w-5 h-5 mr-2" />
+                Upgrade to Pro - ₹2,999/mo
               </button>
-              <button className="upgrade-btn secondary">
-                Try 3 more queries
+              <button className="pro-btn pro-btn-ghost pro-btn-lg">
+                <Sparkles className="w-5 h-5 mr-2" />
+                Try 3 More Queries
               </button>
             </div>
           </div>

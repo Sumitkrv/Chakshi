@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { 
   FiHome,
   FiBook, 
@@ -28,6 +29,7 @@ const items = [
 export default function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [activeHover, setActiveHover] = useState(null);
+  const { user } = useAuth();
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
@@ -104,7 +106,7 @@ export default function Sidebar() {
           </div>
           {!isCollapsed && (
             <div className="ml-3 overflow-hidden">
-              <p className="text-sm font-medium">John Doe</p>
+              <p className="text-sm font-medium">{user ? user.name || user.email.split('@')[0] : 'John Doe'}</p>
               <p className="text-xs text-slate-400">3L Student</p>
             </div>
           )}
