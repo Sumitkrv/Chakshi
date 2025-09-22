@@ -28,7 +28,7 @@ const StudentDashboard = () => {
       title: 'Courses Enrolled', 
       value: '8', 
       icon: BookOpen, 
-      color: 'from-blue-500 to-cyan-400',
+      color: 'from-navy-600 to-navy-800',
       change: '+2 this semester',
       trend: 'up'
     },
@@ -36,7 +36,7 @@ const StudentDashboard = () => {
       title: 'Assignments Due', 
       value: '3', 
       icon: FileText, 
-      color: 'from-orange-500 to-amber-400',
+      color: 'from-gold-500 to-gold-600',
       change: '2 due this week',
       trend: 'neutral'
     },
@@ -44,7 +44,7 @@ const StudentDashboard = () => {
       title: 'Study Hours', 
       value: '42', 
       icon: Clock, 
-      color: 'from-green-500 to-emerald-400',
+      color: 'from-navy-500 to-navy-700',
       change: '+8 this week',
       trend: 'up'
     },
@@ -52,7 +52,7 @@ const StudentDashboard = () => {
       title: 'Overall Progress', 
       value: '75%', 
       icon: TrendingUp, 
-      color: 'from-purple-500 to-indigo-400',
+      color: 'from-gold-400 to-gold-600',
       change: '+5% this month',
       trend: 'up'
     }
@@ -140,24 +140,24 @@ const StudentDashboard = () => {
   };
 
   return (
-    <div className="pro-dashboard-layout">
-      <div className="pro-main-content lg:ml-64">
+    <div className="min-h-screen bg-gradient-to-br from-navy-50 via-white to-gold-50">
+      <div className="main-content lg:ml-64">
         
         {/* Professional Header */}
-        <header className="pro-header">
-          <div className="pro-flex-between w-full">
-            <div className="pro-flex-col">
-              <h1 className="pro-heading-lg text-gray-900">
+        <header className="bg-white/80 backdrop-blur-sm border-b border-gold-200/30 px-6 py-8 sticky top-0 z-10">
+          <div className="flex justify-between items-start w-full">
+            <div className="flex flex-col">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-navy-900 to-navy-700 bg-clip-text text-transparent">
                 Welcome back, {user ? user.name || user.email.split('@')[0] : 'Student'}! 👋
               </h1>
-              <p className="pro-text-body text-gray-600">
+              <p className="text-lg text-navy-600 mt-2 font-medium">
                 Ready to continue your legal education journey?
               </p>
             </div>
             
-            <div className="pro-flex items-center pro-gap-4">
-              <div className="pro-flex items-center pro-gap-2 pro-text-sm text-gray-600">
-                <Calendar className="w-4 h-4" />
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 text-sm text-navy-600 bg-white/90 backdrop-blur-sm border-2 border-gold-200 rounded-xl px-4 py-2 font-medium">
+                <Calendar className="w-4 h-4 text-gold-600" />
                 <span>{new Date().toLocaleDateString('en-US', { 
                   weekday: 'long', 
                   month: 'long', 
@@ -169,31 +169,31 @@ const StudentDashboard = () => {
         </header>
 
         {/* Dashboard Content */}
-        <div className="pro-p-6 lg:p-8">
+        <div className="p-6 lg:p-8">
           
           {/* Stats Grid */}
-          <div className="pro-grid pro-grid-4 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {stats.map((stat, index) => (
               <div 
                 key={index} 
-                className="pro-stat-card group pro-animate-fade-in pro-hover-lift"
+                className="backdrop-blur-xl bg-gradient-to-br from-white/90 to-white/70 border-2 border-gold-200/50 hover:border-gold-400/60 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 group hover:scale-105"
                 style={{animationDelay: `${0.1 * index}s`}}
               >
-                <div className="pro-flex-between items-start mb-4">
-                  <div className={`w-12 h-12 pro-rounded-xl bg-gradient-to-r ${stat.color} pro-flex-center pro-shadow-glow group-hover:scale-110 transition-transform duration-300`}>
+                <div className="flex justify-between items-start mb-4">
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${stat.color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
                     <stat.icon className="w-6 h-6 text-white" />
                   </div>
-                  <div className={`pro-flex items-center pro-gap-1 pro-text-xs ${stat.trend === 'up' ? 'text-green-600' : 'text-gray-500'}`}>
+                  <div className={`flex items-center gap-1 text-xs ${stat.trend === 'up' ? 'text-green-600' : 'text-navy-500'} font-medium`}>
                     <TrendingUp className="w-3 h-3" />
                     <span>{stat.change}</span>
                   </div>
                 </div>
                 
-                <div className="pro-flex-col">
-                  <h3 className="pro-heading-xl font-bold text-gray-900 mb-1">
+                <div className="flex flex-col">
+                  <h3 className="text-2xl font-bold bg-gradient-to-r from-navy-900 to-navy-700 bg-clip-text text-transparent mb-1">
                     {stat.value}
                   </h3>
-                  <p className="pro-text-sm font-medium text-gray-600">
+                  <p className="text-sm font-semibold text-navy-600">
                     {stat.title}
                   </p>
                 </div>

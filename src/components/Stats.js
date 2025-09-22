@@ -1,27 +1,144 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo, useLayoutEffect } from "react";
 import { 
-  FileText, 
-  Target, 
-  Scale, 
-  Clock, 
-  ArrowRight, 
-  Star, 
-  Shield, 
-  TrendingUp,
-  Users,
-  Award,
-  CheckCircle,
-  BarChart3,
-  Zap,
-  Globe
+  FileText, Target, Scale, Clock, ArrowRight, Star, Shield, 
+  TrendingUp, Users, Award, CheckCircle, BarChart3, Zap, Globe 
 } from 'lucide-react';
 
-const Stats = () => {
-  const [isVisible, setIsVisible] = useState(false);
-  const [hasAnimated, setHasAnimated] = useState(false);
-  const statsRef = useRef(null);
-  const animationRefs = useRef([]);
+// Custom hook for intersection observer with debouncing
+const useIntersectionObserver = (ref, options, shouldAnimate) => {
+  const [isIntersecting, setIsIntersecting] = useState(false);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element || !shouldAnimate) return;
+
+    const observer = new IntersectionObserver(([entry]) => {
+      setIsIntersecting(entry.isIntersecting);
+    }, options);
+
+    observer.observe(element);
+    return () => observer.unobserve(element);
+  }, [ref, options, shouldAnimate]);
+
+  return isIntersecting;
+};
+
+// Custom hook for number animation
+const useNumberAnimation = (isActive, targetValue, duration = 2000, prefix = "", suffix = "") => {
+  const [displayValue, setDisplayValue] = useState(`${prefix}0${suffix}`);
+  const rafRef = useRef(null);
+
+  useEffect(() => {
+    if (!isActive) return;
+
+    let startTimestamp = null;
+    const startValue = 0;
+    const endValue = targetValue;
+
+    const animate = (timestamp) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      
+      // Cubic easing function
+      const easedProgress = progress < 0.5 
+        ? 4 * progress * progress * progress 
+        : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+      
+      // Handle decimal values differently
+      const currentValue = endValue % 1 !== 0 
+        ? (easedProgress * (endValue - startValue) + startValue).toFixed(1)
+        : Math.floor(easedProgress * (endValue - startValue) + startValue);
+      
+      setDisplayValue(`${prefix}${parseFloat(currentValue).toLocaleString()}${suffix}`);
+      
+      if (progress < 1) {
+        rafRef.current = requestAnimationFrame(animate);
+      }
+    };
+
+    rafRef.current = requestAnimationFrame(animate);
+    
+    return () => {
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+      }
+    };
+  }, [isActive, targetValue, duration, prefix, suffix]);
+
+  return displayValue;
+};
+
+// StatCard Component
+const StatCard = ({ stat, index, isVisible, prefersReducedMotion }) => {
+  const IconComponent = stat.icon;
+  const cardRef = useRef(null);
+  const [isHovered, setIsHovered] = useState(false);
   
+  const animatedValue = useNumberAnimation(
+    isVisible && !prefersReducedMotion, 
+    stat.number, 
+    2000 + (index * 200), 
+    stat.prefix, 
+    stat.suffix
+  );
+
+  const displayValue = prefersReducedMotion 
+    ? `${stat.prefix}${stat.number.toLocaleString()}${stat.suffix}`
+    : animatedValue;
+
+  return (
+    <div 
+      ref={cardRef}
+      className="group relative pro-card pro-p-8 bg-white/80 backdrop-blur-sm border border-white/30 hover:shadow-xl transition-all duration-500 hover:scale-105"
+      aria-label={`${stat.number} ${stat.label}`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* Background Gradient */}
+      <div className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500 pro-rounded-xl`}></div>
+      
+      <div className="relative z-10">
+        <div className={`w-16 h-16 bg-gradient-to-br ${stat.gradient} pro-rounded-xl pro-flex-center mx-auto mb-6 transition-all duration-500 ${isHovered ? 'scale-110 rotate-3' : ''}`}>
+          <IconComponent className="w-8 h-8 text-white" />
+        </div>
+        
+        <div className="text-center">
+          <div 
+            className="pro-heading-section text-gray-900 mb-2 font-bold transition-all duration-500" 
+            aria-live="polite"
+          >
+            {displayValue}
+          </div>
+          <div className="pro-heading-sm text-gray-900 mb-3 font-semibold">{stat.label}</div>
+          <p className="pro-text-sm text-gray-600 group-hover:text-gray-700 transition-colors duration-300">
+            {stat.description}
+          </p>
+        </div>
+      </div>
+      
+      {/* Hover Effect */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pro-rounded-xl"></div>
+    </div>
+  );
+};
+
+// Main Component
+const Stats = () => {
+  const statsRef = useRef(null);
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  
+  // Check for reduced motion preference
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+    
+    const handleChange = () => setPrefersReducedMotion(mediaQuery.matches);
+    mediaQuery.addEventListener('change', handleChange);
+    
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
   const statsData = useMemo(() => [
     { 
       number: 50000, 
@@ -61,87 +178,27 @@ const Stats = () => {
     }
   ], []);
 
-  const additionalStats = [
+  const additionalStats = useMemo(() => [
     { icon: Users, label: "Active Law Firms", value: "500+", color: "text-blue-600" },
     { icon: Globe, label: "Cities Covered", value: "50+", color: "text-green-600" },
     { icon: Award, label: "Industry Awards", value: "12", color: "text-purple-600" },
     { icon: TrendingUp, label: "Growth Rate", value: "300%", color: "text-orange-600" }
-  ];
+  ], []);
 
-  // Animation function using requestAnimationFrame for smoother performance
-  const animateValue = useCallback((element, start, end, duration, suffix = "", prefix = "") => {
-    let startTimestamp = null;
-    const step = (timestamp) => {
-      if (!startTimestamp) startTimestamp = timestamp;
-      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-      const easedProgress = progress < 0.5 
-        ? 4 * progress * progress * progress 
-        : 1 - Math.pow(-2 * progress + 2, 3) / 2; // Cubic ease-in-out
-      
-      const current = end % 1 !== 0 
-        ? (easedProgress * (end - start) + start).toFixed(1)
-        : Math.floor(easedProgress * (end - start) + start);
-      
-      element.textContent = `${prefix}${parseFloat(current).toLocaleString()}${suffix}`;
-      
-      if (progress < 1) {
-        window.requestAnimationFrame(step);
-      }
-    };
-    window.requestAnimationFrame(step);
-  }, []);
+  const isVisible = useIntersectionObserver(
+    statsRef,
+    { 
+      threshold: 0.3,
+      rootMargin: "0px 0px -50px 0px"
+    },
+    !hasAnimated && !prefersReducedMotion
+  );
 
-  // Intersection Observer setup
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !hasAnimated) {
-          setIsVisible(true);
-          setHasAnimated(true);
-        }
-      },
-      { 
-        threshold: 0.3,
-        rootMargin: "0px 0px -50px 0px"
-      }
-    );
-
-    const currentRef = statsRef.current;
-    if (currentRef) {
-      observer.observe(currentRef);
+    if (isVisible && !hasAnimated) {
+      setHasAnimated(true);
     }
-
-    return () => {
-      if (currentRef) {
-        observer.unobserve(currentRef);
-      }
-    };
-  }, [hasAnimated]);
-
-  // Animation effect
-  useEffect(() => {
-    if (!isVisible) return;
-
-    animationRefs.current.forEach((element, index) => {
-      if (!element) return;
-      
-      const stat = statsData[index];
-      const duration = 2000 + (index * 200);
-      
-      element.textContent = `${stat.prefix}0${stat.suffix}`;
-      
-      setTimeout(() => {
-        animateValue(
-          element, 
-          0, 
-          stat.number, 
-          duration, 
-          stat.suffix, 
-          stat.prefix
-        );
-      }, index * 300);
-    });
-  }, [isVisible, statsData, animateValue]);
+  }, [isVisible, hasAnimated]);
 
   return (
     <section 
@@ -160,8 +217,8 @@ const Stats = () => {
         {/* Grid Pattern */}
         <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
         
-        {/* Floating Particles */}
-        {[...Array(15)].map((_, i) => (
+        {/* Floating Particles - Reduced for performance */}
+        {[...Array(prefersReducedMotion ? 5 : 15)].map((_, i) => (
           <div 
             key={i} 
             className="absolute w-2 h-2 bg-blue-400/30 rounded-full animate-float"
@@ -193,42 +250,15 @@ const Stats = () => {
         
         {/* Main Stats Grid */}
         <div className="pro-grid lg:grid-cols-4 md:grid-cols-2 pro-gap-8 mb-16">
-          {statsData.map((stat, index) => {
-            const IconComponent = stat.icon;
-            return (
-              <div 
-                key={index} 
-                className="group relative pro-card pro-p-8 bg-white/70 backdrop-blur-sm border-white/30 hover:shadow-xl transition-all duration-500 hover:scale-105"
-                aria-label={`${stat.number} ${stat.label}`}
-              >
-                {/* Background Gradient */}
-                <div className={`absolute inset-0 bg-gradient-to-r ${stat.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500 pro-rounded-xl`}></div>
-                
-                <div className="relative z-10">
-                  <div className={`w-16 h-16 bg-gradient-to-r ${stat.gradient} pro-rounded-xl pro-flex-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-500`}>
-                    <IconComponent className="w-8 h-8 text-white" />
-                  </div>
-                  
-                  <div className="text-center">
-                    <div 
-                      className="pro-heading-section text-gray-900 mb-2 font-bold group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 transition-all duration-500" 
-                      ref={el => animationRefs.current[index] = el}
-                      aria-live="polite"
-                    >
-                      {stat.prefix}0{stat.suffix}
-                    </div>
-                    <div className="pro-heading-sm text-gray-900 mb-3 font-semibold">{stat.label}</div>
-                    <p className="pro-text-sm text-gray-600 group-hover:text-gray-700 transition-colors duration-300">
-                      {stat.description}
-                    </p>
-                  </div>
-                </div>
-                
-                {/* Hover Effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pro-rounded-xl"></div>
-              </div>
-            );
-          })}
+          {statsData.map((stat, index) => (
+            <StatCard 
+              key={index}
+              stat={stat}
+              index={index}
+              isVisible={isVisible}
+              prefersReducedMotion={prefersReducedMotion}
+            />
+          ))}
         </div>
         
         {/* Additional Stats */}
@@ -236,7 +266,7 @@ const Stats = () => {
           {additionalStats.map((stat, index) => {
             const IconComponent = stat.icon;
             return (
-              <div key={index} className="text-center pro-p-6 bg-white/50 backdrop-blur-sm pro-rounded-xl border border-white/20 hover:shadow-lg transition-all duration-300">
+              <div key={index} className="text-center pro-p-6 bg-white/70 backdrop-blur-sm pro-rounded-xl border border-white/20 hover:shadow-lg transition-all duration-300">
                 <div className="w-12 h-12 bg-gray-100 pro-rounded-xl pro-flex-center mx-auto mb-3">
                   <IconComponent className={`w-6 h-6 ${stat.color}`} />
                 </div>
@@ -249,19 +279,19 @@ const Stats = () => {
         
         {/* Trust Indicators */}
         <div className="pro-flex flex-wrap justify-center items-center pro-gap-8 mb-12">
-          <div className="pro-flex items-center pro-gap-2 pro-p-4 bg-white/50 backdrop-blur-sm pro-rounded-lg border border-white/20">
+          <div className="pro-flex items-center pro-gap-2 pro-p-4 bg-white/70 backdrop-blur-sm pro-rounded-lg border border-white/20">
             <Star className="w-5 h-5 text-yellow-500 fill-current" />
             <span className="pro-text-sm font-medium text-gray-700">4.9/5 Rating</span>
           </div>
-          <div className="pro-flex items-center pro-gap-2 pro-p-4 bg-white/50 backdrop-blur-sm pro-rounded-lg border border-white/20">
+          <div className="pro-flex items-center pro-gap-2 pro-p-4 bg-white/70 backdrop-blur-sm pro-rounded-lg border border-white/20">
             <Shield className="w-5 h-5 text-green-500" />
             <span className="pro-text-sm font-medium text-gray-700">SOC 2 Compliant</span>
           </div>
-          <div className="pro-flex items-center pro-gap-2 pro-p-4 bg-white/50 backdrop-blur-sm pro-rounded-lg border border-white/20">
+          <div className="pro-flex items-center pro-gap-2 pro-p-4 bg-white/70 backdrop-blur-sm pro-rounded-lg border border-white/20">
             <Award className="w-5 h-5 text-purple-500" />
             <span className="pro-text-sm font-medium text-gray-700">Industry Leading</span>
           </div>
-          <div className="pro-flex items-center pro-gap-2 pro-p-4 bg-white/50 backdrop-blur-sm pro-rounded-lg border border-white/20">
+          <div className="pro-flex items-center pro-gap-2 pro-p-4 bg-white/70 backdrop-blur-sm pro-rounded-lg border border-white/20">
             <Zap className="w-5 h-5 text-blue-500" />
             <span className="pro-text-sm font-medium text-gray-700">AI Powered</span>
           </div>
@@ -276,12 +306,12 @@ const Stats = () => {
           </p>
           
           <div className="pro-flex flex-wrap justify-center items-center pro-gap-4 mb-8">
-            <button className="pro-btn pro-btn-primary bg-gradient-to-r from-blue-500 to-purple-600 border-0 hover:from-blue-600 hover:to-purple-700 pro-flex items-center pro-gap-2">
+            <button className="pro-btn pro-btn-primary bg-gradient-to-r from-blue-500 to-purple-600 border-0 hover:from-blue-600 hover:to-purple-700 pro-flex items-center pro-gap-2 focus:ring-4 focus:ring-blue-200">
               <BarChart3 className="w-5 h-5" />
               See Case Studies
               <ArrowRight className="w-5 h-5" />
             </button>
-            <button className="pro-btn pro-btn-ghost">
+            <button className="pro-btn pro-btn-ghost focus:ring-4 focus:ring-purple-200">
               <Users className="w-5 h-5 mr-2" />
               Join the Community
             </button>

@@ -1,8 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import LoadingOverlay from '../components/LoadingOverlay';
-import { Search, Menu, Bell, Grid3X3, Settings, User, LogOut, ChevronDown, X, Zap } from 'lucide-react';
+import { Search, Menu, Bell, Grid3X3, Settings, User, LogOut, ChevronDown, X, Zap, Filter, Clock, ArrowRight, Check, Trash2, Mail, Phone, Shield, Moon, Sun, Globe, HelpCircle } from 'lucide-react';
 
 const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -10,26 +10,43 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [searchFilters, setSearchFilters] = useState({ category: 'all', dateRange: 'all' });
+  const [searchHistory, setSearchHistory] = useState([]);
+  const [selectedSearchIndex, setSelectedSearchIndex] = useState(-1);
+  const [notifications, setNotifications] = useState([
+    { id: 1, text: 'Hearing reminder for Case #C-2023-4582', time: '10 mins ago', read: false, type: 'reminder', priority: 'high' },
+    { id: 2, text: 'New document uploaded by client', time: '45 mins ago', read: false, type: 'document', priority: 'medium' },
+    { id: 3, text: 'Court date changed for Smith v. Jones', time: '2 hours ago', read: true, type: 'schedule', priority: 'high' },
+    { id: 4, text: 'Client Johnson signed the agreement', time: '5 hours ago', read: true, type: 'document', priority: 'low' },
+    { id: 5, text: 'Payment received from client ABC Corp', time: '1 day ago', read: false, type: 'payment', priority: 'medium' }
+  ]);
+  const [notificationFilter, setNotificationFilter] = useState('all');
+  const [darkMode, setDarkMode] = useState(false);
+  
   const searchRef = useRef(null);
   const notificationsRef = useRef(null);
   const profileRef = useRef(null);
   const navigate = useNavigate();
   const { user, logout } = useAuth();
 
-  const notifications = [
-    { id: 1, text: 'Hearing reminder for Case #C-2023-4582', time: '10 mins ago', read: false },
-    { id: 2, text: 'New document uploaded by client', time: '45 mins ago', read: false },
-    { id: 3, text: 'Court date changed for Smith v. Jones', time: '2 hours ago', read: true },
-    { id: 4, text: 'Client Johnson signed the agreement', time: '5 hours ago', read: true }
-  ];
-
   const unreadCount = notifications.filter(n => !n.read).length;
+
+  // Enhanced search categories
+  const searchCategories = [
+    { value: 'all', label: 'All' },
+    { value: 'cases', label: 'Cases' },
+    { value: 'clients', label: 'Clients' },
+    { value: 'documents', label: 'Documents' },
+    { value: 'appointments', label: 'Appointments' },
+    { value: 'contacts', label: 'Contacts' }
+  ];
 
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
         setSearchOpen(false);
+        setSelectedSearchIndex(-1);
       }
       if (notificationsRef.current && !notificationsRef.current.contains(event.target)) {
         setNotificationsOpen(false);
@@ -45,76 +62,93 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
     };
   }, []);
 
-  // Function to search all visible content
-  const searchAllContent = (query) => {
+  // Keyboard navigation for search
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (searchOpen && searchResults.length > 0) {
+        switch (event.key) {
+          case 'ArrowDown':
+            event.preventDefault();
+            setSelectedSearchIndex(prev => 
+              prev < searchResults.length - 1 ? prev + 1 : prev
+            );
+            break;
+          case 'ArrowUp':
+            event.preventDefault();
+            setSelectedSearchIndex(prev => prev > 0 ? prev - 1 : -1);
+            break;
+          case 'Enter':
+            event.preventDefault();
+            if (selectedSearchIndex >= 0) {
+              handleResultClick(searchResults[selectedSearchIndex]);
+            } else if (searchResults.length > 0) {
+              handleResultClick(searchResults[0]);
+            }
+            break;
+          case 'Escape':
+            setSearchOpen(false);
+            setSelectedSearchIndex(-1);
+            break;
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [searchOpen, searchResults, selectedSearchIndex]);
+
+  // Enhanced search function with filters
+  const searchAllContent = useCallback((query) => {
     if (!query.trim()) return [];
     
     const results = [];
     const searchTerm = query.toLowerCase();
     
-    // Get all text content from the main content area
-    const mainContent = document.querySelector('main');
-    if (!mainContent) return results;
-    
-    // Search through all elements with text content
-    const textNodes = mainContent.querySelectorAll('h1, h2, h3, h4, h5, h6, p, li, td, th, span, div');
-    
-    textNodes.forEach(node => {
-      if (node.textContent) {
-        const text = node.textContent.toLowerCase();
-        if (text.includes(searchTerm)) {
-          // Get some context around the match
-          const startIndex = Math.max(0, text.indexOf(searchTerm) - 20);
-          const endIndex = Math.min(text.length, text.indexOf(searchTerm) + searchTerm.length + 50);
-          let context = text.substring(startIndex, endIndex);
-          
-          // Add ellipsis if not at beginning/end
-          if (startIndex > 0) context = '...' + context;
-          if (endIndex < text.length) context = context + '...';
-          
-          // Find the closest section or card for categorization
-          let category = 'Page Content';
-          let parent = node.parentElement;
-          
-          while (parent && parent !== mainContent) {
-            if (parent.tagName === 'SECTION' || parent.classList.contains('card') || 
-                parent.classList.contains('panel') || parent.getAttribute('aria-label')) {
-              if (parent.getAttribute('aria-label')) {
-                category = parent.getAttribute('aria-label');
-              } else if (parent.classList.contains('card')) {
-                category = 'Card';
-              } else if (parent.tagName === 'SECTION') {
-                category = 'Section';
-              } else if (parent.id) {
-                category = parent.id;
-              }
-              break;
-            }
-            parent = parent.parentElement;
-          }
-          
-          // Avoid duplicate results
-          const isDuplicate = results.some(result => 
-            result.element === node || result.text.includes(context)
-          );
-          
-          if (!isDuplicate) {
+    // Mock data for different categories
+    const mockData = {
+      cases: [
+        { title: 'Smith v. Jones Corporation', category: 'Commercial Law', id: 'C-2023-001' },
+        { title: 'Estate of Williams', category: 'Probate Law', id: 'C-2023-002' },
+        { title: 'ABC Corp vs XYZ Ltd', category: 'Corporate Law', id: 'C-2023-003' }
+      ],
+      clients: [
+        { name: 'John Smith', company: 'Smith Enterprises', phone: '+1-555-0123' },
+        { name: 'Sarah Johnson', company: 'Johnson & Associates', phone: '+1-555-0124' },
+        { name: 'Michael Brown', company: 'Brown Industries', phone: '+1-555-0125' }
+      ],
+      documents: [
+        { name: 'Contract Agreement - Smith.pdf', type: 'Contract', date: '2023-12-01' },
+        { name: 'Court Filing - Jones Case.doc', type: 'Court Filing', date: '2023-11-28' },
+        { name: 'Legal Brief - Williams Estate.pdf', type: 'Legal Brief', date: '2023-11-25' }
+      ]
+    };
+
+    // Search through different data types based on filter
+    Object.keys(mockData).forEach(category => {
+      if (searchFilters.category === 'all' || searchFilters.category === category) {
+        mockData[category].forEach(item => {
+          const searchableText = Object.values(item).join(' ').toLowerCase();
+          if (searchableText.includes(searchTerm)) {
             results.push({
-              text: context,
-              category: category,
-              element: node
+              text: category === 'cases' ? `${item.title} - ${item.category}` :
+                    category === 'clients' ? `${item.name} - ${item.company}` :
+                    `${item.name} - ${item.type}`,
+              category: category.charAt(0).toUpperCase() + category.slice(1),
+              id: item.id || item.name || item.title,
+              data: item
             });
           }
-        }
+        });
       }
     });
     
-    return results.slice(0, 8); // Limit to 8 results
-  };
+    return results.slice(0, 8);
+  }, [searchFilters]);
 
   const handleSearchChange = (e) => {
     const query = e.target.value;
     setSearchQuery(query);
+    setSelectedSearchIndex(-1);
     
     if (query.length > 2) {
       const results = searchAllContent(query);
@@ -130,35 +164,82 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
     setSearchQuery('');
     setSearchResults([]);
     setSearchOpen(false);
+    setSelectedSearchIndex(-1);
   };
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    if (searchResults.length > 0) {
-      handleResultClick(searchResults[0]);
+    if (searchQuery.trim()) {
+      // Add to search history
+      setSearchHistory(prev => {
+        const newHistory = [searchQuery, ...prev.filter(item => item !== searchQuery)].slice(0, 5);
+        return newHistory;
+      });
+      
+      if (searchResults.length > 0) {
+        const targetResult = selectedSearchIndex >= 0 ? searchResults[selectedSearchIndex] : searchResults[0];
+        handleResultClick(targetResult);
+      }
     }
   };
 
   const handleResultClick = (result) => {
-    // Scroll to the element
-    result.element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    
-    // Highlight the element temporarily with a more sophisticated approach
-    const originalBg = result.element.style.backgroundColor;
-    const originalTransition = result.element.style.transition;
-    
-    result.element.style.transition = 'background-color 0.5s ease';
-    result.element.style.backgroundColor = '#fffdba';
-    
-    setTimeout(() => {
-      result.element.style.backgroundColor = originalBg;
-      setTimeout(() => {
-        result.element.style.transition = originalTransition;
-      }, 500);
-    }, 2000);
-    
+    // Navigate based on category
+    switch (result.category.toLowerCase()) {
+      case 'cases':
+        navigate(`/advocate/cases/${result.id}`);
+        break;
+      case 'clients':
+        navigate(`/advocate/clients/${result.id}`);
+        break;
+      case 'documents':
+        navigate(`/advocate/documents/${result.id}`);
+        break;
+      default:
+        // Scroll to element if it exists
+        if (result.element) {
+          result.element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          // Highlight the element temporarily with a more sophisticated approach
+          const originalBg = result.element.style.backgroundColor;
+          const originalTransition = result.element.style.transition;
+          
+          result.element.style.transition = 'background-color 0.5s ease';
+          result.element.style.backgroundColor = '#fffdba';
+          
+          setTimeout(() => {
+            result.element.style.backgroundColor = originalBg;
+            setTimeout(() => {
+              result.element.style.transition = originalTransition;
+            }, 500);
+          }, 2000);
+        }
+    }
     setSearchOpen(false);
+    setSelectedSearchIndex(-1);
   };
+
+  // Enhanced notification functions
+  const markNotificationAsRead = (id) => {
+    setNotifications(prev => 
+      prev.map(notif => 
+        notif.id === id ? { ...notif, read: true } : notif
+      )
+    );
+  };
+
+  const deleteNotification = (id) => {
+    setNotifications(prev => prev.filter(notif => notif.id !== id));
+  };
+
+  const markAllAsRead = () => {
+    setNotifications(prev => prev.map(notif => ({ ...notif, read: true })));
+  };
+
+  const filteredNotifications = notifications.filter(notif => {
+    if (notificationFilter === 'all') return true;
+    if (notificationFilter === 'unread') return !notif.read;
+    return notif.type === notificationFilter;
+  });
 
   // Handle navigation to different pages
   const handleNavigation = (path) => {
@@ -172,24 +253,27 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
   const handleSignOut = async () => {
     setProfileOpen(false);
     setIsLoggingOut(true);
-    // Simulate logout delay
     await new Promise(resolve => setTimeout(resolve, 1500));
-    // Call the logout function from context
     logout();
-    // Navigate to home page
     navigate('/');
+  };
+
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+    // Apply dark mode to document
+    document.documentElement.classList.toggle('dark');
   };
 
   return (
     <>
       {isLoggingOut && <LoadingOverlay message="Logging out..." />}
       <nav className="glass-morphism-card border-b border-white/20 backdrop-blur-xl bg-gradient-to-r from-purple-900/80 via-blue-900/80 to-indigo-900/80 px-6 py-4 saas-shadow-glow sticky top-0 z-50">
-        <div className="flex justify-between items-center">
+        <div className="flex items-center justify-between h-16">
           {/* Left side - Menu toggle and Logo */}
           <div className="flex items-center space-x-4">
             <button 
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className="saas-button-secondary p-2.5 group"
+              className="saas-button-secondary p-2.5 rounded-lg group transition-all duration-300 hover:bg-white/10"
               aria-label="Toggle sidebar"
             >
               <Menu className="w-5 h-5 text-white/80 group-hover:text-white transition-colors duration-300" />
@@ -213,9 +297,9 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
             </div>
           </div>
 
-          {/* Enhanced Search Bar */}
+          {/* Enhanced Search Bar with Filters */}
           <div className="flex-1 max-w-2xl mx-6 relative animate-float" ref={searchRef}>
-            <form onSubmit={handleSearchSubmit}>
+            <form onSubmit={handleSearchSubmit} className="w-full">
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <Search className="h-5 w-5 text-white/60" />
@@ -223,78 +307,148 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
                 <input
                   type="text"
                   placeholder="Search cases, documents, clients..."
-                  className="saas-input w-full pl-12 pr-12 py-3.5 bg-white/10 border border-white/20 text-white placeholder-white/60 backdrop-blur-md focus:bg-white/15 focus:border-blue-400/50 focus:ring-2 focus:ring-blue-400/30"
+                  className="saas-input w-full pl-12 pr-20 py-3.5 bg-white/10 border border-white/20 text-white placeholder-white/60 backdrop-blur-md focus:bg-white/15 focus:border-blue-400/50 focus:ring-2 focus:ring-blue-400/30 rounded-xl transition-all duration-300"
                   value={searchQuery}
                   onChange={handleSearchChange}
                   onFocus={() => searchQuery.length > 2 && setSearchOpen(true)}
                 />
-                {searchQuery && (
+                <div className="absolute inset-y-0 right-0 flex items-center space-x-2 pr-4">
                   <button
                     type="button"
-                    onClick={clearSearch}
-                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-white/60 hover:text-white transition-colors duration-300"
+                    onClick={() => setSearchOpen(!searchOpen)}
+                    className="text-white/60 hover:text-white transition-colors duration-300"
+                    aria-label="Search filters"
                   >
-                    <X className="h-5 w-5" />
+                    <Filter className="h-4 w-4" />
                   </button>
-                )}
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={clearSearch}
+                      className="text-white/60 hover:text-white transition-colors duration-300"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
               </div>
             </form>
 
-            {/* Enhanced Search Results Dropdown */}
-            {searchOpen && searchResults.length > 0 && (
-              <div className="absolute z-50 mt-2 w-full glass-morphism-card border border-white/20 backdrop-blur-xl overflow-hidden animate-stagger-fade-in">
-                <div className="p-4 border-b border-white/10 bg-gradient-to-r from-blue-600/20 to-purple-600/20 flex justify-between items-center">
-                  <h3 className="text-sm font-semibold text-white">
-                    {searchResults.length} result{searchResults.length !== 1 ? 's' : ''} found
-                  </h3>
-                  <button 
-                    onClick={clearSearch}
-                    className="text-xs text-white/60 hover:text-white transition-colors duration-300"
-                  >
-                    Clear
-                  </button>
-                </div>
-                <div className="max-h-80 overflow-y-auto">
-                  {searchResults.map((result, index) => (
-                    <div 
-                      key={index} 
-                      className="p-4 border-b border-white/10 hover:bg-white/10 cursor-pointer transition-all duration-300 group"
-                      onClick={() => handleResultClick(result)}
+            {/* Enhanced Search Results with Filters */}
+            {searchOpen && (
+              <div className="absolute z-50 mt-2 w-full glass-morphism-card border border-white/20 backdrop-blur-xl rounded-xl overflow-hidden animate-stagger-fade-in shadow-2xl">
+                {/* Search Filters */}
+                <div className="p-4 border-b border-white/10 bg-gradient-to-r from-blue-600/20 to-purple-600/20">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-sm font-semibold text-white">Search Filters</h3>
+                    <button 
+                      onClick={clearSearch}
+                      className="text-xs text-white/60 hover:text-white transition-colors duration-300"
                     >
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm text-white/90 truncate group-hover:text-white transition-colors duration-300">
-                            {result.text}
-                          </p>
-                          <span className="inline-flex items-center mt-2 px-3 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-200 border border-blue-400/30">
-                            {result.category}
-                          </span>
-                        </div>
-                        <ChevronDown className="h-4 w-4 text-white/60 flex-shrink-0 ml-3 rotate-[-90deg] group-hover:text-white transition-colors duration-300" />
-                      </div>
-                    </div>
-                  ))}
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <div className="flex space-x-3">
+                    <select 
+                      value={searchFilters.category}
+                      onChange={(e) => setSearchFilters(prev => ({ ...prev, category: e.target.value }))}
+                      className="text-xs bg-white/10 border border-white/20 text-white rounded-lg px-3 py-1"
+                    >
+                      {searchCategories.map(cat => (
+                        <option key={cat.value} value={cat.value} className="bg-gray-800">
+                          {cat.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
-              </div>
-            )}
 
-            {searchOpen && searchQuery.length > 2 && searchResults.length === 0 && (
-              <div className="absolute z-50 mt-2 w-full glass-morphism-card border border-white/20 backdrop-blur-xl overflow-hidden animate-stagger-fade-in">
-                <div className="p-6 text-center">
-                  <Search className="w-12 h-12 mx-auto text-white/30 mb-3" />
-                  <p className="text-sm text-white/80 mb-1">No results found for "{searchQuery}"</p>
-                  <p className="text-xs text-white/50">Try different keywords or check your spelling</p>
-                </div>
+                {/* Search History */}
+                {searchHistory.length > 0 && searchQuery.length <= 2 && (
+                  <div className="p-4 border-b border-white/10">
+                    <h4 className="text-xs font-semibold text-white/80 mb-2 flex items-center">
+                      <Clock className="h-3 w-3 mr-1" />
+                      Recent Searches
+                    </h4>
+                    {searchHistory.map((term, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setSearchQuery(term)}
+                        className="block w-full text-left text-sm text-white/70 hover:text-white py-1 hover:bg-white/5 rounded px-2"
+                      >
+                        {term}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Search Results */}
+                {searchResults.length > 0 && (
+                  <>
+                    <div className="p-4 border-b border-white/10 bg-gradient-to-r from-green-600/20 to-blue-600/20">
+                      <h3 className="text-sm font-semibold text-white">
+                        {searchResults.length} result{searchResults.length !== 1 ? 's' : ''} found
+                      </h3>
+                    </div>
+                    <div className="max-h-80 overflow-y-auto">
+                      {searchResults.map((result, index) => (
+                        <div 
+                          key={index} 
+                          className={`p-4 border-b border-white/10 hover:bg-white/10 cursor-pointer transition-all duration-300 group ${
+                            selectedSearchIndex === index ? 'bg-white/15' : ''
+                          }`}
+                          onClick={() => handleResultClick(result)}
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm text-white/90 group-hover:text-white transition-colors duration-300 line-clamp-2">
+                                {result.text}
+                              </p>
+                              <span className="inline-flex items-center mt-2 px-3 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-200 border border-blue-400/30">
+                                {result.category}
+                              </span>
+                            </div>
+                            <ArrowRight className="h-4 w-4 text-white/60 flex-shrink-0 ml-3 mt-1 group-hover:text-white transition-colors duration-300" />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+
+                {searchQuery.length > 2 && searchResults.length === 0 && (
+                  <div className="p-6 text-center">
+                    <Search className="w-12 h-12 mx-auto text-white/30 mb-3" />
+                    <p className="text-sm text-white/80 mb-1">No results found for "{searchQuery}"</p>
+                    <p className="text-xs text-white/50">Try different keywords or check your spelling</p>
+                  </div>
+                )}
               </div>
             )}
           </div>
 
           {/* Right side items */}
           <div className="flex items-center space-x-3">
+            {/* Dark Mode Toggle */}
+            <button 
+              onClick={toggleDarkMode}
+              className="saas-button-secondary p-2.5 group relative rounded-lg transition-all duration-300 hover:bg-white/10"
+              aria-label="Toggle dark mode"
+            >
+              {darkMode ? 
+                <Sun className="h-5 w-5 text-white/80 group-hover:text-white transition-colors duration-300" /> :
+                <Moon className="h-5 w-5 text-white/80 group-hover:text-white transition-colors duration-300" />
+              }
+              <div className="saas-tooltip">
+                {darkMode ? 'Light Mode' : 'Dark Mode'}
+              </div>
+            </button>
+
             {/* Apps button */}
             <button 
-              className="saas-button-secondary p-2.5 group relative"
+              className="saas-button-secondary p-2.5 group relative rounded-lg transition-all duration-300 hover:bg-white/10"
               onClick={() => navigate('/apps')}
+              aria-label="Apps"
             >
               <Grid3X3 className="h-5 w-5 text-white/80 group-hover:text-white transition-colors duration-300" />
               <div className="saas-tooltip">
@@ -305,8 +459,9 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
             {/* Enhanced Notifications */}
             <div className="relative" ref={notificationsRef}>
               <button 
-                className="saas-button-secondary p-2.5 group relative"
+                className="saas-button-secondary p-2.5 group relative rounded-lg transition-all duration-300 hover:bg-white/10"
                 onClick={() => setNotificationsOpen(!notificationsOpen)}
+                aria-label="Notifications"
               >
                 <Bell className="h-5 w-5 text-white/80 group-hover:text-white transition-colors duration-300" />
                 {unreadCount > 0 && (
@@ -320,39 +475,97 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
               </button>
 
               {notificationsOpen && (
-                <div className="absolute right-0 mt-3 w-80 glass-morphism-card border border-white/20 backdrop-blur-xl overflow-hidden z-10 animate-slide-down">
-                  <div className="p-4 border-b border-white/10 bg-gradient-to-r from-blue-600/20 to-purple-600/20 flex justify-between items-center">
-                    <h3 className="text-sm font-semibold text-white">Notifications</h3>
-                    <button className="text-xs text-blue-300 hover:text-blue-200 font-medium transition-colors duration-300">
-                      Mark all as read
-                    </button>
+                <div className="absolute right-0 mt-3 w-96 glass-morphism-card border border-white/20 backdrop-blur-xl rounded-xl overflow-hidden z-10 animate-slide-down shadow-2xl">
+                  <div className="p-4 border-b border-white/10 bg-gradient-to-r from-blue-600/20 to-purple-600/20">
+                    <div className="flex justify-between items-center mb-3">
+                      <h3 className="text-sm font-semibold text-white">Notifications</h3>
+                      <div className="flex space-x-2">
+                        {unreadCount > 0 && (
+                          <button 
+                            onClick={markAllAsRead}
+                            className="text-xs text-blue-300 hover:text-blue-200 font-medium transition-colors duration-300"
+                          >
+                            Mark all read
+                          </button>
+                        )}
+                        <button 
+                          onClick={() => navigate('/notifications')}
+                          className="text-xs text-blue-300 hover:text-blue-200 font-medium transition-colors duration-300"
+                        >
+                          View all
+                        </button>
+                      </div>
+                    </div>
+                    {/* Notification Filters */}
+                    <div className="flex space-x-2">
+                      {['all', 'unread', 'reminder', 'document', 'payment'].map(filter => (
+                        <button
+                          key={filter}
+                          onClick={() => setNotificationFilter(filter)}
+                          className={`text-xs px-3 py-1 rounded-full transition-colors duration-300 ${
+                            notificationFilter === filter 
+                              ? 'bg-blue-500/30 text-blue-200' 
+                              : 'bg-white/10 text-white/60 hover:text-white'
+                          }`}
+                        >
+                          {filter.charAt(0).toUpperCase() + filter.slice(1)}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                   <div className="max-h-96 overflow-y-auto">
-                    {notifications.length > 0 ? (
-                      notifications.map(notification => (
-                        <div key={notification.id} className={`p-4 border-b border-white/10 hover:bg-white/10 transition-all duration-300 ${!notification.read ? 'bg-blue-500/10' : ''}`}>
-                          <div className="flex">
-                            {!notification.read && (
-                              <span className="h-2 w-2 mt-2 rounded-full bg-gradient-to-r from-blue-400 to-blue-500 mr-3 flex-shrink-0 animate-pulse-glow"></span>
-                            )}
-                            <div className={notification.read ? "ml-5" : ""}>
-                              <p className="text-sm text-white/90">{notification.text}</p>
-                              <p className="text-xs text-white/50 mt-1">{notification.time}</p>
+                    {filteredNotifications.length > 0 ? (
+                      filteredNotifications.map(notification => (
+                        <div key={notification.id} className={`p-4 border-b border-white/10 hover:bg-white/10 transition-all duration-300 group ${!notification.read ? 'bg-blue-500/10' : ''}`}>
+                          <div className="flex items-start justify-between">
+                            <div className="flex items-start flex-1">
+                              {!notification.read && (
+                                <span className="h-2 w-2 mt-2 rounded-full bg-gradient-to-r from-blue-400 to-blue-500 mr-3 flex-shrink-0 animate-pulse-glow"></span>
+                              )}
+                              <div className={notification.read ? "ml-5" : ""}>
+                                <p className="text-sm text-white/90">{notification.text}</p>
+                                <div className="flex items-center justify-between mt-2">
+                                  <p className="text-xs text-white/50">{notification.time}</p>
+                                  <span className={`text-xs px-2 py-1 rounded-full ${
+                                    notification.priority === 'high' ? 'bg-red-500/20 text-red-300' :
+                                    notification.priority === 'medium' ? 'bg-yellow-500/20 text-yellow-300' :
+                                    'bg-green-500/20 text-green-300'
+                                  }`}>
+                                    {notification.priority}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex space-x-1 ml-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                              {!notification.read && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    markNotificationAsRead(notification.id);
+                                  }}
+                                  className="p-1 text-white/60 hover:text-green-400 transition-colors duration-300"
+                                  title="Mark as read"
+                                >
+                                  <Check className="h-3 w-3" />
+                                </button>
+                              )}
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  deleteNotification(notification.id);
+                                }}
+                                className="p-1 text-white/60 hover:text-red-400 transition-colors duration-300"
+                                title="Delete"
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </button>
                             </div>
                           </div>
                         </div>
                       ))
                     ) : (
-                      <p className="p-6 text-sm text-white/60 text-center">No notifications</p>
+                      <p className="p-6 text-sm text-white/60 text-center">No notifications found</p>
                     )}
-                  </div>
-                  <div className="p-3 border-t border-white/10 bg-gradient-to-r from-purple-600/10 to-blue-600/10 text-center">
-                    <button 
-                      className="text-xs text-blue-300 hover:text-blue-200 font-medium transition-colors duration-300"
-                      onClick={() => navigate('/notifications')}
-                    >
-                      View all notifications
-                    </button>
                   </div>
                 </div>
               )}
@@ -361,14 +574,15 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
             {/* Enhanced User profile */}
             <div className="relative" ref={profileRef}>
               <button 
-                className="flex items-center space-x-3 focus:outline-none group saas-button-secondary px-4 py-2.5"
+                className="flex items-center space-x-3 focus:outline-none group saas-button-secondary px-4 py-2.5 rounded-xl transition-all duration-300 hover:bg-white/10"
                 onClick={() => setProfileOpen(!profileOpen)}
+                aria-label="User profile"
               >
                 <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center text-white font-bold shadow-lg group-hover:shadow-purple-500/30 transition-all duration-300">
                   {user ? user.name?.charAt(0) || user.email?.charAt(0) || 'U' : 'U'}
                 </div>
                 <div className="hidden md:block text-left">
-                  <p className="text-sm font-semibold text-white/90 group-hover:text-white transition-colors duration-300">
+                  <p className="text-sm font-semibold text-white/90 group-hover:text-white transition-colors duration-300 truncate max-w-[120px]">
                     {user ? user.name || user.email.split('@')[0] : 'User'}
                   </p>
                   <p className="text-xs text-white/60 group-hover:text-white/70 transition-colors duration-300">
@@ -379,29 +593,60 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
               </button>
 
               {profileOpen && (
-                <div className="absolute right-0 mt-3 w-52 glass-morphism-card border border-white/20 backdrop-blur-xl py-2 z-10 animate-slide-down">
+                <div className="absolute right-0 mt-3 w-64 glass-morphism-card border border-white/20 backdrop-blur-xl rounded-xl py-2 z-10 animate-slide-down shadow-2xl">
                   <div className="px-4 py-3 border-b border-white/10">
-                    <p className="text-sm font-semibold text-white/90">{user ? user.name || user.email.split('@')[0] : 'User'}</p>
-                    <p className="text-xs text-white/60 truncate">{user ? user.email : 'user@example.com'}</p>
+                    <div className="flex items-center space-x-3">
+                      <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center text-white font-bold">
+                        {user ? user.name?.charAt(0) || user.email?.charAt(0) || 'U' : 'U'}
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-white/90 truncate">{user ? user.name || user.email.split('@')[0] : 'User'}</p>
+                        <p className="text-xs text-white/60 truncate">{user ? user.email : 'user@example.com'}</p>
+                        <div className="flex items-center mt-1">
+                          <Shield className="h-3 w-3 text-green-400 mr-1" />
+                          <span className="text-xs text-green-400">Verified</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
+                  
                   <button 
-                    onClick={() => handleNavigation('/advocate/settings')}
-                    className="block w-full text-left px-4 py-3 text-sm text-white/80 hover:bg-white/10 hover:text-white transition-all duration-300 flex items-center space-x-3 group"
+                    onClick={() => handleNavigation('/advocate/profile')}
+                    className="flex items-center space-x-3 w-full text-left px-4 py-3 text-sm text-white/80 hover:bg-white/10 hover:text-white transition-all duration-300 group"
                   >
                     <User className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
-                    <span>Profile</span>
+                    <span>My Profile</span>
                   </button>
+                  
                   <button 
                     onClick={() => handleNavigation('/advocate/settings')}
-                    className="block w-full text-left px-4 py-3 text-sm text-white/80 hover:bg-white/10 hover:text-white transition-all duration-300 flex items-center space-x-3 group"
+                    className="flex items-center space-x-3 w-full text-left px-4 py-3 text-sm text-white/80 hover:bg-white/10 hover:text-white transition-all duration-300 group"
                   >
                     <Settings className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
                     <span>Settings</span>
                   </button>
+
+                  <button 
+                    onClick={() => handleNavigation('/advocate/billing')}
+                    className="flex items-center space-x-3 w-full text-left px-4 py-3 text-sm text-white/80 hover:bg-white/10 hover:text-white transition-all duration-300 group"
+                  >
+                    <Globe className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
+                    <span>Billing & Plans</span>
+                  </button>
+
+                  <button 
+                    onClick={() => handleNavigation('/help')}
+                    className="flex items-center space-x-3 w-full text-left px-4 py-3 text-sm text-white/80 hover:bg-white/10 hover:text-white transition-all duration-300 group"
+                  >
+                    <HelpCircle className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
+                    <span>Help & Support</span>
+                  </button>
+
                   <div className="border-t border-white/10 my-1"></div>
+                  
                   <button 
                     onClick={handleSignOut}
-                    className="block w-full text-left px-4 py-3 text-sm text-red-300 hover:bg-red-500/10 hover:text-red-200 transition-all duration-300 flex items-center space-x-3 group"
+                    className="flex items-center space-x-3 w-full text-left px-4 py-3 text-sm text-red-300 hover:bg-red-500/10 hover:text-red-200 transition-all duration-300 group"
                   >
                     <LogOut className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
                     <span>Sign out</span>

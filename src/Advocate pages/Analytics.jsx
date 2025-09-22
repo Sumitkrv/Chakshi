@@ -146,8 +146,8 @@ const AnalyticsDashboard = () => {
     datasets: [{
       label: 'Progress %',
       data: caseData.map(c => c.progress),
-      backgroundColor: 'rgba(37, 99, 235, 0.8)',
-      borderColor: 'rgba(37, 99, 235, 1)',
+      backgroundColor: 'rgba(212, 175, 55, 0.8)',
+      borderColor: 'rgba(212, 175, 55, 1)',
       borderWidth: 2,
       borderRadius: 4,
       borderSkipped: false,
@@ -183,9 +183,9 @@ const AnalyticsDashboard = () => {
     datasets: [{
       label: 'Case Value ($)',
       data: caseData.map(c => c.value),
-      backgroundColor: 'rgba(124, 58, 237, 0.8)',
-      borderColor: 'rgba(124, 58, 237, 1)',
-      borderWidth: 2,
+      backgroundColor: 'rgba(10, 35, 66, 0.2)',
+      borderColor: 'rgba(10, 35, 66, 1)',
+      borderWidth: 3,
       fill: true,
       tension: 0.4
     }]
@@ -249,22 +249,24 @@ const AnalyticsDashboard = () => {
   ];
 
   return (
-    <div className="pro-dashboard-layout">
-      <div className="pro-main-content lg:ml-64">
+    <div className="min-h-screen bg-gradient-to-br from-navy-50 via-white to-gold-50">
+      <div className="main-content lg:ml-64">
         
         {/* Professional Header */}
-        <header className="pro-header">
-          <div className="pro-flex-between w-full">
-            <div className="pro-flex-col">
-              <h1 className="pro-heading-xl text-gray-900">Analytics Dashboard</h1>
-              <p className="pro-text-body text-gray-600">
+        <header className="bg-white/80 backdrop-blur-sm border-b border-gold-200/30 px-6 py-8 sticky top-0 z-10">
+          <div className="flex justify-between items-start w-full">
+            <div className="flex flex-col">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-navy-900 to-navy-700 bg-clip-text text-transparent">
+                Analytics Dashboard
+              </h1>
+              <p className="text-lg text-navy-600 mt-2 font-medium">
                 Comprehensive insights into your legal practice performance
               </p>
             </div>
             
-            <div className="pro-flex items-center pro-gap-4">
+            <div className="flex items-center gap-4">
               <select 
-                className="pro-form-select"
+                className="bg-white/90 backdrop-blur-sm border-2 border-gold-200 hover:border-gold-400 focus:border-gold-500 rounded-xl px-4 py-3 text-navy-700 font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gold-400/30"
                 value={filters.timeframe}
                 onChange={(e) => setFilters({...filters, timeframe: e.target.value})}
               >
@@ -274,8 +276,8 @@ const AnalyticsDashboard = () => {
                 <option value="1y">Last year</option>
               </select>
               
-              <button className="pro-btn pro-btn-ghost">
-                <Filter className="w-4 h-4 mr-2" />
+              <button className="px-6 py-3 bg-gradient-to-r from-white/90 to-white/70 backdrop-blur-sm border-2 border-gold-200 hover:border-gold-400 rounded-xl text-navy-700 font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg flex items-center gap-2">
+                <Filter className="w-4 h-4" />
                 Filters
               </button>
             </div>
@@ -283,37 +285,37 @@ const AnalyticsDashboard = () => {
         </header>
 
         {/* Dashboard Content */}
-        <div className="pro-p-6 lg:p-8">
+        <div className="p-6 lg:p-8">
           
           {/* Key Metrics Grid */}
-          <div className="pro-grid lg:grid-cols-3 md:grid-cols-2 pro-gap-6 mb-8">
+          <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-6 mb-8">
             {statCards.map((stat, index) => (
               <div 
                 key={index}
-                className="pro-stat-card group pro-animate-fade-in pro-hover-lift cursor-pointer"
+                className="backdrop-blur-xl bg-gradient-to-br from-white/90 to-white/70 border-2 border-gold-200/50 hover:border-gold-400/60 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer hover:scale-105"
                 style={{animationDelay: `${0.1 * index}s`}}
                 onClick={() => setActiveMetric(stat.title.toLowerCase().replace(' ', '_'))}
               >
-                <div className="pro-flex-between items-start mb-4">
-                  <div className={`w-12 h-12 pro-rounded-xl bg-gradient-to-r ${stat.color} pro-flex-center pro-shadow-glow group-hover:scale-110 transition-transform duration-300`}>
-                    <stat.icon className="w-6 h-6 text-white" />
+                <div className="flex justify-between items-start mb-4">
+                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-r ${stat.color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                    <stat.icon className="w-7 h-7 text-white" />
                   </div>
-                  <div className="pro-flex items-center pro-gap-1">
+                  <div className="flex items-center gap-1">
                     {getTrendIcon(stat.change)}
-                    <span className={`pro-text-xs font-medium ${stat.change > 0 ? 'text-green-600' : stat.change < 0 ? 'text-red-600' : 'text-gray-500'}`}>
+                    <span className={`text-xs font-bold ${stat.change > 0 ? 'text-green-600' : stat.change < 0 ? 'text-red-600' : 'text-navy-500'}`}>
                       {Math.abs(stat.change)}%
                     </span>
                   </div>
                 </div>
                 
-                <div className="pro-flex-col">
-                  <h3 className="pro-heading-xl font-bold text-gray-900 mb-1">
+                <div className="flex flex-col">
+                  <h3 className="text-3xl font-bold bg-gradient-to-r from-navy-900 to-navy-700 bg-clip-text text-transparent mb-1">
                     {stat.value}
                   </h3>
-                  <p className="pro-text-sm font-medium text-gray-600 mb-2">
+                  <p className="text-sm font-semibold text-navy-600 mb-2">
                     {stat.title}
                   </p>
-                  <p className="pro-text-xs text-gray-500">
+                  <p className="text-xs text-navy-500 font-medium">
                     {stat.trend}
                   </p>
                 </div>
@@ -322,13 +324,17 @@ const AnalyticsDashboard = () => {
           </div>
 
           {/* Charts Section */}
-          <div className="pro-grid lg:grid-cols-2 pro-gap-8 mb-8">
+          <div className="grid lg:grid-cols-2 gap-8 mb-8">
             
             {/* Case Progress Chart */}
-            <div className="pro-dashboard-card">
-              <div className="pro-flex-between items-center mb-6">
-                <h3 className="pro-heading-lg text-gray-900">Case Progress Overview</h3>
-                <BarChart3 className="w-5 h-5 text-gray-400" />
+            <div className="backdrop-blur-xl bg-gradient-to-br from-white/90 to-white/70 border-2 border-gold-200/50 hover:border-gold-400/60 rounded-3xl p-8 shadow-lg hover:shadow-xl transition-all duration-300">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-2xl font-bold bg-gradient-to-r from-navy-900 to-navy-700 bg-clip-text text-transparent">
+                  Case Progress Overview
+                </h3>
+                <div className="w-10 h-10 bg-gradient-to-br from-gold-400/20 to-gold-600/20 backdrop-blur-sm border border-gold-400/30 rounded-xl flex items-center justify-center">
+                  <BarChart3 className="w-5 h-5 text-gold-600" />
+                </div>
               </div>
               <div style={{ height: '300px' }}>
                 <Bar data={progressData} options={chartOptions} />
@@ -336,10 +342,14 @@ const AnalyticsDashboard = () => {
             </div>
 
             {/* Risk Distribution */}
-            <div className="pro-dashboard-card">
-              <div className="pro-flex-between items-center mb-6">
-                <h3 className="pro-heading-lg text-gray-900">Risk Distribution</h3>
-                <PieChart className="w-5 h-5 text-gray-400" />
+            <div className="backdrop-blur-xl bg-gradient-to-br from-white/90 to-white/70 border-2 border-gold-200/50 hover:border-gold-400/60 rounded-3xl p-8 shadow-lg hover:shadow-xl transition-all duration-300">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-2xl font-bold bg-gradient-to-r from-navy-900 to-navy-700 bg-clip-text text-transparent">
+                  Risk Distribution
+                </h3>
+                <div className="w-10 h-10 bg-gradient-to-br from-gold-400/20 to-gold-600/20 backdrop-blur-sm border border-gold-400/30 rounded-xl flex items-center justify-center">
+                  <PieChart className="w-5 h-5 text-gold-600" />
+                </div>
               </div>
               <div style={{ height: '300px' }}>
                 <Doughnut data={riskData} options={{...chartOptions, cutout: '60%'}} />
@@ -348,10 +358,14 @@ const AnalyticsDashboard = () => {
           </div>
 
           {/* Case Value Trend */}
-          <div className="pro-dashboard-card mb-8">
-            <div className="pro-flex-between items-center mb-6">
-              <h3 className="pro-heading-lg text-gray-900">Case Value Trends</h3>
-              <TrendingUp className="w-5 h-5 text-gray-400" />
+          <div className="backdrop-blur-xl bg-gradient-to-br from-white/90 to-white/70 border-2 border-gold-200/50 hover:border-gold-400/60 rounded-3xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 mb-8">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-navy-900 to-navy-700 bg-clip-text text-transparent">
+                Case Value Trends
+              </h3>
+              <div className="w-10 h-10 bg-gradient-to-br from-gold-400/20 to-gold-600/20 backdrop-blur-sm border border-gold-400/30 rounded-xl flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-gold-600" />
+              </div>
             </div>
             <div style={{ height: '350px' }}>
               <Line data={valueData} options={chartOptions} />
@@ -359,14 +373,16 @@ const AnalyticsDashboard = () => {
           </div>
 
           {/* Case Summary Table */}
-          <div className="pro-dashboard-card">
-            <div className="pro-flex-between items-center mb-6">
-              <h3 className="pro-heading-lg text-gray-900">Case Summary</h3>
-              <div className="pro-flex items-center pro-gap-2">
+          <div className="backdrop-blur-xl bg-gradient-to-br from-white/90 to-white/70 border-2 border-gold-200/50 hover:border-gold-400/60 rounded-3xl p-8 shadow-lg hover:shadow-xl transition-all duration-300">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-navy-900 to-navy-700 bg-clip-text text-transparent">
+                Case Summary
+              </h3>
+              <div className="flex items-center gap-2">
                 <input
                   type="text"
                   placeholder="Search cases..."
-                  className="pro-search-input"
+                  className="bg-white/90 backdrop-blur-sm border-2 border-gold-200 hover:border-gold-400 focus:border-gold-500 rounded-xl px-4 py-2 text-navy-700 font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gold-400/30"
                 />
               </div>
             </div>
@@ -374,63 +390,63 @@ const AnalyticsDashboard = () => {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="text-left pro-p-4 pro-text-sm font-semibold text-gray-700">Case Name</th>
-                    <th className="text-left pro-p-4 pro-text-sm font-semibold text-gray-700">Progress</th>
-                    <th className="text-left pro-p-4 pro-text-sm font-semibold text-gray-700">Risk Level</th>
-                    <th className="text-left pro-p-4 pro-text-sm font-semibold text-gray-700">Success Rate</th>
-                    <th className="text-left pro-p-4 pro-text-sm font-semibold text-gray-700">Value</th>
-                    <th className="text-left pro-p-4 pro-text-sm font-semibold text-gray-700">Status</th>
+                  <tr className="border-b-2 border-gold-200/50">
+                    <th className="text-left p-4 text-sm font-bold text-navy-700">Case Name</th>
+                    <th className="text-left p-4 text-sm font-bold text-navy-700">Progress</th>
+                    <th className="text-left p-4 text-sm font-bold text-navy-700">Risk Level</th>
+                    <th className="text-left p-4 text-sm font-bold text-navy-700">Success Rate</th>
+                    <th className="text-left p-4 text-sm font-bold text-navy-700">Value</th>
+                    <th className="text-left p-4 text-sm font-bold text-navy-700">Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {caseData.map((caseItem) => (
-                    <tr key={caseItem.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200">
-                      <td className="pro-p-4">
-                        <div className="pro-flex-col">
-                          <span className="pro-text-sm font-medium text-gray-900">
+                    <tr key={caseItem.id} className="border-b border-gold-100/60 hover:bg-gradient-to-r hover:from-gold-50/50 hover:to-navy-50/30 transition-all duration-200">
+                      <td className="p-4">
+                        <div className="flex flex-col">
+                          <span className="text-sm font-semibold text-navy-900">
                             {caseItem.name}
                           </span>
-                          <span className="pro-text-xs text-gray-500">
+                          <span className="text-xs text-navy-600 font-medium">
                             {caseItem.category}
                           </span>
                         </div>
                       </td>
-                      <td className="pro-p-4">
-                        <div className="pro-flex items-center pro-gap-2">
-                          <div className="w-16 bg-gray-200 pro-rounded-full h-2">
+                      <td className="p-4">
+                        <div className="flex items-center gap-2">
+                          <div className="w-16 bg-navy-200/40 rounded-full h-2">
                             <div 
-                              className="h-2 bg-blue-500 pro-rounded-full transition-all duration-300"
+                              className="h-2 bg-gradient-to-r from-gold-400 to-gold-600 rounded-full transition-all duration-300"
                               style={{width: `${caseItem.progress}%`}}
                             ></div>
                           </div>
-                          <span className="pro-text-xs text-gray-600">{caseItem.progress}%</span>
+                          <span className="text-xs text-navy-600 font-medium">{caseItem.progress}%</span>
                         </div>
                       </td>
-                      <td className="pro-p-4">
-                        <span className={`pro-status-badge ${
-                          caseItem.risk === 'High' ? 'pro-status-error' :
-                          caseItem.risk === 'Medium' ? 'pro-status-warning' :
-                          'pro-status-success'
+                      <td className="p-4">
+                        <span className={`inline-flex items-center px-3 py-1 rounded-xl text-xs font-bold border-2 ${
+                          caseItem.risk === 'High' ? 'bg-red-50 text-red-700 border-red-200' :
+                          caseItem.risk === 'Medium' ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                          'bg-green-50 text-green-700 border-green-200'
                         }`}>
                           {caseItem.risk}
                         </span>
                       </td>
-                      <td className="pro-p-4">
-                        <span className="pro-text-sm font-medium text-gray-900">
+                      <td className="p-4">
+                        <span className="text-sm font-semibold text-navy-900">
                           {caseItem.successProbability}%
                         </span>
                       </td>
-                      <td className="pro-p-4">
-                        <span className="pro-text-sm font-medium text-gray-900">
+                      <td className="p-4">
+                        <span className="text-sm font-semibold text-navy-900">
                           ${caseItem.value.toLocaleString()}
                         </span>
                       </td>
-                      <td className="pro-p-4">
-                        <span className={`pro-status-badge ${
-                          caseItem.status === 'Active' ? 'pro-status-success' :
-                          caseItem.status === 'Pending' ? 'pro-status-warning' :
-                          'pro-status-info'
+                      <td className="p-4">
+                        <span className={`inline-flex items-center px-3 py-1 rounded-xl text-xs font-bold border-2 ${
+                          caseItem.status === 'Active' ? 'bg-green-50 text-green-700 border-green-200' :
+                          caseItem.status === 'Pending' ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                          'bg-blue-50 text-blue-700 border-blue-200'
                         }`}>
                           {caseItem.status}
                         </span>

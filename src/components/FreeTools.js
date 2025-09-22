@@ -20,146 +20,322 @@ import {
   Filter,
   Users,
   Target,
-  CheckCircle
+  CheckCircle,
+  Calendar,
+  MousePointer,
+  Heart,
+  Share2,
+  ExternalLink,
+  Play,
+  Lock,
+  Lightbulb,
+  AlertCircle,
+  Settings,
+  BarChart3
 } from 'lucide-react';
 
 const FreeTools = () => {
   const freeTools = [
     {
       id: 1,
-      title: "RTI Application",
+      title: "RTI Application Generator",
       icon: FileText,
-      description: "Draft a comprehensive Right to Information application to obtain information from government authorities with proper legal formatting.",
+      description: "Create comprehensive Right to Information applications with automated legal formatting and government compliance checks.",
       category: "Government",
       isNew: false,
+      isFeatured: true,
       popularity: 95,
-      timeEstimate: "10-15 min",
-      uses: 12540,
+      timeEstimate: "8-12 min",
+      uses: 15680,
       difficulty: "Beginner",
       successRate: 98,
-      tags: ["Information", "Government", "Transparency"]
+      rating: 4.9,
+      lastUpdated: "2024-09-15",
+      premium: false,
+      tags: ["Information", "Government", "Transparency", "RTI"],
+      features: [
+        "Auto-fill government details",
+        "Legal compliance verification",
+        "Multiple format exports",
+        "Application tracking support"
+      ]
     },
     {
       id: 2,
-      title: "Police Complaint",
+      title: "Police Complaint Builder",
       icon: Shield,
-      description: "File a formal police complaint for various offenses and incidents with proper legal format and required details.",
+      description: "Generate legally sound police complaints with proper formatting, evidence attachment guidelines, and follow-up procedures.",
       category: "Criminal",
       isNew: true,
-      popularity: 87,
-      timeEstimate: "15-20 min",
-      uses: 8765,
+      isFeatured: false,
+      popularity: 89,
+      timeEstimate: "12-18 min",
+      uses: 12340,
       difficulty: "Intermediate",
       successRate: 94,
-      tags: ["Crime", "Police", "Complaint"]
+      rating: 4.7,
+      lastUpdated: "2024-09-20",
+      premium: false,
+      tags: ["Crime", "Police", "Complaint", "Evidence"],
+      features: [
+        "Evidence checklist included",
+        "Station locator integration",
+        "Legal procedure guidance",
+        "Progress tracking system"
+      ]
     },
     {
       id: 3,
-      title: "Consumer Court",
+      title: "Consumer Court Assistant",
       icon: Users,
-      description: "Draft a comprehensive complaint for defective products, poor services, or unfair trade practices with legal backing.",
+      description: "Draft comprehensive consumer complaints with automated damage calculations, legal precedent references, and court filing guidance.",
       category: "Consumer",
       isNew: false,
-      popularity: 92,
-      timeEstimate: "20-25 min",
-      uses: 11230,
+      isFeatured: true,
+      popularity: 93,
+      timeEstimate: "15-25 min",
+      uses: 18920,
       difficulty: "Intermediate",
       successRate: 96,
-      tags: ["Consumer Rights", "Products", "Services"]
+      rating: 4.8,
+      lastUpdated: "2024-09-10",
+      premium: false,
+      tags: ["Consumer Rights", "Products", "Services", "Redressal"],
+      features: [
+        "Damage calculator built-in",
+        "Legal precedent database",
+        "Court fee calculator",
+        "Filing procedure guide"
+      ]
     },
     {
       id: 4,
-      title: "Rental Agreement",
+      title: "Smart Rental Agreement",
       icon: BookOpen,
-      description: "Create a legally sound rental agreement for residential property leasing with all essential clauses and protections.",
+      description: "Create legally compliant rental agreements with city-specific clauses, automatic rent calculations, and tenant protection features.",
       category: "Property",
       isNew: false,
-      popularity: 98,
-      timeEstimate: "25-30 min",
-      uses: 18760,
+      isFeatured: true,
+      popularity: 97,
+      timeEstimate: "20-30 min",
+      uses: 28760,
       difficulty: "Advanced",
       successRate: 99,
-      tags: ["Property", "Rental", "Agreement"]
+      rating: 4.9,
+      lastUpdated: "2024-09-18",
+      premium: false,
+      tags: ["Property", "Rental", "Agreement", "Tenancy"],
+      features: [
+        "City-specific legal clauses",
+        "Rent escalation calculator",
+        "Security deposit tracker",
+        "Digital signature support"
+      ]
     },
     {
       id: 5,
-      title: "Will Template",
+      title: "Will & Testament Creator",
       icon: Award,
-      description: "Create a simple yet comprehensive last will and testament to distribute your assets according to your wishes.",
+      description: "Design comprehensive wills with asset distribution planning, executor guidelines, and legal validity verification across states.",
       category: "Personal",
       isNew: true,
-      popularity: 85,
-      timeEstimate: "30-35 min",
-      uses: 6540,
+      isFeatured: false,
+      popularity: 86,
+      timeEstimate: "25-40 min",
+      uses: 9840,
       difficulty: "Advanced",
       successRate: 97,
-      tags: ["Will", "Assets", "Testament"]
+      rating: 4.6,
+      lastUpdated: "2024-09-22",
+      premium: true,
+      tags: ["Will", "Assets", "Testament", "Inheritance"],
+      features: [
+        "Asset valuation guide",
+        "State law compliance",
+        "Executor responsibilities",
+        "Legal witness requirements"
+      ]
     },
     {
       id: 6,
-      title: "Legal Notice",
+      title: "Legal Notice Generator",
       icon: Target,
-      description: "Draft a formal legal notice before initiating court proceedings with proper legal language and format.",
+      description: "Draft formal legal notices with appropriate legal language, response timelines, and escalation procedures for various situations.",
       category: "Civil",
       isNew: false,
-      popularity: 90,
-      timeEstimate: "15-20 min",
-      uses: 14320,
+      isFeatured: false,
+      popularity: 91,
+      timeEstimate: "10-20 min",
+      uses: 16420,
       difficulty: "Intermediate",
       successRate: 95,
-      tags: ["Notice", "Legal", "Court"]
+      rating: 4.7,
+      lastUpdated: "2024-09-12",
+      premium: false,
+      tags: ["Notice", "Legal", "Court", "Civil"],
+      features: [
+        "Multiple notice types",
+        "Timeline calculators",
+        "Legal language database",
+        "Delivery proof guidance"
+      ]
     },
     {
       id: 7,
       title: "FIR Copy Application",
       icon: FileText,
-      description: "Apply for a certified copy of your First Information Report from the police station with proper documentation.",
+      description: "Generate applications for certified FIR copies with proper documentation requirements and police station procedures.",
       category: "Criminal",
       isNew: false,
-      popularity: 82,
-      timeEstimate: "10-15 min",
-      uses: 7650,
+      isFeatured: false,
+      popularity: 84,
+      timeEstimate: "5-10 min",
+      uses: 11250,
       difficulty: "Beginner",
       successRate: 99,
-      tags: ["FIR", "Police", "Copy"]
+      rating: 4.8,
+      lastUpdated: "2024-09-08",
+      premium: false,
+      tags: ["FIR", "Police", "Copy", "Documentation"],
+      features: [
+        "Station contact details",
+        "Required documents list",
+        "Fee calculation guide",
+        "Processing timeline"
+      ]
     },
     {
       id: 8,
-      title: "Property Verification",
+      title: "Property Due Diligence Kit",
       icon: CheckCircle,
-      description: "Comprehensive checklist for verifying property documents before purchase to avoid legal complications.",
+      description: "Comprehensive property verification toolkit with document checklists, legal compliance checks, and investment risk assessment.",
       category: "Property",
       isNew: true,
-      popularity: 88,
-      timeEstimate: "20-25 min",
-      uses: 9870,
-      difficulty: "Intermediate",
+      isFeatured: true,
+      popularity: 90,
+      timeEstimate: "30-45 min",
+      uses: 14870,
+      difficulty: "Advanced",
       successRate: 93,
-      tags: ["Property", "Verification", "Documents"]
+      rating: 4.8,
+      lastUpdated: "2024-09-21",
+      premium: true,
+      tags: ["Property", "Verification", "Documents", "Investment"],
+      features: [
+        "Document verification matrix",
+        "Legal compliance scanner",
+        "Risk assessment calculator",
+        "Investment analysis tools"
+      ]
+    },
+    {
+      id: 9,
+      title: "Employment Contract Builder",
+      icon: Lightbulb,
+      description: "Create comprehensive employment contracts with role-specific clauses, compliance checks, and industry standard terms.",
+      category: "Corporate",
+      isNew: true,
+      isFeatured: false,
+      popularity: 88,
+      timeEstimate: "15-25 min",
+      uses: 7340,
+      difficulty: "Intermediate",
+      successRate: 96,
+      rating: 4.7,
+      lastUpdated: "2024-09-19",
+      premium: false,
+      tags: ["Employment", "Contract", "HR", "Compliance"],
+      features: [
+        "Role-based templates",
+        "Salary structure guide",
+        "Compliance verification",
+        "Digital signature ready"
+      ]
+    },
+    {
+      id: 10,
+      title: "Startup Legal Essentials",
+      icon: TrendingUp,
+      description: "Complete legal documentation package for startups including incorporation papers, founder agreements, and compliance guides.",
+      category: "Corporate",
+      isNew: false,
+      isFeatured: true,
+      popularity: 92,
+      timeEstimate: "45-60 min",
+      uses: 5670,
+      difficulty: "Advanced",
+      successRate: 94,
+      rating: 4.9,
+      lastUpdated: "2024-09-17",
+      premium: true,
+      tags: ["Startup", "Incorporation", "Founders", "Compliance"],
+      features: [
+        "Complete incorporation kit",
+        "Founder equity calculator",
+        "Compliance calendar",
+        "Investor agreement templates"
+      ]
     }
   ];
 
-  const categories = ["All", "Government", "Criminal", "Consumer", "Property", "Personal", "Civil"];
+  const categories = [
+    "All", 
+    "Government", 
+    "Criminal", 
+    "Consumer", 
+    "Property", 
+    "Personal", 
+    "Civil", 
+    "Corporate"
+  ];
+  
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("default");
   const [viewMode, setViewMode] = useState("grid");
   const [selectedTool, setSelectedTool] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showOnlyFree, setShowOnlyFree] = useState(false);
+  const [bookmarkedTools, setBookmarkedTools] = useState([]);
+  const [activeFilters, setActiveFilters] = useState({
+    difficulty: [],
+    rating: null,
+    featured: false
+  });
 
-  // Filter tools based on category and search query
+  // Filter tools based on category, search query, and additional filters
   const filteredTools = freeTools
-    .filter(tool => 
-      (selectedCategory === "All" || tool.category === selectedCategory) &&
-      (tool.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-       tool.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-       tool.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())))
-    )
+    .filter(tool => {
+      // Category filter
+      const categoryMatch = selectedCategory === "All" || tool.category === selectedCategory;
+      
+      // Search filter
+      const searchMatch = tool.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        tool.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        tool.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+      
+      // Free/Premium filter
+      const freeMatch = !showOnlyFree || !tool.premium;
+      
+      // Difficulty filter
+      const difficultyMatch = activeFilters.difficulty.length === 0 || 
+        activeFilters.difficulty.includes(tool.difficulty);
+      
+      // Rating filter
+      const ratingMatch = !activeFilters.rating || tool.rating >= activeFilters.rating;
+      
+      // Featured filter
+      const featuredMatch = !activeFilters.featured || tool.isFeatured;
+      
+      return categoryMatch && searchMatch && freeMatch && difficultyMatch && ratingMatch && featuredMatch;
+    })
     .sort((a, b) => {
       if (sortBy === "popularity") return b.popularity - a.popularity;
       if (sortBy === "name") return a.title.localeCompare(b.title);
       if (sortBy === "uses") return b.uses - a.uses;
       if (sortBy === "success") return b.successRate - a.successRate;
+      if (sortBy === "rating") return b.rating - a.rating;
+      if (sortBy === "newest") return new Date(b.lastUpdated) - new Date(a.lastUpdated);
       return 0;
     });
 
@@ -171,6 +347,35 @@ const FreeTools = () => {
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedTool(null);
+  };
+
+  const toggleBookmark = (toolId) => {
+    setBookmarkedTools(prev => 
+      prev.includes(toolId) 
+        ? prev.filter(id => id !== toolId)
+        : [...prev, toolId]
+    );
+  };
+
+  const clearAllFilters = () => {
+    setSearchQuery("");
+    setSelectedCategory("All");
+    setShowOnlyFree(false);
+    setActiveFilters({
+      difficulty: [],
+      rating: null,
+      featured: false
+    });
+    setSortBy("default");
+  };
+
+  const toggleDifficultyFilter = (difficulty) => {
+    setActiveFilters(prev => ({
+      ...prev,
+      difficulty: prev.difficulty.includes(difficulty)
+        ? prev.difficulty.filter(d => d !== difficulty)
+        : [...prev.difficulty, difficulty]
+    }));
   };
 
   useEffect(() => {
@@ -192,87 +397,116 @@ const FreeTools = () => {
       case 'Property': return 'bg-purple-100 text-purple-700 border-purple-200';
       case 'Personal': return 'bg-orange-100 text-orange-700 border-orange-200';
       case 'Civil': return 'bg-indigo-100 text-indigo-700 border-indigo-200';
+      case 'Corporate': return 'bg-cyan-100 text-cyan-700 border-cyan-200';
       default: return 'bg-gray-100 text-gray-700 border-gray-200';
     }
   };
 
   const getDifficultyColor = (difficulty) => {
     switch (difficulty) {
-      case 'Beginner': return 'bg-green-100 text-green-700';
-      case 'Intermediate': return 'bg-yellow-100 text-yellow-700';
-      case 'Advanced': return 'bg-red-100 text-red-700';
-      default: return 'bg-gray-100 text-gray-700';
+      case 'Beginner': return 'bg-green-100 text-green-700 border border-green-200';
+      case 'Intermediate': return 'bg-yellow-100 text-yellow-700 border border-yellow-200';
+      case 'Advanced': return 'bg-red-100 text-red-700 border border-red-200';
+      default: return 'bg-gray-100 text-gray-700 border border-gray-200';
     }
   };
 
-  const getPopularityColor = (popularity) => {
-    if (popularity >= 95) return 'from-green-500 to-emerald-600';
-    if (popularity >= 85) return 'from-blue-500 to-cyan-600';
-    if (popularity >= 75) return 'from-yellow-500 to-orange-600';
-    return 'from-gray-400 to-gray-500';
+  const renderStarRating = (rating) => {
+    return (
+      <div className="flex items-center gap-1">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <Star
+            key={star}
+            className={`w-3 h-3 ${
+              star <= rating ? 'text-yellow-500 fill-current' : 'text-gray-300'
+            }`}
+          />
+        ))}
+        <span className="text-xs text-gray-600 ml-1">{rating}</span>
+      </div>
+    );
   };
 
   return (
-    <section className="pro-section bg-gradient-to-br from-gray-50 to-blue-50">
-      <div className="pro-container">
+    <section className="relative min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 overflow-hidden">
+      
+      {/* Enhanced Background Elements */}
+      <div className="absolute inset-0">
+        <div className="absolute top-20 right-10 w-96 h-96 bg-gradient-to-r from-blue-400/20 to-purple-600/20 rounded-full mix-blend-multiply filter blur-xl animate-blob"></div>
+        <div className="absolute bottom-20 left-10 w-96 h-96 bg-gradient-to-r from-green-400/20 to-blue-600/20 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-2000"></div>
+        <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-gradient-to-r from-purple-400/20 to-pink-600/20 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-4000"></div>
         
-        {/* Header */}
-        <div className="text-center mb-16">
-          <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-blue-600 pro-rounded-xl pro-flex-center mx-auto mb-6">
-            <BookOpen className="w-8 h-8 text-white" />
+        {/* Grid Pattern */}
+        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+      </div>
+      
+      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 py-24">
+        
+        {/* Enhanced Header */}
+        <div className="text-center mb-20">
+          <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-2xl">
+            <BookOpen className="w-10 h-10 text-white" />
           </div>
-          <h2 className="pro-heading-section text-gray-900 mb-4">
-            Free Legal Document Templates
-          </h2>
-          <p className="pro-text-lead text-gray-600 max-w-3xl mx-auto mb-8">
-            Create professional legal documents in minutes with our comprehensive template library. 
-            No legal expertise required - just follow our guided process.
+          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+            Legal Document
+            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"> Templates</span>
+          </h1>
+          <p className="text-xl text-gray-600 max-w-4xl mx-auto mb-12 leading-relaxed">
+            Transform your legal document creation with our AI-powered template library. 
+            Professional-grade documents in minutes, not hours.
           </p>
           
-          {/* Stats */}
-          <div className="pro-grid md:grid-cols-3 pro-gap-8 max-w-3xl mx-auto">
-            <div className="text-center">
-              <div className="w-12 h-12 bg-blue-100 pro-rounded-lg pro-flex-center mx-auto mb-3">
-                <FileText className="w-6 h-6 text-blue-600" />
+          {/* Enhanced Stats */}
+          <div className="grid md:grid-cols-4 gap-8 max-w-4xl mx-auto mb-12">
+            <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 text-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border border-white/20">
+              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <FileText className="w-8 h-8 text-white" />
               </div>
-              <div className="pro-heading-lg font-bold text-gray-900">{freeTools.length}+</div>
-              <div className="pro-text-sm text-gray-600">Templates Available</div>
+              <div className="text-3xl font-bold text-gray-900 mb-2">{freeTools.length}+</div>
+              <div className="text-sm font-medium text-gray-600">Professional Templates</div>
             </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-green-100 pro-rounded-lg pro-flex-center mx-auto mb-3">
-                <TrendingUp className="w-6 h-6 text-green-600" />
+            <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 text-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border border-white/20">
+              <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <BarChart3 className="w-8 h-8 text-white" />
               </div>
-              <div className="pro-heading-lg font-bold text-gray-900">98%</div>
-              <div className="pro-text-sm text-gray-600">Success Rate</div>
+              <div className="text-3xl font-bold text-gray-900 mb-2">98%</div>
+              <div className="text-sm font-medium text-gray-600">Success Rate</div>
             </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-purple-100 pro-rounded-lg pro-flex-center mx-auto mb-3">
-                <Users className="w-6 h-6 text-purple-600" />
+            <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 text-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border border-white/20">
+              <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <Users className="w-8 h-8 text-white" />
               </div>
-              <div className="pro-heading-lg font-bold text-gray-900">50K+</div>
-              <div className="pro-text-sm text-gray-600">Happy Users</div>
+              <div className="text-3xl font-bold text-gray-900 mb-2">75K+</div>
+              <div className="text-sm font-medium text-gray-600">Active Users</div>
+            </div>
+            <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 text-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border border-white/20">
+              <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <Clock className="w-8 h-8 text-white" />
+              </div>
+              <div className="text-3xl font-bold text-gray-900 mb-2">15min</div>
+              <div className="text-sm font-medium text-gray-600">Avg. Completion</div>
             </div>
           </div>
         </div>
 
-        {/* Search and Controls */}
-        <div className="pro-dashboard-card mb-8">
-          <div className="pro-flex flex-col lg:flex-row lg:items-center pro-gap-6">
+        {/* Enhanced Search and Controls */}
+        <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-8 mb-8 shadow-xl border border-white/30">
+          <div className="flex flex-col lg:flex-row lg:items-center gap-6">
             
             {/* Search */}
             <div className="flex-1">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input 
                   type="text" 
                   placeholder="Search templates, categories, or keywords..." 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pro-p-4 pl-12 pr-12 border border-gray-300 pro-rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full py-4 pl-12 pr-12 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 bg-white/50 backdrop-blur-sm text-gray-900 placeholder-gray-500"
                 />
                 {searchQuery && (
                   <button 
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 w-6 h-6 pro-flex-center hover:bg-gray-100 pro-rounded-lg"
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 w-6 h-6 flex items-center justify-center hover:bg-gray-100 rounded-lg transition-colors duration-200"
                     onClick={() => setSearchQuery("")}
                   >
                     <X className="w-4 h-4 text-gray-400" />
@@ -281,15 +515,15 @@ const FreeTools = () => {
               </div>
             </div>
             
-            {/* Controls */}
-            <div className="pro-flex items-center pro-gap-4">
+            {/* Enhanced Controls */}
+            <div className="flex items-center gap-4">
               
               {/* View Toggle */}
-              <div className="pro-flex bg-gray-100 pro-rounded-lg pro-p-1">
+              <div className="flex bg-gray-100 rounded-xl p-1 shadow-inner">
                 <button 
-                  className={`pro-flex items-center pro-gap-2 px-3 py-2 pro-rounded-lg transition-all duration-200 ${
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 ${
                     viewMode === 'grid' 
-                      ? 'bg-white text-blue-600 shadow-sm' 
+                      ? 'bg-white text-blue-600 shadow-md transform scale-105' 
                       : 'text-gray-600 hover:text-gray-900'
                   }`}
                   onClick={() => setViewMode('grid')}
@@ -298,9 +532,9 @@ const FreeTools = () => {
                   Grid
                 </button>
                 <button 
-                  className={`pro-flex items-center pro-gap-2 px-3 py-2 pro-rounded-lg transition-all duration-200 ${
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 ${
                     viewMode === 'list' 
-                      ? 'bg-white text-blue-600 shadow-sm' 
+                      ? 'bg-white text-blue-600 shadow-md transform scale-105' 
                       : 'text-gray-600 hover:text-gray-900'
                   }`}
                   onClick={() => setViewMode('list')}
@@ -315,132 +549,296 @@ const FreeTools = () => {
                 <select 
                   value={sortBy} 
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="appearance-none bg-white border border-gray-300 pro-rounded-lg px-4 py-2 pr-8 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="appearance-none bg-white/80 backdrop-blur-sm border-2 border-gray-200 rounded-xl px-4 py-3 pr-10 focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 text-gray-700 font-medium"
                 >
-                  <option value="default">Default</option>
-                  <option value="popularity">Popularity</option>
-                  <option value="name">Name</option>
+                  <option value="default">Default Order</option>
+                  <option value="popularity">Most Popular</option>
+                  <option value="name">Alphabetical</option>
                   <option value="uses">Most Used</option>
-                  <option value="success">Success Rate</option>
+                  <option value="rating">Highest Rated</option>
+                  <option value="newest">Recently Updated</option>
                 </select>
-                <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
               </div>
+              
+              {/* Advanced Filters Toggle */}
+              <button
+                onClick={() => setShowOnlyFree(!showOnlyFree)}
+                className={`flex items-center gap-2 px-4 py-3 rounded-xl border-2 transition-all duration-300 ${
+                  showOnlyFree 
+                    ? 'bg-blue-500 text-white border-blue-500 shadow-lg' 
+                    : 'bg-white/80 text-gray-700 border-gray-200 hover:border-blue-300'
+                }`}
+              >
+                <Lock className="w-4 h-4" />
+                Free Only
+              </button>
             </div>
           </div>
         </div>
 
-        {/* Category Filter */}
-        <div className="mb-8">
-          <div className="pro-flex items-center pro-gap-2 mb-4">
-            <Filter className="w-4 h-4 text-gray-600" />
-            <span className="pro-text-sm font-medium text-gray-700">Filter by Category:</span>
+        {/* Enhanced Category Filter */}
+        <div className="mb-10">
+          <div className="flex items-center gap-3 mb-6">
+            <Filter className="w-5 h-5 text-gray-600" />
+            <span className="text-lg font-semibold text-gray-800">Filter by Category</span>
           </div>
-          <div className="pro-flex flex-wrap pro-gap-3">
-            {categories.map(category => (
-              <button
-                key={category}
-                className={`pro-flex items-center pro-gap-2 px-4 py-2 pro-rounded-lg border transition-all duration-200 ${
-                  selectedCategory === category 
-                    ? 'bg-blue-500 text-white border-blue-500' 
-                    : 'bg-white text-gray-700 border-gray-300 hover:border-blue-300 hover:bg-blue-50'
-                }`}
-                onClick={() => setSelectedCategory(category)}
-              >
-                {category}
-                {category !== 'All' && (
-                  <span className={`pro-text-xs px-2 py-0.5 pro-rounded-lg font-medium ${
+          <div className="flex flex-wrap gap-3">
+            {categories.map(category => {
+              const categoryCount = category === 'All' 
+                ? freeTools.length 
+                : freeTools.filter(tool => tool.category === category).length;
+              
+              return (
+                <button
+                  key={category}
+                  className={`flex items-center gap-3 px-6 py-3 rounded-xl border-2 transition-all duration-300 transform hover:scale-105 ${
                     selectedCategory === category 
-                      ? 'bg-blue-400 text-white' 
+                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white border-transparent shadow-lg shadow-blue-500/25' 
+                      : 'bg-white/80 backdrop-blur-sm text-gray-700 border-gray-200 hover:border-blue-300 hover:bg-blue-50/50 shadow-sm'
+                  }`}
+                  onClick={() => setSelectedCategory(category)}
+                >
+                  <span className="font-medium">{category}</span>
+                  <span className={`text-xs px-2 py-1 rounded-lg font-semibold ${
+                    selectedCategory === category 
+                      ? 'bg-white/20 text-white' 
                       : 'bg-gray-100 text-gray-600'
                   }`}>
-                    {freeTools.filter(tool => tool.category === category).length}
+                    {categoryCount}
                   </span>
-                )}
-              </button>
-            ))}
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        {/* Results Count */}
-        <div className="pro-flex items-center justify-between mb-6">
-          <p className="pro-text-sm text-gray-600">
-            Showing {filteredTools.length} of {freeTools.length} templates
-            {selectedCategory !== 'All' && ` in ${selectedCategory}`}
-            {searchQuery && ` matching "${searchQuery}"`}
-          </p>
+        {/* Advanced Filters */}
+        <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 mb-8 border border-white/30">
+          <div className="flex flex-wrap items-center gap-6">
+            
+            {/* Difficulty Filter */}
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-medium text-gray-700">Difficulty:</span>
+              <div className="flex gap-2">
+                {['Beginner', 'Intermediate', 'Advanced'].map(difficulty => (
+                  <button
+                    key={difficulty}
+                    onClick={() => toggleDifficultyFilter(difficulty)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all duration-200 ${
+                      activeFilters.difficulty.includes(difficulty)
+                        ? getDifficultyColor(difficulty).replace('bg-', 'bg-').replace('text-', 'text-')
+                        : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    {difficulty}
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+            {/* Rating Filter */}
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-medium text-gray-700">Min Rating:</span>
+              <select
+                value={activeFilters.rating || ''}
+                onChange={(e) => setActiveFilters(prev => ({
+                  ...prev,
+                  rating: e.target.value ? parseFloat(e.target.value) : null
+                }))}
+                className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm bg-white/80 backdrop-blur-sm"
+              >
+                <option value="">Any</option>
+                <option value="4.5">4.5+ Stars</option>
+                <option value="4.0">4.0+ Stars</option>
+                <option value="3.5">3.5+ Stars</option>
+              </select>
+            </div>
+            
+            {/* Featured Filter */}
+            <button
+              onClick={() => setActiveFilters(prev => ({
+                ...prev,
+                featured: !prev.featured
+              }))}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-200 ${
+                activeFilters.featured
+                  ? 'bg-yellow-100 text-yellow-700 border-yellow-300'
+                  : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+              }`}
+            >
+              <Star className="w-4 h-4" />
+              Featured Only
+            </button>
+            
+            {/* Clear Filters */}
+            {(searchQuery || selectedCategory !== 'All' || showOnlyFree || 
+              activeFilters.difficulty.length > 0 || activeFilters.rating || activeFilters.featured) && (
+              <button
+                onClick={clearAllFilters}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 transition-all duration-200"
+              >
+                <X className="w-4 h-4" />
+                Clear All
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Enhanced Results Info */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <p className="text-lg font-medium text-gray-800">
+              Showing <span className="text-blue-600 font-bold">{filteredTools.length}</span> of{' '}
+              <span className="font-bold">{freeTools.length}</span> templates
+              {selectedCategory !== 'All' && (
+                <span className="text-gray-600"> in {selectedCategory}</span>
+              )}
+            </p>
+            {searchQuery && (
+              <p className="text-sm text-gray-600 mt-1">
+                Results for "<span className="font-medium text-gray-800">{searchQuery}</span>"
+              </p>
+            )}
+          </div>
+          
           {filteredTools.length > 0 && (
-            <div className="pro-flex items-center pro-gap-2 pro-text-sm text-gray-500">
-              <Zap className="w-4 h-4" />
-              Average completion: 15-25 minutes
+            <div className="flex items-center gap-6 text-sm text-gray-600">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-blue-500" />
+                <span>Avg: 15-25 min</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-green-500" />
+                <span>98% Success Rate</span>
+              </div>
             </div>
           )}
         </div>
 
-        {/* Tools Grid/List */}
+        {/* Enhanced Tools Grid/List */}
         {filteredTools.length > 0 ? (
-          <div className={`pro-grid pro-gap-6 mb-12 ${
+          <div className={`grid gap-8 mb-16 ${
             viewMode === 'grid' ? 'lg:grid-cols-3 md:grid-cols-2' : 'grid-cols-1'
           }`}>
             {filteredTools.map(tool => {
               const IconComponent = tool.icon;
+              const isBookmarked = bookmarkedTools.includes(tool.id);
+              
               return (
                 <div 
                   key={tool.id} 
-                  className={`pro-card group cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-105 ${
-                    viewMode === 'list' ? 'pro-flex items-center pro-gap-6' : ''
+                  className={`group cursor-pointer transition-all duration-500 hover:scale-105 ${
+                    viewMode === 'list' ? 'flex items-center gap-8' : ''
                   }`}
                   onClick={() => openToolDetails(tool)}
                 >
-                  {tool.isNew && (
-                    <div className="absolute top-4 right-4 bg-green-500 text-white pro-text-xs px-2 py-1 pro-rounded-lg font-semibold">
-                      NEW
-                    </div>
-                  )}
-                  
-                  <div className={`${viewMode === 'list' ? 'flex-shrink-0' : 'mb-4'}`}>
-                    <div className="w-16 h-16 bg-gradient-to-r from-blue-100 to-purple-100 pro-rounded-xl pro-flex-center mx-auto group-hover:scale-110 transition-transform duration-300">
-                      <IconComponent className="w-8 h-8 text-blue-600" />
-                    </div>
-                  </div>
-                  
-                  <div className={`${viewMode === 'list' ? 'flex-1' : ''}`}>
-                    <div className="pro-flex items-start justify-between mb-3">
-                      <h3 className="pro-heading-md text-gray-900 group-hover:text-blue-600 transition-colors duration-300">
-                        {tool.title}
-                      </h3>
-                      <div className="pro-flex items-center pro-gap-1">
-                        <Star className="w-4 h-4 text-yellow-500" />
-                        <span className="pro-text-sm font-medium text-gray-700">{tool.popularity}%</span>
-                      </div>
-                    </div>
+                  <div className={`relative bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-500 border border-white/30 ${
+                    tool.isFeatured ? 'ring-2 ring-yellow-400/50' : ''
+                  } ${viewMode === 'list' ? 'flex-1' : ''}`}>
                     
-                    <p className="pro-text-sm text-gray-600 mb-4 line-clamp-2">{tool.description}</p>
-                    
-                    <div className="pro-flex flex-wrap items-center pro-gap-2 mb-4">
-                      <span className={`pro-text-xs px-2 py-1 pro-rounded-lg border font-medium ${getCategoryColor(tool.category)}`}>
-                        {tool.category}
-                      </span>
-                      <span className={`pro-text-xs px-2 py-1 pro-rounded-lg font-medium ${getDifficultyColor(tool.difficulty)}`}>
-                        {tool.difficulty}
-                      </span>
-                    </div>
-                    
-                    <div className="pro-flex items-center justify-between">
-                      <div className="pro-flex items-center pro-gap-4 pro-text-xs text-gray-500">
-                        <div className="pro-flex items-center pro-gap-1">
-                          <Clock className="w-3 h-3" />
-                          {tool.timeEstimate}
+                    {/* Badges */}
+                    <div className="absolute top-4 right-4 flex flex-col gap-2">
+                      {tool.isNew && (
+                        <div className="bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs px-3 py-1 rounded-full font-bold shadow-lg">
+                          NEW
                         </div>
-                        <div className="pro-flex items-center pro-gap-1">
-                          <Eye className="w-3 h-3" />
-                          {tool.uses.toLocaleString()}
+                      )}
+                      {tool.isFeatured && (
+                        <div className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-xs px-3 py-1 rounded-full font-bold shadow-lg">
+                          FEATURED
+                        </div>
+                      )}
+                      {tool.premium && (
+                        <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs px-3 py-1 rounded-full font-bold shadow-lg">
+                          PRO
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Bookmark Button */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleBookmark(tool.id);
+                      }}
+                      className={`absolute top-4 left-4 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
+                        isBookmarked 
+                          ? 'bg-red-500 text-white shadow-lg scale-110' 
+                          : 'bg-white/80 text-gray-400 hover:text-red-500 hover:bg-white'
+                      }`}
+                    >
+                      <Heart className={`w-4 h-4 ${isBookmarked ? 'fill-current' : ''}`} />
+                    </button>
+                    
+                    <div className={`${viewMode === 'list' ? 'flex items-start gap-6' : ''}`}>
+                      {/* Icon */}
+                      <div className={`${viewMode === 'list' ? 'flex-shrink-0' : 'mb-6'}`}>
+                        <div className="w-20 h-20 bg-gradient-to-r from-blue-100 to-purple-100 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                          <IconComponent className="w-10 h-10 text-blue-600" />
                         </div>
                       </div>
                       
-                      <button className="pro-btn pro-btn-primary pro-btn-sm group-hover:bg-blue-600 transition-colors duration-300">
-                        Use Template
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                      </button>
+                      <div className={`${viewMode === 'list' ? 'flex-1' : ''}`}>
+                        {/* Header */}
+                        <div className="flex items-start justify-between mb-4">
+                          <h3 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors duration-300 leading-tight">
+                            {tool.title}
+                          </h3>
+                        </div>
+                        
+                        {/* Rating and Stats */}
+                        <div className="flex items-center justify-between mb-4">
+                          {renderStarRating(tool.rating)}
+                          <div className="flex items-center gap-2 text-xs text-gray-500">
+                            <Eye className="w-3 h-3" />
+                            <span>{tool.uses.toLocaleString()}</span>
+                          </div>
+                        </div>
+                        
+                        {/* Description */}
+                        <p className="text-gray-600 mb-6 leading-relaxed line-clamp-3">
+                          {tool.description}
+                        </p>
+                        
+                        {/* Tags */}
+                        <div className="flex flex-wrap gap-2 mb-6">
+                          <span className={`text-xs px-3 py-1.5 rounded-lg border font-medium ${getCategoryColor(tool.category)}`}>
+                            {tool.category}
+                          </span>
+                          <span className={`text-xs px-3 py-1.5 rounded-lg font-medium ${getDifficultyColor(tool.difficulty)}`}>
+                            {tool.difficulty}
+                          </span>
+                        </div>
+                        
+                        {/* Footer */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4 text-xs text-gray-500">
+                            <div className="flex items-center gap-1">
+                              <Clock className="w-3 h-3" />
+                              <span>{tool.timeEstimate}</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <CheckCircle className="w-3 h-3 text-green-500" />
+                              <span>{tool.successRate}%</span>
+                            </div>
+                          </div>
+                          
+                          <button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-6 py-2.5 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center gap-2">
+                            {tool.premium ? (
+                              <>
+                                <Lock className="w-4 h-4" />
+                                Upgrade
+                              </>
+                            ) : (
+                              <>
+                                <Play className="w-4 h-4" />
+                                Use Template
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -448,47 +846,89 @@ const FreeTools = () => {
             })}
           </div>
         ) : (
-          <div className="text-center py-16">
-            <div className="w-16 h-16 bg-gray-100 pro-rounded-xl pro-flex-center mx-auto mb-4">
-              <Search className="w-8 h-8 text-gray-400" />
+          <div className="text-center py-20">
+            <div className="w-24 h-24 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <Search className="w-12 h-12 text-gray-400" />
             </div>
-            <h3 className="pro-heading-lg text-gray-900 mb-2">No templates found</h3>
-            <p className="pro-text-body text-gray-600 mb-6">
-              Try adjusting your search terms or filters to find what you're looking for.
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">No templates found</h3>
+            <p className="text-gray-600 mb-8 max-w-md mx-auto">
+              We couldn't find any templates matching your criteria. Try adjusting your search terms or filters.
             </p>
             <button 
-              className="pro-btn pro-btn-ghost"
-              onClick={() => {
-                setSearchQuery("");
-                setSelectedCategory("All");
-              }}
+              className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-8 py-3 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 shadow-lg"
+              onClick={clearAllFilters}
             >
               Clear All Filters
             </button>
           </div>
         )}
 
-        {/* CTA Section */}
-        <div className="bg-gradient-to-r from-blue-100 to-purple-100 border border-blue-200 pro-rounded-xl pro-p-8 text-center">
-          <div className="w-12 h-12 bg-blue-500 pro-rounded-xl pro-flex-center mx-auto mb-4">
-            <Zap className="w-6 h-6 text-white" />
+        {/* Enhanced CTA Section */}
+        <div className="relative bg-gradient-to-r from-blue-900 via-purple-900 to-indigo-900 rounded-3xl p-12 text-center overflow-hidden shadow-2xl">
+          {/* Background Elements */}
+          <div className="absolute inset-0">
+            <div className="absolute top-0 left-1/4 w-64 h-64 bg-blue-400/20 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-purple-400/20 rounded-full blur-3xl"></div>
           </div>
-          <h3 className="pro-heading-lg text-gray-900 mb-3">
-            Need Custom Legal Documents?
-          </h3>
-          <p className="pro-text-body text-gray-700 mb-6 max-w-2xl mx-auto">
-            Our AI-powered document generator can create customized legal documents tailored to your 
-            specific requirements. Get professional-grade documents with expert guidance.
-          </p>
-          <div className="pro-flex flex-wrap justify-center items-center pro-gap-4">
-            <button className="pro-btn pro-btn-primary">
-              Try AI Document Generator
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </button>
-            <button className="pro-btn pro-btn-ghost">
-              <Download className="w-4 h-4 mr-2" />
-              Download All Templates
-            </button>
+          
+          <div className="relative z-10">
+            <div className="w-20 h-20 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-2xl">
+              <Lightbulb className="w-10 h-10 text-white" />
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
+              Need Custom Legal
+              <span className="bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent"> Solutions?</span>
+            </h2>
+            <p className="text-xl text-blue-100 mb-10 max-w-3xl mx-auto leading-relaxed">
+              Our AI-powered document generator creates personalized legal documents tailored to your 
+              specific requirements. Get professional-grade documents with expert guidance in minutes.
+            </p>
+            
+            {/* Features */}
+            <div className="grid md:grid-cols-3 gap-8 mb-10 max-w-4xl mx-auto">
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                <Settings className="w-8 h-8 text-yellow-400 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-white mb-2">AI Customization</h3>
+                <p className="text-blue-100 text-sm">Tailored documents based on your specific needs</p>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                <Shield className="w-8 h-8 text-green-400 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-white mb-2">Legal Compliance</h3>
+                <p className="text-blue-100 text-sm">Guaranteed compliance with current regulations</p>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                <Users className="w-8 h-8 text-purple-400 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-white mb-2">Expert Support</h3>
+                <p className="text-blue-100 text-sm">24/7 assistance from legal professionals</p>
+              </div>
+            </div>
+            
+            <div className="flex flex-wrap justify-center items-center gap-6">
+              <button className="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white px-10 py-4 rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-yellow-500/25 flex items-center gap-3">
+                <Zap className="w-6 h-6" />
+                Try AI Generator
+                <ArrowRight className="w-6 h-6" />
+              </button>
+              <button className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white border-2 border-white/30 hover:border-white/50 px-10 py-4 rounded-xl font-bold text-lg transition-all duration-300 flex items-center gap-3">
+                <Download className="w-6 h-6" />
+                Download All Templates
+              </button>
+            </div>
+            
+            <div className="mt-8 flex flex-wrap justify-center items-center gap-8 text-blue-200">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-green-400" />
+                <span>No credit card required</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-green-400" />
+                <span>14-day free trial</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-green-400" />
+                <span>Cancel anytime</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>

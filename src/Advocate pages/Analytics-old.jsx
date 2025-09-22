@@ -13,6 +13,27 @@ import {
   Legend,
   Filler
 } from 'chart.js';
+import { 
+  TrendingUp, 
+  AlertTriangle, 
+  CheckCircle, 
+  DollarSign, 
+  FileText, 
+  Calendar, 
+  Filter, 
+  Download,
+  Search,
+  ArrowUp,
+  ArrowDown,
+  BarChart3,
+  PieChart,
+  Activity,
+  Target,
+  Clock,
+  Shield,
+  Users,
+  Briefcase
+} from 'lucide-react';
 
 // Register ChartJS components
 ChartJS.register(
@@ -60,9 +81,90 @@ const AnalyticsDashboard = () => {
     });
   }, [caseData, filters]);
 
-  // Data for charts
+  // Enhanced chart configurations with professional styling
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'top',
+        labels: {
+          usePointStyle: true,
+          padding: 20,
+          font: {
+            size: 12,
+            family: "'Inter', sans-serif"
+          },
+          color: '#6B7280'
+        }
+      },
+      tooltip: {
+        backgroundColor: 'rgba(17, 24, 39, 0.95)',
+        titleColor: '#F9FAFB',
+        bodyColor: '#F9FAFB',
+        borderColor: 'rgba(59, 130, 246, 0.5)',
+        borderWidth: 1,
+        padding: 16,
+        titleFont: {
+          size: 14,
+          family: "'Inter', sans-serif"
+        },
+        bodyFont: {
+          size: 13,
+          family: "'Inter', sans-serif"
+        },
+        cornerRadius: 12,
+        displayColors: true,
+        caretPadding: 10
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: {
+          color: 'rgba(107, 114, 128, 0.1)',
+          drawBorder: false
+        },
+        ticks: {
+          padding: 12,
+          color: '#6B7280',
+          font: {
+            size: 11,
+            family: "'Inter', sans-serif"
+          }
+        }
+      },
+      x: {
+        grid: {
+          display: false
+        },
+        ticks: {
+          padding: 12,
+          color: '#6B7280',
+          font: {
+            size: 11,
+            family: "'Inter', sans-serif"
+          },
+          maxRotation: 45
+        }
+      }
+    },
+    elements: {
+      bar: {
+        borderRadius: 6,
+        borderSkipped: false
+      },
+      point: {
+        radius: 6,
+        hoverRadius: 8,
+        borderWidth: 3
+      }
+    }
+  };
+
+  // Enhanced chart data with professional color schemes
   const riskData = {
-    labels: filteredCases.map(caseItem => caseItem.name),
+    labels: filteredCases.map(caseItem => caseItem.name.length > 20 ? caseItem.name.substring(0, 20) + '...' : caseItem.name),
     datasets: [
       {
         label: 'Risk Score',
@@ -72,50 +174,53 @@ const AnalyticsDashboard = () => {
           return 75;
         }),
         backgroundColor: filteredCases.map(caseItem => {
-          if (caseItem.risk === 'Low') return 'rgba(76, 175, 80, 0.7)';
-          if (caseItem.risk === 'Medium') return 'rgba(255, 152, 0, 0.7)';
-          return 'rgba(244, 67, 54, 0.7)';
+          if (caseItem.risk === 'Low') return 'rgba(34, 197, 94, 0.8)';
+          if (caseItem.risk === 'Medium') return 'rgba(251, 191, 36, 0.8)';
+          return 'rgba(239, 68, 68, 0.8)';
         }),
         borderColor: filteredCases.map(caseItem => {
-          if (caseItem.risk === 'Low') return 'rgba(76, 175, 80, 1)';
-          if (caseItem.risk === 'Medium') return 'rgba(255, 152, 0, 1)';
-          return 'rgba(244, 67, 54, 1)';
+          if (caseItem.risk === 'Low') return 'rgba(34, 197, 94, 1)';
+          if (caseItem.risk === 'Medium') return 'rgba(251, 191, 36, 1)';
+          return 'rgba(239, 68, 68, 1)';
         }),
-        borderWidth: 1,
-        borderRadius: 4,
+        borderWidth: 2,
+        borderRadius: 8,
+        borderSkipped: false,
       },
     ],
   };
 
   const progressData = {
-    labels: filteredCases.map(caseItem => caseItem.name),
+    labels: filteredCases.map(caseItem => caseItem.name.length > 20 ? caseItem.name.substring(0, 20) + '...' : caseItem.name),
     datasets: [
       {
         label: 'Progress (%)',
         data: filteredCases.map(caseItem => caseItem.progress),
-        backgroundColor: 'rgba(33, 150, 243, 0.7)',
-        borderColor: 'rgba(33, 150, 243, 1)',
-        borderWidth: 1,
-        borderRadius: 4,
+        backgroundColor: 'rgba(59, 130, 246, 0.8)',
+        borderColor: 'rgba(59, 130, 246, 1)',
+        borderWidth: 2,
+        borderRadius: 8,
+        borderSkipped: false,
       },
     ],
   };
 
   const successData = {
-    labels: filteredCases.map(caseItem => caseItem.name),
+    labels: filteredCases.map(caseItem => caseItem.name.length > 15 ? caseItem.name.substring(0, 15) + '...' : caseItem.name),
     datasets: [
       {
         label: 'Success Probability (%)',
         data: filteredCases.map(caseItem => caseItem.successProbability),
-        backgroundColor: 'rgba(0, 150, 136, 0.2)',
-        borderColor: 'rgba(0, 150, 136, 1)',
-        borderWidth: 2,
+        backgroundColor: 'rgba(16, 185, 129, 0.2)',
+        borderColor: 'rgba(16, 185, 129, 1)',
+        borderWidth: 3,
         fill: true,
         tension: 0.4,
-        pointBackgroundColor: 'rgba(0, 150, 136, 1)',
-        pointBorderColor: '#fff',
-        pointRadius: 5,
-        pointHoverRadius: 7,
+        pointBackgroundColor: 'rgba(16, 185, 129, 1)',
+        pointBorderColor: '#ffffff',
+        pointBorderWidth: 3,
+        pointRadius: 6,
+        pointHoverRadius: 8,
       },
     ],
   };
@@ -188,65 +293,6 @@ const AnalyticsDashboard = () => {
     ],
   };
 
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: 'top',
-        labels: {
-          usePointStyle: true,
-          padding: 20,
-          font: {
-            size: 12
-          }
-        }
-      },
-      title: {
-        display: true,
-        text: 'Case Analytics',
-        font: {
-          size: 16,
-          weight: 'bold'
-        },
-        padding: {
-          top: 10,
-          bottom: 20
-        }
-      },
-      tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.7)',
-        padding: 12,
-        titleFont: {
-          size: 14
-        },
-        bodyFont: {
-          size: 13
-        },
-        cornerRadius: 4
-      }
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        grid: {
-          drawBorder: false
-        },
-        ticks: {
-          padding: 8
-        }
-      },
-      x: {
-        grid: {
-          display: false
-        },
-        ticks: {
-          padding: 8
-        }
-      }
-    }
-  };
-
   const pieChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -266,27 +312,20 @@ const AnalyticsDashboard = () => {
 
   const getRiskColor = (riskLevel) => {
     switch (riskLevel) {
-      case 'Low': return 'bg-green-100 text-green-800 border-green-200';
-      case 'Medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'High': return 'bg-red-100 text-red-800 border-red-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'Low': return 'bg-green-50 text-green-700 border-green-200';
+      case 'Medium': return 'bg-yellow-50 text-yellow-700 border-yellow-200';
+      case 'High': return 'bg-red-50 text-red-700 border-red-200';
+      default: return 'bg-gray-50 text-gray-700 border-gray-200';
     }
   };
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'Active': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'Pending': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'Completed': return 'bg-green-100 text-green-800 border-green-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'Active': return 'bg-blue-50 text-blue-700 border-blue-200';
+      case 'Pending': return 'bg-yellow-50 text-yellow-700 border-yellow-200';
+      case 'Completed': return 'bg-green-50 text-green-700 border-green-200';
+      default: return 'bg-gray-50 text-gray-700 border-gray-200';
     }
-  };
-
-  const getSuccessColor = (probability) => {
-    if (probability >= 80) return 'bg-green-100 text-green-800 border-green-200';
-    if (probability >= 60) return 'bg-blue-100 text-blue-800 border-blue-200';
-    if (probability >= 40) return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-    return 'bg-red-100 text-red-800 border-red-200';
   };
 
   const formatCurrency = (amount) => {
@@ -330,320 +369,540 @@ const AnalyticsDashboard = () => {
   }, [caseData]);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Legal Case Analytics Dashboard</h1>
-          <p className="text-gray-600">Track progress, risks, and success probabilities for all your cases</p>
-        </div>
-
-        {/* Filter Section */}
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-8 border border-gray-100">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Filter Cases</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Search Cases</label>
-              <input
-                type="text"
-                placeholder="Search by case name..."
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                value={filters.searchQuery}
-                onChange={(e) => handleFilterChange('searchQuery', e.target.value)}
-              />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 relative overflow-hidden">
+      {/* Background Elements */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 via-purple-600/5 to-indigo-600/5"></div>
+      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-400/10 to-purple-600/10 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-indigo-400/10 to-blue-600/10 rounded-full blur-3xl transform -translate-x-1/2 translate-y-1/2"></div>
+      
+      <div className="relative z-10 p-6 lg:p-8">
+        <div className="max-w-7xl mx-auto">
+          {/* Header Section */}
+          <div className="mb-8 animate-fade-in">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
+              <div className="mb-4 lg:mb-0">
+                <div className="flex items-center space-x-3 mb-2">
+                  <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl shadow-lg">
+                    <BarChart3 className="w-8 h-8 text-white" />
+                  </div>
+                  <div>
+                    <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+                      Legal Analytics Dashboard
+                    </h1>
+                    <p className="text-gray-600 text-lg mt-1">
+                      Comprehensive insights into case performance and risk assessment
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-3">
+                <button className="saas-button-secondary px-6 py-3 flex items-center space-x-2 bg-white/80 backdrop-blur-sm border border-gray-200 hover:bg-white transition-all duration-300">
+                  <Download className="w-5 h-5" />
+                  <span>Export Report</span>
+                </button>
+                <button className="saas-button-primary px-6 py-3 flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+                  <Calendar className="w-5 h-5" />
+                  <span>Schedule Review</span>
+                </button>
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Risk Level</label>
-              <select
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                value={filters.riskLevel}
-                onChange={(e) => handleFilterChange('riskLevel', e.target.value)}
+          </div>
+
+          {/* Enhanced Filter Section */}
+          <div className="glass-morphism-card bg-white/70 backdrop-blur-xl border border-white/20 rounded-2xl p-6 mb-8 saas-shadow-glow animate-slide-up">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg">
+                  <Filter className="w-5 h-5 text-white" />
+                </div>
+                <h2 className="text-xl font-semibold text-gray-800">Advanced Filters</h2>
+              </div>
+              <button 
+                onClick={() => setFilters({ riskLevel: 'All', status: 'All', category: 'All', searchQuery: '' })}
+                className="text-sm text-gray-500 hover:text-gray-700 transition-colors duration-300"
               >
-                <option value="All">All Risk Levels</option>
-                <option value="Low">Low Risk</option>
-                <option value="Medium">Medium Risk</option>
-                <option value="High">High Risk</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-              <select
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                value={filters.status}
-                onChange={(e) => handleFilterChange('status', e.target.value)}
-              >
-                <option value="All">All Statuses</option>
-                <option value="Active">Active</option>
-                <option value="Pending">Pending</option>
-                <option value="Completed">Completed</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-              <select
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                value={filters.category}
-                onChange={(e) => handleFilterChange('category', e.target.value)}
-              >
-                <option value="All">All Categories</option>
-                {caseCategories.map(category => (
-                  <option key={category} value={category}>{category}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
-
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-            <div className="flex items-center">
-              <div className="p-3 rounded-lg bg-indigo-50 mr-4">
-                <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-gray-600 mb-1">Total Cases</h3>
-                <p className="text-2xl font-bold text-gray-800">{caseData.length}</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-            <div className="flex items-center">
-              <div className="p-3 rounded-lg bg-blue-50 mr-4">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-gray-600 mb-1">Average Progress</h3>
-                <p className="text-2xl font-bold text-gray-800">{averageProgress}%</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-            <div className="flex items-center">
-              <div className="p-3 rounded-lg bg-red-50 mr-4">
-                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-gray-600 mb-1">High Risk Cases</h3>
-                <p className="text-2xl font-bold text-gray-800">{highRiskCasesCount}</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-            <div className="flex items-center">
-              <div className="p-3 rounded-lg bg-green-50 mr-4">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-gray-600 mb-1">Avg. Success Probability</h3>
-                <p className="text-2xl font-bold text-gray-800">{averageSuccessProbability}%</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Risk Assessment by Case</h2>
-            <div className="h-80">
-              <Bar data={riskData} options={chartOptions} />
-            </div>
-          </div>
-          
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Case Progress</h2>
-            <div className="h-80">
-              <Bar data={progressData} options={chartOptions} />
-            </div>
-          </div>
-          
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Success Probability Forecast</h2>
-            <div className="h-80">
-              <Line data={successData} options={chartOptions} />
-            </div>
-          </div>
-          
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Case Distribution by Category</h2>
-            <div className="h-80">
-              <Pie data={categoryDistributionData} options={pieChartOptions} />
-            </div>
-          </div>
-        </div>
-
-        {/* Case Details Table */}
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-8 border border-gray-100">
-          <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-            <div className="flex justify-between items-center">
-              <div>
-                <h2 className="text-xl font-semibold text-gray-800">Case Details</h2>
-                <p className="text-sm text-gray-600 mt-1">Detailed view of all cases with progress metrics</p>
-              </div>
-              <div className="text-sm text-gray-600">
-                Showing {filteredCases.length} of {caseData.length} cases
-              </div>
-            </div>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Case Name
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Category
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Progress
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Risk Level
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Success Probability
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Stages Completed
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Delays
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Value
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredCases.map((caseItem) => (
-                  <tr key={caseItem.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{caseItem.name}</div>
-                      <div className="text-xs text-gray-500">Opened: {formatDate(caseItem.openedDate)}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {caseItem.category}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full border ${getStatusColor(caseItem.status)}`}>
-                        {caseItem.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="w-full bg-gray-200 rounded-full h-2.5 mr-2">
-                          <div 
-                            className="h-2.5 rounded-full bg-blue-600" 
-                            style={{ width: `${caseItem.progress}%` }}
-                          ></div>
-                        </div>
-                        <span className="text-xs text-gray-500 w-8">{caseItem.progress}%</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full border ${getRiskColor(caseItem.risk)}`}>
-                        {caseItem.risk}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full border ${getSuccessColor(caseItem.successProbability)}`}>
-                        {caseItem.successProbability}%
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {caseItem.completedStages} / {caseItem.stages}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${caseItem.delays > 0 ? "bg-red-100 text-red-800 border border-red-200" : "bg-green-100 text-green-800 border border-green-200"}`}>
-                        {caseItem.delays} {caseItem.delays === 1 ? 'delay' : 'delays'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {formatCurrency(caseItem.value)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Insights Section */}
-        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
-            <svg className="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-            Analytics & Risk Insights
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-blue-50 p-5 rounded-lg border border-blue-100">
-              <h3 className="text-lg font-medium text-gray-700 mb-2 flex items-center">
-                <svg className="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                </svg>
-                Case Progress Analytics
-              </h3>
-              <p className="text-gray-600 mb-4">
-                Monitor stage completion rates and identify delays across all cases. Cases with more than 2 delays are flagged for review.
-              </p>
-              <ul className="space-y-2">
-                {caseData.filter(item => item.delays > 2).map(item => (
-                  <li key={item.id} className="text-sm text-red-600 flex items-center">
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                    {item.name} has {item.delays} delays requiring attention
-                  </li>
-                ))}
-                {caseData.filter(item => item.delays > 2).length === 0 && (
-                  <li className="text-sm text-green-600 flex items-center">
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    No cases with excessive delays
-                  </li>
-                )}
-              </ul>
+                Clear All
+              </button>
             </div>
             
-            <div className="bg-green-50 p-5 rounded-lg border border-green-100">
-              <h3 className="text-lg font-medium text-gray-700 mb-2 flex items-center">
-                <svg className="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-                Risk Assessment
-              </h3>
-              <p className="text-gray-600 mb-4">
-                Risk levels are calculated based on case complexity, historical data, and current progress. High risk cases may need additional resources.
-              </p>
-              <div className="mt-4 flex space-x-4">
-                <div className="flex items-center">
-                  <div className="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
-                  <span className="text-sm">High Risk</span>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">Search Cases</label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search by case name..."
+                    className="saas-input w-full pl-10 pr-4 py-3 bg-white/80 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-300"
+                    value={filters.searchQuery}
+                    onChange={(e) => handleFilterChange('searchQuery', e.target.value)}
+                  />
                 </div>
-                <div className="flex items-center">
-                  <div className="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>
-                  <span className="text-sm">Medium Risk</span>
+              </div>
+              
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">Risk Level</label>
+                <select
+                  className="saas-input w-full p-3 bg-white/80 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-300"
+                  value={filters.riskLevel}
+                  onChange={(e) => handleFilterChange('riskLevel', e.target.value)}
+                >
+                  <option value="All">All Risk Levels</option>
+                  <option value="Low">Low Risk</option>
+                  <option value="Medium">Medium Risk</option>
+                  <option value="High">High Risk</option>
+                </select>
+              </div>
+              
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">Status</label>
+                <select
+                  className="saas-input w-full p-3 bg-white/80 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-300"
+                  value={filters.status}
+                  onChange={(e) => handleFilterChange('status', e.target.value)}
+                >
+                  <option value="All">All Statuses</option>
+                  <option value="Active">Active</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Completed">Completed</option>
+                </select>
+              </div>
+              
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">Category</label>
+                <select
+                  className="saas-input w-full p-3 bg-white/80 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-300"
+                  value={filters.category}
+                  onChange={(e) => handleFilterChange('category', e.target.value)}
+                >
+                  <option value="All">All Categories</option>
+                  <option value="Civil Litigation">Civil Litigation</option>
+                  <option value="Corporate Law">Corporate Law</option>
+                  <option value="Criminal Defense">Criminal Defense</option>
+                  <option value="Estate Planning">Estate Planning</option>
+                  <option value="Contract Law">Contract Law</option>
+                  <option value="Intellectual Property">Intellectual Property</option>
+                  <option value="Bankruptcy">Bankruptcy</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Enhanced Summary Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="glass-morphism-card bg-white/70 backdrop-blur-xl border border-white/20 rounded-2xl p-6 saas-shadow-glow hover:shadow-blue-500/20 transition-all duration-300 animate-stagger-fade-in group">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className="p-3 bg-gradient-to-r from-indigo-500 to-blue-600 rounded-xl shadow-lg group-hover:shadow-indigo-500/30 transition-all duration-300">
+                    <Briefcase className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-600 mb-1">Total Cases</h3>
+                    <p className="text-3xl font-bold text-gray-900">{caseData.length}</p>
+                  </div>
                 </div>
-                <div className="flex items-center">
-                  <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-                  <span className="text-sm">Low Risk</span>
+                <ArrowUp className="w-5 h-5 text-green-500" />
+              </div>
+              <div className="mt-4 flex items-center text-sm">
+                <span className="text-green-600 flex items-center">
+                  <ArrowUp className="w-4 h-4 mr-1" />
+                  +12%
+                </span>
+                <span className="text-gray-500 ml-2">from last month</span>
+              </div>
+            </div>
+            
+            <div className="glass-morphism-card bg-white/70 backdrop-blur-xl border border-white/20 rounded-2xl p-6 saas-shadow-glow hover:shadow-blue-500/20 transition-all duration-300 animate-stagger-fade-in group" style={{animationDelay: '100ms'}}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className="p-3 bg-gradient-to-r from-blue-500 to-cyan-600 rounded-xl shadow-lg group-hover:shadow-blue-500/30 transition-all duration-300">
+                    <Activity className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-600 mb-1">Average Progress</h3>
+                    <p className="text-3xl font-bold text-gray-900">{averageProgress}%</p>
+                  </div>
+                </div>
+                <ArrowUp className="w-5 h-5 text-green-500" />
+              </div>
+              <div className="mt-4 flex items-center text-sm">
+                <span className="text-green-600 flex items-center">
+                  <ArrowUp className="w-4 h-4 mr-1" />
+                  +8%
+                </span>
+                <span className="text-gray-500 ml-2">improvement</span>
+              </div>
+            </div>
+            
+            <div className="glass-morphism-card bg-white/70 backdrop-blur-xl border border-white/20 rounded-2xl p-6 saas-shadow-glow hover:shadow-red-500/20 transition-all duration-300 animate-stagger-fade-in group" style={{animationDelay: '200ms'}}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className="p-3 bg-gradient-to-r from-red-500 to-pink-600 rounded-xl shadow-lg group-hover:shadow-red-500/30 transition-all duration-300">
+                    <AlertTriangle className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-600 mb-1">High Risk Cases</h3>
+                    <p className="text-3xl font-bold text-gray-900">{highRiskCasesCount}</p>
+                  </div>
+                </div>
+                <ArrowDown className="w-5 h-5 text-red-500" />
+              </div>
+              <div className="mt-4 flex items-center text-sm">
+                <span className="text-red-600 flex items-center">
+                  <AlertTriangle className="w-4 h-4 mr-1" />
+                  Requires attention
+                </span>
+              </div>
+            </div>
+            
+            <div className="glass-morphism-card bg-white/70 backdrop-blur-xl border border-white/20 rounded-2xl p-6 saas-shadow-glow hover:shadow-green-500/20 transition-all duration-300 animate-stagger-fade-in group" style={{animationDelay: '300ms'}}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className="p-3 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl shadow-lg group-hover:shadow-green-500/30 transition-all duration-300">
+                    <DollarSign className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-600 mb-1">Total Case Value</h3>
+                    <p className="text-3xl font-bold text-gray-900">{formatCurrency(totalCaseValue)}</p>
+                  </div>
+                </div>
+                <ArrowUp className="w-5 h-5 text-green-500" />
+              </div>
+              <div className="mt-4 flex items-center text-sm">
+                <span className="text-green-600 flex items-center">
+                  <ArrowUp className="w-4 h-4 mr-1" />
+                  +15%
+                </span>
+                <span className="text-gray-500 ml-2">portfolio growth</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Enhanced Charts Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <div className="glass-morphism-card bg-white/70 backdrop-blur-xl border border-white/20 rounded-2xl p-6 saas-shadow-glow animate-slide-up">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-gradient-to-r from-red-500 to-orange-600 rounded-lg">
+                    <Shield className="w-5 h-5 text-white" />
+                  </div>
+                  <h2 className="text-xl font-semibold text-gray-800">Risk Assessment by Case</h2>
+                </div>
+                <button className="text-gray-400 hover:text-gray-600 transition-colors duration-300">
+                  <Download className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="h-80 relative">
+                <Bar data={riskData} options={chartOptions} />
+              </div>
+            </div>
+            
+            <div className="glass-morphism-card bg-white/70 backdrop-blur-xl border border-white/20 rounded-2xl p-6 saas-shadow-glow animate-slide-up" style={{animationDelay: '100ms'}}>
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg">
+                    <TrendingUp className="w-5 h-5 text-white" />
+                  </div>
+                  <h2 className="text-xl font-semibold text-gray-800">Case Progress Overview</h2>
+                </div>
+                <button className="text-gray-400 hover:text-gray-600 transition-colors duration-300">
+                  <Download className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="h-80 relative">
+                <Bar data={progressData} options={chartOptions} />
+              </div>
+            </div>
+            
+            <div className="glass-morphism-card bg-white/70 backdrop-blur-xl border border-white/20 rounded-2xl p-6 saas-shadow-glow animate-slide-up" style={{animationDelay: '200ms'}}>
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-gradient-to-r from-green-500 to-teal-600 rounded-lg">
+                    <Target className="w-5 h-5 text-white" />
+                  </div>
+                  <h2 className="text-xl font-semibold text-gray-800">Success Probability Forecast</h2>
+                </div>
+                <button className="text-gray-400 hover:text-gray-600 transition-colors duration-300">
+                  <Download className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="h-80 relative">
+                <Line data={successData} options={chartOptions} />
+              </div>
+            </div>
+            
+            <div className="glass-morphism-card bg-white/70 backdrop-blur-xl border border-white/20 rounded-2xl p-6 saas-shadow-glow animate-slide-up" style={{animationDelay: '300ms'}}>
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg">
+                    <PieChart className="w-5 h-5 text-white" />
+                  </div>
+                  <h2 className="text-xl font-semibold text-gray-800">Case Distribution by Category</h2>
+                </div>
+                <button className="text-gray-400 hover:text-gray-600 transition-colors duration-300">
+                  <Download className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="h-80 relative">
+                <Doughnut 
+                  data={{
+                    labels: ['Civil Litigation', 'Corporate Law', 'Criminal Defense', 'Estate Planning', 'Contract Law', 'Intellectual Property', 'Bankruptcy'],
+                    datasets: [{
+                      data: [1, 1, 1, 1, 1, 1, 1],
+                      backgroundColor: [
+                        'rgba(239, 68, 68, 0.8)',
+                        'rgba(59, 130, 246, 0.8)',
+                        'rgba(251, 191, 36, 0.8)',
+                        'rgba(34, 197, 94, 0.8)',
+                        'rgba(168, 85, 247, 0.8)',
+                        'rgba(249, 115, 22, 0.8)',
+                        'rgba(107, 114, 128, 0.8)'
+                      ],
+                      borderColor: [
+                        'rgba(239, 68, 68, 1)',
+                        'rgba(59, 130, 246, 1)',
+                        'rgba(251, 191, 36, 1)',
+                        'rgba(34, 197, 94, 1)',
+                        'rgba(168, 85, 247, 1)',
+                        'rgba(249, 115, 22, 1)',
+                        'rgba(107, 114, 128, 1)'
+                      ],
+                      borderWidth: 2,
+                    }]
+                  }} 
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                      legend: {
+                        position: 'bottom',
+                        labels: {
+                          usePointStyle: true,
+                          padding: 20,
+                          font: {
+                            size: 12,
+                            family: "'Inter', sans-serif"
+                          }
+                        }
+                      }
+                    }
+                  }} 
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Enhanced Case Details Table */}
+          <div className="glass-morphism-card bg-white/70 backdrop-blur-xl border border-white/20 rounded-2xl overflow-hidden saas-shadow-glow animate-slide-up">
+            <div className="px-6 py-6 border-b border-gray-200/50 bg-gradient-to-r from-gray-50/50 to-blue-50/50">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between">
+                <div className="flex items-center space-x-3 mb-4 sm:mb-0">
+                  <div className="p-2 bg-gradient-to-r from-gray-600 to-gray-700 rounded-lg">
+                    <FileText className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-semibold text-gray-800">Case Details Overview</h2>
+                    <p className="text-sm text-gray-600 mt-1">Comprehensive view of all cases with progress metrics</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <span className="text-sm text-gray-600 bg-white/60 px-3 py-2 rounded-lg">
+                    Showing {filteredCases.length} of {caseData.length} cases
+                  </span>
+                  <button className="saas-button-secondary px-4 py-2 bg-white/80 hover:bg-white transition-all duration-300">
+                    <Download className="w-4 h-4 mr-2" />
+                    Export
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200/50">
+                <thead className="bg-gradient-to-r from-gray-50/80 to-blue-50/80">
+                  <tr>
+                    <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      Case Information
+                    </th>
+                    <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      Category & Status
+                    </th>
+                    <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      Progress
+                    </th>
+                    <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      Risk Assessment
+                    </th>
+                    <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      Success Rate
+                    </th>
+                    <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      Stages & Delays
+                    </th>
+                    <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      Case Value
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white/50 divide-y divide-gray-200/50">
+                  {filteredCases.map((caseItem, index) => (
+                    <tr key={caseItem.id} className="hover:bg-white/70 transition-all duration-300 group" style={{animationDelay: `${index * 50}ms`}}>
+                      <td className="px-6 py-6 whitespace-nowrap">
+                        <div className="flex items-center space-x-3">
+                          <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-sm">
+                            {caseItem.name.charAt(0)}
+                          </div>
+                          <div>
+                            <div className="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors duration-300">
+                              {caseItem.name}
+                            </div>
+                            <div className="text-xs text-gray-500 flex items-center mt-1">
+                              <Calendar className="w-3 h-3 mr-1" />
+                              Opened: {formatDate(caseItem.openedDate)}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-6 whitespace-nowrap">
+                        <div className="space-y-2">
+                          <div className="text-sm text-gray-600 font-medium">{caseItem.category}</div>
+                          <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full border ${getStatusColor(caseItem.status)}`}>
+                            {caseItem.status}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-6 whitespace-nowrap">
+                        <div className="flex items-center space-x-3">
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-xs font-medium text-gray-700">{caseItem.progress}%</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2">
+                              <div 
+                                className="h-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 transition-all duration-500" 
+                                style={{ width: `${caseItem.progress}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-6 whitespace-nowrap">
+                        <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full border ${getRiskColor(caseItem.risk)}`}>
+                          <Shield className="w-3 h-3 mr-1" />
+                          {caseItem.risk}
+                        </span>
+                      </td>
+                      <td className="px-6 py-6 whitespace-nowrap">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-sm font-semibold text-gray-900">{caseItem.successProbability}%</span>
+                          <div className="w-16 bg-gray-200 rounded-full h-2">
+                            <div 
+                              className={`h-2 rounded-full transition-all duration-500 ${
+                                caseItem.successProbability >= 80 ? 'bg-green-500' :
+                                caseItem.successProbability >= 60 ? 'bg-blue-500' :
+                                caseItem.successProbability >= 40 ? 'bg-yellow-500' : 'bg-red-500'
+                              }`}
+                              style={{ width: `${caseItem.successProbability}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-6 whitespace-nowrap">
+                        <div className="space-y-1">
+                          <div className="text-sm text-gray-600">
+                            {caseItem.completedStages} / {caseItem.stages} stages
+                          </div>
+                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${caseItem.delays > 0 ? "bg-red-50 text-red-700 border border-red-200" : "bg-green-50 text-green-700 border border-green-200"}`}>
+                            <Clock className="w-3 h-3 mr-1" />
+                            {caseItem.delays} {caseItem.delays === 1 ? 'delay' : 'delays'}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-6 whitespace-nowrap">
+                        <div className="text-sm font-semibold text-gray-900">{formatCurrency(caseItem.value)}</div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Enhanced Insights Section */}
+          <div className="mt-8 glass-morphism-card bg-white/70 backdrop-blur-xl border border-white/20 rounded-2xl p-6 saas-shadow-glow animate-slide-up">
+            <div className="flex items-center space-x-3 mb-6">
+              <div className="p-3 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl shadow-lg">
+                <Target className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-semibold text-gray-800">Analytics & Risk Insights</h2>
+                <p className="text-gray-600 mt-1">AI-powered insights and recommendations for your legal practice</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="glass-morphism-card bg-gradient-to-br from-blue-50/80 to-indigo-50/80 border border-blue-200/50 p-6 rounded-xl">
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg">
+                    <TrendingUp className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-800">Case Progress Analytics</h3>
+                </div>
+                <p className="text-gray-600 mb-4">
+                  Monitor stage completion rates and identify delays across all cases. Cases with more than 2 delays are flagged for immediate review.
+                </p>
+                <div className="space-y-3">
+                  {caseData.filter(item => item.delays > 2).map(item => (
+                    <div key={item.id} className="flex items-center space-x-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+                      <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0" />
+                      <div className="flex-1">
+                        <div className="text-sm font-medium text-red-800">{item.name}</div>
+                        <div className="text-xs text-red-600">{item.delays} delays requiring immediate attention</div>
+                      </div>
+                    </div>
+                  ))}
+                  {caseData.filter(item => item.delays > 2).length === 0 && (
+                    <div className="flex items-center space-x-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                      <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                      <div className="text-sm font-medium text-green-800">All cases are on track with minimal delays</div>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              <div className="glass-morphism-card bg-gradient-to-br from-green-50/80 to-emerald-50/80 border border-green-200/50 p-6 rounded-xl">
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="p-2 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg">
+                    <Shield className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-800">Risk Assessment Summary</h3>
+                </div>
+                <p className="text-gray-600 mb-4">
+                  Risk levels are calculated using AI algorithms that analyze case complexity, historical data, and current progress patterns.
+                </p>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-3 bg-white/60 rounded-lg border border-gray-200/50">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-4 h-4 bg-red-500 rounded-full"></div>
+                      <span className="text-sm font-medium text-gray-700">High Risk Cases</span>
+                    </div>
+                    <span className="text-sm font-bold text-red-600">{caseData.filter(item => item.risk === 'High').length}</span>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-white/60 rounded-lg border border-gray-200/50">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-4 h-4 bg-yellow-500 rounded-full"></div>
+                      <span className="text-sm font-medium text-gray-700">Medium Risk Cases</span>
+                    </div>
+                    <span className="text-sm font-bold text-yellow-600">{caseData.filter(item => item.risk === 'Medium').length}</span>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-white/60 rounded-lg border border-gray-200/50">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-4 h-4 bg-green-500 rounded-full"></div>
+                      <span className="text-sm font-medium text-gray-700">Low Risk Cases</span>
+                    </div>
+                    <span className="text-sm font-bold text-green-600">{caseData.filter(item => item.risk === 'Low').length}</span>
+                  </div>
                 </div>
               </div>
             </div>

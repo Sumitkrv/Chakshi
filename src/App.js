@@ -11,11 +11,11 @@ import Stats from "./components/Stats";
 import Features from "./components/Features";
 import FreeQueryWidget from "./components/FreeQueryWidget";
 import FreeTools from "./components/FreeTools";
-import CourtroomSimulatorDemo from "./components/CourtroomSimulatorDemo";
+// import CourtroomSimulatorDemo from "./components/CourtroomSimulatorDemo";
 import RoleGateway from "./components/RoleGateway";
 import Pricing from "./components/Pricing";
 import Testimonials from "./components/Testimonials";
-import Footer from "./components/Footer";
+// import Footer from "./components/Footer";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import Dashboard from "./components/Dashboard";
@@ -103,9 +103,7 @@ const Home = () => {
         <div className="stagger-fade-in">
           <Features />
         </div>
-        <div className="stagger-fade-in">
-          <CourtroomSimulatorDemo />
-        </div>
+       
         <div className="stagger-fade-in">
           <RoleGateway />
         </div>
@@ -182,7 +180,7 @@ function AppContent() {
           <div className="min-h-screen">
             <Navbar />
             <Home />
-            <Footer />
+            {/* <Footer /> */}
           </div>
         } />
         

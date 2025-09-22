@@ -1,63 +1,96 @@
 /* =================================
    PROFESSIONAL DESIGN SYSTEM
-   Inspired by Droxy & Modern SaaS Platforms
+   Navy Blue & Gold Theme - Inspired by Hero.css
    ================================= */
 
 /* Import Professional Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800&family=Cal+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800&display=swap');
 
 :root {
-  /* Brand Colors - Professional Palette */
-  --brand-primary: #2563eb;
-  --brand-secondary: #7c3aed;
-  --brand-accent: #06b6d4;
+  /* Navy Blue & Gold Brand Colors */
+  --brand-primary: #0A2342;        /* Deep Navy */
+  --brand-primary-light: #1E3A8A;  /* Lighter Navy */
+  --brand-secondary: #D4AF37;      /* Gold */
+  --brand-accent: #f8fafc;         /* Light background */
+  --brand-accent-secondary: #e2e8f0; /* Secondary light */
   --brand-success: #10b981;
   --brand-warning: #f59e0b;
   --brand-danger: #ef4444;
   
-  /* Neutral Scale - Modern Gray Palette */
-  --gray-50: #fafafa;
-  --gray-100: #f4f4f5;
-  --gray-200: #e4e4e7;
-  --gray-300: #d4d4d8;
-  --gray-400: #a1a1aa;
-  --gray-500: #71717a;
-  --gray-600: #52525b;
-  --gray-700: #3f3f46;
-  --gray-800: #27272a;
-  --gray-900: #18181b;
-  --gray-950: #09090b;
+  /* Extended Navy Palette */
+  --navy-50: #f0f5ff;
+  --navy-100: #e0ebff;
+  --navy-200: #c7d7fe;
+  --navy-300: #a5b8fc;
+  --navy-400: #818cf8;
+  --navy-500: #6366f1;
+  --navy-600: #1E3A8A;
+  --navy-700: #1d4ed8;
+  --navy-800: #0A2342;
+  --navy-900: #1e1b4b;
   
-  /* Professional Backgrounds */
+  /* Gold Palette */
+  --gold-50: #fefce8;
+  --gold-100: #fef9c3;
+  --gold-200: #fef08a;
+  --gold-300: #fde047;
+  --gold-400: #D4AF37;
+  --gold-500: #eab308;
+  --gold-600: #ca8a04;
+  --gold-700: #a16207;
+  --gold-800: #854d0e;
+  --gold-900: #713f12;
+  
+  /* Neutral Scale - Professional Gray Palette */
+  --gray-50: #f8fafc;
+  --gray-100: #f1f5f9;
+  --gray-200: #e2e8f0;
+  --gray-300: #cbd5e1;
+  --gray-400: #94a3b8;
+  --gray-500: #64748b;
+  --gray-600: #475569;
+  --gray-700: #334155;
+  --gray-800: #1e293b;
+  --gray-900: #0f172a;
+  --gray-950: #020617;
+  
+  /* Professional Backgrounds - Navy Theme */
   --bg-primary: #ffffff;
   --bg-secondary: #f8fafc;
   --bg-tertiary: #f1f5f9;
-  --bg-dark: #0f172a;
-  --bg-dark-secondary: #1e293b;
-  --bg-dark-tertiary: #334155;
+  --bg-navy: #0A2342;
+  --bg-navy-light: #1E3A8A;
+  --bg-navy-lighter: #1d4ed8;
   
-  /* Glass Morphism */
-  --glass-bg: rgba(255, 255, 255, 0.08);
-  --glass-bg-strong: rgba(255, 255, 255, 0.15);
+  /* Glass Morphism - Navy Theme */
+  --glass-bg: rgba(10, 35, 66, 0.08);
+  --glass-bg-strong: rgba(10, 35, 66, 0.15);
   --glass-border: rgba(255, 255, 255, 0.12);
   --glass-border-strong: rgba(255, 255, 255, 0.2);
+  --glass-navy: rgba(10, 35, 66, 0.1);
+  --glass-navy-strong: rgba(10, 35, 66, 0.2);
   
-  /* Professional Gradients */
-  --gradient-primary: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
-  --gradient-secondary: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
-  --gradient-brand: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%);
-  --gradient-dark: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  /* Professional Gradients - Navy & Gold */
+  --gradient-primary: linear-gradient(90deg, #0A2342, #1E3A8A);
+  --gradient-secondary: linear-gradient(135deg, #D4AF37 0%, #ca8a04 100%);
+  --gradient-brand: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-light) 100%);
+  --gradient-hero: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  --gradient-navy: linear-gradient(135deg, #0A2342 0%, #1E3A8A 100%);
+  --gradient-gold: linear-gradient(135deg, #D4AF37 0%, #eab308 100%);
   --gradient-surface: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
   
-  /* Professional Shadows */
+  /* Professional Shadows - Navy Theme */
   --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
   --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
   --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.25);
-  --shadow-glow: 0 0 20px rgba(37, 99, 235, 0.15);
-  --shadow-glow-strong: 0 0 40px rgba(37, 99, 235, 0.3);
+  --shadow-glow: 0 0 20px rgba(10, 35, 66, 0.15);
+  --shadow-glow-strong: 0 0 40px rgba(10, 35, 66, 0.3);
+  --shadow-navy: 0 4px 15px rgba(10, 35, 66, 0.3);
+  --shadow-navy-lg: 0 8px 20px rgba(10, 35, 66, 0.4);
+  --shadow-gold: 0 4px 15px rgba(212, 175, 55, 0.3);
   
   /* Professional Spacing Scale */
   --space-px: 1px;
@@ -83,6 +116,7 @@
   --radius-xl: 0.75rem;     /* 12px */
   --radius-2xl: 1rem;       /* 16px */
   --radius-3xl: 1.5rem;     /* 24px */
+  --radius-hero: 50px;      /* Hero button style */
   --radius-full: 9999px;
   
   /* Animation System */
@@ -90,14 +124,16 @@
   --timing-normal: 250ms;
   --timing-slow: 400ms;
   --timing-slower: 600ms;
+  --timing-hero: 300ms;      /* Hero animation timing */
   --easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
   --easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
   --easing-smooth: cubic-bezier(0.4, 0, 0.6, 1);
+  --easing-hero: ease;       /* Hero easing */
   
-  /* Typography Scale */
+  /* Typography Scale - Navy Theme */
   --font-family-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-family-mono: 'JetBrains Mono', 'SF Mono', Monaco, 'Cascadia Code', monospace;
-  --font-family-display: 'Cal Sans', 'Inter', sans-serif;
+  --font-family-display: 'Inter', sans-serif;
   
   /* Font Weights */
   --font-weight-light: 300;
@@ -157,22 +193,22 @@
   color: white;
 }
 
-/* Professional Buttons */
+/* Professional Buttons - Navy & Gold Theme */
 .pro-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  padding: var(--space-3) var(--space-6);
-  border-radius: var(--radius-lg);
+  padding: 1rem 2rem;
+  border-radius: var(--radius-hero);
   font-family: var(--font-family-sans);
-  font-weight: var(--font-weight-medium);
+  font-weight: 600;
   font-size: 0.875rem;
   line-height: var(--leading-tight);
   text-decoration: none;
   border: none;
   cursor: pointer;
-  transition: all var(--timing-normal) var(--easing-standard);
+  transition: all var(--timing-hero) var(--easing-hero);
   position: relative;
   overflow: hidden;
 }
@@ -180,23 +216,37 @@
 .pro-btn-primary {
   background: var(--gradient-primary);
   color: white;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-navy);
 }
 
 .pro-btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-navy-lg);
+}
+
+.pro-btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.pro-btn-primary:hover::before {
+  left: 100%;
 }
 
 .pro-btn-secondary {
-  background: var(--bg-secondary);
-  color: var(--gray-700);
-  border: 1px solid var(--gray-300);
+  background: transparent;
+  color: var(--brand-primary);
+  border: 2px solid var(--brand-primary);
 }
 
 .pro-btn-secondary:hover {
-  background: var(--gray-100);
-  border-color: var(--brand-primary);
+  background: rgba(10, 35, 66, 0.05);
 }
 
 .pro-btn-ghost {
@@ -981,7 +1031,7 @@
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
-/* Enhanced Animation Keyframes */
+/* Enhanced Animation Keyframes - Navy & Gold Theme */
 @keyframes pro-slide-down {
   from {
     opacity: 0;
@@ -1003,6 +1053,127 @@
     transform: translateY(0);
   }
 }
+
+/* Navy & Gold Theme Animations */
+@keyframes blob {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes loading-bar {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(0%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes hero-glow {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+@keyframes navy-pulse {
+  0%, 100% { 
+    background-color: rgba(10, 35, 66, 0.1);
+  }
+  50% { 
+    background-color: rgba(10, 35, 66, 0.2);
+  }
+}
+
+@keyframes gold-shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Animation Classes */
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}
+
+.animate-loading-bar {
+  animation: loading-bar 2s ease-in-out infinite;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+
+.animate-hero-glow {
+  animation: hero-glow 3s ease-in-out infinite;
+}
+
+.animate-navy-pulse {
+  animation: navy-pulse 2s ease-in-out infinite;
+}
+
+.animate-gold-shimmer {
+  animation: gold-shimmer 2s ease-in-out infinite;
+}
+
+/* Animation Delays */
+.animation-delay-1000 { animation-delay: 1000ms; }
+.animation-delay-2000 { animation-delay: 2000ms; }
+.animation-delay-3000 { animation-delay: 3000ms; }
+.animation-delay-4000 { animation-delay: 4000ms; }
+.animation-delay-5000 { animation-delay: 5000ms; }
+
+/* Background Patterns */
+.bg-grid-pattern {
+  background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0);
+  background-size: 20px 20px;
+}
+
+/* Navy Blue & Gold Utility Classes */
+.text-navy-800 { color: #0A2342; }
+.text-navy-600 { color: #1E3A8A; }
+.text-gold-400 { color: #D4AF37; }
+.text-gold-600 { color: #ca8a04; }
+
+.bg-navy-800 { background-color: #0A2342; }
+.bg-navy-600 { background-color: #1E3A8A; }
+.bg-gold-400 { background-color: #D4AF37; }
+.bg-gold-600 { background-color: #ca8a04; }
+
+.border-navy-800 { border-color: #0A2342; }
+.border-gold-400 { border-color: #D4AF37; }
+
+.from-navy-800 { --tw-gradient-from: #0A2342; }
+.from-navy-600 { --tw-gradient-from: #1E3A8A; }
+.from-gold-400 { --tw-gradient-from: #D4AF37; }
+.to-navy-600 { --tw-gradient-to: #1E3A8A; }
+.to-gold-400 { --tw-gradient-to: #D4AF37; }
+.to-gold-500 { --tw-gradient-to: #eab308; }
 
 /* Hero-style Background Animations */
 @keyframes blob {
