@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Menu, X, Scale, ChevronDown, ArrowRight } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext'; // Import useAuth
+import { supabase } from '../lib/supabaseClient'; // Import supabase
+import { Search, Menu, X, Scale, ChevronDown, ArrowRight, LogOut } from 'lucide-react'; // Add LogOut icon
 import './Navbar.css';
 
 const Navbar = () => {
@@ -66,6 +68,20 @@ const Navbar = () => {
     navigate('/register');
   };
 
+  const { user, logout } = useAuth(); // Get user and logout from AuthContext
+
+  const handleLogout = async () => {
+    setIsOpen(false); // Close mobile menu if open
+    try {
+      await supabase.auth.signOut(); // Sign out from Supabase
+      logout(); // Clear local auth state
+      navigate('/login'); // Redirect to login page
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Optionally, display an error message to the user
+    }
+  };
+
   return (
     <>
       <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${
@@ -128,19 +144,31 @@ const Navbar = () => {
 
               {/* Auth Buttons */}
               <div className="flex items-center space-x-4">
-                <button 
-                  className="px-6 py-2.5 text-white/90 hover:text-white font-semibold transition-all duration-300 hover:bg-white/10 rounded-xl"
-                  onClick={handleLogin}
-                >
-                  Sign In
-                </button>
-                <button 
-                  className="px-6 py-2.5 bg-gradient-to-r from-gold-400 to-gold-600 hover:from-gold-500 hover:to-gold-700 text-white font-semibold rounded-xl transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-gold-400/30 flex items-center gap-2"
-                  onClick={handleRegister}
-                >
-                  Get Started
-                  <ArrowRight className="w-4 h-4" />
-                </button>
+                {user ? (
+                  <button 
+                    className="px-6 py-2.5 bg-gradient-to-r from-gold-400 to-gold-600 hover:from-gold-500 hover:to-gold-700 text-white font-semibold rounded-xl transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-gold-400/30 flex items-center gap-2"
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Logout
+                  </button>
+                ) : (
+                  <>
+                    <button 
+                      className="px-6 py-2.5 text-white/90 hover:text-white font-semibold transition-all duration-300 hover:bg-white/10 rounded-xl"
+                      onClick={handleLogin}
+                    >
+                      Sign In
+                    </button>
+                    <button 
+                      className="px-6 py-2.5 bg-gradient-to-r from-gold-400 to-gold-600 hover:from-gold-500 hover:to-gold-700 text-white font-semibold rounded-xl transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-gold-400/30 flex items-center gap-2"
+                      onClick={handleRegister}
+                    >
+                      Get Started
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </>
+                )}
               </div>
             </div>
 
@@ -194,19 +222,31 @@ const Navbar = () => {
 
               {/* Mobile Auth Buttons */}
               <div className="flex flex-col space-y-3">
-                <button 
-                  className="w-full py-3 px-6 text-white/90 hover:text-white font-semibold transition-all duration-300 hover:bg-white/10 rounded-xl border border-white/20 hover:border-gold-400/50"
-                  onClick={handleLogin}
-                >
-                  Sign In
-                </button>
-                <button 
-                  className="w-full py-3 px-6 bg-gradient-to-r from-gold-400 to-gold-600 hover:from-gold-500 hover:to-gold-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-gold-400/30 flex items-center justify-center gap-2"
-                  onClick={handleRegister}
-                >
-                  Get Started
-                  <ArrowRight className="w-4 h-4" />
-                </button>
+                {user ? (
+                  <button 
+                    className="w-full py-3 px-6 bg-gradient-to-r from-gold-400 to-gold-600 hover:from-gold-500 hover:to-gold-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-gold-400/30 flex items-center justify-center gap-2"
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Logout
+                  </button>
+                ) : (
+                  <>
+                    <button 
+                      className="w-full py-3 px-6 text-white/90 hover:text-white font-semibold transition-all duration-300 hover:bg-white/10 rounded-xl border border-white/20 hover:border-gold-400/50"
+                      onClick={handleLogin}
+                    >
+                      Sign In
+                    </button>
+                    <button 
+                      className="w-full py-3 px-6 bg-gradient-to-r from-gold-400 to-gold-600 hover:from-gold-500 hover:to-gold-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-gold-400/30 flex items-center justify-center gap-2"
+                      onClick={handleRegister}
+                    >
+                      Get Started
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           </div>

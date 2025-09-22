@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabaseClient';
+import { loginUser } from '../lib/api';
 import { 
   Mail, 
   Lock, 
@@ -71,27 +73,6 @@ const Login = () => {
     setError('');
   };
 
-  // Demo authentication - replace with actual API call
-  const authenticateUser = async (credentials) => {
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // For demo purposes, allow any email/password combination
-    // In production, this should make a real API call
-    if (credentials.email && credentials.password && credentials.role) {
-      return {
-        id: Date.now(),
-        email: credentials.email,
-        role: credentials.role,
-        name: credentials.email.split('@')[0],
-        token: `demo-token-${Date.now()}`,
-        isAuthenticated: true
-      };
-    } else {
-      throw new Error('Invalid credentials');
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -111,11 +92,34 @@ const Login = () => {
     }
 
     try {
-      // Authenticate user (replace with actual API call)
-      const userData = await authenticateUser(formData);
+      // 1. Authenticate with Supabase
+      const { data, error: supabaseError } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (supabaseError) {
+        throw new Error(supabaseError.message);
+      }
+
+      if (!data.session) {
+        throw new Error('Supabase session not found after sign-in.');
+      }
+
+      const supabaseAccessToken = data.session.access_token;
+
+      // 2. Call backend login API with Supabase JWT
+      const backendResponse = await loginUser(supabaseAccessToken);
       
+      if (!backendResponse.success) {
+        throw new Error(backendResponse.message || 'Backend login failed.');
+      }
+
+      const userData = backendResponse.data.user;
+      const backendToken = supabaseAccessToken; // Use Supabase token for frontend session
+
       // Store user data in context and localStorage
-      login(userData);
+      login({ ...userData, token: backendToken });
       
       // Get the selected role's route
       const selectedRole = roles.find(role => role.id === formData.role);

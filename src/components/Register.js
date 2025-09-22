@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabaseClient';
+import { loginUser } from '../lib/api';
 import { 
   User, 
   Mail, 
@@ -129,28 +131,6 @@ const Register = () => {
     return true;
   };
 
-  // Demo registration - replace with actual API call
-  const registerUser = async (userData) => {
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // For demo purposes, accept any valid data
-    // In production, this should make a real API call
-    if (userData.name && userData.email && userData.password && userData.role) {
-      return {
-        id: Date.now(),
-        name: userData.name,
-        email: userData.email,
-        role: userData.role,
-        token: `demo-token-${Date.now()}`,
-        isAuthenticated: true,
-        registeredAt: new Date().toISOString()
-      };
-    } else {
-      throw new Error('Registration failed');
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -163,11 +143,45 @@ const Register = () => {
     }
 
     try {
-      // Register user (replace with actual API call)
-      const userData = await registerUser(formData);
+      // 1. Register user with Supabase
+      const { data, error: supabaseError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            full_name: formData.name, // Store name in Supabase user metadata
+            role: formData.role, // Store role in Supabase user metadata
+          }
+        }
+      });
+
+      if (supabaseError) {
+        throw new Error(supabaseError.message);
+      }
+
+      if (!data.session) {
+        // This case might happen if email confirmation is required and no session is immediately created
+        // For now, we'll assume a session is created or handle it as a success with a message.
+        // In a real app, you might want to show a message like "Please check your email to verify your account."
+        setError('Registration successful! Please check your email to verify your account.');
+        setLoading(false);
+        return;
+      }
+
+      const supabaseAccessToken = data.session.access_token;
+
+      // 2. Call backend login API with Supabase JWT to create/update user in local DB
+      const backendResponse = await loginUser(supabaseAccessToken);
       
+      if (!backendResponse.success) {
+        throw new Error(backendResponse.message || 'Backend registration/login failed.');
+      }
+
+      const userData = backendResponse.data.user;
+      const backendToken = supabaseAccessToken; // Use Supabase token for frontend session
+
       // Store user data in context and localStorage
-      login(userData);
+      login({ ...userData, token: backendToken });
       
       // Get the selected role's route
       const selectedRole = roles.find(role => role.id === formData.role);
