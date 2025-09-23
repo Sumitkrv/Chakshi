@@ -556,7 +556,7 @@ export default function Settings() {
                     
                     <div className="mt-8 flex justify-end">
                       <button 
-                        onClick={() => saveWithStatus(saveWorkspaceSettings, 'Workspace settings saved!')}
+                        onClick={saveWorkspaceSettings}
                         className="saas-button-primary px-8 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white flex items-center space-x-2"
                       >
                         <Save className="w-4 h-4" />
