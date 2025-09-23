@@ -1,24 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { 
-  Mail, 
-  Lock, 
-  Eye, 
-  EyeOff, 
-  Scale, 
-  GraduationCap, 
-  FileText, 
-  ArrowRight, 
-  AlertCircle,
-  CheckCircle,
-  Shield,
-  Loader,
-  Star,
-  Home,
-  LogIn,
-  UserCheck
-} from 'lucide-react';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -37,26 +19,26 @@ const Login = () => {
     {
       id: 'advocate',
       title: 'Advocate',
-      icon: Scale,
+      label: '⚖️ Legal Professional',
       route: '/advocate/dashboard',
-      description: 'Legal professional',
-      gradient: 'from-blue-500 to-indigo-600'
+      description: 'Legal professional practice management',
+      emoji: '⚖️'
     },
     {
       id: 'student',
       title: 'Law Student',
-      icon: GraduationCap,
+      label: '🎓 Academic Learning',
       route: '/student/dashboard',
-      description: 'Pursuing legal education',
-      gradient: 'from-green-500 to-emerald-600'
+      description: 'Pursuing legal education and training',
+      emoji: '🎓'
     },
     {
       id: 'clerk',
       title: 'Court Clerk',
-      icon: FileText,
+      label: '📋 Administrative Support',
       route: '/clerk/dashboard',
-      description: 'Court administration',
-      gradient: 'from-purple-500 to-violet-600'
+      description: 'Court administration and case management',
+      emoji: '📋'
     }
   ];
 
@@ -130,7 +112,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pro-flex items-center justify-center pro-p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-950 via-blue-900 to-blue-800 flex items-center justify-center p-4">
       
       {/* Background Pattern */}
       <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none"></div>
@@ -139,24 +121,23 @@ const Login = () => {
         
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 pro-rounded-xl pro-flex-center mx-auto mb-4">
-            <LogIn className="w-8 h-8 text-white" />
+          <div className="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center mx-auto mb-4">
+            <span className="text-3xl">🔐</span>
           </div>
-          <h1 className="pro-heading-xl text-gray-900 mb-2">Welcome Back</h1>
-          <p className="pro-text-body text-gray-600">Sign in to your legal platform account</p>
+          <h1 className="text-4xl font-bold text-white mb-2">Welcome Back</h1>
+          <p className="text-xl text-blue-200">Sign in to your legal platform account</p>
         </div>
 
         {/* Main Form Card */}
-        <div className="pro-dashboard-card pro-p-8 mb-6">
+        <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-8 mb-6 border border-white/20 shadow-xl">
           <form onSubmit={handleSubmit} className="space-y-6">
             
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block pro-text-sm font-medium text-gray-700 mb-2">
-                Email Address
+              <label htmlFor="email" className="block text-sm font-medium text-white mb-2">
+                📧 Email Address
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type="email"
                   id="email"
@@ -165,7 +146,7 @@ const Login = () => {
                   onChange={handleChange}
                   required
                   placeholder="Enter your email"
-                  className="w-full pro-p-3 pl-12 border border-gray-300 pro-rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                  className="w-full p-4 pl-4 bg-white/20 border border-white/30 rounded-xl text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all duration-200"
                   disabled={loading}
                 />
               </div>
@@ -173,11 +154,10 @@ const Login = () => {
 
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block pro-text-sm font-medium text-gray-700 mb-2">
-                Password
+              <label htmlFor="password" className="block text-sm font-medium text-white mb-2">
+                🔒 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type={showPassword ? "text" : "password"}
                   id="password"
@@ -186,49 +166,48 @@ const Login = () => {
                   onChange={handleChange}
                   required
                   placeholder="Enter your password"
-                  className="w-full pro-p-3 pl-12 pr-12 border border-gray-300 pro-rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                  className="w-full p-4 pl-4 pr-12 bg-white/20 border border-white/30 rounded-xl text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all duration-200"
                   disabled={loading}
                 />
                 <button
                   type="button"
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 w-6 h-6 text-gray-300 hover:text-white transition-colors"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? '🙈' : '👁️'}
                 </button>
               </div>
             </div>
 
             {/* Role Selection */}
             <div>
-              <label className="block pro-text-sm font-medium text-gray-700 mb-3">
-                Select Your Role
+              <label className="block text-sm font-medium text-white mb-3">
+                👤 Select Your Role
               </label>
               <div className="space-y-3">
                 {roles.map((role) => {
-                  const IconComponent = role.icon;
                   return (
                     <div
                       key={role.id}
-                      className={`pro-p-4 border-2 pro-rounded-lg cursor-pointer transition-all duration-300 ${
+                      className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 ${
                         formData.role === role.id 
-                          ? `border-blue-500 bg-blue-50 ring-2 ring-blue-200` 
-                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                          ? `border-white bg-white/20 ring-2 ring-white/30` 
+                          : 'border-white/30 hover:border-white/50 hover:bg-white/10'
                       } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                       onClick={() => !loading && handleChange({ target: { name: 'role', value: role.id } })}
                     >
-                      <div className="pro-flex items-center pro-gap-3">
-                        <div className={`w-12 h-12 bg-gradient-to-r ${role.gradient} pro-rounded-lg pro-flex-center flex-shrink-0`}>
-                          <IconComponent className="w-6 h-6 text-white" />
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 bg-gray-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                          <span className="text-2xl">{role.emoji}</span>
                         </div>
                         <div className="flex-1">
-                          <div className="pro-flex items-center justify-between">
-                            <h4 className="pro-heading-sm text-gray-900">{role.title}</h4>
+                          <div className="flex items-center justify-between">
+                            <h4 className="text-lg font-semibold text-white">{role.title}</h4>
                             {formData.role === role.id && (
-                              <CheckCircle className="w-5 h-5 text-blue-500" />
+                              <span className="text-green-400 text-xl">✅</span>
                             )}
                           </div>
-                          <p className="pro-text-xs text-gray-600">{role.description}</p>
+                          <p className="text-sm text-blue-200">{role.description}</p>
                         </div>
                       </div>
                     </div>
@@ -236,8 +215,8 @@ const Login = () => {
                 })}
               </div>
               {roleError && (
-                <div className="mt-2 pro-flex items-center pro-gap-2 pro-text-sm text-red-600">
-                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                <div className="mt-2 flex items-center gap-2 text-sm text-red-300">
+                  <span>⚠️</span>
                   {roleError}
                 </div>
               )}
@@ -246,21 +225,21 @@ const Login = () => {
             {/* Submit Button */}
             <button 
               type="submit" 
-              className={`w-full pro-btn pro-btn-primary pro-flex items-center justify-center pro-gap-2 ${
+              className={`w-full bg-gray-600 hover:bg-gray-500 text-white py-4 px-6 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
                 loading ? 'opacity-75 cursor-not-allowed' : ''
               }`}
               disabled={loading}
             >
               {loading ? (
                 <>
-                  <Loader className="w-5 h-5 animate-spin" />
+                  <span className="animate-spin">⏳</span>
                   Signing In...
                 </>
               ) : (
                 <>
-                  <UserCheck className="w-5 h-5" />
+                  <span>👤</span>
                   Sign In
-                  <ArrowRight className="w-5 h-5" />
+                  <span>→</span>
                 </>
               )}
             </button>
@@ -268,19 +247,19 @@ const Login = () => {
 
           {/* Error Message */}
           {error && (
-            <div className="mt-4 pro-p-3 bg-red-50 border border-red-200 pro-rounded-lg pro-flex items-center pro-gap-2">
-              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-              <p className="pro-text-sm text-red-700">{error}</p>
+            <div className="mt-4 p-3 bg-red-500/20 border border-red-400/30 rounded-xl flex items-center gap-2">
+              <span className="text-red-300">⚠️</span>
+              <p className="text-sm text-red-300">{error}</p>
             </div>
           )}
         </div>
 
         {/* Register Link */}
-        <div className="text-center pro-p-4 bg-white border border-gray-200 pro-rounded-lg">
-          <p className="pro-text-sm text-gray-600">
+        <div className="text-center p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl">
+          <p className="text-sm text-blue-200">
             Don't have an account? {' '}
             <button 
-              className="text-blue-600 hover:text-blue-700 font-medium hover:underline transition-colors duration-200"
+              className="text-white hover:text-blue-200 font-medium hover:underline transition-colors duration-200"
               onClick={() => !loading && navigate('/register')}
               disabled={loading}
             >
@@ -290,14 +269,14 @@ const Login = () => {
         </div>
 
         {/* Demo Notice */}
-        <div className="mt-6 pro-p-4 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 pro-rounded-lg">
-          <div className="pro-flex items-start pro-gap-3">
-            <div className="w-8 h-8 bg-blue-500 pro-rounded-lg pro-flex-center flex-shrink-0">
-              <Star className="w-4 h-4 text-white" />
+        <div className="mt-6 p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl">
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+              <span className="text-xl">⭐</span>
             </div>
             <div>
-              <h4 className="pro-text-sm font-semibold text-blue-900 mb-1">Demo Mode Active</h4>
-              <p className="pro-text-xs text-blue-700 leading-relaxed">
+              <h4 className="text-sm font-semibold text-white mb-1">Demo Mode Active</h4>
+              <p className="text-xs text-blue-200 leading-relaxed">
                 You can sign in with any email and password. Just select your role and click "Sign In" to explore the platform.
               </p>
             </div>
@@ -307,10 +286,10 @@ const Login = () => {
         {/* Quick Access */}
         <div className="mt-4 text-center">
           <button 
-            className="pro-text-sm text-gray-500 hover:text-gray-700 pro-flex items-center pro-gap-1 mx-auto transition-colors duration-200"
+            className="text-sm text-blue-200 hover:text-white flex items-center gap-1 mx-auto transition-colors duration-200"
             onClick={() => navigate('/')}
           >
-            <Home className="w-4 h-4" />
+            <span>🏠</span>
             Back to Home
           </button>
         </div>

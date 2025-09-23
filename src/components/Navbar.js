@@ -1,25 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Menu, X, Scale, ChevronDown, ArrowRight } from 'lucide-react';
-import './Navbar.css';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [searchFocused, setSearchFocused] = useState(false);
   const navbarRef = useRef(null);
   const navigate = useNavigate();
 
-  // Handle scroll event to change navbar appearance
+  // Scroll effect handler
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      setIsScrolled(window.scrollY > 20);
     };
     
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close menu when clicking outside
+  // Click outside handler
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (navbarRef.current && !navbarRef.current.contains(event.target) && isOpen) {
@@ -31,7 +30,7 @@ const Navbar = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isOpen]);
 
-  // Prevent body scroll when menu is open on mobile
+  // Body overflow handler
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -44,175 +43,198 @@ const Navbar = () => {
     };
   }, [isOpen]);
 
-  // Handle menu toggle for mobile view
   const toggleMenu = () => {
-    setIsOpen(!isOpen);
+    setIsOpen(prev => !prev);
   };
 
-  // Close mobile menu when a link is clicked
   const handleLinkClick = () => {
     setIsOpen(false);
   };
 
-  // Handle login navigation
   const handleLogin = () => {
     handleLinkClick();
     navigate('/login');
   };
 
-  // Handle register navigation
   const handleRegister = () => {
     handleLinkClick();
     navigate('/register');
   };
 
+  const handleHomeClick = () => {
+    navigate('/');
+    handleLinkClick();
+  };
+
+  const navigationItems = [
+    { href: '#home', label: 'Home' },
+    { href: '#features', label: 'Features' },
+    { href: '#solutions', label: 'Solutions' },
+    { href: '#resources', label: 'Resources' },
+    { href: '#pricing', label: 'Pricing' }
+  ];
+
   return (
-    <>
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${
+    <nav 
+      ref={navbarRef}
+      className={`fixed top-0 w-full z-50 transition-all duration-300 ${
         isScrolled 
-          ? 'backdrop-blur-xl bg-navy-800/95 border-b border-gold-400/20 shadow-2xl shadow-navy-800/20' 
+          ? 'backdrop-blur-md bg-[#1E3A8A]/95 border-b border-white/10 shadow-lg' 
           : 'bg-transparent'
-      }`}>
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            
-            {/* Logo */}
-            <div className="flex items-center space-x-3 group cursor-pointer" onClick={() => navigate('/')}>
-              <div className="relative p-3 rounded-2xl bg-gradient-to-br from-gold-400 to-gold-600 shadow-xl hover:shadow-gold-400/30 transition-all duration-300">
-                <Scale className="w-8 h-8 text-white group-hover:scale-110 transition-transform duration-300" />
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-2xl font-bold bg-gradient-to-r from-white via-gold-200 to-gold-300 bg-clip-text text-transparent">
-                  Chakshi
-                </span>
-                <span className="text-xs text-gold-300/80 font-medium -mt-1 tracking-wide">
-                  Legal AI Suite
-                </span>
-              </div>
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-20">
+          
+          {/* Logo */}
+          <div 
+            className="flex items-center space-x-3 cursor-pointer group"
+            onClick={handleHomeClick}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleHomeClick()}
+          >
+            <div className="p-2 rounded-lg bg-[#374151] shadow-md group-hover:bg-[#374151]/80 transition-all duration-300">
+              <span className="text-lg font-bold text-white">⚖</span>
             </div>
-
-            {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center space-x-8">
-              <div className="flex items-center space-x-6">
-                {[
-                  { href: '#home', label: 'Home' },
-                  { href: '#features', label: 'Features' },
-                  { href: '#resources', label: 'Resources' },
-                  { href: '#pricing', label: 'Pricing' },
-                  { href: '#contact', label: 'Contact' }
-                ].map((item, index) => (
-                  <a
-                    key={index}
-                    href={item.href}
-                    onClick={handleLinkClick}
-                    className="relative text-white/90 hover:text-gold-300 font-medium transition-all duration-300 group py-2"
-                  >
-                    {item.label}
-                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-gold-400 to-gold-600 group-hover:w-full transition-all duration-300"></span>
-                  </a>
-                ))}
-              </div>
-
-              {/* Search */}
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Search className="h-5 w-5 text-gold-300/60" />
-                </div>
-                <input
-                  type="text"
-                  placeholder="Search legal AI..."
-                  className="bg-white/10 border border-white/20 hover:border-gold-400/50 focus:border-gold-400 text-white placeholder-gold-200/60 pl-10 pr-4 py-2.5 w-64 rounded-xl backdrop-blur-md focus:bg-white/15 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gold-400/30"
-                />
-              </div>
-
-              {/* Auth Buttons */}
-              <div className="flex items-center space-x-4">
-                <button 
-                  className="px-6 py-2.5 text-white/90 hover:text-white font-semibold transition-all duration-300 hover:bg-white/10 rounded-xl"
-                  onClick={handleLogin}
-                >
-                  Sign In
-                </button>
-                <button 
-                  className="px-6 py-2.5 bg-gradient-to-r from-gold-400 to-gold-600 hover:from-gold-500 hover:to-gold-700 text-white font-semibold rounded-xl transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-gold-400/30 flex items-center gap-2"
-                  onClick={handleRegister}
-                >
-                  Get Started
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
+            <div className="flex flex-col">
+              <span className="text-xl font-bold text-white">
+                Chakshi
+              </span>
+              <span className="text-xs text-gray-300 font-medium -mt-1 tracking-wide">
+                Legal Intelligence Platform
+              </span>
             </div>
-
-            {/* Mobile Menu Button */}
-            <button
-              className={`lg:hidden p-3 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 hover:border-gold-400/50 transition-all duration-300 ${isOpen ? 'rotate-180' : ''}`}
-              onClick={toggleMenu}
-              aria-label="Toggle navigation menu"
-            >
-              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
           </div>
 
-          {/* Mobile Navigation */}
-          <div className={`lg:hidden transition-all duration-500 overflow-hidden ${
-            isOpen ? 'max-h-screen opacity-100 pb-6' : 'max-h-0 opacity-0'
-          }`}>
-            <div className="backdrop-blur-xl bg-navy-800/90 border border-gold-400/20 rounded-2xl mt-4 p-6 shadow-2xl">
-              
-              {/* Mobile Search */}
-              <div className="relative mb-6">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Search className="h-5 w-5 text-gold-300/60" />
-                </div>
-                <input
-                  type="text"
-                  placeholder="Search legal AI..."
-                  className="bg-white/10 border border-white/20 hover:border-gold-400/50 focus:border-gold-400 text-white placeholder-gold-200/60 pl-10 pr-4 py-3 w-full rounded-xl backdrop-blur-md focus:bg-white/15 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gold-400/30"
-                />
-              </div>
+          {/* Desktop Navigation */}
+          <div className="hidden lg:flex items-center space-x-8">
+            
+            {/* Navigation Links */}
+            <div className="flex items-center space-x-1">
+              {navigationItems.map((item) => (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  onClick={handleLinkClick}
+                  className="relative px-4 py-2 text-gray-300 hover:text-white font-medium transition-all duration-300 rounded-lg hover:bg-white/10 group"
+                >
+                  {item.label}
+                  <span className="absolute bottom-0 left-4 w-0 h-0.5 bg-white group-hover:w-[calc(100%-2rem)] transition-all duration-300" />
+                </a>
+              ))}
+            </div>
 
-              {/* Mobile Navigation Links */}
-              <div className="space-y-4 mb-6">
-                {[
-                  { href: '#home', label: 'Home' },
-                  { href: '#features', label: 'Features' },
-                  { href: '#resources', label: 'Resources' },
-                  { href: '#pricing', label: 'Pricing' },
-                  { href: '#contact', label: 'Contact' }
-                ].map((item, index) => (
+            {/* Search */}
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search legal resources..."
+                className="bg-white/10 border border-white/20 hover:border-white/40 focus:border-white/60 text-white placeholder-gray-400 px-4 py-3 w-72 rounded-lg backdrop-blur-sm focus:bg-white/15 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white/30"
+                onFocus={() => setSearchFocused(true)}
+                onBlur={() => setSearchFocused(false)}
+                aria-label="Search legal resources"
+              />
+              <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
+                <kbd className="px-2 py-1 text-xs font-semibold text-gray-400 bg-white/10 border border-white/20 rounded">
+                  Ctrl+K
+                </kbd>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center space-x-4">
+              <button 
+                className="px-6 py-2.5 text-gray-300 hover:text-white font-medium transition-all duration-300 hover:bg-white/10 rounded-lg"
+                onClick={handleLogin}
+                type="button"
+              >
+                Sign In
+              </button>
+              <button 
+                className="px-6 py-2.5 text-gray-300 hover:text-white font-medium transition-all duration-300 hover:bg-white/10 rounded-lg"
+                onClick={handleRegister}
+                type="button"
+              >
+                Register
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            className={`lg:hidden relative p-3 rounded-lg bg-white/10 hover:bg-white/20 text-white border border-white/20 hover:border-white/40 transition-all duration-300 ${
+              isOpen ? 'bg-white/20' : ''
+            }`}
+            onClick={toggleMenu}
+            aria-label="Toggle navigation menu"
+            aria-expanded={isOpen}
+            type="button"
+          >
+            {isOpen ? (
+              <span className="text-lg font-medium">✕</span>
+            ) : (
+              <span className="text-lg font-medium">Menu</span>
+            )}
+          </button>
+        </div>
+
+        {/* Mobile Navigation */}
+        <div 
+          className={`lg:hidden transition-all duration-500 overflow-hidden ${
+            isOpen ? 'max-h-screen opacity-100 pb-6' : 'max-h-0 opacity-0'
+          }`}
+          aria-hidden={!isOpen}
+        >
+          <div className="backdrop-blur-md bg-[#1E3A8A]/95 border border-white/20 rounded-lg mt-4 p-6 shadow-lg">
+            
+            {/* Mobile Search */}
+            <div className="relative mb-6">
+              <input
+                type="text"
+                placeholder="Search legal resources..."
+                className="bg-white/10 border border-white/20 hover:border-white/40 focus:border-white/60 text-white placeholder-gray-400 px-4 py-3 w-full rounded-lg backdrop-blur-sm focus:bg-white/15 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white/30"
+                aria-label="Search legal resources"
+              />
+            </div>
+
+            {/* Mobile Navigation Links */}
+            <nav aria-label="Mobile navigation">
+              <div className="space-y-2 mb-6">
+                {navigationItems.map((item) => (
                   <a
-                    key={index}
+                    key={item.label}
                     href={item.href}
                     onClick={handleLinkClick}
-                    className="block text-white/90 hover:text-gold-300 font-medium py-3 px-4 rounded-xl transition-all duration-300 hover:bg-white/10 border-b border-gold-400/20 last:border-0"
+                    className="flex items-center justify-between text-gray-300 hover:text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 hover:bg-white/10 border border-transparent hover:border-white/20"
                   >
-                    {item.label}
+                    <span>{item.label}</span>
                   </a>
                 ))}
               </div>
+            </nav>
 
-              {/* Mobile Auth Buttons */}
-              <div className="flex flex-col space-y-3">
-                <button 
-                  className="w-full py-3 px-6 text-white/90 hover:text-white font-semibold transition-all duration-300 hover:bg-white/10 rounded-xl border border-white/20 hover:border-gold-400/50"
-                  onClick={handleLogin}
-                >
-                  Sign In
-                </button>
-                <button 
-                  className="w-full py-3 px-6 bg-gradient-to-r from-gold-400 to-gold-600 hover:from-gold-500 hover:to-gold-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-gold-400/30 flex items-center justify-center gap-2"
-                  onClick={handleRegister}
-                >
-                  Get Started
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
+            {/* Mobile Auth Buttons */}
+            <div className="flex flex-col space-y-3">
+              <button 
+                className="w-full py-3 px-6 text-gray-300 hover:text-white font-medium transition-all duration-300 hover:bg-white/10 rounded-lg border border-white/20 hover:border-white/40"
+                onClick={handleLogin}
+                type="button"
+              >
+                Sign In
+              </button>
+              <button 
+                className="w-full py-3 px-6 text-gray-300 hover:text-white font-medium transition-all duration-300 hover:bg-white/10 rounded-lg border border-white/20 hover:border-white/40"
+                onClick={handleRegister}
+                type="button"
+              >
+                Register
+              </button>
             </div>
           </div>
         </div>
-      </nav>
-    </>
+      </div>
+    </nav>
   );
 };
 

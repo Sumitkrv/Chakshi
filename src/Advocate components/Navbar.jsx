@@ -267,95 +267,98 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
   return (
     <>
       {isLoggingOut && <LoadingOverlay message="Logging out..." />}
-      <nav className="glass-morphism-card border-b border-white/20 backdrop-blur-xl bg-gradient-to-r from-purple-900/80 via-blue-900/80 to-indigo-900/80 px-6 py-4 saas-shadow-glow sticky top-0 z-50">
-        <div className="flex items-center justify-between h-16">
+      <nav className="border-b border-gray-200 backdrop-blur-xl bg-gradient-to-r from-blue-900/95 via-blue-800/95 to-blue-900/95 px-4 md:px-6 py-3 md:py-4 shadow-lg sticky top-0 z-50" style={{backgroundColor: '#1E3A8A'}}>
+        <div className="flex items-center justify-between h-14 md:h-16">
           {/* Left side - Menu toggle and Logo */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3 md:space-x-4">
             <button 
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className="saas-button-secondary p-2.5 rounded-lg group transition-all duration-300 hover:bg-white/10"
+              className="p-2 md:p-2.5 rounded-lg group transition-all duration-300 hover:bg-gray-700/30 text-white"
               aria-label="Toggle sidebar"
+              style={{color: '#FFFFFF'}}
             >
-              <Menu className="w-5 h-5 text-white/80 group-hover:text-white transition-colors duration-300" />
+              <span className="text-sm font-medium">Menu</span>
             </button>
             
             {/* Enhanced Logo/Brand */}
             <div className="hidden md:flex items-center cursor-pointer group" onClick={() => navigate('/advocate/dashboard')}>
               <div className="flex items-center space-x-3">
-                <div className="p-2 rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 shadow-lg group-hover:shadow-yellow-500/30 transition-all duration-300">
-                  <Zap className="w-6 h-6 text-white animate-pulse-glow" />
+                <div className="p-2 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300" style={{backgroundColor: '#374151'}}>
+                  <span className="text-white font-bold text-lg">⚖</span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-xl font-bold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
-                    LegalSuite
+                  <span className="text-lg md:text-xl font-bold text-white">
+                    Chakshi Pro
                   </span>
-                  <span className="text-xs text-white/60 font-medium">
-                    Advocate Dashboard
+                  <span className="text-xs text-gray-200 font-medium">
+                    Legal Practice Management
                   </span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Enhanced Search Bar with Filters */}
-          <div className="flex-1 max-w-2xl mx-6 relative animate-float" ref={searchRef}>
+          {/* Enhanced Search Bar */}
+          <div className="flex-1 max-w-xl md:max-w-2xl mx-3 md:mx-6 relative" ref={searchRef}>
             <form onSubmit={handleSearchSubmit} className="w-full">
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Search className="h-5 w-5 text-white/60" />
+                <div className="absolute inset-y-0 left-0 pl-3 md:pl-4 flex items-center pointer-events-none">
+                  <span className="text-sm text-gray-400">🔍</span>
                 </div>
                 <input
                   type="text"
                   placeholder="Search cases, documents, clients..."
-                  className="saas-input w-full pl-12 pr-20 py-3.5 bg-white/10 border border-white/20 text-white placeholder-white/60 backdrop-blur-md focus:bg-white/15 focus:border-blue-400/50 focus:ring-2 focus:ring-blue-400/30 rounded-xl transition-all duration-300"
+                  className="w-full pl-10 md:pl-12 pr-16 md:pr-20 py-2.5 md:py-3.5 border border-gray-600/30 text-white placeholder-gray-300 backdrop-blur-md focus:border-gray-400/50 focus:ring-2 focus:ring-gray-400/30 rounded-xl transition-all duration-300"
+                  style={{backgroundColor: 'rgba(55, 65, 81, 0.3)'}}
                   value={searchQuery}
                   onChange={handleSearchChange}
                   onFocus={() => searchQuery.length > 2 && setSearchOpen(true)}
                 />
-                <div className="absolute inset-y-0 right-0 flex items-center space-x-2 pr-4">
+                <div className="absolute inset-y-0 right-0 flex items-center space-x-1 md:space-x-2 pr-3 md:pr-4">
                   <button
                     type="button"
                     onClick={() => setSearchOpen(!searchOpen)}
-                    className="text-white/60 hover:text-white transition-colors duration-300"
+                    className="text-gray-400 hover:text-white transition-colors duration-300"
                     aria-label="Search filters"
                   >
-                    <Filter className="h-4 w-4" />
+                    <span className="text-xs">Filters</span>
                   </button>
                   {searchQuery && (
                     <button
                       type="button"
                       onClick={clearSearch}
-                      className="text-white/60 hover:text-white transition-colors duration-300"
+                      className="text-gray-400 hover:text-white transition-colors duration-300"
                     >
-                      <X className="h-4 w-4" />
+                      <span className="text-xs">Clear</span>
                     </button>
                   )}
                 </div>
               </div>
             </form>
 
-            {/* Enhanced Search Results with Filters */}
+            {/* Enhanced Search Results */}
             {searchOpen && (
-              <div className="absolute z-50 mt-2 w-full glass-morphism-card border border-white/20 backdrop-blur-xl rounded-xl overflow-hidden animate-stagger-fade-in shadow-2xl">
+              <div className="absolute z-50 mt-2 w-full border border-gray-600/30 backdrop-blur-xl rounded-xl overflow-hidden animate-slide-down shadow-lg" style={{backgroundColor: 'rgba(30, 58, 138, 0.9)'}}>
                 {/* Search Filters */}
-                <div className="p-4 border-b border-white/10 bg-gradient-to-r from-blue-600/20 to-purple-600/20">
+                <div className="p-3 md:p-4 border-b border-gray-600/20" style={{backgroundColor: 'rgba(55, 65, 81, 0.1)'}}>
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-sm font-semibold text-white">Search Filters</h3>
+                    <h3 className="text-sm font-semibold text-white">Search Options</h3>
                     <button 
                       onClick={clearSearch}
-                      className="text-xs text-white/60 hover:text-white transition-colors duration-300"
+                      className="text-xs text-gray-300 hover:text-white transition-colors duration-300"
                     >
-                      <X className="h-4 w-4" />
+                      <span>Close</span>
                     </button>
                   </div>
                   <div className="flex space-x-3">
                     <select 
                       value={searchFilters.category}
                       onChange={(e) => setSearchFilters(prev => ({ ...prev, category: e.target.value }))}
-                      className="text-xs bg-white/10 border border-white/20 text-white rounded-lg px-3 py-1"
+                      className="text-xs border border-gray-600/30 text-white rounded-lg px-3 py-1.5"
+                      style={{backgroundColor: 'rgba(55, 65, 81, 0.3)'}}
                     >
                       {searchCategories.map(cat => (
-                        <option key={cat.value} value={cat.value} className="bg-gray-800">
+                        <option key={cat.value} value={cat.value} style={{backgroundColor: '#374151'}}>
                           {cat.label}
                         </option>
                       ))}
@@ -367,7 +370,7 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
                 {searchHistory.length > 0 && searchQuery.length <= 2 && (
                   <div className="p-4 border-b border-white/10">
                     <h4 className="text-xs font-semibold text-white/80 mb-2 flex items-center">
-                      <Clock className="h-3 w-3 mr-1" />
+                      <span className="mr-2">🕒</span>
                       Recent Searches
                     </h4>
                     {searchHistory.map((term, index) => (
@@ -385,17 +388,17 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
                 {/* Search Results */}
                 {searchResults.length > 0 && (
                   <>
-                    <div className="p-4 border-b border-white/10 bg-gradient-to-r from-green-600/20 to-blue-600/20">
+                    <div className="p-3 md:p-4 border-b border-gray-600/20" style={{backgroundColor: 'rgba(55, 65, 81, 0.1)'}}>
                       <h3 className="text-sm font-semibold text-white">
                         {searchResults.length} result{searchResults.length !== 1 ? 's' : ''} found
                       </h3>
                     </div>
-                    <div className="max-h-80 overflow-y-auto">
+                    <div className="max-h-80 overflow-y-auto custom-scrollbar">
                       {searchResults.map((result, index) => (
                         <div 
                           key={index} 
-                          className={`p-4 border-b border-white/10 hover:bg-white/10 cursor-pointer transition-all duration-300 group ${
-                            selectedSearchIndex === index ? 'bg-white/15' : ''
+                          className={`p-3 md:p-4 border-b border-gray-600/20 hover:bg-gray-500/10 cursor-pointer transition-all duration-300 group ${
+                            selectedSearchIndex === index ? 'bg-gray-500/15' : ''
                           }`}
                           onClick={() => handleResultClick(result)}
                         >
@@ -404,11 +407,11 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
                               <p className="text-sm text-white/90 group-hover:text-white transition-colors duration-300 line-clamp-2">
                                 {result.text}
                               </p>
-                              <span className="inline-flex items-center mt-2 px-3 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-200 border border-blue-400/30">
+                              <span className="inline-flex items-center mt-2 px-3 py-1 rounded-full text-xs font-medium text-white border border-gray-500/30" style={{backgroundColor: 'rgba(55, 65, 81, 0.2)'}}>
                                 {result.category}
                               </span>
                             </div>
-                            <ArrowRight className="h-4 w-4 text-white/60 flex-shrink-0 ml-3 mt-1 group-hover:text-white transition-colors duration-300" />
+                            <span className="text-gray-400 flex-shrink-0 ml-3 mt-1 group-hover:text-white transition-colors duration-300">→</span>
                           </div>
                         </div>
                       ))}
@@ -417,10 +420,10 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
                 )}
 
                 {searchQuery.length > 2 && searchResults.length === 0 && (
-                  <div className="p-6 text-center">
-                    <Search className="w-12 h-12 mx-auto text-white/30 mb-3" />
+                  <div className="p-6 md:p-8 text-center">
+                    <span className="text-4xl mx-auto block mb-3">🔍</span>
                     <p className="text-sm text-white/80 mb-1">No results found for "{searchQuery}"</p>
-                    <p className="text-xs text-white/50">Try different keywords or check your spelling</p>
+                    <p className="text-xs text-gray-300">Try different keywords or check your spelling</p>
                   </div>
                 )}
               </div>
@@ -429,68 +432,58 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
 
           {/* Right side items */}
           <div className="flex items-center space-x-3">
-            {/* Dark Mode Toggle */}
+            {/* Theme Toggle */}
             <button 
               onClick={toggleDarkMode}
-              className="saas-button-secondary p-2.5 group relative rounded-lg transition-all duration-300 hover:bg-white/10"
-              aria-label="Toggle dark mode"
+              className="p-2 md:p-2.5 group relative rounded-lg transition-all duration-300 hover:bg-gray-700/30 text-white"
+              aria-label="Toggle theme"
             >
-              {darkMode ? 
-                <Sun className="h-5 w-5 text-white/80 group-hover:text-white transition-colors duration-300" /> :
-                <Moon className="h-5 w-5 text-white/80 group-hover:text-white transition-colors duration-300" />
-              }
-              <div className="saas-tooltip">
+              <span className="text-sm font-medium">
                 {darkMode ? 'Light Mode' : 'Dark Mode'}
-              </div>
+              </span>
             </button>
 
-            {/* Apps button */}
+            {/* Applications */}
             <button 
-              className="saas-button-secondary p-2.5 group relative rounded-lg transition-all duration-300 hover:bg-white/10"
+              className="p-2 md:p-2.5 group relative rounded-lg transition-all duration-300 hover:bg-gray-700/30 text-white"
               onClick={() => navigate('/apps')}
-              aria-label="Apps"
+              aria-label="Applications"
             >
-              <Grid3X3 className="h-5 w-5 text-white/80 group-hover:text-white transition-colors duration-300" />
-              <div className="saas-tooltip">
-                Apps
-              </div>
+              <span className="text-sm font-medium">Applications</span>
             </button>
 
             {/* Enhanced Notifications */}
             <div className="relative" ref={notificationsRef}>
               <button 
-                className="saas-button-secondary p-2.5 group relative rounded-lg transition-all duration-300 hover:bg-white/10"
+                className="p-2 md:p-2.5 group relative rounded-lg transition-all duration-300 hover:bg-gray-700/30 text-white"
                 onClick={() => setNotificationsOpen(!notificationsOpen)}
                 aria-label="Notifications"
               >
-                <Bell className="h-5 w-5 text-white/80 group-hover:text-white transition-colors duration-300" />
+                <span className="text-sm font-medium">Notifications</span>
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 inline-flex items-center justify-center h-5 w-5 text-xs font-bold text-white bg-gradient-to-r from-red-500 to-pink-500 rounded-full animate-pulse-glow shadow-lg">
+                  <span className="absolute -top-1 -right-1 inline-flex items-center justify-center h-4 w-4 md:h-5 md:w-5 text-xs font-bold text-white rounded-full animate-pulse shadow-lg" style={{backgroundColor: '#DC2626'}}>
                     {unreadCount}
                   </span>
                 )}
-                <div className="saas-tooltip">
-                  Notifications
-                </div>
               </button>
 
               {notificationsOpen && (
-                <div className="absolute right-0 mt-3 w-96 glass-morphism-card border border-white/20 backdrop-blur-xl rounded-xl overflow-hidden z-10 animate-slide-down shadow-2xl">
-                  <div className="p-4 border-b border-white/10 bg-gradient-to-r from-blue-600/20 to-purple-600/20">
+                <div className="absolute right-0 mt-3 w-80 md:w-96 border border-gray-600/30 backdrop-blur-xl rounded-xl overflow-hidden z-10 animate-slide-down shadow-lg" style={{backgroundColor: 'rgba(30, 58, 138, 0.9)'}}>
+                  <div className="p-3 md:p-4 border-b border-gray-600/20" style={{backgroundColor: 'rgba(55, 65, 81, 0.1)'}}>
                     <div className="flex justify-between items-center mb-3">
                       <h3 className="text-sm font-semibold text-white">Notifications</h3>
                       <div className="flex space-x-2">
                         {unreadCount > 0 && (
                           <button 
                             onClick={markAllAsRead}
-                            className="text-xs text-blue-300 hover:text-blue-200 font-medium transition-colors duration-300"
+                            className="text-xs text-gray-300 hover:text-white font-medium transition-colors duration-300"
                           >
                             Mark all read
                           </button>
                         )}
                         <button 
                           onClick={() => navigate('/notifications')}
-                          className="text-xs text-blue-300 hover:text-blue-200 font-medium transition-colors duration-300"
+                          className="text-xs text-gray-300 hover:text-white font-medium transition-colors duration-300"
                         >
                           View all
                         </button>
@@ -504,28 +497,29 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
                           onClick={() => setNotificationFilter(filter)}
                           className={`text-xs px-3 py-1 rounded-full transition-colors duration-300 ${
                             notificationFilter === filter 
-                              ? 'bg-blue-500/30 text-blue-200' 
-                              : 'bg-white/10 text-white/60 hover:text-white'
+                              ? 'text-white border' 
+                              : 'text-gray-300 hover:text-white border border-gray-600/20 hover:border-gray-500/30'
                           }`}
+                          style={{backgroundColor: notificationFilter === filter ? 'rgba(55, 65, 81, 0.3)' : 'rgba(55, 65, 81, 0.1)', borderColor: notificationFilter === filter ? '#374151' : 'rgba(55, 65, 81, 0.3)'}}
                         >
                           {filter.charAt(0).toUpperCase() + filter.slice(1)}
                         </button>
                       ))}
                     </div>
                   </div>
-                  <div className="max-h-96 overflow-y-auto">
+                  <div className="max-h-96 overflow-y-auto custom-scrollbar">
                     {filteredNotifications.length > 0 ? (
                       filteredNotifications.map(notification => (
-                        <div key={notification.id} className={`p-4 border-b border-white/10 hover:bg-white/10 transition-all duration-300 group ${!notification.read ? 'bg-blue-500/10' : ''}`}>
+                        <div key={notification.id} className={`p-3 md:p-4 border-b border-gray-600/20 hover:bg-gray-500/10 transition-all duration-300 group ${!notification.read ? 'bg-gray-500/5 border-l-2' : ''}`} style={{borderLeftColor: !notification.read ? '#374151' : 'transparent'}}>
                           <div className="flex items-start justify-between">
                             <div className="flex items-start flex-1">
                               {!notification.read && (
-                                <span className="h-2 w-2 mt-2 rounded-full bg-gradient-to-r from-blue-400 to-blue-500 mr-3 flex-shrink-0 animate-pulse-glow"></span>
+                                <span className="h-2 w-2 mt-2 rounded-full mr-3 flex-shrink-0 animate-pulse" style={{backgroundColor: '#374151'}}></span>
                               )}
                               <div className={notification.read ? "ml-5" : ""}>
                                 <p className="text-sm text-white/90">{notification.text}</p>
                                 <div className="flex items-center justify-between mt-2">
-                                  <p className="text-xs text-white/50">{notification.time}</p>
+                                  <p className="text-xs text-gray-300">{notification.time}</p>
                                   <span className={`text-xs px-2 py-1 rounded-full ${
                                     notification.priority === 'high' ? 'bg-red-500/20 text-red-300' :
                                     notification.priority === 'medium' ? 'bg-yellow-500/20 text-yellow-300' :
@@ -543,10 +537,10 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
                                     e.stopPropagation();
                                     markNotificationAsRead(notification.id);
                                   }}
-                                  className="p-1 text-white/60 hover:text-green-400 transition-colors duration-300"
+                                  className="p-1 text-gray-400 hover:text-green-400 transition-colors duration-300"
                                   title="Mark as read"
                                 >
-                                  <Check className="h-3 w-3" />
+                                  <span>✓</span>
                                 </button>
                               )}
                               <button
@@ -554,17 +548,17 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
                                   e.stopPropagation();
                                   deleteNotification(notification.id);
                                 }}
-                                className="p-1 text-white/60 hover:text-red-400 transition-colors duration-300"
+                                className="p-1 text-gray-400 hover:text-red-400 transition-colors duration-300"
                                 title="Delete"
                               >
-                                <Trash2 className="h-3 w-3" />
+                                <span>🗑</span>
                               </button>
                             </div>
                           </div>
                         </div>
                       ))
                     ) : (
-                      <p className="p-6 text-sm text-white/60 text-center">No notifications found</p>
+                      <p className="p-6 text-sm text-gray-300 text-center">No notifications found</p>
                     )}
                   </div>
                 </div>
@@ -574,37 +568,36 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
             {/* Enhanced User profile */}
             <div className="relative" ref={profileRef}>
               <button 
-                className="flex items-center space-x-3 focus:outline-none group saas-button-secondary px-4 py-2.5 rounded-xl transition-all duration-300 hover:bg-white/10"
+                className="flex items-center space-x-2 md:space-x-3 focus:outline-none group px-3 md:px-4 py-2 md:py-2.5 rounded-xl transition-all duration-300 hover:bg-gray-700/30 text-white"
                 onClick={() => setProfileOpen(!profileOpen)}
                 aria-label="User profile"
               >
-                <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center text-white font-bold shadow-lg group-hover:shadow-purple-500/30 transition-all duration-300">
+                <div className="h-8 w-8 md:h-9 md:w-9 rounded-xl flex items-center justify-center text-white font-bold shadow-lg group-hover:shadow-xl transition-all duration-300" style={{backgroundColor: '#374151'}}>
                   {user ? user.name?.charAt(0) || user.email?.charAt(0) || 'U' : 'U'}
                 </div>
                 <div className="hidden md:block text-left">
-                  <p className="text-sm font-semibold text-white/90 group-hover:text-white transition-colors duration-300 truncate max-w-[120px]">
+                  <p className="text-sm font-semibold text-white group-hover:text-gray-200 transition-colors duration-300 truncate max-w-[120px]">
                     {user ? user.name || user.email.split('@')[0] : 'User'}
                   </p>
-                  <p className="text-xs text-white/60 group-hover:text-white/70 transition-colors duration-300">
-                    {user ? user.role || 'Advocate' : 'Advocate'}
+                  <p className="text-xs text-gray-300 group-hover:text-gray-200 transition-colors duration-300">
+                    {user ? user.role || 'Legal Professional' : 'Legal Professional'}
                   </p>
                 </div>
-                <ChevronDown className={`h-4 w-4 text-white/60 group-hover:text-white transition-all duration-300 ${profileOpen ? 'rotate-180' : ''}`} />
+                <span className={`text-sm transition-all duration-300 ${profileOpen ? 'rotate-180' : ''}`}>▼</span>
               </button>
 
               {profileOpen && (
-                <div className="absolute right-0 mt-3 w-64 glass-morphism-card border border-white/20 backdrop-blur-xl rounded-xl py-2 z-10 animate-slide-down shadow-2xl">
-                  <div className="px-4 py-3 border-b border-white/10">
+                <div className="absolute right-0 mt-3 w-64 border border-gray-600/30 backdrop-blur-xl rounded-xl py-2 z-10 animate-slide-down shadow-lg" style={{backgroundColor: 'rgba(30, 58, 138, 0.9)'}}>
+                  <div className="px-4 py-3 border-b border-gray-600/20">
                     <div className="flex items-center space-x-3">
-                      <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center text-white font-bold">
+                      <div className="h-12 w-12 rounded-xl flex items-center justify-center text-white font-bold" style={{backgroundColor: '#374151'}}>
                         {user ? user.name?.charAt(0) || user.email?.charAt(0) || 'U' : 'U'}
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-white/90 truncate">{user ? user.name || user.email.split('@')[0] : 'User'}</p>
-                        <p className="text-xs text-white/60 truncate">{user ? user.email : 'user@example.com'}</p>
+                        <p className="text-sm font-semibold text-white truncate">{user ? user.name || user.email.split('@')[0] : 'User'}</p>
+                        <p className="text-xs text-gray-300 truncate">{user ? user.email : 'user@example.com'}</p>
                         <div className="flex items-center mt-1">
-                          <Shield className="h-3 w-3 text-green-400 mr-1" />
-                          <span className="text-xs text-green-400">Verified</span>
+                          <span className="text-xs text-green-400">🛡 Verified</span>
                         </div>
                       </div>
                     </div>
@@ -612,44 +605,44 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
                   
                   <button 
                     onClick={() => handleNavigation('/advocate/profile')}
-                    className="flex items-center space-x-3 w-full text-left px-4 py-3 text-sm text-white/80 hover:bg-white/10 hover:text-white transition-all duration-300 group"
+                    className="flex items-center space-x-3 w-full text-left px-4 py-3 text-sm text-gray-300 hover:bg-gray-500/10 hover:text-white transition-all duration-300 group"
                   >
-                    <User className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
-                    <span>My Profile</span>
+                    <span>👤</span>
+                    <span>Profile Settings</span>
                   </button>
-                  
+
                   <button 
                     onClick={() => handleNavigation('/advocate/settings')}
-                    className="flex items-center space-x-3 w-full text-left px-4 py-3 text-sm text-white/80 hover:bg-white/10 hover:text-white transition-all duration-300 group"
+                    className="flex items-center space-x-3 w-full text-left px-4 py-3 text-sm text-gray-300 hover:bg-gray-500/10 hover:text-white transition-all duration-300 group"
                   >
-                    <Settings className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
-                    <span>Settings</span>
+                    <span>⚙️</span>
+                    <span>Account Settings</span>
                   </button>
 
                   <button 
                     onClick={() => handleNavigation('/advocate/billing')}
-                    className="flex items-center space-x-3 w-full text-left px-4 py-3 text-sm text-white/80 hover:bg-white/10 hover:text-white transition-all duration-300 group"
+                    className="flex items-center space-x-3 w-full text-left px-4 py-3 text-sm text-gray-300 hover:bg-gray-500/10 hover:text-white transition-all duration-300 group"
                   >
-                    <Globe className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
+                    <span>💳</span>
                     <span>Billing & Plans</span>
                   </button>
 
                   <button 
                     onClick={() => handleNavigation('/help')}
-                    className="flex items-center space-x-3 w-full text-left px-4 py-3 text-sm text-white/80 hover:bg-white/10 hover:text-white transition-all duration-300 group"
+                    className="flex items-center space-x-3 w-full text-left px-4 py-3 text-sm text-gray-300 hover:bg-gray-500/10 hover:text-white transition-all duration-300 group"
                   >
-                    <HelpCircle className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
+                    <span>❓</span>
                     <span>Help & Support</span>
                   </button>
 
-                  <div className="border-t border-white/10 my-1"></div>
+                  <div className="border-t border-gray-600/20 my-1"></div>
                   
                   <button 
                     onClick={handleSignOut}
                     className="flex items-center space-x-3 w-full text-left px-4 py-3 text-sm text-red-300 hover:bg-red-500/10 hover:text-red-200 transition-all duration-300 group"
                   >
-                    <LogOut className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
-                    <span>Sign out</span>
+                    <span>🚪</span>
+                    <span>Sign Out</span>
                   </button>
                 </div>
               )}

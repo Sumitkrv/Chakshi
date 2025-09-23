@@ -2,23 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import LoadingOverlay from '../components/LoadingOverlay';
-import { 
-  Home, 
-  FileSearch, 
-  FolderOpen, 
-  Users, 
-  Brain, 
-  Play, 
-  BarChart3, 
-  Settings, 
-  Zap, 
-  ChevronLeft, 
-  ChevronRight, 
-  LogOut,
-  Shield,
-  Sparkles,
-  Crown
-} from 'lucide-react';
 
 const Sidebar = ({ collapsed, setCollapsed }) => {
   const navigate = useNavigate();
@@ -31,63 +14,63 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
     { 
       id: 'dashboard', 
       name: 'Dashboard', 
-      icon: Home,
+      emoji: '🏠',
       badge: null,
       description: 'Overview & Analytics'
     },
     { 
       id: 'contractcomparison', 
       name: 'Contract Analysis', 
-      icon: FileSearch,
+      emoji: '🔍',
       badge: 'AI',
       description: 'Smart Contract Review'
     },
     { 
       id: 'documents', 
       name: 'Case Management', 
-      icon: FolderOpen,
+      emoji: '📁',
       badge: null,
       description: 'Organize & Track Cases'
     },
     { 
       id: 'clients', 
       name: 'Client Portal', 
-      icon: Users,
+      emoji: '👥',
       badge: null,
       description: 'Client Communication Hub'
     },
     { 
       id: 'research', 
       name: 'AI Research', 
-      icon: Brain,
+      emoji: '🧠',
       badge: 'NEW',
       description: 'Intelligent Legal Research'
     },
     { 
       id: 'simulation', 
       name: 'Courtroom Prep', 
-      icon: Play,
+      emoji: '▶️',
       badge: null,
       description: 'Practice & Simulation'
     },
     { 
       id: 'analytics', 
       name: 'Practice Analytics', 
-      icon: BarChart3,
+      emoji: '📊',
       badge: 'PRO',
       description: 'Performance Insights'
     },
     { 
       id: 'integrations', 
       name: 'Integrations', 
-      icon: Zap,
+      emoji: '⚡',
       badge: null,
       description: 'Connect Your Tools'
     },
     { 
       id: 'settings', 
       name: 'Settings', 
-      icon: Settings,
+      emoji: '⚙️',
       badge: null,
       description: 'Preferences & Configuration'
     }
@@ -110,89 +93,127 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
   return (
     <>
       {isLoggingOut && <LoadingOverlay message="Logging out..." />}
-      <div className={`bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white flex flex-col transition-all duration-500 ease-in-out ${collapsed ? 'w-20' : 'w-72'} relative border-r border-slate-700/50 shadow-2xl`}>
+      <div className={`text-white flex flex-col transition-all duration-500 ease-in-out ${collapsed ? 'w-16 md:w-20' : 'w-64 md:w-72'} relative shadow-xl`} style={{
+        background: 'linear-gradient(to bottom, #1E3A8A, #374151)',
+        borderRight: '1px solid rgba(255, 255, 255, 0.1)'
+      }}>
         
         {/* Sidebar Header */}
-        <div className="p-6 border-b border-slate-700/50 flex items-center justify-between bg-gradient-to-r from-slate-800/50 to-slate-700/30 backdrop-blur-sm">
+        <div className="p-4 md:p-6 flex items-center justify-between" style={{
+          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+          background: 'linear-gradient(to right, rgba(30, 58, 138, 0.5), rgba(55, 65, 81, 0.3))'
+        }}>
           {!collapsed && (
             <div className="flex items-center space-x-3">
               <div className="relative">
-                <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
-                  <Shield className="w-5 h-5 text-white" />
+                <div className="h-8 w-8 md:h-10 md:w-10 rounded-xl flex items-center justify-center shadow-lg" style={{
+                  background: 'linear-gradient(to bottom right, #374151, #4B5563)'
+                }}>
+                  <span className="text-white text-xl">🛡️</span>
                 </div>
-                <div className="absolute -top-1 -right-1 h-3 w-3 bg-emerald-400 rounded-full border-2 border-slate-900 animate-pulse"></div>
+                <div className="absolute -top-1 -right-1 h-2.5 w-2.5 md:h-3 md:w-3 bg-emerald-400 rounded-full border-2 animate-pulse" style={{borderColor: '#1E3A8A'}}></div>
               </div>
               <div>
-                <h2 className="text-xl font-bold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent tracking-tight">
+                <h2 className="text-lg md:text-xl font-bold text-white tracking-tight">
                   Chakshi Pro
                 </h2>
-                <p className="text-xs text-slate-400 font-medium">Legal Intelligence Suite</p>
+                <p className="text-xs font-medium" style={{color: 'rgba(255, 255, 255, 0.6)'}}>Legal Intelligence Suite</p>
               </div>
             </div>
           )}
           {collapsed && (
             <div className="relative mx-auto">
-              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
-                <Shield className="w-5 h-5 text-white" />
+              <div className="h-8 w-8 md:h-10 md:w-10 rounded-xl flex items-center justify-center shadow-lg" style={{
+                background: 'linear-gradient(to bottom right, #374151, #4B5563)'
+              }}>
+                <span className="text-white text-xl">🛡️</span>
               </div>
-              <div className="absolute -top-1 -right-1 h-3 w-3 bg-emerald-400 rounded-full border-2 border-slate-900 animate-pulse"></div>
+              <div className="absolute -top-1 -right-1 h-2.5 w-2.5 md:h-3 md:w-3 bg-emerald-400 rounded-full border-2 animate-pulse" style={{borderColor: '#1E3A8A'}}></div>
             </div>
           )}
           <button 
             onClick={() => setCollapsed(!collapsed)}
-            className="p-2 rounded-lg hover:bg-slate-700/50 transition-all duration-200 text-slate-400 hover:text-white group"
+            className="p-2 rounded-lg transition-all duration-200 group"
+            style={{color: 'rgba(255, 255, 255, 0.6)'}}
+            onMouseEnter={(e) => {
+              e.target.style.background = 'rgba(55, 65, 81, 0.3)';
+              e.target.style.color = '#FFFFFF';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.background = 'transparent';
+              e.target.style.color = 'rgba(255, 255, 255, 0.6)';
+            }}
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
-            {collapsed ? (
-              <ChevronRight className="w-4 h-4 group-hover:scale-110 transition-transform" />
-            ) : (
-              <ChevronLeft className="w-4 h-4 group-hover:scale-110 transition-transform" />
-            )}
+            <span className="text-xl">{collapsed ? '➤' : '⬅'}</span>
           </button>
         </div>
         
         {/* Navigation Items */}
-        <nav className="flex-1 overflow-y-auto py-6 px-3 space-y-1">
+        <nav className="flex-1 overflow-y-auto py-4 md:py-6 px-2 md:px-3 space-y-1 custom-scrollbar">
           {menuItems.map((item, index) => {
-            const IconComponent = item.icon;
             const isActive = currentPath === item.id.toLowerCase();
             
             return (
               <div key={item.id} className="relative group">
                 <button
                   onClick={() => handleItemClick(item.id)}
-                  className={`w-full flex items-center px-4 py-3.5 rounded-xl transition-all duration-300 group relative overflow-hidden ${
+                  className={`w-full flex items-center px-3 md:px-4 py-3 md:py-3.5 rounded-xl transition-all duration-300 group relative overflow-hidden ${
                     isActive
-                      ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/25' 
-                      : 'text-slate-300 hover:bg-slate-700/50 hover:text-white'
+                      ? 'text-white shadow-lg' 
+                      : 'hover:text-white'
                   }`}
+                  style={{
+                    background: isActive 
+                      ? 'linear-gradient(to right, #1E3A8A, #374151)' 
+                      : 'transparent',
+                    color: isActive ? '#FFFFFF' : 'rgba(255, 255, 255, 0.6)'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isActive) {
+                      e.target.style.background = 'rgba(55, 65, 81, 0.3)';
+                      e.target.style.color = '#FFFFFF';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) {
+                      e.target.style.background = 'transparent';
+                      e.target.style.color = 'rgba(255, 255, 255, 0.6)';
+                    }
+                  }}
                 >
                   {/* Active indicator */}
                   {isActive && (
-                    <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-xl"></div>
+                    <div className="absolute inset-0 rounded-xl" style={{background: 'linear-gradient(to right, rgba(30, 58, 138, 0.2), rgba(55, 65, 81, 0.2)'}}></div>
                   )}
                   
                   <div className="relative flex items-center w-full">
-                    <div className={`${isActive ? 'text-white' : 'text-slate-400 group-hover:text-indigo-400'} transition-colors duration-200`}>
-                      <IconComponent className="w-5 h-5" />
+                    <div className={`transition-colors duration-200 ${isActive ? 'text-white' : 'group-hover:text-white'}`}>
+                      <span className="text-xl">{item.emoji}</span>
                     </div>
                     
                     {!collapsed && (
-                      <div className="ml-4 flex-1 text-left">
+                      <div className="ml-3 md:ml-4 flex-1 text-left">
                         <div className="flex items-center justify-between">
                           <span className="font-medium text-sm tracking-wide">{item.name}</span>
                           {item.badge && (
                             <span className={`px-2 py-0.5 text-xs rounded-full font-semibold ${
-                              item.badge === 'AI' ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white' :
-                              item.badge === 'NEW' ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white' :
-                              item.badge === 'PRO' ? 'bg-gradient-to-r from-amber-500 to-yellow-500 text-black' :
-                              'bg-slate-600 text-slate-200'
-                            }`}>
+                              item.badge === 'AI' ? 'text-white' :
+                              item.badge === 'NEW' ? 'text-white' :
+                              item.badge === 'PRO' ? 'text-white' :
+                              'text-white'
+                            }`} style={{
+                              background: item.badge === 'AI' ? 'linear-gradient(to right, #10B981, #059669)' :
+                                         item.badge === 'NEW' ? 'linear-gradient(to right, #F97316, #EA580C)' :
+                                         item.badge === 'PRO' ? 'linear-gradient(to right, #374151, #4B5563)' :
+                                         '#374151',
+                              border: item.badge === 'PRO' ? '1px solid rgba(55, 65, 81, 0.3)' : 'none'
+                            }}>
                               {item.badge}
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-slate-400 mt-0.5 opacity-75">{item.description}</p>
+                        <p className="text-xs mt-0.5 opacity-75" style={{color: 'rgba(255, 255, 255, 0.6)'}}>{item.description}</p>
                       </div>
                     )}
                     
@@ -206,20 +227,24 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
                 
                 {/* Tooltip for collapsed state */}
                 {collapsed && (
-                  <div className="absolute left-full ml-3 top-1/2 transform -translate-y-1/2 bg-slate-800 text-white px-3 py-2 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50 border border-slate-600 min-w-max">
+                  <div className="absolute left-full ml-3 top-1/2 transform -translate-y-1/2 text-white px-3 py-2 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50 min-w-max" style={{
+                    background: 'linear-gradient(to right, #374151, #4B5563)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)'
+                  }}>
                     <div className="font-medium text-sm">{item.name}</div>
-                    <div className="text-xs text-slate-300 mt-0.5">{item.description}</div>
+                    <div className="text-xs mt-0.5" style={{color: 'rgba(255, 255, 255, 0.6)'}}>{item.description}</div>
                     {item.badge && (
-                      <span className={`inline-block px-2 py-0.5 text-xs rounded-full font-semibold mt-1 ${
-                        item.badge === 'AI' ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white' :
-                        item.badge === 'NEW' ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white' :
-                        item.badge === 'PRO' ? 'bg-gradient-to-r from-amber-500 to-yellow-500 text-black' :
-                        'bg-slate-600 text-slate-200'
-                      }`}>
+                      <span className={`inline-block px-2 py-0.5 text-xs rounded-full font-semibold mt-1 text-white`} style={{
+                        background: item.badge === 'AI' ? 'linear-gradient(to right, #10B981, #059669)' :
+                                   item.badge === 'NEW' ? 'linear-gradient(to right, #F97316, #EA580C)' :
+                                   item.badge === 'PRO' ? 'linear-gradient(to right, #374151, #4B5563)' :
+                                   '#374151',
+                        border: item.badge === 'PRO' ? '1px solid rgba(55, 65, 81, 0.3)' : 'none'
+                      }}>
                         {item.badge}
                       </span>
                     )}
-                    <div className="absolute right-full top-1/2 transform -translate-y-1/2 border-4 border-transparent border-r-slate-800"></div>
+                    <div className="absolute right-full top-1/2 transform -translate-y-1/2 border-4 border-transparent" style={{borderRightColor: '#374151'}}></div>
                   </div>
                 )}
               </div>
@@ -229,33 +254,60 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
         
         {/* Upgrade Banner */}
         {!collapsed && (
-          <div className="mx-3 mb-4 p-4 bg-gradient-to-br from-indigo-600/20 to-purple-600/20 rounded-xl border border-indigo-500/30 backdrop-blur-sm">
+          <div className="mx-2 md:mx-3 mb-3 md:mb-4 p-3 md:p-4 rounded-xl border" style={{
+            background: 'linear-gradient(to bottom right, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.2))',
+            borderColor: 'rgba(251, 191, 36, 0.3)'
+          }}>
             <div className="flex items-center space-x-3 mb-3">
-              <div className="h-8 w-8 rounded-lg bg-gradient-to-r from-amber-500 to-yellow-500 flex items-center justify-center">
-                <Crown className="w-4 h-4 text-white" />
+              <div className="h-6 w-6 md:h-8 md:w-8 rounded-lg flex items-center justify-center" style={{
+                background: 'linear-gradient(to right, #F59E0B, #D97706)'
+              }}>
+                <span className="text-white text-lg">👑</span>
               </div>
               <div>
                 <h3 className="font-semibold text-sm text-white">Upgrade to Pro</h3>
-                <p className="text-xs text-slate-400">Unlock advanced AI features</p>
+                <p className="text-xs" style={{color: 'rgba(255, 255, 255, 0.6)'}}>Unlock advanced AI features</p>
               </div>
             </div>
-            <button className="w-full py-2 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-lg">
+            <button className="w-full py-2 px-4 text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-lg" style={{
+              background: 'linear-gradient(to right, #F59E0B, #D97706)'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.background = 'linear-gradient(to right, #D97706, #B45309)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.background = 'linear-gradient(to right, #F59E0B, #D97706)';
+            }}>
               Upgrade Now
             </button>
           </div>
         )}
         
         {/* User Profile & Footer */}
-        <div className="p-4 border-t border-slate-700/50 bg-gradient-to-r from-slate-800/30 to-slate-700/20">
+        <div className="p-3 md:p-4" style={{
+          borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+          background: 'linear-gradient(to right, rgba(30, 58, 138, 0.3), rgba(55, 65, 81, 0.2))'
+        }}>
           {!collapsed ? (
             <>
-              <div className="flex items-center mb-4 p-3 rounded-xl bg-slate-800/50 border border-slate-700/50 backdrop-blur-sm hover:bg-slate-700/50 transition-all duration-200">
+              <div className="flex items-center mb-3 md:mb-4 p-3 rounded-xl border transition-all duration-200" style={{
+                background: 'rgba(255, 255, 255, 0.05)',
+                borderColor: 'rgba(255, 255, 255, 0.1)'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.background = 'rgba(55, 65, 81, 0.3)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.background = 'rgba(255, 255, 255, 0.05)';
+              }}>
                 <div className="relative">
-                  <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                  <div className="h-10 w-10 md:h-11 md:w-11 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg" style={{
+                    background: 'linear-gradient(to bottom right, #374151, #4B5563)'
+                  }}>
                     {user ? user.name?.charAt(0) || user.email?.charAt(0) || 'U' : 'U'}
                   </div>
-                  <div className="absolute -bottom-1 -right-1 h-4 w-4 bg-emerald-400 rounded-full border-2 border-slate-900 flex items-center justify-center">
-                    <div className="h-2 w-2 bg-white rounded-full"></div>
+                  <div className="absolute -bottom-1 -right-1 h-3 w-3 md:h-4 md:w-4 bg-emerald-400 rounded-full border-2 flex items-center justify-center" style={{borderColor: '#1E3A8A'}}>
+                    <div className="h-1.5 w-1.5 md:h-2 md:w-2 bg-white rounded-full"></div>
                   </div>
                 </div>
                 <div className="ml-3 flex-1 overflow-hidden">
@@ -263,10 +315,13 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
                     {user ? user.name || user.email.split('@')[0] : 'User'}
                   </p>
                   <div className="flex items-center space-x-2">
-                    <p className="text-xs text-slate-400">
+                    <p className="text-xs" style={{color: 'rgba(255, 255, 255, 0.6)'}}>
                       {user ? user.role || 'Senior Advocate' : 'Senior Advocate'}
                     </p>
-                    <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-400 text-xs rounded-full font-medium">
+                    <span className="px-2 py-0.5 text-xs rounded-full font-medium" style={{
+                      background: 'rgba(16, 185, 129, 0.2)',
+                      color: '#10B981'
+                    }}>
                       Pro
                     </span>
                   </div>
@@ -274,28 +329,60 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
               </div>
               <button 
                 onClick={handleLogout}
-                className="w-full flex items-center justify-center py-3 px-4 bg-slate-700/50 hover:bg-red-600/20 hover:border-red-500/50 border border-slate-600/50 rounded-xl text-sm font-medium transition-all duration-200 text-slate-300 hover:text-red-400 group"
+                className="w-full flex items-center justify-center py-2.5 md:py-3 px-4 border rounded-xl text-sm font-medium transition-all duration-200 group"
+                style={{
+                  background: 'rgba(55, 65, 81, 0.3)',
+                  borderColor: 'rgba(255, 255, 255, 0.1)',
+                  color: 'rgba(255, 255, 255, 0.6)'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = 'rgba(239, 68, 68, 0.2)';
+                  e.target.style.borderColor = 'rgba(239, 68, 68, 0.5)';
+                  e.target.style.color = '#F87171';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = 'rgba(55, 65, 81, 0.3)';
+                  e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                  e.target.style.color = 'rgba(255, 255, 255, 0.6)';
+                }}
               >
-                <LogOut className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
+                <span className="text-lg mr-2">🚪</span>
                 Sign Out
               </button>
             </>
           ) : (
-            <div className="flex flex-col items-center space-y-4">
+            <div className="flex flex-col items-center space-y-3 md:space-y-4">
               <div className="relative">
-                <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                <div className="h-10 w-10 md:h-11 md:w-11 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg" style={{
+                  background: 'linear-gradient(to bottom right, #374151, #4B5563)'
+                }}>
                   {user ? user.name?.charAt(0) || user.email?.charAt(0) || 'U' : 'U'}
                 </div>
-                <div className="absolute -bottom-1 -right-1 h-4 w-4 bg-emerald-400 rounded-full border-2 border-slate-900 flex items-center justify-center">
-                  <div className="h-2 w-2 bg-white rounded-full"></div>
+                <div className="absolute -bottom-1 -right-1 h-3 w-3 md:h-4 md:w-4 bg-emerald-400 rounded-full border-2 flex items-center justify-center" style={{borderColor: '#1E3A8A'}}>
+                  <div className="h-1.5 w-1.5 md:h-2 md:w-2 bg-white rounded-full"></div>
                 </div>
               </div>
               <button 
                 onClick={handleLogout}
-                className="p-3 rounded-xl bg-slate-700/50 hover:bg-red-600/20 border border-slate-600/50 hover:border-red-500/50 text-slate-300 hover:text-red-400 transition-all duration-200 group" 
+                className="p-2.5 md:p-3 rounded-xl border transition-all duration-200 group" 
+                style={{
+                  background: 'rgba(55, 65, 81, 0.3)',
+                  borderColor: 'rgba(255, 255, 255, 0.1)',
+                  color: 'rgba(255, 255, 255, 0.6)'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = 'rgba(239, 68, 68, 0.2)';
+                  e.target.style.borderColor = 'rgba(239, 68, 68, 0.5)';
+                  e.target.style.color = '#F87171';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = 'rgba(55, 65, 81, 0.3)';
+                  e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                  e.target.style.color = 'rgba(255, 255, 255, 0.6)';
+                }}
                 aria-label="Logout"
               >
-                <LogOut className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                <span className="text-lg">🚪</span>
               </button>
             </div>
           )}

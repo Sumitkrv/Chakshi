@@ -1,26 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { 
-  User, 
-  Mail, 
-  Lock, 
-  Eye, 
-  EyeOff, 
-  Scale, 
-  GraduationCap, 
-  FileText, 
-  ArrowRight, 
-  AlertCircle,
-  CheckCircle,
-  Shield,
-  Loader,
-  Star,
-  Home,
-  UserPlus,
-  Check,
-  X
-} from 'lucide-react';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -42,26 +22,20 @@ const Register = () => {
     {
       id: 'advocate',
       title: 'Advocate',
-      icon: Scale,
       description: 'Legal professional managing cases and clients',
-      route: '/advocate/dashboard',
-      gradient: 'from-blue-500 to-indigo-600'
+      route: '/advocate/dashboard'
     },
     {
       id: 'student',
       title: 'Law Student',
-      icon: GraduationCap,
       description: 'Student pursuing legal education',
-      route: '/student/dashboard',
-      gradient: 'from-green-500 to-emerald-600'
+      route: '/student/dashboard'
     },
     {
       id: 'clerk',
       title: 'Court Clerk',
-      icon: FileText,
       description: 'Court administrative professional',
-      route: '/clerk/dashboard',
-      gradient: 'from-purple-500 to-violet-600'
+      route: '/clerk/dashboard'
     }
   ];
 
@@ -182,33 +156,33 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 pro-flex items-center justify-center pro-p-4">
+    <div className="min-h-screen bg-[#1E3A8A] flex items-center justify-center p-4">
       
       {/* Background Pattern */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none"></div>
+      <div className="absolute inset-0 opacity-10 pointer-events-none"></div>
       
       <div className="w-full max-w-md relative z-10">
         
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-blue-600 pro-rounded-xl pro-flex-center mx-auto mb-4">
-            <UserPlus className="w-8 h-8 text-white" />
+          <div className="w-16 h-16 bg-[#FFFFFF] rounded-xl flex items-center justify-center mx-auto mb-4">
+            <span className="text-[#1E3A8A] font-bold text-lg">Register</span>
           </div>
-          <h1 className="pro-heading-xl text-gray-900 mb-2">Create Your Account</h1>
-          <p className="pro-text-body text-gray-600">Join our legal platform and get started</p>
+          <h1 className="text-3xl font-bold text-white mb-2">Create Your Account</h1>
+          <p className="text-base text-white opacity-90">Join our legal platform and get started</p>
         </div>
 
         {/* Main Form Card */}
-        <div className="pro-dashboard-card pro-p-8 mb-6">
+        <div className="bg-white p-8 rounded-lg shadow-lg mb-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             
             {/* Name Field */}
             <div>
-              <label htmlFor="name" className="block pro-text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
                 Full Name
               </label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">Name:</span>
                 <input
                   type="text"
                   id="name"
@@ -217,7 +191,7 @@ const Register = () => {
                   onChange={handleChange}
                   required
                   placeholder="Enter your full name"
-                  className="w-full pro-p-3 pl-12 border border-gray-300 pro-rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
+                  className="w-full p-3 pl-16 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1E3A8A] focus:border-[#1E3A8A] transition-colors duration-200"
                   disabled={loading}
                 />
               </div>
@@ -225,11 +199,11 @@ const Register = () => {
 
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block pro-text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                 Email Address
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">Email:</span>
                 <input
                   type="email"
                   id="email"
@@ -238,7 +212,7 @@ const Register = () => {
                   onChange={handleChange}
                   required
                   placeholder="Enter your email address"
-                  className="w-full pro-p-3 pl-12 border border-gray-300 pro-rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
+                  className="w-full p-3 pl-16 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1E3A8A] focus:border-[#1E3A8A] transition-colors duration-200"
                   disabled={loading}
                 />
               </div>
@@ -246,11 +220,11 @@ const Register = () => {
 
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block pro-text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">Pass:</span>
                 <input
                   type={showPassword ? "text" : "password"}
                   id="password"
@@ -259,34 +233,34 @@ const Register = () => {
                   onChange={handleChange}
                   required
                   placeholder="Create a password (min 6 characters)"
-                  className="w-full pro-p-3 pl-12 pr-12 border border-gray-300 pro-rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
+                  className="w-full p-3 pl-16 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1E3A8A] focus:border-[#1E3A8A] transition-colors duration-200"
                   disabled={loading}
                   minLength="6"
                 />
                 <button
                   type="button"
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? "Hide" : "Show"}
                 </button>
               </div>
               
               {/* Password Strength Indicator */}
               {formData.password && (
                 <div className="mt-2">
-                  <div className="pro-flex items-center justify-between mb-1">
-                    <span className="pro-text-xs text-gray-600">Password Strength</span>
-                    <span className={`pro-text-xs font-medium ${
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs text-gray-600">Password Strength</span>
+                    <span className={`text-xs font-medium ${
                       passwordStrength.color === 'red' ? 'text-red-600' :
                       passwordStrength.color === 'yellow' ? 'text-yellow-600' : 'text-green-600'
                     }`}>
                       {passwordStrength.text}
                     </span>
                   </div>
-                  <div className="w-full bg-gray-200 pro-rounded-lg h-2">
+                  <div className="w-full bg-gray-200 rounded-lg h-2">
                     <div 
-                      className={`h-2 pro-rounded-lg transition-all duration-300 ${
+                      className={`h-2 rounded-lg transition-all duration-300 ${
                         passwordStrength.color === 'red' ? 'bg-red-500' :
                         passwordStrength.color === 'yellow' ? 'bg-yellow-500' : 'bg-green-500'
                       }`}
@@ -299,11 +273,11 @@ const Register = () => {
 
             {/* Confirm Password Field */}
             <div>
-              <label htmlFor="confirmPassword" className="block pro-text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
                 Confirm Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">Confirm:</span>
                 <input
                   type={showConfirmPassword ? "text" : "password"}
                   id="confirmPassword"
@@ -312,30 +286,30 @@ const Register = () => {
                   onChange={handleChange}
                   required
                   placeholder="Confirm your password"
-                  className="w-full pro-p-3 pl-12 pr-12 border border-gray-300 pro-rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
+                  className="w-full p-3 pl-20 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1E3A8A] focus:border-[#1E3A8A] transition-colors duration-200"
                   disabled={loading}
                 />
                 <button
                   type="button"
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
-                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showConfirmPassword ? "Hide" : "Show"}
                 </button>
               </div>
               
               {/* Password Match Indicator */}
               {formData.confirmPassword && (
-                <div className="mt-2 pro-flex items-center pro-gap-2">
+                <div className="mt-2 flex items-center gap-2">
                   {formData.password === formData.confirmPassword ? (
                     <>
-                      <Check className="w-4 h-4 text-green-500" />
-                      <span className="pro-text-xs text-green-600">Passwords match</span>
+                      <span className="text-green-500">✓</span>
+                      <span className="text-xs text-green-600">Passwords match</span>
                     </>
                   ) : (
                     <>
-                      <X className="w-4 h-4 text-red-500" />
-                      <span className="pro-text-xs text-red-600">Passwords don't match</span>
+                      <span className="text-red-500">✗</span>
+                      <span className="text-xs text-red-600">Passwords don't match</span>
                     </>
                   )}
                 </div>
@@ -344,34 +318,33 @@ const Register = () => {
 
             {/* Role Selection */}
             <div>
-              <label className="block pro-text-sm font-medium text-gray-700 mb-3">
+              <label className="block text-sm font-medium text-gray-700 mb-3">
                 Select Your Role
               </label>
               <div className="space-y-3">
                 {roles.map((role) => {
-                  const IconComponent = role.icon;
                   return (
                     <div
                       key={role.id}
-                      className={`pro-p-4 border-2 pro-rounded-lg cursor-pointer transition-all duration-300 ${
+                      className={`p-4 border-2 rounded-lg cursor-pointer transition-all duration-300 ${
                         formData.role === role.id 
-                          ? `border-green-500 bg-green-50 ring-2 ring-green-200` 
+                          ? `border-[#1E3A8A] bg-blue-50 ring-2 ring-blue-200` 
                           : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                       } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                       onClick={() => !loading && handleChange({ target: { name: 'role', value: role.id } })}
                     >
-                      <div className="pro-flex items-center pro-gap-3">
-                        <div className={`w-12 h-12 bg-gradient-to-r ${role.gradient} pro-rounded-lg pro-flex-center flex-shrink-0`}>
-                          <IconComponent className="w-6 h-6 text-white" />
+                      <div className="flex items-center gap-3">
+                        <div className={`w-12 h-12 bg-${formData.role === role.id ? '[#1E3A8A]' : '[#374151]'} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                          <span className="text-white font-bold text-sm">{role.title.charAt(0)}</span>
                         </div>
                         <div className="flex-1">
-                          <div className="pro-flex items-center justify-between mb-1">
-                            <h4 className="pro-heading-sm text-gray-900">{role.title}</h4>
+                          <div className="flex items-center justify-between mb-1">
+                            <h4 className="text-lg font-semibold text-gray-900">{role.title}</h4>
                             {formData.role === role.id && (
-                              <CheckCircle className="w-5 h-5 text-green-500" />
+                              <span className="text-[#1E3A8A] font-bold">✓</span>
                             )}
                           </div>
-                          <p className="pro-text-xs text-gray-600">{role.description}</p>
+                          <p className="text-xs text-gray-600">{role.description}</p>
                         </div>
                       </div>
                     </div>
@@ -379,8 +352,8 @@ const Register = () => {
                 })}
               </div>
               {roleError && (
-                <div className="mt-2 pro-flex items-center pro-gap-2 pro-text-sm text-red-600">
-                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                <div className="mt-2 flex items-center gap-2 text-sm text-red-600">
+                  <span className="font-bold">!</span>
                   {roleError}
                 </div>
               )}
@@ -389,21 +362,19 @@ const Register = () => {
             {/* Submit Button */}
             <button 
               type="submit" 
-              className={`w-full pro-btn pro-btn-primary bg-gradient-to-r from-green-500 to-blue-600 border-0 hover:from-green-600 hover:to-blue-700 pro-flex items-center justify-center pro-gap-2 ${
+              className={`w-full p-4 bg-[#1E3A8A] text-white rounded-lg font-semibold hover:bg-[#1E3A8A]/90 transition-all duration-300 flex items-center justify-center gap-2 ${
                 loading ? 'opacity-75 cursor-not-allowed' : ''
               }`}
               disabled={loading}
             >
               {loading ? (
                 <>
-                  <Loader className="w-5 h-5 animate-spin" />
+                  <span className="animate-pulse">●</span>
                   Creating Account...
                 </>
               ) : (
                 <>
-                  <UserPlus className="w-5 h-5" />
                   Create Account
-                  <ArrowRight className="w-5 h-5" />
                 </>
               )}
             </button>
@@ -411,19 +382,19 @@ const Register = () => {
 
           {/* Error Message */}
           {error && (
-            <div className="mt-4 pro-p-3 bg-red-50 border border-red-200 pro-rounded-lg pro-flex items-center pro-gap-2">
-              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-              <p className="pro-text-sm text-red-700">{error}</p>
+            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2">
+              <span className="text-red-500 font-bold">!</span>
+              <p className="text-sm text-red-700">{error}</p>
             </div>
           )}
         </div>
 
         {/* Login Link */}
-        <div className="text-center pro-p-4 bg-white border border-gray-200 pro-rounded-lg">
-          <p className="pro-text-sm text-gray-600">
+        <div className="text-center p-4 bg-white border border-gray-200 rounded-lg">
+          <p className="text-sm text-gray-600">
             Already have an account? {' '}
             <button 
-              className="text-green-600 hover:text-green-700 font-medium hover:underline transition-colors duration-200"
+              className="text-[#1E3A8A] hover:text-[#1E3A8A]/80 font-medium hover:underline transition-colors duration-200"
               onClick={() => !loading && navigate('/login')}
               disabled={loading}
             >
@@ -433,14 +404,14 @@ const Register = () => {
         </div>
 
         {/* Demo Notice */}
-        <div className="mt-6 pro-p-4 bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 pro-rounded-lg">
-          <div className="pro-flex items-start pro-gap-3">
-            <div className="w-8 h-8 bg-green-500 pro-rounded-lg pro-flex-center flex-shrink-0">
-              <Star className="w-4 h-4 text-white" />
+        <div className="mt-6 p-4 bg-white border border-[#1E3A8A] rounded-lg">
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 bg-[#1E3A8A] rounded-lg flex items-center justify-center flex-shrink-0">
+              <span className="text-white font-bold">i</span>
             </div>
             <div>
-              <h4 className="pro-text-sm font-semibold text-green-900 mb-1">Demo Mode Active</h4>
-              <p className="pro-text-xs text-green-700 leading-relaxed">
+              <h4 className="text-sm font-semibold text-gray-900 mb-1">Demo Mode Active</h4>
+              <p className="text-xs text-gray-700 leading-relaxed">
                 Registration will create a demo account. Fill in all fields and select your role to get started exploring the platform.
               </p>
             </div>
@@ -450,10 +421,9 @@ const Register = () => {
         {/* Quick Access */}
         <div className="mt-4 text-center">
           <button 
-            className="pro-text-sm text-gray-500 hover:text-gray-700 pro-flex items-center pro-gap-1 mx-auto transition-colors duration-200"
+            className="text-sm text-white hover:text-white/80 flex items-center gap-1 mx-auto transition-colors duration-200"
             onClick={() => navigate('/')}
           >
-            <Home className="w-4 h-4" />
             Back to Home
           </button>
         </div>

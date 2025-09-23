@@ -315,84 +315,117 @@ const Dashboard = () => {
   ];
 
   const quickActions = [
-    { name: 'New Case', icon: Plus, color: 'blue', action: () => {}, description: 'Create a new case file' },
-    { name: 'Upload Document', icon: Upload, color: 'green', action: () => {}, description: 'Upload legal documents' },
-    { name: 'Add Client', icon: Users, color: 'purple', action: () => {}, description: 'Register new client' },
-    { name: 'Schedule Hearing', icon: Calendar, color: 'orange', action: () => {}, description: 'Schedule court hearing' },
-    { name: 'AI Analysis', icon: Brain, color: 'indigo', action: () => {}, description: 'Analyze documents with AI' },
-    { name: 'Generate Report', icon: FileText, color: 'pink', action: () => {}, description: 'Create case reports' }
+    { name: 'Create New Case', color: 'blue', action: () => {}, description: 'Start a new legal case file' },
+    { name: 'Upload Documents', color: 'green', action: () => {}, description: 'Upload legal documents' },
+    { name: 'Add New Client', color: 'purple', action: () => {}, description: 'Register new client profile' },
+    { name: 'Schedule Meeting', color: 'orange', action: () => {}, description: 'Schedule client meeting' },
+    { name: 'AI Document Analysis', color: 'indigo', action: () => {}, description: 'Analyze documents with AI' },
+    { name: 'Generate Report', color: 'pink', action: () => {}, description: 'Create comprehensive case reports' }
   ];
 
   const tabs = [
-    { id: 'workspace', name: 'Dashboard Overview', icon: Home, color: 'blue' },
-    { id: 'analytics', name: 'Analytics & Insights', icon: BarChart3, color: 'green' },
-    { id: 'contract-analysis', name: 'AI Contract Analysis', icon: Brain, color: 'purple' },
-    { id: 'case-management', name: 'Case Management', icon: Briefcase, color: 'orange' },
-    { id: 'client-portal', name: 'Client Portal', icon: Users, color: 'indigo' },
-    { id: 'ai-tools', name: 'AI Assistant', icon: Sparkles, color: 'pink' },
-    { id: 'practice-tools', name: 'Practice Tools', icon: Settings, color: 'teal' }
+    { id: 'workspace', name: 'Dashboard Overview', color: 'navy' },
+    { id: 'analytics', name: 'Analytics & Insights', color: 'gray' },
+    { id: 'contract-analysis', name: 'AI Contract Analysis', color: 'navy' },
+    { id: 'case-management', name: 'Case Management', color: 'gray' },
+    { id: 'client-portal', name: 'Client Portal', color: 'navy' },
+    { id: 'ai-tools', name: 'AI Assistant', color: 'gray' },
+    { id: 'practice-tools', name: 'Practice Tools', color: 'navy' }
   ];
 
+  // Fixed upcoming events data structure
+  const upcomingEvents = [
+    { title: 'Court Hearing - Property Dispute', time: 'Today, 2:00 PM', type: 'hearing', urgent: true },
+    { title: 'Client Meeting - Tech Startup', time: 'Tomorrow, 10:00 AM', type: 'meeting', urgent: false },
+    { title: 'Document Review Deadline', time: 'Dec 25, 5:00 PM', type: 'deadline', urgent: true },
+    { title: 'Mediation Session', time: 'Dec 26, 11:00 AM', type: 'mediation', urgent: false }
+  ];
+
+  // Fixed AI analysis tools data structure
+  const aiAnalysisTools = [
+    { name: 'Risk Analysis', icon: Shield, color: 'red', description: 'Identify potential risks and missing clauses' },
+    { name: 'Document Summarizer', icon: BookOpen, color: 'green', description: 'Convert complex documents to plain language' },
+    { name: 'Authenticity Checker', icon: Search, color: 'purple', description: 'Verify document authenticity and detect tampering' }
+  ];
+
+  // Helper function to get color classes safely
+  const getColorClasses = (color, type = 'bg') => {
+    const colorMap = {
+      blue: `${type}-blue-500`,
+      green: `${type}-green-500`,
+      purple: `${type}-purple-500`,
+      orange: `${type}-orange-500`,
+      red: `${type}-red-500`,
+      teal: `${type}-teal-500`,
+      indigo: `${type}-indigo-500`,
+      pink: `${type}-pink-500`
+    };
+    return colorMap[color] || `${type}-gray-500`;
+  };
+
   const renderWorkspace = () => (
-    <div className="space-y-8 animate-fade-in">
+    <div className="space-y-6 md:space-y-8 animate-fade-in">
       {/* Welcome Section */}
-      <div className="glass-morphism-card bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-indigo-500/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 saas-shadow-glow">
+      <div className="backdrop-blur-xl border rounded-2xl p-6 md:p-8 shadow-lg" style={{background: 'linear-gradient(to right, rgba(30, 58, 138, 0.1), rgba(55, 65, 81, 0.1), rgba(30, 58, 138, 0.1))', borderColor: 'rgba(30, 58, 138, 0.2)'}}>
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
           <div className="mb-6 lg:mb-0">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">
-              Good {new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 18 ? 'Afternoon' : 'Evening'}, {user?.name?.split(' ')[0] || 'Advocate'}! 👋
+            <h2 className="text-2xl md:text-3xl font-bold mb-2" style={{color: '#1E3A8A'}}>
+              Good {new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 18 ? 'Afternoon' : 'Evening'}, {user?.name?.split(' ')[0] || 'Legal Professional'}! 👋
             </h2>
-            <p className="text-gray-700 text-lg">
+            <p className="text-base md:text-lg" style={{color: '#374151'}}>
               Here's what's happening with your legal practice today
             </p>
           </div>
-          <div className="hidden lg:flex items-center space-x-8">
+          <div className="hidden lg:flex items-center space-x-6 md:space-x-8">
             <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">24</div>
-              <div className="text-sm text-gray-600">Active Cases</div>
+              <div className="text-2xl font-bold" style={{color: '#374151'}}>24</div>
+              <div className="text-sm" style={{color: '#374151'}}>Active Cases</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">87%</div>
-              <div className="text-sm text-gray-600">Success Rate</div>
+              <div className="text-2xl font-bold text-emerald-600">87%</div>
+              <div className="text-sm" style={{color: '#374151'}}>Success Rate</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">12</div>
-              <div className="text-sm text-gray-600">Clients</div>
+              <div className="text-2xl font-bold" style={{color: '#374151'}}>12</div>
+              <div className="text-sm" style={{color: '#374151'}}>Clients</div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Enhanced Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         {stats.map((stat, index) => {
-          const IconComponent = stat.icon;
           return (
             <div 
               key={index} 
-              className="glass-morphism-card bg-white/80 backdrop-blur-xl border border-white/20 rounded-2xl p-6 saas-shadow-glow hover:shadow-xl transition-all duration-300 animate-stagger-fade-in group cursor-pointer"
-              style={{ animationDelay: `${index * 100}ms` }}
+              className="backdrop-blur-xl border rounded-2xl p-4 md:p-6 shadow-lg hover:shadow-xl transition-all duration-300 animate-stagger-fade-in group cursor-pointer"
+              style={{ 
+                background: 'rgba(255, 255, 255, 0.8)',
+                borderColor: 'rgba(30, 58, 138, 0.2)',
+                animationDelay: `${index * 100}ms` 
+              }}
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center space-x-3 mb-4">
-                    <div className={`p-3 bg-gradient-to-r from-${stat.color}-500 to-${stat.color}-600 rounded-xl group-hover:shadow-${stat.color}-500/30 transition-all duration-300 flex-shrink-0`}>
-                      <IconComponent className="w-6 h-6 text-white" />
+                    <div className="p-2.5 md:p-3 rounded-xl transition-all duration-300 flex-shrink-0" style={{
+                      background: index % 2 === 0 
+                        ? 'linear-gradient(to right, #1E3A8A, #1E40AF)' 
+                        : 'linear-gradient(to right, #374151, #4B5563)'
+                    }}>
+                      <span className="text-xl text-white">{stat.emoji}</span>
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-gray-700 truncate">{stat.name}</p>
-                      <p className="text-xs text-gray-600 truncate">{stat.description}</p>
+                      <p className="text-sm font-medium truncate" style={{color: '#374151'}}>{stat.name}</p>
+                      <p className="text-xs truncate" style={{color: '#6B7280'}}>{stat.description}</p>
                     </div>
                   </div>
                   <div className="flex items-end justify-between">
-                    <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                    <p className="text-xl md:text-2xl font-bold" style={{color: '#1E3A8A'}}>{stat.value}</p>
                     <div className="flex items-center space-x-1">
-                      {stat.trend === 'up' ? (
-                        <ArrowUp className="w-4 h-4 text-green-500" />
-                      ) : (
-                        <ArrowDown className="w-4 h-4 text-red-500" />
-                      )}
-                      <span className={`text-sm font-medium ${stat.trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
+                      <span className="text-lg">{stat.trend === 'up' ? '↗️' : '↘️'}</span>
+                      <span className={`text-sm font-medium ${stat.trend === 'up' ? 'text-emerald-600' : 'text-red-600'}`}>
                         {stat.change}
                       </span>
                     </div>
@@ -403,35 +436,49 @@ const Dashboard = () => {
           );
         })}
       </div>
-
       {/* Quick Actions Grid */}
-      <div className="glass-morphism-card bg-white/80 backdrop-blur-xl border border-white/20 rounded-2xl p-8 saas-shadow-glow animate-slide-up">
+      <div className="backdrop-blur-xl border rounded-2xl p-6 md:p-8 shadow-lg animate-slide-up" style={{
+        background: 'rgba(255, 255, 255, 0.8)',
+        borderColor: 'rgba(30, 58, 138, 0.2)'
+      }}>
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg">
-              <Zap className="w-5 h-5 text-white" />
+            <div className="p-2 rounded-lg" style={{background: 'linear-gradient(to right, #374151, #4B5563)'}}>
+              <span className="text-white text-xl">⚡</span>
             </div>
-            <h3 className="text-2xl font-bold text-gray-900">Quick Actions</h3>
+            <h3 className="text-xl md:text-2xl font-bold" style={{color: '#1E3A8A'}}>Quick Actions</h3>
           </div>
-          <span className="text-sm text-gray-600">Click to get started</span>
+          <span className="text-sm" style={{color: '#6B7280'}}>Click to get started</span>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
           {quickActions.map((action, index) => {
-            const IconComponent = action.icon;
             return (
               <button 
                 key={index}
                 onClick={action.action}
-                className="group p-6 border-2 border-dashed border-gray-300 hover:border-blue-400 rounded-xl hover:bg-blue-50/50 transition-all duration-300 animate-stagger-fade-in text-center"
-                style={{ animationDelay: `${index * 100}ms` }}
+                className="group p-4 md:p-6 border-2 border-dashed rounded-xl hover:bg-blue-50/50 transition-all duration-300 animate-stagger-fade-in text-center"
+                style={{ 
+                  borderColor: 'rgba(30, 58, 138, 0.3)',
+                  animationDelay: `${index * 100}ms` 
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.borderColor = '#374151';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.borderColor = 'rgba(30, 58, 138, 0.3)';
+                }}
               >
-                <div className={`w-12 h-12 bg-gradient-to-r from-${action.color}-500 to-${action.color}-600 rounded-xl flex items-center justify-center mb-3 mx-auto group-hover:scale-110 transition-transform duration-300`}>
-                  <IconComponent className="w-6 h-6 text-white" />
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center mb-3 mx-auto group-hover:scale-110 transition-transform duration-300" style={{
+                  background: index % 2 === 0 
+                    ? 'linear-gradient(to right, #1E3A8A, #1E40AF)' 
+                    : 'linear-gradient(to right, #374151, #4B5563)'
+                }}>
+                  <span className="text-white text-xl">{action.emoji}</span>
                 </div>
-                <div className="text-sm font-semibold text-gray-800 group-hover:text-gray-900 transition-colors duration-300 mb-1">
+                <div className="text-sm font-semibold mb-1 group-hover:text-blue-900 transition-colors duration-300" style={{color: '#374151'}}>
                   {action.name}
                 </div>
-                <div className="text-xs text-gray-600 group-hover:text-gray-700 transition-colors duration-300">
+                <div className="text-xs transition-colors duration-300" style={{color: '#6B7280'}}>
                   {action.description}
                 </div>
               </button>
@@ -441,15 +488,18 @@ const Dashboard = () => {
       </div>
 
       {/* Recent Activities & Upcoming Events */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
         {/* Recent Activities */}
-        <div className="glass-morphism-card bg-white/80 backdrop-blur-xl border border-white/20 rounded-2xl p-8 saas-shadow-glow animate-slide-up">
+        <div className="backdrop-blur-xl border rounded-2xl p-6 md:p-8 shadow-lg animate-slide-up" style={{
+          background: 'rgba(255, 255, 255, 0.8)',
+          borderColor: 'rgba(30, 58, 138, 0.2)'
+        }}>
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-3">
-              <div className="p-2 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg">
-                <Clock className="w-5 h-5 text-white" />
+              <div className="p-2 rounded-lg" style={{background: 'linear-gradient(to right, #10B981, #059669)'}}>
+                <span className="text-white text-xl">🕒</span>
               </div>
-              <h3 className="text-xl font-bold text-gray-900">Recent Activities</h3>
+              <h3 className="text-xl font-bold" style={{color: '#1E3A8A'}}>Recent Activities</h3>
             </div>
             <button className="px-4 py-2 text-sm bg-white/80 border border-gray-200 hover:bg-gray-50 rounded-lg transition-all duration-300 text-gray-700">
               View All
@@ -520,12 +570,7 @@ const Dashboard = () => {
             </button>
           </div>
           <div className="space-y-4">
-            {{
-              { title: 'Court Hearing - Property Dispute', time: 'Today, 2:00 PM', type: 'hearing', urgent: true },
-              { title: 'Client Meeting - Tech Startup', time: 'Tomorrow, 10:00 AM', type: 'meeting', urgent: false },
-              { title: 'Document Review Deadline', time: 'Dec 25, 5:00 PM', type: 'deadline', urgent: true },
-              { title: 'Mediation Session', time: 'Dec 26, 11:00 AM', type: 'mediation', urgent: false }
-            }.map((event, index) => (
+            {upcomingEvents.map((event, index) => (
               <div 
                 key={index}
                 className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-300 hover:shadow-md cursor-pointer ${
@@ -684,11 +729,7 @@ const Dashboard = () => {
 
         {/* AI Analysis Tools Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {{
-            { name: 'Risk Analysis', icon: Shield, color: 'red', description: 'Identify potential risks and missing clauses' },
-            { name: 'Document Summarizer', icon: BookOpen, color: 'green', description: 'Convert complex documents to plain language' },
-            { name: 'Authenticity Checker', icon: Search, color: 'purple', description: 'Verify document authenticity and detect tampering' }
-          }.map((tool, index) => {
+          {aiAnalysisTools.map((tool, index) => {
             const IconComponent = tool.icon;
             return (
               <div 
@@ -972,88 +1013,66 @@ const Dashboard = () => {
     </div>
   );
 
-  const renderCourtroomPrep = () => (
+  // Missing render functions for other tabs
+  const renderAnalytics = () => (
     <div className="space-y-6">
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Courtroom Preparation Suite</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="p-4 border border-gray-200 rounded-lg">
-            <h4 className="font-medium text-gray-900 mb-3">🎯 Oral Arguments Simulator</h4>
-            <p className="text-sm text-gray-600 mb-3">Practice sessions with AI feedback on persuasive techniques</p>
-            <button className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700">
-              Start Simulation
-            </button>
-          </div>
-          
-          <div className="p-4 border border-gray-200 rounded-lg">
-            <h4 className="font-medium text-gray-900 mb-3">❓ Cross-Examination Trainer</h4>
-            <p className="text-sm text-gray-600 mb-3">Mock witness questioning with dynamic response scenarios</p>
-            <button className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700">
-              Practice Cross-Examination
-            </button>
-          </div>
-          
-          <div className="p-4 border border-gray-200 rounded-lg">
-            <h4 className="font-medium text-gray-900 mb-3">📊 Case Presentation Rehearsal</h4>
-            <p className="text-sm text-gray-600 mb-3">Full argument run-through with timing and effectiveness metrics</p>
-            <button className="w-full bg-purple-600 text-white py-2 rounded-md hover:bg-purple-700">
-              Rehearse Presentation
-            </button>
-          </div>
-          
-          <div className="p-4 border border-gray-200 rounded-lg">
-            <h4 className="font-medium text-gray-900 mb-3">🎯 Strategy Optimizer</h4>
-            <p className="text-sm text-gray-600 mb-3">Best approach recommendations based on judge profiles</p>
-            <button className="w-full bg-orange-600 text-white py-2 rounded-md hover:bg-orange-700">
-              Optimize Strategy
-            </button>
-          </div>
-        </div>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Analytics & Insights</h3>
+        <p className="text-gray-600">Analytics dashboard coming soon...</p>
+      </div>
+    </div>
+  );
+
+  const renderPracticeTools = () => (
+    <div className="space-y-6">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Practice Tools</h3>
+        <p className="text-gray-600">Practice tools dashboard coming soon...</p>
       </div>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 relative overflow-hidden">
+    <div className="min-h-screen" style={{background: 'linear-gradient(to bottom right, #F8FAFC, #E2E8F0, #F8FAFC)'}}>
       {/* Background Elements */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 via-purple-600/5 to-indigo-600/5"></div>
-      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-400/10 to-purple-600/10 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-indigo-400/10 to-blue-600/10 rounded-full blur-3xl transform -translate-x-1/2 translate-y-1/2"></div>
+      <div className="absolute inset-0" style={{background: 'linear-gradient(to bottom right, rgba(30, 58, 138, 0.05), rgba(55, 65, 81, 0.05), rgba(30, 58, 138, 0.07))'}}></div>
+      <div className="absolute top-0 right-0 w-80 h-80 md:w-96 md:h-96 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2" style={{background: 'linear-gradient(to bottom right, rgba(55, 65, 81, 0.1), rgba(30, 58, 138, 0.1))'}}></div>
+      <div className="absolute bottom-0 left-0 w-80 h-80 md:w-96 md:h-96 rounded-full blur-3xl transform -translate-x-1/2 translate-y-1/2" style={{background: 'linear-gradient(to top right, rgba(30, 58, 138, 0.1), rgba(55, 65, 81, 0.1))'}}></div>
       
       <div className="relative z-10">
         {/* Enhanced Header */}
-        <div className="glass-morphism-card bg-white/80 backdrop-blur-xl border-b border-white/20 p-6 saas-shadow-glow">
+        <div className="backdrop-blur-xl border-b p-4 md:p-6 shadow-lg" style={{background: 'linear-gradient(to right, rgba(30, 58, 138, 0.95), rgba(30, 58, 138, 0.95), rgba(30, 58, 138, 0.95))', borderColor: 'rgba(30, 58, 138, 0.2)'}}>
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between">
-              <div className="flex items-center space-x-4 mb-4 lg:mb-0">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl shadow-lg animate-pulse-glow">
+              <div className="flex items-center space-x-3 md:space-x-4 mb-4 lg:mb-0">
+                <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center text-white font-bold text-lg md:text-xl shadow-lg animate-pulse" style={{background: 'linear-gradient(to right, #374151, #374151)'}}>
                   {user?.name?.charAt(0) || 'A'}
                 </div>
                 <div>
-                  <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+                  <h1 className="text-2xl md:text-3xl font-bold text-white">
                     Legal Practice Dashboard
                   </h1>
-                  <p className="text-gray-700 mt-1 flex items-center">
+                  <p className="text-white/80 mt-1 flex items-center text-sm md:text-base">
                     <span className="mr-2">Welcome back,</span>
-                    <span className="font-semibold text-blue-600">{user?.name || 'Advocate'}</span>
-                    <div className="w-2 h-2 bg-green-500 rounded-full ml-3 animate-pulse"></div>
-                    <span className="text-sm text-green-600 ml-1">Online</span>
+                    <span className="font-semibold text-gray-200">{user?.name || 'Legal Professional'}</span>
+                    <div className="w-2 h-2 bg-emerald-400 rounded-full ml-3 animate-pulse"></div>
+                    <span className="text-sm text-emerald-300 ml-1">Online</span>
                   </p>
                 </div>
               </div>
               
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-xl">
-                  <Crown className="w-5 h-5 text-yellow-600" />
-                  <span className="text-sm font-semibold text-yellow-700">Pro Plan</span>
+              <div className="flex items-center space-x-3 md:space-x-4">
+                <div className="flex items-center space-x-2 px-3 md:px-4 py-2 border rounded-xl backdrop-blur-sm text-white" style={{background: 'rgba(55, 65, 81, 0.1)', borderColor: 'rgba(55, 65, 81, 0.3)'}}>
+                  <span>👑</span>
+                  <span className="text-sm font-semibold">Professional Plan</span>
                 </div>
-                <button className="px-4 py-2 bg-white/80 border border-gray-200 flex items-center space-x-2 hover:bg-gray-50 rounded-lg transition-all duration-300 text-gray-700">
-                  <Bell className="w-4 h-4" />
+                <button className="px-3 md:px-4 py-2 border flex items-center space-x-2 rounded-lg transition-all duration-300 text-white hover:bg-white/10" style={{borderColor: 'rgba(30, 58, 138, 0.3)'}}>
+                  <span>🔔</span>
                   <span className="hidden md:inline">Notifications</span>
                   <span className="w-2 h-2 bg-red-500 rounded-full"></span>
                 </button>
-                <button className="px-4 py-2 bg-white/80 border border-gray-200 flex items-center space-x-2 hover:bg-gray-50 rounded-lg transition-all duration-300 text-gray-700">
-                  <Settings className="w-4 h-4" />
+                <button className="px-3 md:px-4 py-2 border flex items-center space-x-2 rounded-lg transition-all duration-300 text-white hover:bg-white/10" style={{borderColor: 'rgba(30, 58, 138, 0.3)'}}>
+                  <span>⚙️</span>
                   <span className="hidden md:inline">Settings</span>
                 </button>
               </div>
@@ -1062,32 +1081,43 @@ const Dashboard = () => {
         </div>
 
         {/* Enhanced Navigation Tabs */}
-        <div className="glass-morphism-card bg-white/70 backdrop-blur-xl border-b border-white/20">
-          <div className="max-w-7xl mx-auto px-6">
-            <nav className="flex space-x-1 overflow-x-auto py-4">
+        <div className="backdrop-blur-xl border-b" style={{background: 'linear-gradient(to right, rgba(55, 65, 81, 0.7), rgba(55, 65, 81, 0.7), rgba(55, 65, 81, 0.7))', borderColor: 'rgba(30, 58, 138, 0.2)'}}>
+          <div className="max-w-7xl mx-auto px-4 md:px-6">
+            <nav className="flex space-x-1 overflow-x-auto py-4 custom-scrollbar">
               {tabs.map((tab, index) => {
-                const IconComponent = tab.icon;
+                const isActive = activeTab === tab.id;
                 return (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center space-x-3 py-3 px-6 rounded-xl font-medium text-sm whitespace-nowrap transition-all duration-300 animate-stagger-fade-in group ${
-                      activeTab === tab.id
-                        ? `bg-gradient-to-r from-${tab.color}-500 to-${tab.color}-600 text-white saas-shadow-glow`
-                        : 'text-gray-700 hover:text-gray-900 hover:bg-white/60 backdrop-blur-sm'
+                    className={`flex items-center space-x-2 md:space-x-3 py-2.5 md:py-3 px-4 md:px-6 rounded-xl font-medium text-sm whitespace-nowrap transition-all duration-300 group ${
+                      isActive
+                        ? 'text-white shadow-lg border' 
+                        : 'text-gray-200 hover:text-white hover:bg-gray-700/30 backdrop-blur-sm border border-gray-600/20 hover:border-gray-500/30'
                     }`}
-                    style={{ animationDelay: `${index * 50}ms` }}
+                    style={{ 
+                      backgroundColor: isActive ? '#1E3A8A' : 'transparent',
+                      borderColor: isActive ? '#374151' : 'rgba(55, 65, 81, 0.2)',
+                      animationDelay: `${index * 50}ms` 
+                    }}
                   >
-                    <div className={`p-2 rounded-lg transition-all duration-300 ${
-                      activeTab === tab.id 
+                    <div className={`p-1.5 md:p-2 rounded-lg transition-all duration-300 ${
+                      isActive 
                         ? 'bg-white/20' 
-                        : `bg-${tab.color}-50 group-hover:bg-${tab.color}-100`
+                        : 'bg-gray-700/30 group-hover:bg-gray-600/40'
                     }`}>
-                      <IconComponent className={`w-4 h-4 ${
-                        activeTab === tab.id ? 'text-white' : `text-${tab.color}-600`
-                      }`} />
+                      <span className={`text-sm ${
+                        isActive ? 'text-white' : 'text-gray-300 group-hover:text-white'
+                      }`}>
+                        {index === 0 ? '📊' : 
+                         index === 1 ? '📈' : 
+                         index === 2 ? '🤖' : 
+                         index === 3 ? '📁' : 
+                         index === 4 ? '👥' : 
+                         index === 5 ? '⚡' : '🔧'}
+                      </span>
                     </div>
-                    <span className="font-semibold">{tab.name}</span>
+                    <span className="font-semibold hidden sm:inline">{tab.name}</span>
                   </button>
                 );
               })}
@@ -1097,18 +1127,18 @@ const Dashboard = () => {
 
         {/* Enhanced Loading Overlay */}
         {loading && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="glass-morphism-card bg-white/90 backdrop-blur-xl border border-white/20 rounded-2xl p-8 saas-shadow-glow animate-scale-in">
+          <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50" style={{backgroundColor: 'rgba(30, 58, 138, 0.6)'}}>
+            <div className="backdrop-blur-xl border rounded-2xl p-6 md:p-8 shadow-lg animate-scale-in" style={{background: 'linear-gradient(to bottom right, rgba(55, 65, 81, 0.9), rgba(55, 65, 81, 0.9), rgba(55, 65, 81, 0.9))', borderColor: 'rgba(30, 58, 138, 0.3)'}}>
               <div className="flex flex-col items-center space-y-4">
                 <div className="relative">
-                  <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                    <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center" style={{background: 'linear-gradient(to right, #374151, #374151)'}}>
+                    <div className="w-6 h-6 md:w-8 md:h-8 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full animate-ping opacity-20"></div>
+                  <div className="absolute inset-0 rounded-full animate-ping opacity-20" style={{backgroundColor: '#374151'}}></div>
                 </div>
                 <div className="text-center">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-1">Processing Request</h3>
-                  <p className="text-gray-700">AI is working on your analysis...</p>
+                  <h3 className="text-lg font-semibold text-white mb-1">Processing Request</h3>
+                  <p className="text-gray-200">AI is working on your analysis...</p>
                 </div>
               </div>
             </div>
@@ -1118,12 +1148,12 @@ const Dashboard = () => {
         {/* Content Area */}
         <div className="max-w-7xl mx-auto p-6">
           {activeTab === 'workspace' && renderWorkspace()}
+          {activeTab === 'analytics' && renderAnalytics()}
           {activeTab === 'contract-analysis' && renderContractAnalysis()}
           {activeTab === 'case-management' && renderCaseManagement()}
-          {activeTab === 'client-management' && renderClientManagement()}
-          {activeTab === 'practice-management' && renderPracticeManagement()}
+          {activeTab === 'client-portal' && renderClientManagement()}
           {activeTab === 'ai-tools' && renderAITools()}
-          {activeTab === 'courtroom-prep' && renderCourtroomPrep()}
+          {activeTab === 'practice-tools' && renderPracticeTools()}
         </div>
       </div>
     </div>

@@ -15,7 +15,7 @@ import FreeTools from "./components/FreeTools";
 import RoleGateway from "./components/RoleGateway";
 import Pricing from "./components/Pricing";
 import Testimonials from "./components/Testimonials";
-// import Footer from "./components/Footer";
+import Footer from "./components/Footer";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import Dashboard from "./components/Dashboard";
@@ -82,7 +82,7 @@ const SaaSLoader = () => (
 // Home component with enhanced animations
 const Home = () => {
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       {/* Animated background pattern */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-purple-500/5 to-transparent rounded-full blur-3xl"></div>
@@ -177,30 +177,41 @@ function AppContent() {
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={
-          <div className="min-h-screen">
+          <div className="flex flex-col min-h-screen">
             <Navbar />
-            <Home />
-            {/* <Footer /> */}
+            <div className="flex-grow">
+              <Home />
+            </div>
+            <Footer />
           </div>
         } />
         
         {/* Auth Routes */}
         <Route path="/login" element={
-          <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 zoom-in">
-            <Login />
+          <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 zoom-in">
+            <div className="flex-grow">
+              <Login />
+            </div>
+            <Footer />
           </div>
         } />
         <Route path="/register" element={
-          <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 zoom-in">
-            <Register />
+          <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 zoom-in">
+            <div className="flex-grow">
+              <Register />
+            </div>
+            <Footer />
           </div>
         } />
         
         {/* Protected Routes */}
         <Route path="/dashboard" element={
           <ProtectedRoute>
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 slide-in-up">
-              <Dashboard />
+            <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 slide-in-up">
+              <div className="flex-grow">
+                <Dashboard />
+              </div>
+              <Footer />
             </div>
           </ProtectedRoute>
         } />
