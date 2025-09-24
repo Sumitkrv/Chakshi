@@ -3,8 +3,8 @@ import React, { useState } from 'react';
 const ClientsPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('All');
-  const [showNewClientModal, setShowNewClientModal] = useState(false);
-  const [selectedClient, setSelectedClient] = useState(null);
+  // const [showNewClientModal, setShowNewClientModal] = useState(false);
+  // const [selectedClient, setSelectedClient] = useState(null);
 
   // Sample client data
   const [clients] = useState([
@@ -146,10 +146,10 @@ const ClientsPage = () => {
     console.log('Edit client:', client);
   };
 
-  const handleDeleteClient = (clientId) => {
-    // Handle delete functionality
-    console.log('Delete client:', clientId);
-  };
+  // const handleDeleteClient = (clientId) => {
+  //   // Handle delete functionality
+  //   console.log('Delete client:', clientId);
+  // };
 
   return (
     <div className="min-h-screen bg-gray-50">
