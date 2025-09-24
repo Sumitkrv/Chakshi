@@ -23,13 +23,6 @@ const Features = () => {
     return () => observer.disconnect();
   }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveFeature((prev) => (prev + 1) % features.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [features.length]);
-
   const features = [
     {
       title: "AI Legal Research",
@@ -86,6 +79,13 @@ const Features = () => {
       badge: "Bank Grade"
     }
   ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveFeature((prev) => (prev + 1) % features.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [features.length]);
 
   const integrations = [
     { name: "Westlaw", description: "Legal research database", category: "Research" },
