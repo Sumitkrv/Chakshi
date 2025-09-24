@@ -6,6 +6,7 @@ import {
   generateComplianceTasks,
   createMockFile 
 } from '../lib/documentApi';
+import ResultsModal from '../components/ResultsModal';
 
 const DocumentsPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -18,6 +19,12 @@ const DocumentsPage = () => {
   const [showComparisonModal, setShowComparisonModal] = useState(false);
   const [selectedDocuments, setSelectedDocuments] = useState([]);
   const [showComplianceModal, setShowComplianceModal] = useState(false);
+  
+  // Results modal state
+  const [showResultsModal, setShowResultsModal] = useState(false);
+  const [currentResult, setCurrentResult] = useState(null);
+  const [resultTitle, setResultTitle] = useState('');
+  const [resultType, setResultType] = useState('');
 
   // Sample documents data
   const [documents] = useState([
@@ -193,7 +200,13 @@ const DocumentsPage = () => {
       setResults(prev => ({ ...prev, comparison: result }));
       setShowComparisonModal(false);
       setSelectedDocuments([]);
-      alert('Contract comparison completed! Check console for results.');
+      
+      // Show results in modal
+      setCurrentResult(result);
+      setResultTitle(`Contract Comparison: ${selectedDocuments[0].name} vs ${selectedDocuments[1].name}`);
+      setResultType('comparison');
+      setShowResultsModal(true);
+      
       console.log('Contract Comparison Result:', result);
     } catch (error) {
       alert('Contract comparison failed: ' + error.message);
@@ -210,7 +223,13 @@ const DocumentsPage = () => {
       const file = createMockFile(document.name);
       const result = await analyzeContractRisk(file);
       setResults(prev => ({ ...prev, [`risk-${document.id}`]: result }));
-      alert('Risk analysis completed! Check console for results.');
+      
+      // Show results in modal
+      setCurrentResult(result);
+      setResultTitle(`Risk Analysis: ${document.name}`);
+      setResultType('risk');
+      setShowResultsModal(true);
+      
       console.log('Risk Analysis Result:', result);
     } catch (error) {
       alert('Risk analysis failed: ' + error.message);
@@ -227,7 +246,13 @@ const DocumentsPage = () => {
       const file = createMockFile(document.name);
       const result = await summarizeDocument(file);
       setResults(prev => ({ ...prev, [`summary-${document.id}`]: result }));
-      alert('Document summary completed! Check console for results.');
+      
+      // Show results in modal
+      setCurrentResult(result);
+      setResultTitle(`Document Summary: ${document.name}`);
+      setResultType('summary');
+      setShowResultsModal(true);
+      
       console.log('Document Summary Result:', result);
     } catch (error) {
       alert('Document summarization failed: ' + error.message);
@@ -244,7 +269,13 @@ const DocumentsPage = () => {
       const result = await generateComplianceTasks(regulation, country, companyType);
       setResults(prev => ({ ...prev, compliance: result }));
       setShowComplianceModal(false);
-      alert('Compliance tasks generated! Check console for results.');
+      
+      // Show results in modal
+      setCurrentResult(result);
+      setResultTitle(`Compliance Tasks: ${regulation} - ${country}`);
+      setResultType('compliance');
+      setShowResultsModal(true);
+      
       console.log('Compliance Tasks Result:', result);
     } catch (error) {
       alert('Compliance task generation failed: ' + error.message);
@@ -282,22 +313,42 @@ const DocumentsPage = () => {
           
           <div className="flex items-center gap-3 w-full sm:w-auto">
             <button 
-              className="flex-1 sm:flex-none px-3 py-2 text-374151 bg-white border border-E5E7EB rounded-md hover:bg-F9FAFB text-sm"
+              className="flex-1 sm:flex-none px-3 py-2 text-374151 bg-white border border-E5E7EB rounded-md hover:bg-F9FAFB text-sm transition-all duration-200 flex items-center gap-2 disabled:opacity-50"
               onClick={() => setShowComparisonModal(true)}
+              disabled={loading.comparison}
             >
-              Compare Contracts
+              {loading.comparison ? (
+                <>
+                  <div className="animate-spin w-4 h-4 border-2 border-374151 border-t-transparent rounded-full"></div>
+                  Comparing...
+                </>
+              ) : (
+                <>
+                  ⚖️ Compare Contracts
+                </>
+              )}
             </button>
             <button 
-              className="flex-1 sm:flex-none px-3 py-2 text-374151 bg-white border border-E5E7EB rounded-md hover:bg-F9FAFB text-sm"
+              className="flex-1 sm:flex-none px-3 py-2 text-374151 bg-white border border-E5E7EB rounded-md hover:bg-F9FAFB text-sm transition-all duration-200 flex items-center gap-2 disabled:opacity-50"
               onClick={() => setShowComplianceModal(true)}
+              disabled={loading.compliance}
             >
-              Compliance Tasks
+              {loading.compliance ? (
+                <>
+                  <div className="animate-spin w-4 h-4 border-2 border-374151 border-t-transparent rounded-full"></div>
+                  Generating...
+                </>
+              ) : (
+                <>
+                  ✅ Compliance Tasks
+                </>
+              )}
             </button>
-            <button className="flex-1 sm:flex-none px-3 py-2 text-374151 bg-white border border-E5E7EB rounded-md hover:bg-F9FAFB text-sm">
-              Export
+            <button className="flex-1 sm:flex-none px-3 py-2 text-374151 bg-white border border-E5E7EB rounded-md hover:bg-F9FAFB text-sm flex items-center gap-2">
+              📤 Export
             </button>
-            <button className="flex-1 sm:flex-none px-4 py-2 bg-374151 text-white rounded-md hover:bg-1E3A8A text-sm font-medium">
-              Upload
+            <button className="flex-1 sm:flex-none px-4 py-2 bg-374151 text-white rounded-md hover:bg-1E3A8A text-sm font-medium flex items-center gap-2">
+              📁 Upload
             </button>
           </div>
         </div>
@@ -515,20 +566,40 @@ const DocumentsPage = () => {
                     {/* New API Action Buttons */}
                     <div className="flex gap-2 mt-2">
                       <button 
-                        className="flex-1 px-2 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 disabled:bg-gray-400"
+                        className="flex-1 px-2 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 disabled:bg-gray-400 transition-all duration-200 flex items-center justify-center gap-1"
                         onClick={() => handleRiskAnalysis(document)}
                         disabled={loading[`risk-${document.id}`]}
                         title="Analyze Contract Risk"
                       >
-                        {loading[`risk-${document.id}`] ? '🔄' : '⚠️'} Risk
+                        {loading[`risk-${document.id}`] ? (
+                          <>
+                            <div className="animate-spin w-3 h-3 border border-white border-t-transparent rounded-full"></div>
+                            <span>Analyzing...</span>
+                          </>
+                        ) : (
+                          <>
+                            <span>⚠️</span>
+                            <span>Risk Analysis</span>
+                          </>
+                        )}
                       </button>
                       <button 
-                        className="flex-1 px-2 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700 disabled:bg-gray-400"
+                        className="flex-1 px-2 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700 disabled:bg-gray-400 transition-all duration-200 flex items-center justify-center gap-1"
                         onClick={() => handleDocumentSummary(document)}
                         disabled={loading[`summary-${document.id}`]}
                         title="Summarize Document"
                       >
-                        {loading[`summary-${document.id}`] ? '🔄' : '📋'} Summary
+                        {loading[`summary-${document.id}`] ? (
+                          <>
+                            <div className="animate-spin w-3 h-3 border border-white border-t-transparent rounded-full"></div>
+                            <span>Summarizing...</span>
+                          </>
+                        ) : (
+                          <>
+                            <span>📋</span>
+                            <span>Summary</span>
+                          </>
+                        )}
                       </button>
                     </div>
                   </div>
@@ -591,18 +662,28 @@ const DocumentsPage = () => {
             
             <div className="flex gap-3">
               <button
-                className="flex-1 px-4 py-2 bg-374151 text-white rounded hover:bg-1E3A8A disabled:bg-gray-400"
+                className="flex-1 px-4 py-2 bg-374151 text-white rounded hover:bg-1E3A8A disabled:bg-gray-400 transition-all duration-200 flex items-center justify-center gap-2"
                 onClick={handleContractComparison}
                 disabled={selectedDocuments.length !== 2 || loading.comparison}
               >
-                {loading.comparison ? 'Comparing...' : 'Compare'}
+                {loading.comparison ? (
+                  <>
+                    <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
+                    Comparing Documents...
+                  </>
+                ) : (
+                  <>
+                    ⚖️ Compare Selected
+                  </>
+                )}
               </button>
               <button
-                className="flex-1 px-4 py-2 border border-E5E7EB text-374151 rounded hover:bg-F9FAFB"
+                className="flex-1 px-4 py-2 border border-E5E7EB text-374151 rounded hover:bg-F9FAFB transition-colors"
                 onClick={() => {
                   setShowComparisonModal(false);
                   setSelectedDocuments([]);
                 }}
+                disabled={loading.comparison}
               >
                 Cancel
               </button>
@@ -685,15 +766,25 @@ const DocumentsPage = () => {
               <div className="flex gap-3">
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-374151 text-white rounded hover:bg-1E3A8A disabled:bg-gray-400"
+                  className="flex-1 px-4 py-2 bg-374151 text-white rounded hover:bg-1E3A8A disabled:bg-gray-400 transition-all duration-200 flex items-center justify-center gap-2"
                   disabled={loading.compliance}
                 >
-                  {loading.compliance ? 'Generating...' : 'Generate Tasks'}
+                  {loading.compliance ? (
+                    <>
+                      <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
+                      Generating Tasks...
+                    </>
+                  ) : (
+                    <>
+                      ✅ Generate Compliance Tasks
+                    </>
+                  )}
                 </button>
                 <button
                   type="button"
-                  className="flex-1 px-4 py-2 border border-E5E7EB text-374151 rounded hover:bg-F9FAFB"
+                  className="flex-1 px-4 py-2 border border-E5E7EB text-374151 rounded hover:bg-F9FAFB transition-colors"
                   onClick={() => setShowComplianceModal(false)}
+                  disabled={loading.compliance}
                 >
                   Cancel
                 </button>
@@ -702,6 +793,15 @@ const DocumentsPage = () => {
           </div>
         </div>
       )}
+
+      {/* Results Display Modal */}
+      <ResultsModal
+        isOpen={showResultsModal}
+        onClose={() => setShowResultsModal(false)}
+        result={currentResult}
+        title={resultTitle}
+        type={resultType}
+      />
 
       <style jsx>{`
         .text-374151 { color: #374151; }
