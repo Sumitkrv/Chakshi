@@ -3,8 +3,8 @@ import React, { useState } from 'react';
 const ClientsPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('All');
-  // const [showNewClientModal, setShowNewClientModal] = useState(false);
-  // const [selectedClient, setSelectedClient] = useState(null);
+  const [showNewClientModal, setShowNewClientModal] = useState(false);
+  const [selectedClient, setSelectedClient] = useState(null);
 
   // Sample client data
   const [clients] = useState([

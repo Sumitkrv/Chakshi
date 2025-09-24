@@ -6,7 +6,10 @@ module.exports = {
   rules: {
     'react-hooks/exhaustive-deps': 'warn',
     'jsx-a11y/anchor-is-valid': 'warn',
-    'no-unused-vars': 'warn'
+    'no-unused-vars': 'warn',
+    'no-undef': 'warn',
+    'default-case': 'warn',
+    'react/jsx-no-duplicate-props': 'warn'
   },
   env: {
     browser: true,
