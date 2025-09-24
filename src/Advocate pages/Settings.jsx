@@ -7,6 +7,8 @@ import {
   CreditCard,
   Save,
   Shield,
+  Mail,
+  Phone,
   FileText,
   Settings as SettingsIcon,
   Check,

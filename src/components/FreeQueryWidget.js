@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 const FreeQueryWidget = () => {
   const [query, setQuery] = useState("");
@@ -18,7 +18,7 @@ const FreeQueryWidget = () => {
   const [queryStartTime, setQueryStartTime] = useState(null);
   const recognitionRef = useRef(null);
   const textareaRef = useRef(null);
-  const widgetRef = useRef(null);
+  // const widgetRef = useRef(null);
   const responseRef = useRef(null);
 
   // Enhanced quick question templates with categories and metadata

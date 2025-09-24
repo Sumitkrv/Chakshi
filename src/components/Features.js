@@ -28,7 +28,7 @@ const Features = () => {
       setActiveFeature((prev) => (prev + 1) % features.length);
     }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [features.length]);
 
   const features = [
     {

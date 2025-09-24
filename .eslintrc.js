@@ -9,7 +9,8 @@ module.exports = {
     'no-unused-vars': 'warn',
     'no-undef': 'warn',
     'default-case': 'warn',
-    'react/jsx-no-duplicate-props': 'warn'
+    'react/jsx-no-duplicate-props': 'warn',
+    'react/jsx-no-undef': 'warn'
   },
   env: {
     browser: true,
