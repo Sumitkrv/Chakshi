@@ -80,13 +80,6 @@ const Features = () => {
     }
   ];
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveFeature((prev) => (prev + 1) % 6);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
   const integrations = [
     { name: "Westlaw", description: "Legal research database", category: "Research" },
     { name: "LexisNexis", description: "Legal intelligence platform", category: "Research" },
