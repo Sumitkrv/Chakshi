@@ -1,6 +1,9 @@
 /* Import Professional Design System */
 @import './styles/design-system.css';
 
+/* Import Clerk Components CSS */
+@import './styles/clerk.css';
+
 /* Import Professional Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800&display=swap');
 

@@ -7,52 +7,49 @@ import {
   TrendingUp,
   Calendar,
   Award,
-  Target,
-  Users,
   CheckCircle,
-  AlertCircle,
-  Star,
-  Plus,
-  ArrowRight,
+  Users,
   BarChart3,
-  Brain,
-  Trophy
+  Target,
+  ArrowRight,
+  Plus,
+  Bell,
+  Search,
+  User,
+  Menu,
+  X
 } from 'lucide-react';
 
 const StudentDashboard = () => {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('overview');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const stats = [
     { 
       title: 'Courses Enrolled', 
       value: '8', 
-      icon: BookOpen, 
-      color: 'from-navy-600 to-navy-800',
+      icon: BookOpen,
       change: '+2 this semester',
       trend: 'up'
     },
     { 
       title: 'Assignments Due', 
       value: '3', 
-      icon: FileText, 
-      color: 'from-gold-500 to-gold-600',
+      icon: FileText,
       change: '2 due this week',
       trend: 'neutral'
     },
     { 
       title: 'Study Hours', 
       value: '42', 
-      icon: Clock, 
-      color: 'from-navy-500 to-navy-700',
+      icon: Clock,
       change: '+8 this week',
       trend: 'up'
     },
     { 
       title: 'Overall Progress', 
       value: '75%', 
-      icon: TrendingUp, 
-      color: 'from-gold-400 to-gold-600',
+      icon: TrendingUp,
       change: '+5% this month',
       trend: 'up'
     }
@@ -63,29 +60,25 @@ const StudentDashboard = () => {
       activity: 'Submitted Constitutional Law Assignment', 
       time: '2 hours ago',
       type: 'assignment',
-      status: 'completed',
-      icon: CheckCircle
+      status: 'completed'
     },
     { 
       activity: 'Completed Contract Law Quiz', 
       time: '1 day ago',
       type: 'quiz',
-      status: 'completed',
-      icon: CheckCircle
+      status: 'completed'
     },
     { 
       activity: 'Attended Moot Court Session', 
       time: '2 days ago',
       type: 'session',
-      status: 'attended',
-      icon: Users
+      status: 'attended'
     },
     { 
       activity: 'Downloaded Civil Procedure Notes', 
       time: '3 days ago',
       type: 'resource',
-      status: 'downloaded',
-      icon: FileText
+      status: 'downloaded'
     }
   ];
 
@@ -94,316 +87,367 @@ const StudentDashboard = () => {
       task: 'Criminal Law Assignment', 
       dueDate: 'Tomorrow',
       priority: 'high',
-      course: 'Criminal Law',
-      status: 'pending'
+      course: 'Criminal Law'
     },
     { 
       task: 'Legal Research Project', 
       dueDate: 'Friday',
       priority: 'medium',
-      course: 'Legal Research',
-      status: 'in-progress'
+      course: 'Legal Research'
     },
     { 
       task: 'Jurisprudence Quiz', 
       dueDate: 'Next Week',
       priority: 'low',
-      course: 'Jurisprudence',
-      status: 'not-started'
+      course: 'Jurisprudence'
     }
   ];
 
   const achievements = [
-    { name: 'Consistent Learner', icon: Award, earned: true },
-    { name: 'Legal Research Pro', icon: Brain, earned: true },
-    { name: 'Moot Court Star', icon: Trophy, earned: true },
-    { name: 'Top Performer', icon: Star, earned: false }
+    { name: 'Consistent Learner', earned: true },
+    { name: 'Legal Research Pro', earned: true },
+    { name: 'Moot Court Star', earned: true },
+    { name: 'Top Performer', earned: false }
   ];
 
   const getPriorityColor = (priority) => {
     switch (priority) {
-      case 'high': return 'pro-status-error';
-      case 'medium': return 'pro-status-warning';
-      case 'low': return 'pro-status-success';
-      default: return 'pro-status-info';
+      case 'high': return 'bg-red-100 text-red-800 border-red-200';
+      case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'low': return 'bg-green-100 text-green-800 border-green-200';
+      default: return 'bg-blue-100 text-blue-800 border-blue-200';
     }
   };
 
-  const getActivityColor = (type) => {
-    switch (type) {
-      case 'assignment': return 'text-blue-500';
-      case 'quiz': return 'text-green-500';
-      case 'session': return 'text-purple-500';
-      case 'resource': return 'text-indigo-500';
-      default: return 'text-gray-500';
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'completed': return 'bg-green-100 text-green-800 border-green-200';
+      case 'attended': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'downloaded': return 'bg-purple-100 text-purple-800 border-purple-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-navy-50 via-white to-gold-50">
-      <div className="main-content lg:ml-64">
-        
-        {/* Professional Header */}
-        <header className="bg-white/80 backdrop-blur-sm border-b border-gold-200/30 px-6 py-8 sticky top-0 z-10">
-          <div className="flex justify-between items-start w-full">
-            <div className="flex flex-col">
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-navy-900 to-navy-700 bg-clip-text text-transparent">
-                Welcome back, {user ? user.name || user.email.split('@')[0] : 'Student'}! 👋
-              </h1>
-              <p className="text-lg text-navy-600 mt-2 font-medium">
-                Ready to continue your legal education journey?
-              </p>
-            </div>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-30 h-16">
+        <div className="h-full px-4 flex items-center justify-between">
+          {/* Left Section */}
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="p-2 rounded-md hover:bg-gray-100 transition-colors"
+              aria-label="Toggle menu"
+            >
+              {isMobileMenuOpen ? (
+                <X className="w-5 h-5 text-gray-700" />
+              ) : (
+                <Menu className="w-5 h-5 text-gray-700" />
+              )}
+            </button>
             
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 text-sm text-navy-600 bg-white/90 backdrop-blur-sm border-2 border-gold-200 rounded-xl px-4 py-2 font-medium">
-                <Calendar className="w-4 h-4 text-gold-600" />
-                <span>{new Date().toLocaleDateString('en-US', { 
-                  weekday: 'long', 
-                  month: 'long', 
-                  day: 'numeric' 
-                })}</span>
+            {/* Search Bar */}
+            <div className="relative hidden md:block">
+              <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Search..."
+                className="pl-10 pr-4 py-2 w-64 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+              />
+            </div>
+          </div>
+
+          {/* Right Section */}
+          <div className="flex items-center space-x-4">
+            {/* Notifications */}
+            <button className="relative p-2 rounded-md hover:bg-gray-100 transition-colors">
+              <Bell className="w-5 h-5 text-gray-600" />
+              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
+
+            {/* User Profile */}
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                <User className="w-4 h-4 text-blue-600" />
+              </div>
+              <div className="hidden sm:block text-right">
+                <p className="text-sm font-medium text-gray-900">
+                  {user?.name || 'Student'}
+                </p>
+                <p className="text-xs text-gray-500">Student</p>
               </div>
             </div>
           </div>
-        </header>
+        </div>
+      </header>
 
-        {/* Dashboard Content */}
-        <div className="p-6 lg:p-8">
-          
-          {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {stats.map((stat, index) => (
-              <div 
-                key={index} 
-                className="backdrop-blur-xl bg-gradient-to-br from-white/90 to-white/70 border-2 border-gold-200/50 hover:border-gold-400/60 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 group hover:scale-105"
-                style={{animationDelay: `${0.1 * index}s`}}
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden bg-white border-b border-gray-200 p-4">
+          <nav className="space-y-2">
+            {['Dashboard', 'Courses', 'Assignments', 'Profile', 'Settings'].map((item) => (
+              <button
+                key={item}
+                className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 text-gray-700 font-medium"
               >
-                <div className="flex justify-between items-start mb-4">
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${stat.color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                    <stat.icon className="w-6 h-6 text-white" />
-                  </div>
-                  <div className={`flex items-center gap-1 text-xs ${stat.trend === 'up' ? 'text-green-600' : 'text-navy-500'} font-medium`}>
-                    <TrendingUp className="w-3 h-3" />
-                    <span>{stat.change}</span>
-                  </div>
-                </div>
-                
-                <div className="flex flex-col">
-                  <h3 className="text-2xl font-bold bg-gradient-to-r from-navy-900 to-navy-700 bg-clip-text text-transparent mb-1">
-                    {stat.value}
-                  </h3>
-                  <p className="text-sm font-semibold text-navy-600">
-                    {stat.title}
-                  </p>
-                </div>
-              </div>
+                {item}
+              </button>
             ))}
+          </nav>
+        </div>
+      )}
+
+      {/* Main Content */}
+      <main className="p-4 sm:p-6 lg:p-8">
+        {/* Welcome Section */}
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Welcome back, {user ? user.name || user.email.split('@')[0] : 'Student'}
+          </h1>
+          <p className="text-gray-600">
+            Ready to continue your legal education journey?
+          </p>
+          <div className="flex items-center gap-2 text-sm text-gray-500 mt-2">
+            <Calendar className="w-4 h-4" />
+            <span>{new Date().toLocaleDateString('en-US', { 
+              weekday: 'long', 
+              month: 'long', 
+              day: 'numeric' 
+            })}</span>
           </div>
+        </div>
 
-          {/* Main Dashboard Grid */}
-          <div className="pro-grid lg:grid-cols-3 pro-gap-8">
-            
-            {/* Recent Activities */}
-            <div className="lg:col-span-2">
-              <div className="pro-dashboard-card">
-                <div className="pro-flex-between items-center mb-6">
-                  <h2 className="pro-heading-lg text-gray-900">Recent Activities</h2>
-                  <button className="pro-btn pro-btn-ghost pro-text-sm">
-                    See All
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </button>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          {stats.map((stat, index) => (
+            <div 
+              key={index} 
+              className="bg-white border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors duration-200"
+            >
+              <div className="flex justify-between items-start mb-3">
+                <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
+                  <stat.icon className="w-5 h-5 text-gray-600" />
                 </div>
-                
-                <div className="space-y-4">
-                  {recentActivities.map((item, index) => (
-                    <div 
-                      key={index} 
-                      className="pro-flex items-start pro-gap-4 pro-p-4 pro-rounded-lg hover:bg-gray-50 transition-colors duration-200 border border-transparent hover:border-gray-200"
-                    >
-                      <div className={`w-10 h-10 pro-rounded-lg bg-gray-100 pro-flex-center ${getActivityColor(item.type)}`}>
-                        <item.icon className="w-5 h-5" />
-                      </div>
-                      
-                      <div className="flex-1 min-w-0">
-                        <p className="pro-text-body font-medium text-gray-900 mb-1">
-                          {item.activity}
-                        </p>
-                        <p className="pro-text-sm text-gray-500">
-                          {item.time}
-                        </p>
-                      </div>
-                      
-                      <div className={`pro-status-badge pro-status-success`}>
-                        {item.status}
-                      </div>
-                    </div>
-                  ))}
+                <div className="flex items-center gap-1 text-xs text-gray-500">
+                  <span>{stat.change}</span>
                 </div>
-              </div>
-            </div>
-
-            {/* Upcoming Tasks */}
-            <div>
-              <div className="pro-dashboard-card">
-                <div className="pro-flex-between items-center mb-6">
-                  <h2 className="pro-heading-lg text-gray-900">Upcoming Tasks</h2>
-                  <button className="pro-btn pro-btn-primary pro-btn-sm">
-                    <Plus className="w-4 h-4" />
-                  </button>
-                </div>
-                
-                <div className="space-y-3">
-                  {upcomingTasks.map((item, index) => (
-                    <div 
-                      key={index} 
-                      className="pro-p-4 pro-rounded-lg border border-gray-200 hover:border-blue-300 transition-colors duration-200 hover:bg-blue-50/50"
-                    >
-                      <div className="pro-flex-between items-start mb-2">
-                        <h4 className="pro-text-body font-semibold text-gray-900">
-                          {item.task}
-                        </h4>
-                        <div className={`pro-status-badge ${getPriorityColor(item.priority)}`}>
-                          {item.priority}
-                        </div>
-                      </div>
-                      
-                      <p className="pro-text-sm text-gray-600 mb-2">
-                        {item.course}
-                      </p>
-                      
-                      <div className="pro-flex-between items-center">
-                        <span className="pro-text-xs text-gray-500">
-                          Due: {item.dueDate}
-                        </span>
-                        <button className="pro-btn pro-btn-ghost pro-btn-xs">
-                          View
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Progress and Achievements */}
-          <div className="pro-grid lg:grid-cols-2 pro-gap-8 mt-8">
-            
-            {/* Academic Progress */}
-            <div className="pro-dashboard-card">
-              <div className="pro-flex-between items-center mb-6">
-                <h2 className="pro-heading-lg text-gray-900">Academic Progress</h2>
-                <BarChart3 className="w-5 h-5 text-gray-400" />
               </div>
               
-              <div className="space-y-6">
-                {/* Overall Progress */}
-                <div>
-                  <div className="pro-flex-between items-center mb-2">
-                    <span className="pro-text-body font-medium text-gray-700">Overall Progress</span>
-                    <span className="pro-text-body font-bold text-gray-900">75%</span>
+              <div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-1">
+                  {stat.value}
+                </h3>
+                <p className="text-sm font-medium text-gray-600">
+                  {stat.title}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Main Content Grid */}
+        <div className="grid lg:grid-cols-3 gap-6 mb-8">
+          
+          {/* Recent Activities */}
+          <div className="lg:col-span-2">
+            <div className="bg-white border border-gray-200 rounded-lg p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-lg font-semibold text-gray-900">Recent Activities</h2>
+                <button className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 transition-colors">
+                  See All
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+              
+              <div className="space-y-3">
+                {recentActivities.map((item, index) => (
+                  <div 
+                    key={index} 
+                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
+                      <CheckCircle className="w-4 h-4 text-gray-600" />
+                    </div>
+                    
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        {item.activity}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {item.time}
+                      </p>
+                    </div>
+                    
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(item.status)}`}>
+                      {item.status}
+                    </span>
                   </div>
-                  <div className="w-full bg-gray-200 pro-rounded-full h-3 overflow-hidden">
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Upcoming Tasks */}
+          <div>
+            <div className="bg-white border border-gray-200 rounded-lg p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-lg font-semibold text-gray-900">Upcoming Tasks</h2>
+                <button className="w-8 h-8 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors">
+                  <Plus className="w-4 h-4 text-gray-600" />
+                </button>
+              </div>
+              
+              <div className="space-y-3">
+                {upcomingTasks.map((item, index) => (
+                  <div 
+                    key={index} 
+                    className="p-3 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors duration-200"
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <h4 className="text-sm font-semibold text-gray-900">
+                        {item.task}
+                      </h4>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getPriorityColor(item.priority)}`}>
+                        {item.priority}
+                      </span>
+                    </div>
+                    
+                    <p className="text-xs text-gray-600 mb-2">
+                      {item.course}
+                    </p>
+                    
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-500">
+                        Due: {item.dueDate}
+                      </span>
+                      <button className="text-xs text-gray-600 hover:text-gray-900 transition-colors">
+                        View
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Progress and Achievements */}
+        <div className="grid lg:grid-cols-2 gap-6 mb-8">
+          
+          {/* Academic Progress */}
+          <div className="bg-white border border-gray-200 rounded-lg p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-lg font-semibold text-gray-900">Academic Progress</h2>
+              <BarChart3 className="w-5 h-5 text-gray-400" />
+            </div>
+            
+            <div className="space-y-4">
+              {/* Overall Progress */}
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm font-medium text-gray-700">Overall Progress</span>
+                  <span className="text-sm font-semibold text-gray-900">75%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                  <div 
+                    className="h-full bg-blue-600 rounded-full transition-all duration-300"
+                    style={{width: '75%'}}
+                  ></div>
+                </div>
+              </div>
+
+              {/* Subject Progress */}
+              {[
+                { subject: 'Constitutional Law', progress: 85 },
+                { subject: 'Contract Law', progress: 70 },
+                { subject: 'Criminal Law', progress: 90 },
+                { subject: 'Civil Procedure', progress: 65 }
+              ].map((item, index) => (
+                <div key={index}>
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-xs font-medium text-gray-600">{item.subject}</span>
+                    <span className="text-xs font-semibold text-gray-700">{item.progress}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
                     <div 
-                      className="h-full bg-gradient-to-r from-blue-500 to-purple-600 pro-rounded-full transition-all duration-1000 ease-out"
-                      style={{width: '75%'}}
+                      className="h-full bg-green-500 rounded-full transition-all duration-300"
+                      style={{width: `${item.progress}%`}}
                     ></div>
                   </div>
                 </div>
-
-                {/* Subject Progress */}
-                {[
-                  { subject: 'Constitutional Law', progress: 85 },
-                  { subject: 'Contract Law', progress: 70 },
-                  { subject: 'Criminal Law', progress: 90 },
-                  { subject: 'Civil Procedure', progress: 65 }
-                ].map((item, index) => (
-                  <div key={index}>
-                    <div className="pro-flex-between items-center mb-1">
-                      <span className="pro-text-sm font-medium text-gray-600">{item.subject}</span>
-                      <span className="pro-text-sm font-semibold text-gray-700">{item.progress}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 pro-rounded-full h-2 overflow-hidden">
-                      <div 
-                        className="h-full bg-gradient-to-r from-green-400 to-green-600 pro-rounded-full transition-all duration-1000 ease-out"
-                        style={{width: `${item.progress}%`, animationDelay: `${0.2 * index}s`}}
-                      ></div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Achievement Badges */}
-            <div className="pro-dashboard-card">
-              <div className="pro-flex-between items-center mb-6">
-                <h2 className="pro-heading-lg text-gray-900">Achievements</h2>
-                <Target className="w-5 h-5 text-gray-400" />
-              </div>
-              
-              <div className="pro-grid pro-grid-2 pro-gap-4">
-                {achievements.map((achievement, index) => (
-                  <div 
-                    key={index} 
-                    className={`pro-p-4 pro-rounded-lg border-2 transition-all duration-300 ${
-                      achievement.earned 
-                        ? 'border-green-200 bg-green-50 hover:border-green-300' 
-                        : 'border-gray-200 bg-gray-50 hover:border-gray-300'
-                    }`}
-                  >
-                    <div className="pro-flex-col items-center pro-text-center">
-                      <div className={`w-12 h-12 pro-rounded-xl pro-flex-center mb-3 ${
-                        achievement.earned 
-                          ? 'bg-green-100 text-green-600' 
-                          : 'bg-gray-100 text-gray-400'
-                      }`}>
-                        <achievement.icon className="w-6 h-6" />
-                      </div>
-                      <span className={`pro-text-sm font-medium ${
-                        achievement.earned ? 'text-green-700' : 'text-gray-600'
-                      }`}>
-                        {achievement.name}
-                      </span>
-                      {achievement.earned && (
-                        <CheckCircle className="w-4 h-4 text-green-500 mt-2" />
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
+              ))}
             </div>
           </div>
 
-          {/* Quick Actions */}
-          <div className="pro-dashboard-card mt-8">
-            <h2 className="pro-heading-lg text-gray-900 mb-6">Quick Actions</h2>
+          {/* Achievement Badges */}
+          <div className="bg-white border border-gray-200 rounded-lg p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-lg font-semibold text-gray-900">Achievements</h2>
+              <Target className="w-5 h-5 text-gray-400" />
+            </div>
             
-            <div className="pro-grid pro-grid-4 pro-gap-4">
-              {[
-                { title: 'Browse Courses', icon: BookOpen, color: 'from-blue-500 to-blue-600' },
-                { title: 'View Calendar', icon: Calendar, color: 'from-purple-500 to-purple-600' },
-                { title: 'Study Materials', icon: FileText, color: 'from-green-500 to-green-600' },
-                { title: 'Moot Court', icon: Users, color: 'from-orange-500 to-orange-600' }
-              ].map((action, index) => (
-                <button 
-                  key={index}
-                  className="pro-p-4 pro-rounded-lg border border-gray-200 hover:border-blue-300 bg-white hover:bg-blue-50 transition-all duration-300 pro-hover-lift group"
+            <div className="grid grid-cols-2 gap-3">
+              {achievements.map((achievement, index) => (
+                <div 
+                  key={index} 
+                  className={`p-3 rounded-lg border transition-colors duration-200 ${
+                    achievement.earned 
+                      ? 'border-green-200 bg-green-50' 
+                      : 'border-gray-200 bg-gray-50'
+                  }`}
                 >
-                  <div className="pro-flex-col items-center pro-text-center">
-                    <div className={`w-12 h-12 pro-rounded-xl bg-gradient-to-r ${action.color} pro-flex-center mb-3 group-hover:scale-110 transition-transform duration-300 pro-shadow-glow`}>
-                      <action.icon className="w-6 h-6 text-white" />
+                  <div className="flex flex-col items-center text-center">
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center mb-2 ${
+                      achievement.earned 
+                        ? 'bg-green-100 text-green-600' 
+                        : 'bg-gray-100 text-gray-400'
+                    }`}>
+                      <Award className="w-4 h-4" />
                     </div>
-                    <span className="pro-text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors duration-300">
-                      {action.title}
+                    <span className={`text-xs font-medium ${
+                      achievement.earned ? 'text-green-700' : 'text-gray-600'
+                    }`}>
+                      {achievement.name}
                     </span>
+                    {achievement.earned && (
+                      <CheckCircle className="w-3 h-3 text-green-500 mt-1" />
+                    )}
                   </div>
-                </button>
+                </div>
               ))}
             </div>
           </div>
         </div>
-      </div>
+
+        {/* Quick Actions */}
+        <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
+          
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {[
+              { title: 'Browse Courses', icon: BookOpen },
+              { title: 'View Calendar', icon: Calendar },
+              { title: 'Study Materials', icon: FileText },
+              { title: 'Moot Court', icon: Users }
+            ].map((action, index) => (
+              <button 
+                key={index}
+                className="p-3 rounded-lg border border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50 transition-all duration-200"
+              >
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center mb-2">
+                    <action.icon className="w-5 h-5 text-gray-600" />
+                  </div>
+                  <span className="text-xs font-medium text-gray-700">
+                    {action.title}
+                  </span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </main>
     </div>
   );
 };

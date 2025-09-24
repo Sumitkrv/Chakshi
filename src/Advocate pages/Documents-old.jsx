@@ -97,14 +97,6 @@ export default function Documents() {
     setUploadedFiles([...uploadedFiles, ...newFiles]);
   };
 
-  const formatFileSize = (bytes) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  };
-
   const getStatusColor = (status) => {
     switch (status.toLowerCase()) {
       case 'active': return 'bg-green-100 text-green-800';
@@ -125,25 +117,25 @@ export default function Documents() {
   };
 
   const tabs = [
-    { id: 'cases', name: 'Case Management', icon: '📁' },
-    { id: 'documents', name: 'Document Repository', icon: '📄' },
-    { id: 'timeline', name: 'Case Timeline', icon: '📅' },
-    { id: 'analytics', name: 'Case Analytics', icon: '📊' }
+    { id: 'cases', name: 'Cases', icon: '📁' },
+    { id: 'documents', name: 'Documents', icon: '📄' },
+    { id: 'timeline', name: 'Timeline', icon: '📅' },
+    { id: 'analytics', name: 'Analytics', icon: '📊' }
   ];
 
   const renderCaseManagement = () => (
     <div className="space-y-6">
       {/* Search and Filter Section */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
-          <div className="flex-1 max-w-md">
+      <div className="bg-white rounded-lg border border-gray-200 p-4 md:p-6">
+        <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
+          <div className="flex-1 max-w-lg">
             <div className="relative">
               <input
                 type="text"
                 placeholder="Search cases, clients, or case IDs..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -153,11 +145,11 @@ export default function Documents() {
             </div>
           </div>
           
-          <div className="flex space-x-4">
+          <div className="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-3">
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="all">All Status</option>
               <option value="active">Active</option>
@@ -166,8 +158,8 @@ export default function Documents() {
               <option value="closed">Closed</option>
             </select>
             
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center space-x-2">
-              <span>➕</span>
+            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2">
+              <span>+</span>
               <span>New Case</span>
             </button>
           </div>
@@ -175,16 +167,16 @@ export default function Documents() {
       </div>
 
       {/* Cases Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
         {filteredCases.map((case_item) => (
-          <div key={case_item.id} className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-            <div className="p-6">
+          <div key={case_item.id} className="bg-white rounded-lg border border-gray-200 hover:shadow-md transition-all duration-200">
+            <div className="p-4 md:p-6">
               <div className="flex justify-between items-start mb-4">
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-1">{case_item.title}</h3>
-                  <p className="text-sm text-gray-600">Case ID: {case_item.id}</p>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-lg font-semibold text-gray-900 truncate">{case_item.title}</h3>
+                  <p className="text-sm text-gray-600 mt-1">Case ID: {case_item.id}</p>
                 </div>
-                <div className="flex flex-col space-y-2">
+                <div className="flex flex-col space-y-2 ml-3">
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(case_item.status)}`}>
                     {case_item.status}
                   </span>
@@ -194,21 +186,21 @@ export default function Documents() {
                 </div>
               </div>
               
-              <div className="space-y-2 mb-4">
+              <div className="space-y-3 mb-4">
                 <div className="flex items-center text-sm text-gray-600">
-                  <span className="mr-2">👤</span>
-                  <span>{case_item.client}</span>
+                  <span className="w-5 mr-2">👤</span>
+                  <span className="truncate">{case_item.client}</span>
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
-                  <span className="mr-2">🏛️</span>
-                  <span>{case_item.court}</span>
+                  <span className="w-5 mr-2">🏛️</span>
+                  <span className="truncate">{case_item.court}</span>
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
-                  <span className="mr-2">📅</span>
+                  <span className="w-5 mr-2">📅</span>
                   <span>Next: {case_item.nextHearing}</span>
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
-                  <span className="mr-2">📄</span>
+                  <span className="w-5 mr-2">📄</span>
                   <span>{case_item.documents} documents</span>
                 </div>
               </div>
@@ -216,14 +208,11 @@ export default function Documents() {
               <p className="text-sm text-gray-700 mb-4 line-clamp-2">{case_item.description}</p>
               
               <div className="flex space-x-2">
-                <button className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-md text-sm hover:bg-blue-700">
+                <button className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-lg text-sm hover:bg-blue-700 transition-colors">
                   View Details
                 </button>
-                <button className="px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50">
+                <button className="p-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 transition-colors">
                   📄
-                </button>
-                <button className="px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50">
-                  ⚙️
                 </button>
               </div>
             </div>
@@ -236,13 +225,13 @@ export default function Documents() {
   const renderDocumentRepository = () => (
     <div className="space-y-6">
       {/* Document Categories */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="bg-white rounded-lg border border-gray-200 p-4 md:p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Document Categories</h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
           {documentCategories.map((category, index) => (
-            <div key={index} className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer text-center">
+            <div key={index} className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors text-center">
               <div className="text-2xl mb-2">{category.icon}</div>
-              <div className="text-sm font-medium text-gray-900">{category.name}</div>
+              <div className="text-sm font-medium text-gray-900 truncate">{category.name}</div>
               <div className="text-xs text-gray-600">{category.count} files</div>
             </div>
           ))}
@@ -250,18 +239,18 @@ export default function Documents() {
       </div>
 
       {/* Upload Section */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <div className="flex justify-between items-center mb-4">
+      <div className="bg-white rounded-lg border border-gray-200 p-4 md:p-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 space-y-3 sm:space-y-0">
           <h3 className="text-lg font-semibold text-gray-900">Document Upload</h3>
           <button 
             onClick={() => setShowUploadModal(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors w-full sm:w-auto"
           >
             Upload Documents
           </button>
         </div>
         
-        <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center">
+        <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:bg-gray-50 transition-colors">
           <input
             type="file"
             multiple
@@ -269,16 +258,16 @@ export default function Documents() {
             className="hidden"
             id="file-upload"
           />
-          <label htmlFor="file-upload" className="cursor-pointer">
-            <div className="text-4xl mb-4">📁</div>
-            <p className="text-lg font-medium text-gray-700">Drag & drop files here or click to browse</p>
-            <p className="text-gray-500 mt-2">Supports PDF, DOC, DOCX, images, and more</p>
+          <label htmlFor="file-upload" className="cursor-pointer block">
+            <div className="text-4xl mb-3">📁</div>
+            <p className="text-base font-medium text-gray-700">Drag & drop files here or click to browse</p>
+            <p className="text-gray-500 mt-1 text-sm">Supports PDF, DOC, DOCX, images</p>
           </label>
         </div>
       </div>
 
       {/* Recent Documents */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="bg-white rounded-lg border border-gray-200 p-4 md:p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Documents</h3>
         <div className="space-y-3">
           {[
@@ -287,15 +276,15 @@ export default function Documents() {
             { name: 'Court_Order_Sept.pdf', size: '856 KB', date: '2025-09-18', category: 'Court Orders' },
             { name: 'Client_Correspondence.docx', size: '124 KB', date: '2025-09-17', category: 'Correspondence' }
           ].map((doc, index) => (
-            <div key={index} className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-md">
-              <div className="flex items-center space-x-3">
-                <div className="text-2xl">📄</div>
-                <div>
-                  <p className="font-medium text-gray-900">{doc.name}</p>
-                  <p className="text-sm text-gray-600">{doc.category} • {doc.size}</p>
+            <div key={index} className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors">
+              <div className="flex items-center space-x-3 min-w-0">
+                <div className="text-xl">📄</div>
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-gray-900 truncate">{doc.name}</p>
+                  <p className="text-sm text-gray-600 truncate">{doc.category} • {doc.size}</p>
                 </div>
               </div>
-              <div className="text-sm text-gray-500">{doc.date}</div>
+              <div className="text-sm text-gray-500 whitespace-nowrap ml-3">{doc.date}</div>
             </div>
           ))}
         </div>
@@ -305,12 +294,12 @@ export default function Documents() {
 
   const renderTimeline = () => (
     <div className="space-y-6">
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-6">Case Timeline Visualization</h3>
+      <div className="bg-white rounded-lg border border-gray-200 p-4 md:p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-6">Case Timeline</h3>
         
         {filteredCases.map((case_item) => (
           <div key={case_item.id} className="mb-8 last:mb-0">
-            <h4 className="text-md font-medium text-gray-800 mb-4">{case_item.title}</h4>
+            <h4 className="text-base font-medium text-gray-800 mb-4">{case_item.title}</h4>
             <div className="relative">
               {case_item.timeline.map((event, index) => (
                 <div key={index} className="flex items-start mb-6">
@@ -341,27 +330,27 @@ export default function Documents() {
 
   const renderAnalytics = () => (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {[
           { name: 'Total Cases', value: '24', change: '+12%', icon: '📁' },
           { name: 'Active Cases', value: '18', change: '+5%', icon: '⚖️' },
           { name: 'Success Rate', value: '87%', change: '+3%', icon: '🏆' },
-          { name: 'Avg Case Duration', value: '45 days', change: '-8%', icon: '⏱️' }
+          { name: 'Avg Duration', value: '45 days', change: '-8%', icon: '⏱️' }
         ].map((stat, index) => (
-          <div key={index} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div key={index} className="bg-white rounded-lg border border-gray-200 p-4 md:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">{stat.name}</p>
-                <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
-                <p className="text-sm text-green-600">{stat.change}</p>
+                <p className="text-2xl md:text-3xl font-bold text-gray-900 mt-1">{stat.value}</p>
+                <p className="text-sm text-green-600 mt-1">{stat.change}</p>
               </div>
-              <div className="text-3xl">{stat.icon}</div>
+              <div className="text-2xl md:text-3xl">{stat.icon}</div>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="bg-white rounded-lg border border-gray-200 p-4 md:p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Case Distribution by Category</h3>
         <div className="space-y-4">
           {[
@@ -372,19 +361,19 @@ export default function Documents() {
             { category: 'Criminal Law', cases: 2, percentage: 8 }
           ].map((item, index) => (
             <div key={index} className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="w-4 h-4 bg-blue-500 rounded"></div>
-                <span className="font-medium text-gray-900">{item.category}</span>
+              <div className="flex items-center space-x-3 min-w-0 flex-1">
+                <div className="w-3 h-3 bg-blue-500 rounded flex-shrink-0"></div>
+                <span className="font-medium text-gray-900 truncate">{item.category}</span>
               </div>
-              <div className="flex items-center space-x-4">
-                <span className="text-sm text-gray-600">{item.cases} cases</span>
-                <div className="w-20 h-2 bg-gray-200 rounded-full">
+              <div className="flex items-center space-x-3 ml-4">
+                <span className="text-sm text-gray-600 whitespace-nowrap">{item.cases} cases</span>
+                <div className="w-16 md:w-20 h-2 bg-gray-200 rounded-full">
                   <div 
                     className="h-2 bg-blue-500 rounded-full" 
                     style={{ width: `${item.percentage}%` }}
                   ></div>
                 </div>
-                <span className="text-sm font-medium text-gray-900">{item.percentage}%</span>
+                <span className="text-sm font-medium text-gray-900 whitespace-nowrap w-8 text-right">{item.percentage}%</span>
               </div>
             </div>
           ))}
@@ -396,26 +385,26 @@ export default function Documents() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200 p-6">
-        <h1 className="text-3xl font-bold text-gray-900">Case Management System</h1>
-        <p className="text-gray-600">Comprehensive case and document management with lifecycle tracking</p>
+      <div className="bg-white border-b border-gray-200 p-4 md:p-6">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Case Management System</h1>
+        <p className="text-gray-600 mt-1 text-sm md:text-base">Comprehensive case and document management</p>
       </div>
 
       {/* Navigation Tabs */}
       <div className="bg-white border-b border-gray-200">
-        <div className="px-6">
-          <nav className="flex space-x-8 overflow-x-auto">
+        <div className="px-4 md:px-6">
+          <nav className="flex space-x-2 md:space-x-8 overflow-x-auto">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-2 py-4 px-2 border-b-2 font-medium text-sm whitespace-nowrap ${
+                className={`flex items-center space-x-2 py-3 px-2 border-b-2 font-medium text-sm whitespace-nowrap transition-colors ${
                   activeTab === tab.id
                     ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
-                <span>{tab.icon}</span>
+                <span className="text-base">{tab.icon}</span>
                 <span>{tab.name}</span>
               </button>
             ))}
@@ -424,7 +413,7 @@ export default function Documents() {
       </div>
 
       {/* Content */}
-      <div className="p-6">
+      <div className="p-4 md:p-6">
         {activeTab === 'cases' && renderCaseManagement()}
         {activeTab === 'documents' && renderDocumentRepository()}
         {activeTab === 'timeline' && renderTimeline()}

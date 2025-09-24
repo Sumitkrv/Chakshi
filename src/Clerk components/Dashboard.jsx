@@ -1,488 +1,549 @@
-import React, { useState } from 'react';
-import { 
-  FileText, 
-  CheckCircle, 
-  MessageSquare, 
-  Clock, 
-  Activity,
-  Users,
-  Calendar,
-  AlertCircle,
-  TrendingUp,
-  TrendingDown,
-  BarChart3,
-  Plus,
-  Filter,
-  Download,
-  Search,
-  Bell,
-  Settings,
-  Eye,
-  Edit,
-  ArrowRight,
-  Shield,
-  Database,
-  Wifi,
-  Server
-} from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Link, useOutletContext } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
-export default function Dashboard() {
-  const [timeframe, setTimeframe] = useState('today');
+const Dashboard = () => {
+  const [dashboardData, setDashboardData] = useState({
+    stats: {
+      totalCases: 0,
+      activeCases: 0,
+      pendingCases: 0,
+      todayHearings: 0,
+      unreadSMS: 0,
+      pendingDocuments: 0
+    },
+    recentCases: [],
+    upcomingHearings: [],
+    recentActivities: [],
+    notifications: [],
+    weather: null
+  });
+  const [loading, setLoading] = useState(true);
+  const [selectedWidget, setSelectedWidget] = useState(null);
+  const [widgetLayout, setWidgetLayout] = useState([
+    'stats', 'recent-cases', 'hearings', 'activities', 'notifications', 'quick-actions'
+  ]);
 
-  const stats = [
-    {
-      title: 'Cases Processed',
-      value: '142',
-      change: '+12%',
-      trend: 'up',
-      icon: FileText,
-      color: 'from-emerald-500 to-green-600',
-      description: 'Cases processed today'
-    },
-    {
-      title: 'Verifications',
-      value: '89',
-      change: '+8%',
-      trend: 'up',
-      icon: CheckCircle,
-      color: 'from-blue-500 to-indigo-600',
-      description: 'Documents verified'
-    },
-    {
-      title: 'SMS Notifications',
-      value: '256',
-      change: '+23%',
-      trend: 'up',
-      icon: MessageSquare,
-      color: 'from-purple-500 to-pink-600',
-      description: 'Notifications sent'
-    },
-    {
-      title: 'Pending Tasks',
-      value: '18',
-      change: '-5%',
-      trend: 'down',
-      icon: Clock,
-      color: 'from-orange-500 to-red-600',
-      description: 'Tasks awaiting action'
-    }
-  ];
+  const { user } = useAuth();
+  const context = useOutletContext();
+  const { addNotification, theme, language, isOnline } = context || {};
 
-  const recentActivities = [
-    { 
-      id: 1, 
-      action: 'Verified case documents for civil matter', 
-      case: 'CIV/2024/001',
-      caseTitle: 'Smith vs. Johnson',
-      time: '2 hours ago',
-      type: 'verification',
-      priority: 'high',
-      status: 'completed'
+  // Mock data - in real app, this would come from API
+  const mockData = {
+    stats: {
+      totalCases: 247,
+      activeCases: 89,
+      pendingCases: 34,
+      todayHearings: 12,
+      unreadSMS: 8,
+      pendingDocuments: 15
     },
-    { 
-      id: 2, 
-      action: 'SMS notification sent to attorney', 
-      case: 'CRM/2024/045',
-      caseTitle: 'State vs. Williams',
-      time: '4 hours ago',
-      type: 'notification',
-      priority: 'medium',
-      status: 'completed'
-    },
-    { 
-      id: 3, 
-      action: 'Case status updated to hearing scheduled', 
-      case: 'FAM/2024/012',
-      caseTitle: 'Davis Family Matter',
-      time: '6 hours ago',
-      type: 'update',
-      priority: 'medium',
-      status: 'completed'
-    },
-    { 
-      id: 4, 
-      action: 'New evidence document uploaded', 
-      case: 'COM/2024/078',
-      caseTitle: 'Corporate Dispute ABC Inc.',
-      time: '1 day ago',
-      type: 'document',
-      priority: 'low',
-      status: 'pending'
-    },
-  ];
-
-  const systemStatus = [
-    { name: 'Case Management System', status: 'operational', uptime: '99.9%' },
-    { name: 'SMS Service', status: 'operational', uptime: '99.7%' },
-    { name: 'Document Verification', status: 'degraded', uptime: '95.2%' },
-    { name: 'Database Connection', status: 'operational', uptime: '100%' }
-  ];
-
-  const quickActions = [
-    { title: 'Add New Case', icon: FileText, color: 'emerald', description: 'Create new case entry' },
-    { title: 'Verify Documents', icon: CheckCircle, color: 'blue', description: 'Review pending documents' },
-    { title: 'Send Notification', icon: MessageSquare, color: 'purple', description: 'Send SMS updates' },
-    { title: 'Schedule Hearing', icon: Calendar, color: 'orange', description: 'Set hearing dates' },
-    { title: 'Generate Report', icon: BarChart3, color: 'indigo', description: 'Create system reports' },
-    { title: 'Case Analytics', icon: TrendingUp, color: 'pink', description: 'View case statistics' }
-  ];
-
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'operational': return <Shield className="w-4 h-4 text-green-600" />;
-      case 'degraded': return <AlertCircle className="w-4 h-4 text-yellow-600" />;
-      case 'down': return <AlertCircle className="w-4 h-4 text-red-600" />;
-      default: return <Database className="w-4 h-4 text-gray-600" />;
+    recentCases: [
+      { id: 1, number: '2023/CRL/001', title: 'State vs John Doe', status: 'Active', priority: 'High', lastUpdate: '2 hours ago' },
+      { id: 2, number: '2023/CIV/045', title: 'Smith vs ABC Corp', status: 'Pending', priority: 'Medium', lastUpdate: '4 hours ago' },
+      { id: 3, number: '2023/FAM/012', title: 'Divorce - Jane vs Mark', status: 'Active', priority: 'Low', lastUpdate: '1 day ago' },
+      { id: 4, number: '2023/CRL/002', title: 'State vs Crime Syndicate', status: 'Active', priority: 'Critical', lastUpdate: '2 days ago' }
+    ],
+    upcomingHearings: [
+      { id: 1, caseNumber: '2023/CRL/001', title: 'State vs John Doe', court: 'Court Room 1', judge: 'Hon. Justice Smith', time: '10:00 AM', date: 'Today' },
+      { id: 2, caseNumber: '2023/CIV/045', title: 'Smith vs ABC Corp', court: 'Court Room 3', judge: 'Hon. Justice Brown', time: '2:30 PM', date: 'Today' },
+      { id: 3, caseNumber: '2023/FAM/012', title: 'Divorce - Jane vs Mark', court: 'Court Room 2', judge: 'Hon. Justice Wilson', time: '9:00 AM', date: 'Tomorrow' }
+    ],
+    recentActivities: [
+      { id: 1, type: 'case_update', message: 'Case 2023/CRL/001 status updated to Active', time: '30 minutes ago', user: 'System' },
+      { id: 2, type: 'document_upload', message: 'New evidence document uploaded for case 2023/CIV/045', time: '1 hour ago', user: 'Advocate Kumar' },
+      { id: 3, type: 'hearing_scheduled', message: 'Hearing scheduled for case 2023/FAM/012', time: '2 hours ago', user: 'Registry' },
+      { id: 4, type: 'sms_sent', message: 'SMS notification sent to all parties in case 2023/CRL/001', time: '3 hours ago', user: 'Clerk Admin' }
+    ],
+    weather: {
+      temperature: 28,
+      condition: 'Sunny',
+      humidity: 65,
+      location: 'Court Complex'
     }
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'operational': return 'bg-green-100 text-green-800 border-green-200';
-      case 'degraded': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'down': return 'bg-red-100 text-red-800 border-red-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+  // Load dashboard data
+  useEffect(() => {
+    const loadDashboardData = async () => {
+      setLoading(true);
+      try {
+        // Simulate API call
+        setTimeout(() => {
+          setDashboardData(mockData);
+          setLoading(false);
+        }, 1000);
+      } catch (error) {
+        console.error('Error loading dashboard data:', error);
+        setLoading(false);
+        addNotification?.({
+          type: 'error',
+          message: 'Failed to load dashboard data'
+        });
+      }
+    };
+
+    loadDashboardData();
+  }, []);
+
+  // Real-time updates simulation
+  useEffect(() => {
+    if (!isOnline) return;
+
+    const interval = setInterval(() => {
+      // Simulate real-time updates
+      setDashboardData(prevData => ({
+        ...prevData,
+        stats: {
+          ...prevData.stats,
+          unreadSMS: Math.max(0, prevData.stats.unreadSMS + Math.floor(Math.random() * 3) - 1)
+        }
+      }));
+    }, 30000); // Update every 30 seconds
+
+    return () => clearInterval(interval);
+  }, [isOnline]);
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (language === 'ta') {
+      if (hour < 12) return 'सुप्रभात';
+      if (hour < 17) return 'नमस्ते';
+      return 'शुभ संध्या';
+    }
+    if (hour < 12) return 'Good Morning';
+    if (hour < 17) return 'Good Afternoon';
+    return 'Good Evening';
+  };
+
+  const getCurrentDate = () => {
+    const date = new Date();
+    const options = {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    };
+    return date.toLocaleDateString(language === 'ta' ? 'hi-IN' : 'en-US', options);
+  };
+
+  const getPriorityColor = (priority) => {
+    switch (priority?.toLowerCase()) {
+      case 'critical': return 'text-red-600 bg-red-100 dark:bg-red-900/30';
+      case 'high': return 'text-orange-600 bg-orange-100 dark:bg-orange-900/30';
+      case 'medium': return 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900/30';
+      case 'low': return 'text-green-600 bg-green-100 dark:bg-green-900/30';
+      default: return 'text-gray-600 bg-gray-100 dark:bg-gray-700';
     }
   };
 
   const getActivityIcon = (type) => {
     switch (type) {
-      case 'verification': return CheckCircle;
-      case 'notification': return MessageSquare;
-      case 'update': return Edit;
-      case 'document': return FileText;
-      default: return Activity;
+      case 'case_update':
+        return (
+          <svg className="h-5 w-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+        );
+      case 'document_upload':
+        return (
+          <svg className="h-5 w-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+          </svg>
+        );
+      case 'hearing_scheduled':
+        return (
+          <svg className="h-5 w-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+        );
+      case 'sms_sent':
+        return (
+          <svg className="h-5 w-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          </svg>
+        );
+      default:
+        return (
+          <svg className="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        );
     }
   };
 
-  const getPriorityColor = (priority) => {
-    switch (priority) {
-      case 'high': return 'bg-red-100 text-red-700 border-red-200';
-      case 'medium': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
-      case 'low': return 'bg-green-100 text-green-700 border-green-200';
-      default: return 'bg-gray-100 text-gray-700 border-gray-200';
-    }
-  };
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <span className="ml-2 text-gray-600 dark:text-gray-400">
+          {language === 'ta' ? 'लोड हो रहा है...' : 'Loading dashboard...'}
+        </span>
+      </div>
+    );
+  }
 
   return (
-    <div className="pro-dashboard-layout">
-      <div className="pro-main-content lg:ml-64">
-        
-        {/* Professional Header */}
-        <header className="pro-header">
-          <div className="pro-flex-between w-full">
-            <div className="pro-flex-col">
-              <h1 className="pro-heading-xl text-gray-900">Court Clerk Dashboard</h1>
-              <p className="pro-text-body text-gray-600">
-                Manage court proceedings, documentation, and administrative tasks
-              </p>
-            </div>
-            
-            <div className="pro-flex items-center pro-gap-4">
-              <select 
-                className="pro-form-select"
-                value={timeframe}
-                onChange={(e) => setTimeframe(e.target.value)}
-              >
-                <option value="today">Today</option>
-                <option value="week">This Week</option>
-                <option value="month">This Month</option>
-                <option value="quarter">This Quarter</option>
-              </select>
-              
-              <button className="pro-btn pro-btn-ghost">
-                <Download className="w-4 h-4 mr-2" />
-                Export
-              </button>
-              
-              <button className="pro-btn pro-btn-primary">
-                <Plus className="w-4 h-4 mr-2" />
-                Quick Actions
-              </button>
-            </div>
+    <div className="space-y-6">
+      {/* Header Section */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              {getGreeting()}, {user?.name || 'Court Clerk'}!
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-1">
+              {getCurrentDate()}
+            </p>
+            {!isOnline && (
+              <div className="flex items-center mt-2 text-yellow-600 dark:text-yellow-400">
+                <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.268 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+                <span className="text-sm">
+                  {language === 'ta' ? 'ऑफ़लाइन मोड में काम कर रहे हैं' : 'Working in offline mode'}
+                </span>
+              </div>
+            )}
           </div>
-        </header>
-
-        {/* Dashboard Content */}
-        <div className="pro-p-6 lg:p-8">
           
-          {/* Stats Grid */}
-          <div className="pro-grid lg:grid-cols-4 md:grid-cols-2 pro-gap-6 mb-8">
-            {stats.map((stat, index) => (
-              <div 
-                key={index} 
-                className="pro-stat-card group pro-animate-fade-in pro-hover-lift"
-                style={{animationDelay: `${0.1 * index}s`}}
-              >
-                <div className="pro-flex-between items-start mb-4">
-                  <div className={`w-12 h-12 pro-rounded-xl bg-gradient-to-r ${stat.color} pro-flex-center pro-shadow-glow group-hover:scale-110 transition-transform duration-300`}>
-                    <stat.icon className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="pro-flex items-center pro-gap-1">
-                    {stat.trend === 'up' ? (
-                      <TrendingUp className="w-4 h-4 text-green-500" />
-                    ) : (
-                      <TrendingDown className="w-4 h-4 text-red-500" />
-                    )}
-                    <span className={`pro-text-xs font-medium ${stat.trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
-                      {stat.change}
-                    </span>
-                  </div>
+          {dashboardData.weather && (
+            <div className="mt-4 md:mt-0 bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+              <div className="flex items-center space-x-3">
+                <div className="text-blue-600 dark:text-blue-400">
+                  <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
                 </div>
-                
-                <div className="pro-flex-col">
-                  <h3 className="pro-heading-xl font-bold text-gray-900 mb-1">
-                    {stat.value}
-                  </h3>
-                  <p className="pro-text-sm font-medium text-gray-600 mb-1">
-                    {stat.title}
-                  </p>
-                  <p className="pro-text-xs text-gray-500">
-                    {stat.description}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Main Content Grid */}
-          <div className="pro-grid lg:grid-cols-3 pro-gap-8 mb-8">
-            
-            {/* Recent Activities */}
-            <div className="lg:col-span-2">
-              <div className="pro-dashboard-card">
-                <div className="pro-flex-between items-center mb-6">
-                  <h2 className="pro-heading-lg text-gray-900">Recent Activities</h2>
-                  <div className="pro-flex items-center pro-gap-2">
-                    <button className="pro-btn pro-btn-ghost pro-btn-sm">
-                      <Filter className="w-4 h-4" />
-                    </button>
-                    <button className="pro-btn pro-btn-ghost pro-btn-sm">
-                      View All
-                      <ArrowRight className="w-4 h-4 ml-1" />
-                    </button>
+                <div>
+                  <div className="text-lg font-semibold text-blue-900 dark:text-blue-100">
+                    {dashboardData.weather.temperature}°C
                   </div>
-                </div>
-                
-                <div className="space-y-4">
-                  {recentActivities.map((activity) => {
-                    const ActivityIcon = getActivityIcon(activity.type);
-                    
-                    return (
-                      <div 
-                        key={activity.id} 
-                        className="pro-flex items-start pro-gap-4 pro-p-4 pro-rounded-lg hover:bg-gray-50 transition-colors duration-200 border border-transparent hover:border-gray-200"
-                      >
-                        <div className="w-10 h-10 bg-blue-100 pro-rounded-lg pro-flex-center">
-                          <ActivityIcon className="w-5 h-5 text-blue-600" />
-                        </div>
-                        
-                        <div className="flex-1 min-w-0">
-                          <div className="pro-flex items-center pro-gap-2 mb-1">
-                            <p className="pro-text-body font-medium text-gray-900">
-                              {activity.action}
-                            </p>
-                            <span className={`pro-text-xs px-2 py-1 pro-rounded-lg border ${getPriorityColor(activity.priority)}`}>
-                              {activity.priority}
-                            </span>
-                          </div>
-                          <p className="pro-text-sm text-gray-600 mb-1">
-                            <span className="font-medium">Case:</span> {activity.case} - {activity.caseTitle}
-                          </p>
-                          <p className="pro-text-xs text-gray-500">
-                            {activity.time}
-                          </p>
-                        </div>
-                        
-                        <div className="pro-flex items-center pro-gap-2">
-                          <span className={`pro-status-badge ${activity.status === 'completed' ? 'pro-status-success' : 'pro-status-warning'}`}>
-                            {activity.status}
-                          </span>
-                          <button className="pro-btn pro-btn-ghost pro-btn-sm">
-                            <Eye className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
+                  <div className="text-sm text-blue-600 dark:text-blue-300">
+                    {dashboardData.weather.condition}
+                  </div>
                 </div>
               </div>
             </div>
+          )}
+        </div>
+      </div>
 
-            {/* Quick Actions */}
-            <div>
-              <div className="pro-dashboard-card">
-                <h2 className="pro-heading-lg text-gray-900 mb-6">Quick Actions</h2>
-                
-                <div className="space-y-3">
-                  {quickActions.map((action, index) => (
-                    <button 
-                      key={index}
-                      className={`w-full text-left pro-p-4 pro-rounded-lg border transition-all duration-300 pro-hover-lift hover:shadow-md ${
-                        action.color === 'emerald' ? 'bg-emerald-50 hover:bg-emerald-100 border-emerald-200' :
-                        action.color === 'blue' ? 'bg-blue-50 hover:bg-blue-100 border-blue-200' :
-                        action.color === 'purple' ? 'bg-purple-50 hover:bg-purple-100 border-purple-200' :
-                        action.color === 'orange' ? 'bg-orange-50 hover:bg-orange-100 border-orange-200' :
-                        action.color === 'indigo' ? 'bg-indigo-50 hover:bg-indigo-100 border-indigo-200' :
-                        'bg-pink-50 hover:bg-pink-100 border-pink-200'
-                      }`}
-                    >
-                      <div className="pro-flex items-center pro-gap-3">
-                        <div className={`w-10 h-10 pro-rounded-lg pro-flex-center ${
-                          action.color === 'emerald' ? 'bg-emerald-100' :
-                          action.color === 'blue' ? 'bg-blue-100' :
-                          action.color === 'purple' ? 'bg-purple-100' :
-                          action.color === 'orange' ? 'bg-orange-100' :
-                          action.color === 'indigo' ? 'bg-indigo-100' :
-                          'bg-pink-100'
-                        }`}>
-                          <action.icon className={`w-5 h-5 ${
-                            action.color === 'emerald' ? 'text-emerald-600' :
-                            action.color === 'blue' ? 'text-blue-600' :
-                            action.color === 'purple' ? 'text-purple-600' :
-                            action.color === 'orange' ? 'text-orange-600' :
-                            action.color === 'indigo' ? 'text-indigo-600' :
-                            'text-pink-600'
-                          }`} />
-                        </div>
-                        <div className="pro-flex-col">
-                          <span className={`pro-text-sm font-semibold ${
-                            action.color === 'emerald' ? 'text-emerald-800' :
-                            action.color === 'blue' ? 'text-blue-800' :
-                            action.color === 'purple' ? 'text-purple-800' :
-                            action.color === 'orange' ? 'text-orange-800' :
-                            action.color === 'indigo' ? 'text-indigo-800' :
-                            'text-pink-800'
-                          }`}>
-                            {action.title}
-                          </span>
-                          <span className="pro-text-xs text-gray-600">
-                            {action.description}
-                          </span>
-                        </div>
-                      </div>
-                    </button>
-                  ))}
-                </div>
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+        {/* Total Cases */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <div className="bg-blue-100 dark:bg-blue-900/30 p-3 rounded-lg">
+                <svg className="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+            </div>
+            <div className="ml-4">
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                {dashboardData.stats.totalCases}
+              </div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                {language === 'ta' ? 'कुल मामले' : 'Total Cases'}
               </div>
             </div>
           </div>
+        </div>
 
-          {/* System Status */}
-          <div className="pro-dashboard-card">
-            <div className="pro-flex-between items-center mb-6">
-              <h2 className="pro-heading-lg text-gray-900">System Status</h2>
-              <div className="pro-flex items-center pro-gap-2">
-                <div className="pro-flex items-center pro-gap-2 pro-text-sm text-gray-600">
-                  <div className="w-2 h-2 bg-green-500 pro-rounded-full"></div>
-                  <span>All systems operational</span>
-                </div>
-                <button className="pro-btn pro-btn-ghost pro-btn-sm">
-                  <Settings className="w-4 h-4" />
-                </button>
+        {/* Active Cases */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <div className="bg-green-100 dark:bg-green-900/30 p-3 rounded-lg">
+                <svg className="h-6 w-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
               </div>
             </div>
-            
-            <div className="pro-grid md:grid-cols-2 lg:grid-cols-4 pro-gap-4">
-              {systemStatus.map((system, index) => (
-                <div 
-                  key={index}
-                  className="pro-flex items-center pro-gap-3 pro-p-4 pro-rounded-lg border border-gray-200 hover:border-gray-300 transition-colors duration-200"
-                >
-                  <div className="pro-flex-center">
-                    {getStatusIcon(system.status)}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="pro-flex items-center pro-gap-2 mb-1">
-                      <span className="pro-text-sm font-medium text-gray-900 truncate">
-                        {system.name}
-                      </span>
-                      <span className={`pro-text-xs px-2 py-1 pro-rounded-lg border font-medium ${getStatusColor(system.status)}`}>
-                        {system.status}
-                      </span>
-                    </div>
-                    <p className="pro-text-xs text-gray-500">
-                      Uptime: {system.uptime}
-                    </p>
-                  </div>
-                </div>
-              ))}
+            <div className="ml-4">
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                {dashboardData.stats.activeCases}
+              </div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                {language === 'ta' ? 'सक्रिय मामले' : 'Active Cases'}
+              </div>
             </div>
           </div>
+        </div>
 
-          {/* Performance Metrics */}
-          <div className="pro-grid lg:grid-cols-2 pro-gap-8 mt-8">
-            
-            {/* Today's Performance */}
-            <div className="pro-dashboard-card">
-              <h3 className="pro-heading-lg text-gray-900 mb-6">Today's Performance</h3>
-              
-              <div className="space-y-4">
-                {[
-                  { label: 'Case Processing Rate', value: 95, target: 90, color: 'emerald' },
-                  { label: 'Document Verification', value: 87, target: 85, color: 'blue' },
-                  { label: 'Response Time', value: 78, target: 80, color: 'orange' },
-                  { label: 'System Availability', value: 99, target: 95, color: 'purple' }
-                ].map((metric, index) => (
-                  <div key={index}>
-                    <div className="pro-flex-between items-center mb-2">
-                      <span className="pro-text-sm font-medium text-gray-700">{metric.label}</span>
-                      <span className="pro-text-sm font-semibold text-gray-900">{metric.value}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 pro-rounded-full h-2 overflow-hidden">
-                      <div 
-                        className={`h-full pro-rounded-full transition-all duration-1000 ease-out ${
-                          metric.color === 'emerald' ? 'bg-emerald-500' :
-                          metric.color === 'blue' ? 'bg-blue-500' :
-                          metric.color === 'orange' ? 'bg-orange-500' :
-                          'bg-purple-500'
-                        }`}
-                        style={{width: `${metric.value}%`, animationDelay: `${0.2 * index}s`}}
-                      ></div>
-                    </div>
-                    <div className="pro-flex justify-between items-center mt-1">
-                      <span className="pro-text-xs text-gray-500">Target: {metric.target}%</span>
-                      <span className={`pro-text-xs font-medium ${metric.value >= metric.target ? 'text-green-600' : 'text-red-600'}`}>
-                        {metric.value >= metric.target ? '✓ On track' : '⚠ Below target'}
-                      </span>
-                    </div>
-                  </div>
-                ))}
+        {/* Pending Cases */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <div className="bg-yellow-100 dark:bg-yellow-900/30 p-3 rounded-lg">
+                <svg className="h-6 w-6 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
               </div>
             </div>
-
-            {/* Notifications */}
-            <div className="pro-dashboard-card">
-              <div className="pro-flex-between items-center mb-6">
-                <h3 className="pro-heading-lg text-gray-900">Recent Notifications</h3>
-                <Bell className="w-5 h-5 text-gray-400" />
+            <div className="ml-4">
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                {dashboardData.stats.pendingCases}
               </div>
-              
-              <div className="space-y-3">
-                {[
-                  { title: 'System Maintenance Scheduled', time: '10 minutes ago', type: 'info' },
-                  { title: 'New Case Assignment', time: '1 hour ago', type: 'success' },
-                  { title: 'Document Verification Failed', time: '2 hours ago', type: 'warning' },
-                  { title: 'Daily Backup Completed', time: '3 hours ago', type: 'success' }
-                ].map((notification, index) => (
-                  <div key={index} className="pro-flex items-start pro-gap-3 pro-p-3 pro-rounded-lg hover:bg-gray-50 transition-colors duration-200">
-                    <div className={`w-2 h-2 pro-rounded-full mt-2 ${
-                      notification.type === 'success' ? 'bg-green-500' :
-                      notification.type === 'warning' ? 'bg-yellow-500' :
-                      notification.type === 'error' ? 'bg-red-500' :
-                      'bg-blue-500'
-                    }`}></div>
-                    <div className="flex-1">
-                      <p className="pro-text-sm font-medium text-gray-900">{notification.title}</p>
-                      <p className="pro-text-xs text-gray-500">{notification.time}</p>
-                    </div>
-                  </div>
-                ))}
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                {language === 'ta' ? 'लंबित मामले' : 'Pending Cases'}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Today's Hearings */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <div className="bg-purple-100 dark:bg-purple-900/30 p-3 rounded-lg">
+                <svg className="h-6 w-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+            </div>
+            <div className="ml-4">
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                {dashboardData.stats.todayHearings}
+              </div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                {language === 'ta' ? 'आज की सुनवाई' : "Today's Hearings"}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Unread SMS */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <div className="bg-indigo-100 dark:bg-indigo-900/30 p-3 rounded-lg">
+                <svg className="h-6 w-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+              </div>
+            </div>
+            <div className="ml-4">
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                {dashboardData.stats.unreadSMS}
+              </div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                {language === 'ta' ? 'अपठित SMS' : 'Unread SMS'}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Pending Documents */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <div className="bg-red-100 dark:bg-red-900/30 p-3 rounded-lg">
+                <svg className="h-6 w-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+              </div>
+            </div>
+            <div className="ml-4">
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                {dashboardData.stats.pendingDocuments}
+              </div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                {language === 'ta' ? 'लंबित दस्तावेज़' : 'Pending Docs'}
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        {/* Recent Cases */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                {language === 'ta' ? 'हाल के मामले' : 'Recent Cases'}
+              </h3>
+              <Link
+                to="/clerk/cases"
+                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium"
+              >
+                {language === 'ta' ? 'सभी देखें' : 'View All'}
+              </Link>
+            </div>
+          </div>
+          <div className="p-6 space-y-4">
+            {dashboardData.recentCases.map((case_) => (
+              <div key={case_.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <div className="flex-1">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm font-medium text-gray-900 dark:text-white">
+                      {case_.number}
+                    </span>
+                    <span className={`px-2 py-1 text-xs rounded-full font-medium ${getPriorityColor(case_.priority)}`}>
+                      {case_.priority}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    {case_.title}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                    {case_.lastUpdate}
+                  </p>
+                </div>
+                <Link
+                  to={`/clerk/case/${case_.id}`}
+                  className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium"
+                >
+                  {language === 'ta' ? 'देखें' : 'View'}
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Upcoming Hearings */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                {language === 'ta' ? 'आगामी सुनवाई' : 'Upcoming Hearings'}
+              </h3>
+              <Link
+                to="/clerk/calendar"
+                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium"
+              >
+                {language === 'ta' ? 'कैलेंडर' : 'Calendar'}
+              </Link>
+            </div>
+          </div>
+          <div className="p-6 space-y-4">
+            {dashboardData.upcomingHearings.map((hearing) => (
+              <div key={hearing.id} className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">
+                    {hearing.caseNumber}
+                  </span>
+                  <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                    {hearing.date}
+                  </span>
+                </div>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                  {hearing.title}
+                </p>
+                <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-500">
+                  <span>{hearing.court} - {hearing.judge}</span>
+                  <span className="font-medium">{hearing.time}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Recent Activities */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              {language === 'ta' ? 'हाल की गतिविधि' : 'Recent Activities'}
+            </h3>
+          </div>
+          <div className="p-6 space-y-4">
+            {dashboardData.recentActivities.map((activity) => (
+              <div key={activity.id} className="flex items-start space-x-3">
+                <div className="flex-shrink-0 mt-1">
+                  {getActivityIcon(activity.type)}
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm text-gray-900 dark:text-white">
+                    {activity.message}
+                  </p>
+                  <div className="flex items-center justify-between mt-1">
+                    <span className="text-xs text-gray-500 dark:text-gray-500">
+                      {activity.user}
+                    </span>
+                    <span className="text-xs text-gray-500 dark:text-gray-500">
+                      {activity.time}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          {language === 'ta' ? 'त्वरित कार्य' : 'Quick Actions'}
+        </h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          {/* New Case */}
+          <button className="flex flex-col items-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors">
+            <svg className="h-8 w-8 text-blue-600 dark:text-blue-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            <span className="text-sm font-medium text-blue-900 dark:text-blue-100">
+              {language === 'ta' ? 'नया मामला' : 'New Case'}
+            </span>
+          </button>
+
+          {/* Upload Document */}
+          <button className="flex flex-col items-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors">
+            <svg className="h-8 w-8 text-green-600 dark:text-green-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+            <span className="text-sm font-medium text-green-900 dark:text-green-100">
+              {language === 'ta' ? 'दस्तावेज़ अपलोड' : 'Upload Doc'}
+            </span>
+          </button>
+
+          {/* Send SMS */}
+          <button className="flex flex-col items-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors">
+            <svg className="h-8 w-8 text-purple-600 dark:text-purple-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+            <span className="text-sm font-medium text-purple-900 dark:text-purple-100">
+              {language === 'ta' ? 'SMS भेजें' : 'Send SMS'}
+            </span>
+          </button>
+
+          {/* Schedule Hearing */}
+          <button className="flex flex-col items-center p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg hover:bg-yellow-100 dark:hover:bg-yellow-900/30 transition-colors">
+            <svg className="h-8 w-8 text-yellow-600 dark:text-yellow-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <span className="text-sm font-medium text-yellow-900 dark:text-yellow-100">
+              {language === 'ta' ? 'सुनवाई शेड्यूल' : 'Schedule'}
+            </span>
+          </button>
+
+          {/* Generate Report */}
+          <button className="flex flex-col items-center p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors">
+            <svg className="h-8 w-8 text-indigo-600 dark:text-indigo-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            <span className="text-sm font-medium text-indigo-900 dark:text-indigo-100">
+              {language === 'ta' ? 'रिपोर्ट' : 'Report'}
+            </span>
+          </button>
+
+          {/* Search */}
+          <button className="flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
+            <svg className="h-8 w-8 text-gray-600 dark:text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+              {language === 'ta' ? 'खोजें' : 'Search'}
+            </span>
+          </button>
+        </div>
+      </div>
     </div>
   );
-}
+};
+
+export default Dashboard;

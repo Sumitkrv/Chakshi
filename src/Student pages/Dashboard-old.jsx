@@ -1,9 +1,18 @@
+// Updated Dashboard Component with improvements
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import './Dashboard.css';
 
 const StudentDashboard = () => {
   const { user } = useAuth();
+
+  // Fixed: Added proper error handling for user data
+  const getUserName = () => {
+    if (!user) return 'Student';
+    if (user.name) return user.name;
+    if (user.email) return user.email.split('@')[0];
+    return 'Student';
+  };
 
   const stats = [
     { title: 'Courses Enrolled', value: '8', icon: '📚' },
@@ -25,21 +34,30 @@ const StudentDashboard = () => {
     { task: 'Jurisprudence Quiz', dueDate: 'Next Week' }
   ];
 
+  // Fixed: Added proper date formatting with error handling
+  const getFormattedDate = () => {
+    try {
+      return new Date().toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+    } catch (error) {
+      return new Date().toLocaleDateString();
+    }
+  };
+
   return (
     <div className="legal-education-dashboard">
       {/* Header */}
       <div className="dashboard-header">
         <div className="welcome-section">
-          <h1>Welcome back, {user ? user.name || user.email.split('@')[0] : 'Student'}!</h1>
+          <h1>Welcome back, {getUserName()}!</h1>
           <p>Ready to continue your legal education journey?</p>
         </div>
         <div className="date-info">
-          <span>{new Date().toLocaleDateString('en-US', { 
-            weekday: 'long', 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
-          })}</span>
+          <span>{getFormattedDate()}</span>
         </div>
       </div>
 
@@ -47,7 +65,9 @@ const StudentDashboard = () => {
       <div className="stats-grid">
         {stats.map((stat, index) => (
           <div key={index} className="stat-card">
-            <div className="stat-icon">{stat.icon}</div>
+            <div className="stat-icon" role="img" aria-label={stat.title}>
+              {stat.icon}
+            </div>
             <div className="stat-content">
               <h3>{stat.value}</h3>
               <p>{stat.title}</p>
@@ -62,7 +82,9 @@ const StudentDashboard = () => {
         <div className="dashboard-section">
           <div className="section-header">
             <h2>Recent Activities</h2>
-            <button className="see-all-btn">See All</button>
+            <button className="see-all-btn" aria-label="View all activities">
+              See All
+            </button>
           </div>
           <div className="activities-list">
             {recentActivities.map((item, index) => (
@@ -80,7 +102,9 @@ const StudentDashboard = () => {
         <div className="dashboard-section">
           <div className="section-header">
             <h2>Upcoming Tasks</h2>
-            <button className="add-task-btn">+ Add Task</button>
+            <button className="add-task-btn" aria-label="Add new task">
+              + Add Task
+            </button>
           </div>
           <div className="tasks-list">
             {upcomingTasks.map((item, index) => (
@@ -89,7 +113,9 @@ const StudentDashboard = () => {
                   <h4>{item.task}</h4>
                   <span className="due-date">Due: {item.dueDate}</span>
                 </div>
-                <button className="task-action">View</button>
+                <button className="task-action" aria-label={`View ${item.task}`}>
+                  View
+                </button>
               </div>
             ))}
           </div>
@@ -105,7 +131,7 @@ const StudentDashboard = () => {
             <div className="progress-item">
               <h4>Overall Progress</h4>
               <div className="progress-bar-container">
-                <div className="progress-bar">
+                <div className="progress-bar" role="progressbar" aria-valuenow={75} aria-valuemin={0} aria-valuemax={100}>
                   <div className="progress-fill" style={{width: '75%'}}></div>
                 </div>
                 <span>75%</span>
@@ -116,9 +142,9 @@ const StudentDashboard = () => {
             <div className="progress-item">
               <h4>Achievement Badges Earned</h4>
               <div className="badges-container">
-                <div className="badge">Consistent Learner</div>
-                <div className="badge">Legal Research Pro</div>
-                <div className="badge">Moot Court Star</div>
+                <div className="badge" aria-label="Consistent Learner badge">Consistent Learner</div>
+                <div className="badge" aria-label="Legal Research Pro badge">Legal Research Pro</div>
+                <div className="badge" aria-label="Moot Court Star badge">Moot Court Star</div>
               </div>
             </div>
           </div>

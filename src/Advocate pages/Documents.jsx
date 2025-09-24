@@ -1,10 +1,23 @@
 import React, { useState } from 'react';
+import { 
+  compareContracts, 
+  analyzeContractRisk, 
+  summarizeDocument, 
+  generateComplianceTasks,
+  createMockFile 
+} from '../lib/documentApi';
 
 const DocumentsPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedStatus, setSelectedStatus] = useState('All');
-  // const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
+  
+  // New state for API operations
+  const [loading, setLoading] = useState({});
+  const [results, setResults] = useState({});
+  const [showComparisonModal, setShowComparisonModal] = useState(false);
+  const [selectedDocuments, setSelectedDocuments] = useState([]);
+  const [showComplianceModal, setShowComplianceModal] = useState(false);
 
   // Sample documents data
   const [documents] = useState([
@@ -153,294 +166,369 @@ const DocumentsPage = () => {
       case 'pdf': return '📄';
       case 'docx': case 'doc': return '📝';
       case 'zip': case 'rar': return '🗜️';
-      case 'jpg': case 'png': case 'gif': return '🖼️';
-      case 'mp4': case 'avi': case 'mov': return '🎬';
       default: return '📁';
     }
   };
-
-  // const getStatusColor = (status) => {
-  //   switch (status) {
-  //     case 'Active': return 'pro-status-success';
-  //     case 'Draft': return 'pro-status-warning';
-  //     case 'Filed': return 'pro-status-info';
-  //     case 'Archived': return 'pro-status-error';
-  //     default: return 'pro-status-info';
-  //   }
-  // };
-
-  // const formatFileSize = (sizeStr) => {
-  //   const size = parseFloat(sizeStr);
-  //   if (size < 1) return `${(size * 1024).toFixed(0)} KB`;
-  //   return sizeStr;
-  // };
 
   const handleDocumentAction = (action, documentId) => {
     console.log(`${action} document:`, documentId);
   };
 
+  // API Handler Functions
+  const handleContractComparison = async () => {
+    if (selectedDocuments.length !== 2) {
+      alert('Please select exactly 2 documents to compare');
+      return;
+    }
+
+    const loadingKey = 'comparison';
+    setLoading(prev => ({ ...prev, [loadingKey]: true }));
+    
+    try {
+      // Create mock files from selected documents
+      const file1 = createMockFile(selectedDocuments[0].name);
+      const file2 = createMockFile(selectedDocuments[1].name);
+      
+      const result = await compareContracts(file1, file2);
+      setResults(prev => ({ ...prev, comparison: result }));
+      setShowComparisonModal(false);
+      setSelectedDocuments([]);
+      alert('Contract comparison completed! Check console for results.');
+      console.log('Contract Comparison Result:', result);
+    } catch (error) {
+      alert('Contract comparison failed: ' + error.message);
+    } finally {
+      setLoading(prev => ({ ...prev, [loadingKey]: false }));
+    }
+  };
+
+  const handleRiskAnalysis = async (document) => {
+    const loadingKey = `risk-${document.id}`;
+    setLoading(prev => ({ ...prev, [loadingKey]: true }));
+    
+    try {
+      const file = createMockFile(document.name);
+      const result = await analyzeContractRisk(file);
+      setResults(prev => ({ ...prev, [`risk-${document.id}`]: result }));
+      alert('Risk analysis completed! Check console for results.');
+      console.log('Risk Analysis Result:', result);
+    } catch (error) {
+      alert('Risk analysis failed: ' + error.message);
+    } finally {
+      setLoading(prev => ({ ...prev, [loadingKey]: false }));
+    }
+  };
+
+  const handleDocumentSummary = async (document) => {
+    const loadingKey = `summary-${document.id}`;
+    setLoading(prev => ({ ...prev, [loadingKey]: true }));
+    
+    try {
+      const file = createMockFile(document.name);
+      const result = await summarizeDocument(file);
+      setResults(prev => ({ ...prev, [`summary-${document.id}`]: result }));
+      alert('Document summary completed! Check console for results.');
+      console.log('Document Summary Result:', result);
+    } catch (error) {
+      alert('Document summarization failed: ' + error.message);
+    } finally {
+      setLoading(prev => ({ ...prev, [loadingKey]: false }));
+    }
+  };
+
+  const handleComplianceTaskGeneration = async (regulation, country, companyType) => {
+    const loadingKey = 'compliance';
+    setLoading(prev => ({ ...prev, [loadingKey]: true }));
+    
+    try {
+      const result = await generateComplianceTasks(regulation, country, companyType);
+      setResults(prev => ({ ...prev, compliance: result }));
+      setShowComplianceModal(false);
+      alert('Compliance tasks generated! Check console for results.');
+      console.log('Compliance Tasks Result:', result);
+    } catch (error) {
+      alert('Compliance task generation failed: ' + error.message);
+    } finally {
+      setLoading(prev => ({ ...prev, [loadingKey]: false }));
+    }
+  };
+
+  // Document selection for comparison
+  const toggleDocumentSelection = (document) => {
+    setSelectedDocuments(prev => {
+      const isSelected = prev.find(d => d.id === document.id);
+      if (isSelected) {
+        return prev.filter(d => d.id !== document.id);
+      } else if (prev.length < 2) {
+        return [...prev, document];
+      } else {
+        alert('You can only select 2 documents for comparison');
+        return prev;
+      }
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="w-full">
-        
-        {/* Professional Header */}
-        <header className="bg-white border-b border-gray-200 px-6 py-4" style={{backgroundColor: '#FFFFFF', borderColor: '#374151'}}>
-          <div className="flex justify-between items-center w-full">
-            <div className="flex flex-col">
-              <h1 className="text-2xl font-bold" style={{color: '#1E3A8A'}}>Document Management</h1>
-              <p className="text-gray-600 mt-1">
-                Organize, manage, and track all your legal documents
-              </p>
-            </div>
-            
-            <div className="flex items-center gap-4">
-              <button className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 flex items-center">
-                📄 Export
-              </button>
-              <button className="px-4 py-2 text-white rounded-md flex items-center font-medium" style={{backgroundColor: '#1E3A8A'}}>
-                📤 Upload Document
-              </button>
-            </div>
+      {/* Header */}
+      <header className="bg-white border-b border-E5E7EB px-4 sm:px-6 py-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold text-374151">Document Management</h1>
+            <p className="text-6B7280 text-sm mt-1">
+              Organize and track all your legal documents
+            </p>
           </div>
-        </header>
-
-        {/* Dashboard Content */}
-        <div className="p-6">{/* Simplified padding */}
           
-          {/* Metrics Grid */}
-          <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-6 mb-8">
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-              <div className="flex justify-between items-start mb-4">
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl" style={{backgroundColor: '#1E3A8A'}}>
-                  📄
-                </div>
-                <span className="text-xs text-green-600 font-medium">+15%</span>
-              </div>
-              <h3 className="text-2xl font-bold mb-1" style={{color: '#374151'}}>
-                {metrics.totalDocuments}
-              </h3>
-              <p className="text-sm font-medium text-gray-600">Total Documents</p>
-            </div>
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <button 
+              className="flex-1 sm:flex-none px-3 py-2 text-374151 bg-white border border-E5E7EB rounded-md hover:bg-F9FAFB text-sm"
+              onClick={() => setShowComparisonModal(true)}
+            >
+              Compare Contracts
+            </button>
+            <button 
+              className="flex-1 sm:flex-none px-3 py-2 text-374151 bg-white border border-E5E7EB rounded-md hover:bg-F9FAFB text-sm"
+              onClick={() => setShowComplianceModal(true)}
+            >
+              Compliance Tasks
+            </button>
+            <button className="flex-1 sm:flex-none px-3 py-2 text-374151 bg-white border border-E5E7EB rounded-md hover:bg-F9FAFB text-sm">
+              Export
+            </button>
+            <button className="flex-1 sm:flex-none px-4 py-2 bg-374151 text-white rounded-md hover:bg-1E3A8A text-sm font-medium">
+              Upload
+            </button>
+          </div>
+        </div>
+      </header>
 
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-              <div className="flex justify-between items-start mb-4">
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl" style={{backgroundColor: '#1E3A8A'}}>
-                  ✅
-                </div>
-                <span className="text-xs text-green-600 font-medium">+8%</span>
+      {/* Main Content */}
+      <div className="p-4 sm:p-6">
+        {/* Metrics Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="bg-white p-4 rounded-lg border border-E5E7EB">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-8 h-8 rounded-lg bg-374151 flex items-center justify-center">
+                <span className="text-white text-sm">📄</span>
               </div>
-              <h3 className="text-2xl font-bold mb-1" style={{color: '#374151'}}>
-                {metrics.activeDocuments}
-              </h3>
-              <p className="text-sm font-medium text-gray-600">Active Documents</p>
+              <span className="text-xs text-green-600 font-medium">+15%</span>
             </div>
+            <h3 className="text-lg font-bold text-374151">{metrics.totalDocuments}</h3>
+            <p className="text-xs text-6B7280">Total Documents</p>
+          </div>
 
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-              <div className="flex justify-between items-start mb-4">
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl" style={{backgroundColor: '#1E3A8A'}}>
-                  💾
-                </div>
-                <span className="text-xs font-medium" style={{color: '#1E3A8A'}}>{metrics.totalSize.toFixed(1)} MB</span>
+          <div className="bg-white p-4 rounded-lg border border-E5E7EB">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-8 h-8 rounded-lg bg-374151 flex items-center justify-center">
+                <span className="text-white text-sm">✅</span>
               </div>
-              <h3 className="text-2xl font-bold mb-1" style={{color: '#374151'}}>
-                {(metrics.totalSize / 1024).toFixed(1)} GB
-              </h3>
-              <p className="text-sm font-medium text-gray-600">Total Storage</p>
+              <span className="text-xs text-green-600 font-medium">+8%</span>
             </div>
+            <h3 className="text-lg font-bold text-374151">{metrics.activeDocuments}</h3>
+            <p className="text-xs text-6B7280">Active</p>
+          </div>
 
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-              <div className="flex justify-between items-start mb-4">
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl" style={{backgroundColor: '#1E3A8A'}}>
-                  ⭐
-                </div>
-                <span className="text-xs text-orange-600 font-medium">Favorites</span>
+          <div className="bg-white p-4 rounded-lg border border-E5E7EB">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-8 h-8 rounded-lg bg-374151 flex items-center justify-center">
+                <span className="text-white text-sm">💾</span>
               </div>
-              <h3 className="text-2xl font-bold mb-1" style={{color: '#374151'}}>
-                {metrics.starredDocuments}
-              </h3>
-              <p className="text-sm font-medium text-gray-600">Starred Documents</p>
+            </div>
+            <h3 className="text-lg font-bold text-374151">{(metrics.totalSize / 1024).toFixed(1)} GB</h3>
+            <p className="text-xs text-6B7280">Storage Used</p>
+          </div>
+
+          <div className="bg-white p-4 rounded-lg border border-E5E7EB">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-8 h-8 rounded-lg bg-374151 flex items-center justify-center">
+                <span className="text-white text-sm">⭐</span>
+              </div>
+            </div>
+            <h3 className="text-lg font-bold text-374151">{metrics.starredDocuments}</h3>
+            <p className="text-xs text-6B7280">Starred</p>
+          </div>
+        </div>
+
+        {/* Document Library */}
+        <div className="bg-white rounded-lg border border-E5E7EB">
+          {/* Filters Bar */}
+          <div className="p-4 border-b border-E5E7EB">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex-1 relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <span className="text-9CA3AF">🔍</span>
+                </div>
+                <input
+                  type="text"
+                  placeholder="Search documents..."
+                  className="pl-10 pr-4 py-2 border border-E5E7EB rounded-md w-full focus:ring-2 focus:ring-374151 focus:border-transparent"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+              
+              <select 
+                className="px-3 py-2 border border-E5E7EB rounded-md focus:ring-2 focus:ring-374151 focus:border-transparent text-sm"
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+              >
+                {categories.map(category => (
+                  <option key={category} value={category}>{category}</option>
+                ))}
+              </select>
+              
+              <select 
+                className="px-3 py-2 border border-E5E7EB rounded-md focus:ring-2 focus:ring-374151 focus:border-transparent text-sm"
+                value={selectedStatus}
+                onChange={(e) => setSelectedStatus(e.target.value)}
+              >
+                {statuses.map(status => (
+                  <option key={status} value={status}>{status}</option>
+                ))}
+              </select>
             </div>
           </div>
 
-          {/* Document Management Interface */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            
-            {/* Search and Filter Controls */}
-            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-6">
-              <h2 className="text-lg font-semibold" style={{color: '#1E3A8A'}}>Document Library</h2>
-              
-              <div className="flex items-center gap-4 w-full lg:w-auto">
-                <div className="relative flex-1 lg:w-80">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <span className="text-gray-400">🔍</span>
-                  </div>
-                  <input
-                    type="text"
-                    placeholder="Search documents..."
-                    className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:border-blue-500 w-full"
-                    style={{focusRingColor: '#1E3A8A'}}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                </div>
-                
-                <select 
-                  className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:border-blue-500 min-w-[140px]"
-                  style={{focusRingColor: '#1E3A8A'}}
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                >
-                  {categories.map(category => (
-                    <option key={category} value={category}>{category}</option>
-                  ))}
-                </select>
-                
-                <select 
-                  className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:border-blue-500 min-w-[120px]"
-                  style={{focusRingColor: '#1E3A8A'}}
-                  value={selectedStatus}
-                  onChange={(e) => setSelectedStatus(e.target.value)}
-                >
-                  {statuses.map(status => (
-                    <option key={status} value={status}>{status}</option>
-                  ))}
-                </select>
-                
-                <button className="px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
-                  🔽
-                </button>
-              </div>
-            </div>
-
-            {/* Documents Grid */}
-            <div className="grid lg:grid-cols-2 xl:grid-cols-3 gap-6">
-              {filteredDocuments.map((document, index) => {
+          {/* Documents Grid */}
+          <div className="p-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {filteredDocuments.map((document) => {
                 const fileIcon = getFileIcon(document.type);
                 
                 return (
                   <div 
                     key={document.id} 
-                    className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all duration-300"
+                    className="bg-white p-4 rounded-lg border border-E5E7EB hover:border-9CA3AF hover:bg-F9FAFB transition-colors"
                   >
+                    {/* Selection Checkbox for Contract Comparison */}
+                    <div className="flex items-center justify-between mb-3">
+                      <input
+                        type="checkbox"
+                        checked={selectedDocuments.find(d => d.id === document.id) !== undefined}
+                        onChange={() => toggleDocumentSelection(document)}
+                        className="w-4 h-4 text-374151 border-gray-300 rounded focus:ring-374151"
+                      />
+                      <span className="text-xs text-6B7280">
+                        Select for comparison
+                      </span>
+                    </div>
                     {/* Document Header */}
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl" style={{backgroundColor: '#1E3A8A'}}>
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <div className="w-10 h-10 rounded-lg bg-374151 flex items-center justify-center flex-shrink-0">
                           <span className="text-white">{fileIcon}</span>
                         </div>
-                        <div className="flex flex-col flex-1 min-w-0">
-                          <h3 className="text-sm font-semibold truncate" style={{color: '#374151'}}>
+                        <div className="min-w-0 flex-1">
+                          <h3 className="text-sm font-semibold text-374151 truncate">
                             {document.name}
                           </h3>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-6B7280">
                             {document.size} • v{document.version}
                           </p>
                         </div>
                       </div>
                       
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1 flex-shrink-0">
                         {document.isStarred && (
-                          <span className="text-sm text-yellow-400">⭐</span>
+                          <span className="text-yellow-400 text-sm">⭐</span>
                         )}
                         {document.isLocked && (
-                          <span className="text-sm text-gray-400">🔒</span>
+                          <span className="text-6B7280 text-sm">🔒</span>
                         )}
-                        <button className="p-1 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
-                          <span className="text-sm">⚙️</span>
-                        </button>
                       </div>
                     </div>
 
-                    {/* Document Info */}
-                    <div className="space-y-3 mb-4">
-                      <p className="text-sm text-gray-600 line-clamp-2">
-                        {document.description}
-                      </p>
-                      
-                      <div className="flex items-center justify-between">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium`} style={{
+                    {/* Description */}
+                    <p className="text-sm text-6B7280 line-clamp-2 mb-3">
+                      {document.description}
+                    </p>
+
+                    {/* Status and Category */}
+                    <div className="flex items-center justify-between mb-3">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium text-white`} 
+                        style={{
                           backgroundColor: document.status === 'Active' ? '#10B981' : 
                                          document.status === 'Draft' ? '#F59E0B' :
-                                         document.status === 'Filed' ? '#3B82F6' : '#EF4444',
-                          color: '#FFFFFF'
+                                         document.status === 'Filed' ? '#3B82F6' : '#6B7280'
                         }}>
-                          {document.status}
-                        </span>
-                        <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-lg">
-                          {document.category}
-                        </span>
+                        {document.status}
+                      </span>
+                      <span className="text-xs text-6B7280 bg-F9FAFB px-2 py-1 rounded">
+                        {document.category}
+                      </span>
+                    </div>
+
+                    {/* Metadata */}
+                    <div className="space-y-2 mb-3 text-xs text-6B7280">
+                      <div className="flex justify-between">
+                        <span>By {document.author}</span>
+                        <span>{document.views} views</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Modified {new Date(document.lastModified).toLocaleDateString()}</span>
+                        <span>{document.downloads} downloads</span>
                       </div>
                     </div>
 
-                    {/* Document Metadata */}
-                    <div className="space-y-2 mb-4 p-3 bg-gray-50 rounded-lg">
-                      <div className="flex items-center justify-between text-xs text-gray-600">
-                        <div className="flex items-center gap-1">
-                          <span>👤</span>
-                          <span>{document.author}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <span>🕒</span>
-                          <span>{new Date(document.lastModified).toLocaleDateString()}</span>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center justify-between text-xs text-gray-600">
-                        <div className="flex items-center gap-1">
-                          <span>👁️</span>
-                          <span>{document.views} views</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <span>📥</span>
-                          <span>{document.downloads} downloads</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Document Tags */}
+                    {/* Tags */}
                     <div className="flex flex-wrap gap-1 mb-4">
-                      {document.tags.slice(0, 3).map((tag, tagIndex) => (
+                      {document.tags.slice(0, 2).map((tag, index) => (
                         <span 
-                          key={tagIndex}
-                          className="text-xs px-2 py-1 rounded-lg"
-                          style={{backgroundColor: '#E5E7EB', color: '#1E3A8A'}}
+                          key={index}
+                          className="text-xs px-2 py-1 rounded bg-F9FAFB text-374151"
                         >
                           {tag}
                         </span>
                       ))}
-                      {document.tags.length > 3 && (
-                        <span className="text-xs text-gray-500">
-                          +{document.tags.length - 3} more
+                      {document.tags.length > 2 && (
+                        <span className="text-xs text-6B7280">
+                          +{document.tags.length - 2}
                         </span>
                       )}
                     </div>
 
-                    {/* Action Buttons */}
-                    <div className="flex items-center gap-2 pt-4 border-t border-gray-200">
+                    {/* Actions */}
+                    <div className="flex gap-2 pt-3 border-t border-E5E7EB">
                       <button 
-                        className="flex-1 px-4 py-2 text-white rounded-md font-medium flex items-center justify-center"
-                        style={{backgroundColor: '#1E3A8A'}}
+                        className="flex-1 px-3 py-2 bg-374151 text-white rounded text-sm hover:bg-1E3A8A"
                         onClick={() => handleDocumentAction('view', document.id)}
                       >
-                        👁️ View
+                        View
                       </button>
                       <button 
-                        className="p-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                        className="p-2 text-374151 border border-E5E7EB rounded hover:bg-F9FAFB"
                         onClick={() => handleDocumentAction('download', document.id)}
+                        title="Download"
                       >
                         📥
                       </button>
                       <button 
-                        className="p-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-                        onClick={() => handleDocumentAction('share', document.id)}
-                      >
-                        📤
-                      </button>
-                      <button 
-                        className="p-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                        className="p-2 text-374151 border border-E5E7EB rounded hover:bg-F9FAFB"
                         onClick={() => handleDocumentAction('edit', document.id)}
+                        title="Edit"
                       >
                         ✏️
+                      </button>
+                    </div>
+
+                    {/* New API Action Buttons */}
+                    <div className="flex gap-2 mt-2">
+                      <button 
+                        className="flex-1 px-2 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 disabled:bg-gray-400"
+                        onClick={() => handleRiskAnalysis(document)}
+                        disabled={loading[`risk-${document.id}`]}
+                        title="Analyze Contract Risk"
+                      >
+                        {loading[`risk-${document.id}`] ? '🔄' : '⚠️'} Risk
+                      </button>
+                      <button 
+                        className="flex-1 px-2 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700 disabled:bg-gray-400"
+                        onClick={() => handleDocumentSummary(document)}
+                        disabled={loading[`summary-${document.id}`]}
+                        title="Summarize Document"
+                      >
+                        {loading[`summary-${document.id}`] ? '🔄' : '📋'} Summary
                       </button>
                     </div>
                   </div>
@@ -450,22 +538,182 @@ const DocumentsPage = () => {
 
             {/* Empty State */}
             {filteredDocuments.length === 0 && (
-              <div className="text-center py-12">
-                <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center text-4xl">
-                  📄
+              <div className="text-center py-8">
+                <div className="w-12 h-12 mx-auto mb-3 bg-F9FAFB rounded-full flex items-center justify-center">
+                  <span className="text-2xl">📄</span>
                 </div>
-                <h3 className="text-lg font-semibold mb-2" style={{color: '#374151'}}>No documents found</h3>
-                <p className="text-gray-400 mb-6">
-                  {searchQuery ? 'Try adjusting your search criteria' : 'Get started by uploading your first document'}
+                <h3 className="text-lg font-semibold text-374151 mb-1">No documents found</h3>
+                <p className="text-6B7280 text-sm mb-4">
+                  {searchQuery ? 'Try adjusting your search criteria' : 'Upload your first document to get started'}
                 </p>
-                <button className="px-4 py-2 text-white rounded-md font-medium" style={{backgroundColor: '#1E3A8A'}}>
-                  📤 Upload Document
+                <button className="px-4 py-2 bg-374151 text-white rounded text-sm hover:bg-1E3A8A">
+                  Upload Document
                 </button>
               </div>
             )}
           </div>
         </div>
       </div>
+
+      {/* Contract Comparison Modal */}
+      {showComparisonModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg max-w-md w-full mx-4">
+            <h3 className="text-lg font-bold text-374151 mb-4">Compare Contracts</h3>
+            <p className="text-6B7280 mb-4">
+              Select exactly 2 documents to compare. Currently selected: {selectedDocuments.length}/2
+            </p>
+            
+            <div className="space-y-2 mb-4 max-h-60 overflow-y-auto">
+              {documents.map(doc => (
+                <div 
+                  key={doc.id} 
+                  className={`flex items-center p-2 rounded border cursor-pointer ${
+                    selectedDocuments.find(d => d.id === doc.id) 
+                      ? 'border-374151 bg-blue-50' 
+                      : 'border-E5E7EB hover:border-9CA3AF'
+                  }`}
+                  onClick={() => toggleDocumentSelection(doc)}
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedDocuments.find(d => d.id === doc.id) !== undefined}
+                    onChange={() => toggleDocumentSelection(doc)}
+                    className="mr-3"
+                  />
+                  <div>
+                    <p className="text-sm font-medium text-374151">{doc.name}</p>
+                    <p className="text-xs text-6B7280">{doc.category}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <div className="flex gap-3">
+              <button
+                className="flex-1 px-4 py-2 bg-374151 text-white rounded hover:bg-1E3A8A disabled:bg-gray-400"
+                onClick={handleContractComparison}
+                disabled={selectedDocuments.length !== 2 || loading.comparison}
+              >
+                {loading.comparison ? 'Comparing...' : 'Compare'}
+              </button>
+              <button
+                className="flex-1 px-4 py-2 border border-E5E7EB text-374151 rounded hover:bg-F9FAFB"
+                onClick={() => {
+                  setShowComparisonModal(false);
+                  setSelectedDocuments([]);
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Compliance Tasks Modal */}
+      {showComplianceModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg max-w-md w-full mx-4">
+            <h3 className="text-lg font-bold text-374151 mb-4">Generate Compliance Tasks</h3>
+            
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.target);
+              handleComplianceTaskGeneration(
+                formData.get('regulation'),
+                formData.get('country'),
+                formData.get('companyType')
+              );
+            }}>
+              <div className="space-y-4 mb-4">
+                <div>
+                  <label className="block text-sm font-medium text-374151 mb-1">
+                    Regulation
+                  </label>
+                  <select 
+                    name="regulation" 
+                    className="w-full px-3 py-2 border border-E5E7EB rounded focus:ring-2 focus:ring-374151"
+                    required
+                  >
+                    <option value="">Select regulation...</option>
+                    <option value="labor law">Labor Law</option>
+                    <option value="data protection">Data Protection</option>
+                    <option value="environmental law">Environmental Law</option>
+                    <option value="corporate governance">Corporate Governance</option>
+                    <option value="financial regulation">Financial Regulation</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-374151 mb-1">
+                    Country
+                  </label>
+                  <select 
+                    name="country" 
+                    className="w-full px-3 py-2 border border-E5E7EB rounded focus:ring-2 focus:ring-374151"
+                    required
+                  >
+                    <option value="">Select country...</option>
+                    <option value="INDIA">India</option>
+                    <option value="USA">United States</option>
+                    <option value="UK">United Kingdom</option>
+                    <option value="CANADA">Canada</option>
+                    <option value="AUSTRALIA">Australia</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-374151 mb-1">
+                    Company Type
+                  </label>
+                  <select 
+                    name="companyType" 
+                    className="w-full px-3 py-2 border border-E5E7EB rounded focus:ring-2 focus:ring-374151"
+                    required
+                  >
+                    <option value="">Select company type...</option>
+                    <option value="justice">Legal/Justice</option>
+                    <option value="technology">Technology</option>
+                    <option value="healthcare">Healthcare</option>
+                    <option value="finance">Finance</option>
+                    <option value="manufacturing">Manufacturing</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div className="flex gap-3">
+                <button
+                  type="submit"
+                  className="flex-1 px-4 py-2 bg-374151 text-white rounded hover:bg-1E3A8A disabled:bg-gray-400"
+                  disabled={loading.compliance}
+                >
+                  {loading.compliance ? 'Generating...' : 'Generate Tasks'}
+                </button>
+                <button
+                  type="button"
+                  className="flex-1 px-4 py-2 border border-E5E7EB text-374151 rounded hover:bg-F9FAFB"
+                  onClick={() => setShowComplianceModal(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      <style jsx>{`
+        .text-374151 { color: #374151; }
+        .text-6B7280 { color: #6B7280; }
+        .text-9CA3AF { color: #9CA3AF; }
+        .bg-374151 { background-color: #374151; }
+        .bg-F9FAFB { background-color: #F9FAFB; }
+        .border-E5E7EB { border-color: #E5E7EB; }
+        .hover\\:bg-F9FAFB:hover { background-color: #F9FAFB; }
+        .hover\\:bg-1E3A8A:hover { background-color: #1E3A8A; }
+        .focus\\:ring-374151:focus { ring-color: #374151; }
+      `}</style>
     </div>
   );
 };

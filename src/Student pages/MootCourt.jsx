@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FiCalendar, FiUsers, FiAward, FiClock } from 'react-icons/fi';
+import { FiCalendar, FiUsers, FiAward, FiClock, FiBook, FiFileText, FiVideo } from 'react-icons/fi';
 
 const MootCourt = () => {
   const [competitions] = useState([
@@ -32,69 +32,107 @@ const MootCourt = () => {
     }
   ]);
 
+  const resources = [
+    {
+      icon: FiBook,
+      title: 'Preparation Guidelines',
+      description: 'Learn how to prepare for moot court competitions'
+    },
+    {
+      icon: FiFileText,
+      title: 'Past Problems',
+      description: 'Access previous moot court problems and solutions'
+    },
+    {
+      icon: FiVideo,
+      title: 'Video Resources',
+      description: 'Watch recordings of past moot court sessions'
+    }
+  ];
+
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-semibold mb-6">Moot Court Competitions</h1>
+    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Moot Court Competitions</h1>
+          <p className="text-lg text-gray-600">Professional legal advocacy training and competitions</p>
+        </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {competitions.map(competition => (
-          <div key={competition.id} className="bg-white rounded-lg shadow-md p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-purple-100 rounded-full">
-                <FiAward className="text-purple-600 text-xl" />
-              </div>
-              <span className={`px-3 py-1 rounded-full text-sm font-medium 
-                ${competition.status === 'Upcoming' ? 'bg-yellow-100 text-yellow-800' : 
-                  'bg-green-100 text-green-800'}`}>
-                {competition.status}
-              </span>
-            </div>
+        {/* Competitions Grid */}
+        <div className="mb-16">
+          <h2 className="text-xl font-semibold text-gray-900 mb-6">Current Competitions</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {competitions.map(competition => (
+              <div key={competition.id} className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200">
+                <div className="p-6">
+                  {/* Header */}
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center">
+                      <div className="p-2 bg-purple-50 rounded-lg">
+                        <FiAward className="text-purple-600 text-lg" />
+                      </div>
+                      <span className="ml-3 text-sm font-medium text-purple-600">{competition.type}</span>
+                    </div>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium 
+                      ${competition.status === 'Upcoming' ? 'bg-yellow-100 text-yellow-800' : 
+                        'bg-green-100 text-green-800'}`}>
+                      {competition.status}
+                    </span>
+                  </div>
 
-            <h3 className="text-lg font-semibold mb-2">{competition.title}</h3>
-            <p className="text-purple-600 font-medium text-sm mb-4">{competition.type}</p>
+                  {/* Content */}
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3 line-clamp-2">{competition.title}</h3>
+                  
+                  <div className="space-y-3 mb-6">
+                    <div className="flex items-center text-gray-600 text-sm">
+                      <FiCalendar className="mr-2 text-gray-400" size={16} />
+                      <span>Competition: {competition.date}</span>
+                    </div>
+                    <div className="flex items-center text-gray-600 text-sm">
+                      <FiClock className="mr-2 text-gray-400" size={16} />
+                      <span>Register by: {competition.registrationDeadline}</span>
+                    </div>
+                    <div className="flex items-center text-gray-600 text-sm">
+                      <FiUsers className="mr-2 text-gray-400" size={16} />
+                      <span>{competition.participants} teams registered</span>
+                    </div>
+                  </div>
 
-            <div className="space-y-3 mb-6">
-              <div className="flex items-center text-gray-600">
-                <FiCalendar className="mr-2" />
-                <span>Competition Date: {competition.date}</span>
+                  {/* Actions */}
+                  <div className="flex justify-between items-center pt-4 border-t border-gray-100">
+                    <button className="text-purple-600 hover:text-purple-700 font-medium text-sm transition-colors">
+                      View Details
+                    </button>
+                    <button className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 text-sm font-medium transition-colors">
+                      Register Now
+                    </button>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center text-gray-600">
-                <FiClock className="mr-2" />
-                <span>Registration Deadline: {competition.registrationDeadline}</span>
-              </div>
-              <div className="flex items-center text-gray-600">
-                <FiUsers className="mr-2" />
-                <span>{competition.participants} Teams Participating</span>
-              </div>
-            </div>
-
-            <div className="flex justify-between items-center pt-4 border-t">
-              <button className="text-purple-600 hover:text-purple-700 font-medium">
-                View Details
-              </button>
-              <button className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700">
-                Register Now
-              </button>
-            </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </div>
 
-      <div className="mt-8 bg-purple-50 rounded-lg p-6">
-        <h2 className="text-lg font-semibold mb-4">Moot Court Resources</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <button className="p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
-            <h3 className="font-medium mb-2">Preparation Guidelines</h3>
-            <p className="text-sm text-gray-600">Learn how to prepare for moot court competitions</p>
-          </button>
-          <button className="p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
-            <h3 className="font-medium mb-2">Past Problems</h3>
-            <p className="text-sm text-gray-600">Access previous moot court problems and solutions</p>
-          </button>
-          <button className="p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
-            <h3 className="font-medium mb-2">Video Resources</h3>
-            <p className="text-sm text-gray-600">Watch recordings of past moot court sessions</p>
-          </button>
+        {/* Resources Section */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-6">Learning Resources</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {resources.map((resource, index) => (
+              <button 
+                key={index}
+                className="p-4 text-left bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
+              >
+                <div className="flex items-center mb-3">
+                  <div className="p-2 bg-purple-50 rounded-lg">
+                    <resource.icon className="text-purple-600 text-lg" />
+                  </div>
+                </div>
+                <h3 className="font-medium text-gray-900 mb-2">{resource.title}</h3>
+                <p className="text-sm text-gray-600">{resource.description}</p>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </div>

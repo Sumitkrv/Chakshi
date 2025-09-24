@@ -10,13 +10,7 @@ import {
   FiSun,
   FiChevronDown,
   FiX,
-  FiCommand,
-  FiBook,
-  FiFileText,
-  FiUsers,
-  FiCalendar,
-  FiTrendingUp,
-  FiHome
+  FiCommand
 } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -28,32 +22,6 @@ const Navbar = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showSearchSuggestions, setShowSearchSuggestions] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      title: 'Assignment Due Soon',
-      message: 'Contract Law Assignment due in 2 days',
-      time: '2 hours ago',
-      type: 'warning',
-      unread: true
-    },
-    {
-      id: 2,
-      title: 'New Course Material',
-      message: 'Criminal Law lecture notes uploaded',
-      time: '4 hours ago',
-      type: 'info',
-      unread: true
-    },
-    {
-      id: 3,
-      title: 'Exam Schedule',
-      message: 'Mid-term exams start next week',
-      time: '1 day ago',
-      type: 'info',
-      unread: false
-    }
-  ]);
 
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -63,26 +31,45 @@ const Navbar = () => {
   const notificationRef = useRef(null);
   const userMenuRef = useRef(null);
 
-  // Search suggestions based on current route
-  const searchSuggestions = [
-    { icon: <FiBook className="w-4 h-4" />, text: 'Constitutional Law', type: 'course' },
-    { icon: <FiFileText className="w-4 h-4" />, text: 'Contract Analysis Assignment', type: 'assignment' },
-    { icon: <FiUsers className="w-4 h-4" />, text: 'Study Group: Civil Procedure', type: 'group' },
-    { icon: <FiCalendar className="w-4 h-4" />, text: 'Upcoming Exams', type: 'calendar' },
-    { icon: <FiTrendingUp className="w-4 h-4" />, text: 'Performance Analytics', type: 'analytics' }
+  const notifications = [
+    {
+      id: 1,
+      title: 'Assignment Due Soon',
+      message: 'Contract Law Assignment due in 2 days',
+      time: '2 hours ago',
+      unread: true
+    },
+    {
+      id: 2,
+      title: 'New Course Material',
+      message: 'Criminal Law lecture notes uploaded',
+      time: '4 hours ago',
+      unread: true
+    },
+    {
+      id: 3,
+      title: 'Exam Schedule',
+      message: 'Mid-term exams start next week',
+      time: '1 day ago',
+      unread: false
+    }
   ];
 
-  // Get current page breadcrumb
-  const getBreadcrumb = () => {
-    const path = location.pathname;
-    const segments = path.split('/').filter(Boolean);
-    
-    if (segments.length < 2) return 'Dashboard';
-    
-    const pageMap = {
+  const searchSuggestions = [
+    { icon: '📚', text: 'Constitutional Law', type: 'course' },
+    { icon: '📝', text: 'Contract Analysis', type: 'assignment' },
+    { icon: '👥', text: 'Study Groups', type: 'group' },
+    { icon: '📅', text: 'Upcoming Exams', type: 'calendar' },
+    { icon: '📊', text: 'Performance Analytics', type: 'analytics' }
+  ];
+
+  // Get current page title for breadcrumb
+  const getPageTitle = () => {
+    const path = location.pathname.split('/').pop();
+    const pageTitles = {
       'dashboard': 'Dashboard',
       'courses': 'Courses',
-      'assignments': 'Assignments', 
+      'assignments': 'Assignments',
       'library': 'Library',
       'moot-court': 'Moot Court',
       'study-groups': 'Study Groups',
@@ -91,11 +78,10 @@ const Navbar = () => {
       'calendar': 'Calendar',
       'research': 'Research'
     };
-    
-    return pageMap[segments[segments.length - 1]] || 'Student Portal';
+    return pageTitles[path] || 'Dashboard';
   };
 
-  // Handle click outside to close dropdowns
+  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (notificationRef.current && !notificationRef.current.contains(event.target)) {
@@ -114,18 +100,15 @@ const Navbar = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Handle keyboard shortcuts
+  // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (event) => {
-      // Cmd/Ctrl + K for search
       if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
         event.preventDefault();
         searchRef.current?.focus();
         setIsSearchFocused(true);
         setShowSearchSuggestions(true);
       }
-      
-      // Escape to close dropdowns
       if (event.key === 'Escape') {
         setShowNotifications(false);
         setShowUserMenu(false);
@@ -147,61 +130,46 @@ const Navbar = () => {
     }
   }, [logout, navigate]);
 
-  const handleNotificationClick = useCallback((notificationId) => {
-    setNotifications(prev => 
-      prev.map(notif => 
-        notif.id === notificationId 
-          ? { ...notif, unread: false }
-          : notif
-      )
-    );
-  }, []);
-
-  const clearAllNotifications = useCallback(() => {
-    setNotifications(prev => prev.map(notif => ({ ...notif, unread: false })));
-  }, []);
-
-  const unreadCount = notifications.filter(n => n.unread).length;
-
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      // Implement search functionality
       console.log('Searching for:', searchQuery);
       setShowSearchSuggestions(false);
       setIsSearchFocused(false);
     }
   };
 
-  const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-    // Implement dark mode toggle logic
-  };
+  const markNotificationAsRead = useCallback((id) => {
+    // In a real app, you'd update this in your state management
+    console.log('Marking notification as read:', id);
+  }, []);
+
+  const markAllNotificationsAsRead = useCallback(() => {
+    // In a real app, you'd update this in your state management
+    console.log('Marking all notifications as read');
+  }, []);
+
+  const unreadCount = notifications.filter(n => n.unread).length;
 
   return (
-    <nav className="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+    <div className="h-16 bg-white border-b border-gray-200">
+      <div className="px-6 lg:px-8 h-full">
+        <div className="flex items-center justify-between h-full">
           
-          {/* Left Section - Breadcrumb & Search */}
+          {/* Left Section - Page Title & Search */}
           <div className="flex items-center space-x-6 flex-1">
-            {/* Breadcrumb */}
-            <div className="hidden md:flex items-center space-x-2 text-sm">
-              <FiHome className="w-4 h-4 text-gray-400" />
-              <span className="text-gray-400">/</span>
-              <span className="font-medium text-gray-700">{getBreadcrumb()}</span>
+            {/* Page Title */}
+            <div className="hidden lg:block">
+              <h1 className="text-xl font-semibold text-gray-900">{getPageTitle()}</h1>
+              <p className="text-sm text-gray-500 mt-1">Welcome back, {user?.name?.split(' ')[0] || 'Student'}</p>
             </div>
 
-            {/* Enhanced Search */}
-            <div className="relative max-w-lg w-full" ref={searchRef}>
+            {/* Search Bar */}
+            <div className="relative max-w-md w-full" ref={searchRef}>
               <form onSubmit={handleSearchSubmit}>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FiSearch className="h-4 w-4 text-gray-400" />
-                  </div>
+                  <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
-                    ref={searchRef}
-                    id="search"
                     type="search"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -209,56 +177,44 @@ const Navbar = () => {
                       setIsSearchFocused(true);
                       setShowSearchSuggestions(true);
                     }}
-                    className={`
-                      block w-full pl-10 pr-12 py-2 border border-gray-200 rounded-lg 
-                      bg-white text-gray-900 placeholder-gray-400 text-sm
-                      focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                      transition-all duration-200
-                      ${isSearchFocused ? 'ring-2 ring-blue-500 border-blue-500' : 'hover:border-gray-300'}
-                    `}
-                    placeholder="Search courses, assignments, resources..."
-                    aria-label="Search"
+                    className="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    placeholder="Search courses, assignments..."
                   />
-                  <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                    {searchQuery && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSearchQuery('');
-                          setShowSearchSuggestions(false);
-                        }}
-                        className="p-1 hover:bg-gray-100 rounded-full transition-colors mr-2"
-                      >
-                        <FiX className="w-3 h-3 text-gray-400" />
-                      </button>
-                    )}
-                    <div className="hidden sm:flex items-center space-x-1 text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded border border-gray-200">
-                      <FiCommand className="w-3 h-3" />
-                      <span>K</span>
-                    </div>
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery('')}
+                      className="absolute right-10 top-1/2 transform -translate-y-1/2 p-1 hover:bg-gray-100 rounded-lg transition-colors"
+                    >
+                      <FiX className="w-3.5 h-3.5 text-gray-400" />
+                    </button>
+                  )}
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2 hidden sm:flex items-center space-x-1 text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">
+                    <FiCommand className="w-3 h-3" />
+                    <span>K</span>
                   </div>
                 </div>
               </form>
 
-              {/* Search Suggestions Dropdown */}
+              {/* Search Suggestions */}
               {showSearchSuggestions && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 max-h-80 overflow-y-auto">
-                  {searchQuery ? (
-                    <div className="px-4 py-2">
-                      <p className="text-sm text-gray-500 mb-2">Search results for "{searchQuery}"</p>
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
+                  <div className="p-2">
+                    {searchQuery ? (
                       <div className="space-y-1">
+                        <p className="text-xs text-gray-500 px-2 py-1">Search results for "{searchQuery}"</p>
                         {searchSuggestions
                           .filter(item => item.text.toLowerCase().includes(searchQuery.toLowerCase()))
                           .map((item, index) => (
                             <button
                               key={index}
-                              className="w-full flex items-center space-x-3 px-3 py-2 hover:bg-gray-50 rounded-lg transition-colors text-left"
+                              className="w-full flex items-center space-x-3 p-2 text-left hover:bg-gray-50 rounded-lg transition-colors"
                               onClick={() => {
                                 setSearchQuery(item.text);
                                 setShowSearchSuggestions(false);
                               }}
                             >
-                              <div className="text-gray-400">{item.icon}</div>
+                              <span className="text-lg">{item.icon}</span>
                               <div>
                                 <p className="text-sm font-medium text-gray-900">{item.text}</p>
                                 <p className="text-xs text-gray-500 capitalize">{item.type}</p>
@@ -266,21 +222,19 @@ const Navbar = () => {
                             </button>
                           ))}
                       </div>
-                    </div>
-                  ) : (
-                    <div className="px-4 py-2">
-                      <p className="text-sm text-gray-500 mb-2">Quick searches</p>
+                    ) : (
                       <div className="space-y-1">
-                        {searchSuggestions.slice(0, 5).map((item, index) => (
+                        <p className="text-xs text-gray-500 px-2 py-1">Quick searches</p>
+                        {searchSuggestions.map((item, index) => (
                           <button
                             key={index}
-                            className="w-full flex items-center space-x-3 px-3 py-2 hover:bg-gray-50 rounded-lg transition-colors text-left"
+                            className="w-full flex items-center space-x-3 p-2 text-left hover:bg-gray-50 rounded-lg transition-colors"
                             onClick={() => {
                               setSearchQuery(item.text);
                               setShowSearchSuggestions(false);
                             }}
                           >
-                            <div className="text-gray-400">{item.icon}</div>
+                            <span className="text-lg">{item.icon}</span>
                             <div>
                               <p className="text-sm font-medium text-gray-900">{item.text}</p>
                               <p className="text-xs text-gray-500 capitalize">{item.type}</p>
@@ -288,48 +242,48 @@ const Navbar = () => {
                           </button>
                         ))}
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Right Section - Actions & User */}
-          <div className="flex items-center space-x-2">
+          {/* Right Section - Actions */}
+          <div className="flex items-center space-x-1">
             
             {/* Dark Mode Toggle */}
             <button
-              onClick={toggleDarkMode}
-              className="p-2 rounded-lg hover:bg-gray-50 transition-colors duration-200 group"
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              className="p-2.5 rounded-xl hover:bg-gray-100 transition-colors duration-200"
               aria-label="Toggle dark mode"
             >
               {isDarkMode ? (
-                <FiSun className="w-5 h-5 text-gray-600 group-hover:text-yellow-600" />
+                <FiSun className="w-5 h-5 text-gray-600" />
               ) : (
-                <FiMoon className="w-5 h-5 text-gray-600 group-hover:text-gray-700" />
+                <FiMoon className="w-5 h-5 text-gray-600" />
               )}
             </button>
 
             {/* Help Button */}
             <button
-              onClick={() => navigate('/student/help')}
-              className="p-2 rounded-lg hover:bg-gray-50 transition-colors duration-200 group"
+              onClick={() => navigate('/help')}
+              className="p-2.5 rounded-xl hover:bg-gray-100 transition-colors duration-200 hidden sm:block"
               aria-label="Help"
             >
-              <FiHelpCircle className="w-5 h-5 text-gray-600 group-hover:text-blue-600" />
+              <FiHelpCircle className="w-5 h-5 text-gray-600" />
             </button>
 
             {/* Notifications */}
             <div className="relative" ref={notificationRef}>
               <button
                 onClick={() => setShowNotifications(!showNotifications)}
-                className="relative p-2 rounded-lg hover:bg-gray-50 transition-colors duration-200 group"
+                className="relative p-2.5 rounded-xl hover:bg-gray-100 transition-colors duration-200"
                 aria-label="Notifications"
               >
-                <FiBell className="w-5 h-5 text-gray-600 group-hover:text-blue-600" />
+                <FiBell className="w-5 h-5 text-gray-600" />
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium animate-pulse">
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium border-2 border-white">
                     {unreadCount > 9 ? '9+' : unreadCount}
                   </span>
                 )}
@@ -337,56 +291,56 @@ const Navbar = () => {
 
               {/* Notifications Dropdown */}
               {showNotifications && (
-                <div className="absolute top-full right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-w-sm sm:max-w-md">
-                  <div className="px-4 py-3 border-b border-gray-200">
+                <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg border border-gray-200 z-50">
+                  <div className="p-4 border-b border-gray-200">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-semibold text-gray-900">Notifications</h3>
+                      <h3 className="font-semibold text-gray-900">Notifications</h3>
                       {unreadCount > 0 && (
                         <button
-                          onClick={clearAllNotifications}
-                          className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                          onClick={markAllNotificationsAsRead}
+                          className="text-sm text-blue-600 hover:text-blue-700 font-medium"
                         >
                           Mark all read
                         </button>
                       )}
                     </div>
                   </div>
-                  <div className="max-h-80 overflow-y-auto">
+                  <div className="max-h-96 overflow-y-auto">
                     {notifications.length > 0 ? (
                       notifications.map((notification) => (
                         <div
                           key={notification.id}
-                          className={`px-4 py-3 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors ${
-                            notification.unread ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
+                          className={`p-4 border-b border-gray-100 last:border-b-0 cursor-pointer hover:bg-gray-50 transition-colors ${
+                            notification.unread ? 'bg-blue-50' : ''
                           }`}
-                          onClick={() => handleNotificationClick(notification.id)}
+                          onClick={() => markNotificationAsRead(notification.id)}
                         >
                           <div className="flex justify-between items-start">
                             <div className="flex-1">
-                              <p className="text-sm font-medium text-gray-900">{notification.title}</p>
-                              <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
-                              <p className="text-xs text-gray-500 mt-2">{notification.time}</p>
+                              <p className="font-medium text-gray-900 text-sm">{notification.title}</p>
+                              <p className="text-gray-600 text-sm mt-1">{notification.message}</p>
+                              <p className="text-gray-500 text-xs mt-2">{notification.time}</p>
                             </div>
                             {notification.unread && (
-                              <div className="w-2 h-2 bg-blue-500 rounded-full ml-2 mt-1"></div>
+                              <div className="w-2 h-2 bg-blue-500 rounded-full ml-2 mt-1 flex-shrink-0"></div>
                             )}
                           </div>
                         </div>
                       ))
                     ) : (
-                      <div className="px-4 py-8 text-center">
-                        <FiBell className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                        <p className="text-sm text-gray-500">No notifications</p>
+                      <div className="p-8 text-center">
+                        <FiBell className="w-8 h-8 text-gray-400 mx-auto mb-3" />
+                        <p className="text-gray-500 text-sm">No notifications</p>
                       </div>
                     )}
                   </div>
-                  <div className="px-4 py-3 border-t border-gray-200">
+                  <div className="p-3 border-t border-gray-200">
                     <button
                       onClick={() => {
-                        navigate('/student/notifications');
+                        navigate('/notifications');
                         setShowNotifications(false);
                       }}
-                      className="w-full text-center text-sm text-blue-600 hover:text-blue-700 font-medium"
+                      className="w-full text-center text-blue-600 hover:text-blue-700 font-medium text-sm py-2"
                     >
                       View all notifications
                     </button>
@@ -399,57 +353,59 @@ const Navbar = () => {
             <div className="relative" ref={userMenuRef}>
               <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
-                className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors duration-200 group"
+                className="flex items-center space-x-3 p-1.5 rounded-xl hover:bg-gray-100 transition-colors duration-200"
               >
                 <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-blue-500 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-sm">
                   {user?.name ? user.name.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase() || 'U'}
                 </div>
-                <div className="hidden sm:block text-left">
+                <div className="hidden lg:block text-left">
                   <p className="text-sm font-medium text-gray-900">
                     {user?.name || user?.email?.split('@')[0] || 'Student'}
                   </p>
-                  <p className="text-xs text-gray-500">3L Student</p>
+                  <p className="text-xs text-gray-500">Law Student</p>
                 </div>
-                <FiChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${showUserMenu ? 'rotate-180' : ''}`} />
+                <FiChevronDown className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${
+                  showUserMenu ? 'rotate-180' : ''
+                }`} />
               </button>
 
               {/* User Dropdown */}
               {showUserMenu && (
-                <div className="absolute top-full right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-50">
+                <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-200 z-50">
                   {/* User Info */}
-                  <div className="px-4 py-3 border-b border-gray-100">
+                  <div className="p-4 border-b border-gray-200">
                     <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-blue-500 rounded-full flex items-center justify-center text-white font-semibold shadow-md">
+                      <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-blue-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
                         {user?.name ? user.name.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase() || 'U'}
                       </div>
-                      <div>
-                        <p className="text-sm font-semibold text-gray-900">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-gray-900 text-sm truncate">
                           {user?.name || user?.email?.split('@')[0] || 'Student'}
                         </p>
-                        <p className="text-xs text-gray-500">{user?.email || 'student@example.com'}</p>
-                        <p className="text-xs text-blue-600 font-medium">3L Student</p>
+                        <p className="text-gray-500 text-xs truncate">{user?.email || 'student@law.edu'}</p>
+                        <p className="text-blue-600 text-xs font-medium mt-1">Law Student</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Menu Items */}
-                  <div className="py-1">
+                  <div className="p-2">
                     <button
                       onClick={() => {
-                        navigate('/student/profile');
+                        navigate('/profile');
                         setShowUserMenu(false);
                       }}
-                      className="w-full flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      className="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
                     >
                       <FiUser className="w-4 h-4" />
-                      <span>View Profile</span>
+                      <span>Profile</span>
                     </button>
                     <button
                       onClick={() => {
-                        navigate('/student/settings');
+                        navigate('/settings');
                         setShowUserMenu(false);
                       }}
-                      className="w-full flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      className="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
                     >
                       <FiSettings className="w-4 h-4" />
                       <span>Settings</span>
@@ -457,13 +413,13 @@ const Navbar = () => {
                   </div>
 
                   {/* Logout */}
-                  <div className="border-t border-gray-100 py-1">
+                  <div className="p-2 border-t border-gray-200">
                     <button
                       onClick={() => {
                         handleLogout();
                         setShowUserMenu(false);
                       }}
-                      className="w-full flex items-center space-x-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                      className="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                     >
                       <FiLogOut className="w-4 h-4" />
                       <span>Sign out</span>
@@ -475,7 +431,7 @@ const Navbar = () => {
           </div>
         </div>
       </div>
-    </nav>
+    </div>
   );
 };
 
