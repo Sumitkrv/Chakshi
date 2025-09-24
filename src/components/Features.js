@@ -82,10 +82,10 @@ const Features = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setActiveFeature((prev) => (prev + 1) % features.length);
+      setActiveFeature((prev) => (prev + 1) % 6); // Fixed number instead of features.length
     }, 5000);
     return () => clearInterval(interval);
-  }, [features.length]);
+  }, []); // Empty dependency array
 
   const integrations = [
     { name: "Westlaw", description: "Legal research database", category: "Research" },
