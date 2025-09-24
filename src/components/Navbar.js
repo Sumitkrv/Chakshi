@@ -95,15 +95,23 @@ const Navbar = () => {
             onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleHomeClick()}
           >
             <div className="p-2 rounded-lg bg-[#F9FAFB] shadow-sm border border-[#E5E7EB] group-hover:bg-gray-50 transition-all duration-300">
-              <span className="text-lg font-bold text-[#374151]">⚖</span>
+              <img 
+               src="src/components/logo.jpeg" 
+                alt="Chakshi Logo" 
+                className="w-6 h-6 object-contain"
+                onError={(e) => {
+                  // Fallback to emoji if logo fails to load
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'inline';
+                }}
+              />
+              <span className="text-lg font-bold text-[#374151] hidden">⚖</span>
             </div>
             <div className="flex flex-col">
               <span className="text-xl font-bold text-[#374151]">
                 Chakshi
               </span>
-              <span className="text-xs text-[#6B7280] font-medium -mt-1 tracking-wide">
-                Legal Intelligence Platform
-              </span>
+              
             </div>
           </div>
 

@@ -72,7 +72,17 @@ const Navbar = () => {
           {/* Professional Logo */}
           <div className="pro-nav-brand pro-flex items-center pro-gap-3">
             <div className="pro-flex-center w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 pro-rounded-xl pro-shadow-glow pro-hover-lift">
-              <Zap className="w-6 h-6 text-white" />
+              <img 
+                src="src/components/logo.jpeg" 
+                alt="Chakshi Logo" 
+                className="w-6 h-6 object-contain"
+                onError={(e) => {
+                  // Fallback to Zap icon if logo fails to load
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'inline';
+                }}
+              />
+              <Zap className="w-6 h-6 text-white hidden" />
             </div>
             <div className="pro-flex-col">
               <span className="text-2xl font-bold pro-gradient-text bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
