@@ -156,33 +156,33 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#1E3A8A] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#FFFFFF] flex items-center justify-center p-3 md:p-4">
       
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10 pointer-events-none"></div>
       
-      <div className="w-full max-w-md relative z-10">
+      <div className="w-full max-w-md lg:max-w-lg relative z-10">
         
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-[#FFFFFF] rounded-xl flex items-center justify-center mx-auto mb-4">
-            <span className="text-[#1E3A8A] font-bold text-lg">Register</span>
+        <div className="text-center mb-6 md:mb-8">
+          <div className="w-12 h-12 md:w-16 md:h-16 bg-[#374151] border border-[#E5E7EB] rounded-xl flex items-center justify-center mx-auto mb-3 md:mb-4">
+            <span className="text-[#FFFFFF] font-bold text-sm md:text-lg">📝</span>
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">Create Your Account</h1>
-          <p className="text-base text-white opacity-90">Join our legal platform and get started</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-[#374151] mb-2">Create Your Account</h1>
+          <p className="text-sm md:text-base text-[#6B7280]">Join our legal platform and get started</p>
         </div>
 
         {/* Main Form Card */}
-        <div className="bg-white p-8 rounded-lg shadow-lg mb-6">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="bg-[#FFFFFF] border border-[#E5E7EB] p-6 md:p-8 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 mb-4 md:mb-6">
+          <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
             
             {/* Name Field */}
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="name" className="block text-sm font-medium text-[#374151] mb-2">
                 Full Name
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">Name:</span>
+                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#9CA3AF] text-xs md:text-sm">👤</span>
                 <input
                   type="text"
                   id="name"
@@ -191,7 +191,7 @@ const Register = () => {
                   onChange={handleChange}
                   required
                   placeholder="Enter your full name"
-                  className="w-full p-3 pl-16 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1E3A8A] focus:border-[#1E3A8A] transition-colors duration-200"
+                  className="w-full p-3 pl-10 md:pl-12 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#374151] focus:border-[#374151] hover:border-[#6B7280] transition-colors duration-200 text-sm md:text-base"
                   disabled={loading}
                 />
               </div>
@@ -199,11 +199,11 @@ const Register = () => {
 
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-[#374151] mb-2">
                 Email Address
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">Email:</span>
+                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#9CA3AF] text-xs md:text-sm">📧</span>
                 <input
                   type="email"
                   id="email"
@@ -212,7 +212,7 @@ const Register = () => {
                   onChange={handleChange}
                   required
                   placeholder="Enter your email address"
-                  className="w-full p-3 pl-16 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1E3A8A] focus:border-[#1E3A8A] transition-colors duration-200"
+                  className="w-full p-3 pl-10 md:pl-12 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#374151] focus:border-[#374151] hover:border-[#6B7280] transition-colors duration-200 text-sm md:text-base"
                   disabled={loading}
                 />
               </div>
@@ -220,11 +220,11 @@ const Register = () => {
 
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-[#374151] mb-2">
                 Password
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">Pass:</span>
+                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#9CA3AF] text-xs md:text-sm">🔒</span>
                 <input
                   type={showPassword ? "text" : "password"}
                   id="password"
@@ -233,16 +233,16 @@ const Register = () => {
                   onChange={handleChange}
                   required
                   placeholder="Create a password (min 6 characters)"
-                  className="w-full p-3 pl-16 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1E3A8A] focus:border-[#1E3A8A] transition-colors duration-200"
+                  className="w-full p-3 pl-10 md:pl-12 pr-12 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#374151] focus:border-[#374151] hover:border-[#6B7280] transition-colors duration-200 text-sm md:text-base"
                   disabled={loading}
                   minLength="6"
                 />
                 <button
                   type="button"
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#9CA3AF] hover:text-[#6B7280] transition-colors text-xs md:text-sm"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? "Hide" : "Show"}
+                  {showPassword ? "👁️‍🗨️" : "👁️"}
                 </button>
               </div>
               
@@ -250,7 +250,7 @@ const Register = () => {
               {formData.password && (
                 <div className="mt-2">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs text-gray-600">Password Strength</span>
+                    <span className="text-xs text-[#6B7280]">Password Strength</span>
                     <span className={`text-xs font-medium ${
                       passwordStrength.color === 'red' ? 'text-red-600' :
                       passwordStrength.color === 'yellow' ? 'text-yellow-600' : 'text-green-600'
@@ -258,7 +258,7 @@ const Register = () => {
                       {passwordStrength.text}
                     </span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-lg h-2">
+                  <div className="w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg h-2">
                     <div 
                       className={`h-2 rounded-lg transition-all duration-300 ${
                         passwordStrength.color === 'red' ? 'bg-red-500' :
@@ -273,11 +273,11 @@ const Register = () => {
 
             {/* Confirm Password Field */}
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-[#374151] mb-2">
                 Confirm Password
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">Confirm:</span>
+                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#9CA3AF] text-xs md:text-sm">🔐</span>
                 <input
                   type={showConfirmPassword ? "text" : "password"}
                   id="confirmPassword"
@@ -286,15 +286,15 @@ const Register = () => {
                   onChange={handleChange}
                   required
                   placeholder="Confirm your password"
-                  className="w-full p-3 pl-20 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1E3A8A] focus:border-[#1E3A8A] transition-colors duration-200"
+                  className="w-full p-3 pl-10 md:pl-12 pr-12 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#374151] focus:border-[#374151] hover:border-[#6B7280] transition-colors duration-200 text-sm md:text-base"
                   disabled={loading}
                 />
                 <button
                   type="button"
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#9CA3AF] hover:text-[#6B7280] transition-colors text-xs md:text-sm"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
-                  {showConfirmPassword ? "Hide" : "Show"}
+                  {showConfirmPassword ? "👁️‍🗨️" : "👁️"}
                 </button>
               </div>
               
@@ -318,33 +318,33 @@ const Register = () => {
 
             {/* Role Selection */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
+              <label className="block text-sm font-medium text-[#374151] mb-3">
                 Select Your Role
               </label>
-              <div className="space-y-3">
+              <div className="space-y-2 md:space-y-3">
                 {roles.map((role) => {
                   return (
                     <div
                       key={role.id}
-                      className={`p-4 border-2 rounded-lg cursor-pointer transition-all duration-300 ${
+                      className={`p-3 md:p-4 border-2 rounded-lg cursor-pointer transition-all duration-300 ${
                         formData.role === role.id 
-                          ? `border-[#1E3A8A] bg-blue-50 ring-2 ring-blue-200` 
-                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                          ? `border-[#374151] bg-[#F9FAFB] ring-2 ring-[#374151]/20` 
+                          : 'border-[#E5E7EB] hover:border-[#6B7280] hover:bg-[#F9FAFB]'
                       } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                       onClick={() => !loading && handleChange({ target: { name: 'role', value: role.id } })}
                     >
                       <div className="flex items-center gap-3">
-                        <div className={`w-12 h-12 bg-${formData.role === role.id ? '[#1E3A8A]' : '[#374151]'} rounded-lg flex items-center justify-center flex-shrink-0`}>
-                          <span className="text-white font-bold text-sm">{role.title.charAt(0)}</span>
+                        <div className={`w-10 h-10 md:w-12 md:h-12 ${formData.role === role.id ? 'bg-[#374151]' : 'bg-[#6B7280]'} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                          <span className="text-[#FFFFFF] font-bold text-xs md:text-sm">{role.title.charAt(0)}</span>
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center justify-between mb-1">
-                            <h4 className="text-lg font-semibold text-gray-900">{role.title}</h4>
+                            <h4 className="text-base md:text-lg font-semibold text-[#374151]">{role.title}</h4>
                             {formData.role === role.id && (
-                              <span className="text-[#1E3A8A] font-bold">✓</span>
+                              <span className="text-[#374151] font-bold">✓</span>
                             )}
                           </div>
-                          <p className="text-xs text-gray-600">{role.description}</p>
+                          <p className="text-xs md:text-sm text-[#6B7280]">{role.description}</p>
                         </div>
                       </div>
                     </div>
@@ -362,19 +362,19 @@ const Register = () => {
             {/* Submit Button */}
             <button 
               type="submit" 
-              className={`w-full p-4 bg-[#1E3A8A] text-white rounded-lg font-semibold hover:bg-[#1E3A8A]/90 transition-all duration-300 flex items-center justify-center gap-2 ${
+              className={`w-full p-3 md:p-4 bg-[#374151] text-[#FFFFFF] rounded-lg font-semibold hover:bg-[#6B7280] hover:shadow-md transition-all duration-300 flex items-center justify-center gap-2 text-sm md:text-base ${
                 loading ? 'opacity-75 cursor-not-allowed' : ''
               }`}
               disabled={loading}
             >
               {loading ? (
                 <>
-                  <span className="animate-pulse">●</span>
+                  <span className="animate-pulse">⏳</span>
                   Creating Account...
                 </>
               ) : (
                 <>
-                  Create Account
+                  🚀 Create Account
                 </>
               )}
             </button>
@@ -383,18 +383,18 @@ const Register = () => {
           {/* Error Message */}
           {error && (
             <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2">
-              <span className="text-red-500 font-bold">!</span>
+              <span className="text-red-500 font-bold">⚠️</span>
               <p className="text-sm text-red-700">{error}</p>
             </div>
           )}
         </div>
 
         {/* Login Link */}
-        <div className="text-center p-4 bg-white border border-gray-200 rounded-lg">
-          <p className="text-sm text-gray-600">
+        <div className="text-center p-3 md:p-4 bg-[#FFFFFF] border border-[#E5E7EB] rounded-lg hover:bg-[#F9FAFB] transition-colors">
+          <p className="text-xs md:text-sm text-[#6B7280]">
             Already have an account? {' '}
             <button 
-              className="text-[#1E3A8A] hover:text-[#1E3A8A]/80 font-medium hover:underline transition-colors duration-200"
+              className="text-[#374151] hover:text-[#6B7280] font-medium hover:underline transition-colors duration-200"
               onClick={() => !loading && navigate('/login')}
               disabled={loading}
             >
@@ -404,14 +404,14 @@ const Register = () => {
         </div>
 
         {/* Demo Notice */}
-        <div className="mt-6 p-4 bg-white border border-[#1E3A8A] rounded-lg">
+        <div className="mt-4 md:mt-6 p-3 md:p-4 bg-[#FFFFFF] border border-[#374151] rounded-lg hover:shadow-sm transition-all duration-300">
           <div className="flex items-start gap-3">
-            <div className="w-8 h-8 bg-[#1E3A8A] rounded-lg flex items-center justify-center flex-shrink-0">
-              <span className="text-white font-bold">i</span>
+            <div className="w-6 h-6 md:w-8 md:h-8 bg-[#374151] rounded-lg flex items-center justify-center flex-shrink-0">
+              <span className="text-[#FFFFFF] font-bold text-xs md:text-sm">ℹ️</span>
             </div>
             <div>
-              <h4 className="text-sm font-semibold text-gray-900 mb-1">Demo Mode Active</h4>
-              <p className="text-xs text-gray-700 leading-relaxed">
+              <h4 className="text-xs md:text-sm font-semibold text-[#374151] mb-1">Demo Mode Active</h4>
+              <p className="text-xs text-[#6B7280] leading-relaxed">
                 Registration will create a demo account. Fill in all fields and select your role to get started exploring the platform.
               </p>
             </div>
@@ -419,12 +419,12 @@ const Register = () => {
         </div>
 
         {/* Quick Access */}
-        <div className="mt-4 text-center">
+        <div className="mt-3 md:mt-4 text-center">
           <button 
-            className="text-sm text-white hover:text-white/80 flex items-center gap-1 mx-auto transition-colors duration-200"
+            className="text-xs md:text-sm text-[#6B7280] hover:text-[#374151] flex items-center gap-1 mx-auto transition-colors duration-200"
             onClick={() => navigate('/')}
           >
-            Back to Home
+            ← Back to Home
           </button>
         </div>
       </div>

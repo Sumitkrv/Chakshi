@@ -83,23 +83,23 @@ const StatCard = ({ stat, index, isVisible, prefersReducedMotion }) => {
   return (
     <div 
       ref={cardRef}
-      className="relative p-8 bg-white rounded-lg shadow-lg transition-all duration-300"
+      className="relative p-6 md:p-8 bg-[#FFFFFF] border border-[#E5E7EB] rounded-lg shadow-sm hover:shadow-md hover:bg-[#F9FAFB] transition-all duration-300"
       aria-label={`${stat.number} ${stat.label}`}
     >
       <div className="relative z-10">
-        <div className="w-16 h-16 bg-[#374151] rounded-lg flex items-center justify-center mx-auto mb-6">
-          <span className="text-white font-bold text-lg">{stat.symbol}</span>
+        <div className="w-12 h-12 md:w-16 md:h-16 bg-[#374151] rounded-lg flex items-center justify-center mx-auto mb-4 md:mb-6">
+          <span className="text-[#FFFFFF] font-bold text-sm md:text-lg">{stat.symbol}</span>
         </div>
         
         <div className="text-center">
           <div 
-            className="text-3xl font-bold text-[#1E3A8A] mb-2" 
+            className="text-2xl md:text-3xl font-bold text-[#374151] mb-2" 
             aria-live="polite"
           >
             {displayValue}
           </div>
-          <div className="text-xl font-semibold text-gray-900 mb-3">{stat.label}</div>
-          <p className="text-sm text-gray-600">
+          <div className="text-lg md:text-xl font-semibold text-[#374151] mb-2 md:mb-3">{stat.label}</div>
+          <p className="text-xs md:text-sm text-[#6B7280]">
             {stat.description}
           </p>
         </div>
@@ -184,28 +184,28 @@ const Stats = () => {
 
   return (
     <section 
-      className="relative min-h-screen bg-[#1E3A8A] overflow-hidden"
+      className="relative min-h-screen bg-[#FFFFFF] overflow-hidden"
       ref={statsRef}
       aria-labelledby="stats-heading"
     >
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-24">
         
         {/* Header */}
-        <div className="text-center mb-16">
-          <div className="w-16 h-16 bg-white rounded-lg flex items-center justify-center mx-auto mb-6">
-            <span className="text-[#1E3A8A] font-bold text-lg">Stats</span>
+        <div className="text-center mb-12 md:mb-16">
+          <div className="w-12 h-12 md:w-16 md:h-16 bg-[#374151] border border-[#E5E7EB] rounded-lg flex items-center justify-center mx-auto mb-4 md:mb-6">
+            <span className="text-[#FFFFFF] font-bold text-sm md:text-lg">📊</span>
           </div>
-          <h2 id="stats-heading" className="text-4xl md:text-5xl font-bold text-white mb-4">
-            <span className="text-white">Trusted</span> by Legal Professionals Nationwide
+          <h2 id="stats-heading" className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#374151] mb-4">
+            <span className="text-[#374151]">Trusted</span> by Legal Professionals Nationwide
           </h2>
-          <p className="text-xl text-white/90 max-w-3xl mx-auto mb-8">
+          <p className="text-lg md:text-xl text-[#6B7280] max-w-3xl mx-auto mb-6 md:mb-8 px-4">
             Chakshi delivers proven results for law firms of all sizes. See the impact we're making 
             in the legal industry with cutting-edge AI technology.
           </p>
         </div>
         
         {/* Main Stats Grid */}
-        <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-8 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8 mb-12 md:mb-16">
           {statsData.map((stat, index) => (
             <StatCard 
               key={index}
@@ -218,70 +218,70 @@ const Stats = () => {
         </div>
         
         {/* Additional Stats */}
-        <div className="grid md:grid-cols-4 gap-6 mb-16">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mb-12 md:mb-16">
           {additionalStats.map((stat, index) => {
             return (
-              <div key={index} className="text-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300">
-                <div className="w-12 h-12 bg-[#374151] rounded-lg flex items-center justify-center mx-auto mb-3">
-                  <span className="text-white font-bold">{stat.symbol}</span>
+              <div key={index} className="text-center p-4 md:p-6 bg-[#FFFFFF] border border-[#E5E7EB] rounded-lg shadow-sm hover:shadow-md hover:bg-[#F9FAFB] transition-all duration-300">
+                <div className="w-8 h-8 md:w-12 md:h-12 bg-[#374151] rounded-lg flex items-center justify-center mx-auto mb-2 md:mb-3">
+                  <span className="text-[#FFFFFF] font-bold text-xs md:text-sm">{stat.symbol}</span>
                 </div>
-                <div className="text-2xl font-bold text-[#1E3A8A] mb-1">{stat.value}</div>
-                <div className="text-sm text-gray-600">{stat.label}</div>
+                <div className="text-lg md:text-2xl font-bold text-[#374151] mb-1">{stat.value}</div>
+                <div className="text-xs md:text-sm text-[#6B7280]">{stat.label}</div>
               </div>
             );
           })}
         </div>
         
         {/* Trust Indicators */}
-        <div className="flex flex-wrap justify-center items-center gap-8 mb-12">
-          <div className="flex items-center gap-2 p-4 bg-white rounded-lg shadow-sm">
-            <span className="text-yellow-500 font-bold">★</span>
-            <span className="text-sm font-medium text-gray-700">4.9/5 Rating</span>
+        <div className="flex flex-wrap justify-center items-center gap-3 md:gap-6 lg:gap-8 mb-8 md:mb-12 px-4">
+          <div className="flex items-center gap-2 p-3 md:p-4 bg-[#FFFFFF] border border-[#E5E7EB] rounded-lg shadow-sm hover:bg-[#F9FAFB] hover:shadow-md transition-all duration-300">
+            <span className="text-yellow-500 font-bold text-sm md:text-base">★</span>
+            <span className="text-xs md:text-sm font-medium text-[#374151]">4.9/5 Rating</span>
           </div>
-          <div className="flex items-center gap-2 p-4 bg-white rounded-lg shadow-sm">
-            <span className="text-[#1E3A8A] font-bold">S</span>
-            <span className="text-sm font-medium text-gray-700">SOC 2 Compliant</span>
+          <div className="flex items-center gap-2 p-3 md:p-4 bg-[#FFFFFF] border border-[#E5E7EB] rounded-lg shadow-sm hover:bg-[#F9FAFB] hover:shadow-md transition-all duration-300">
+            <span className="text-[#374151] font-bold text-sm md:text-base">🔒</span>
+            <span className="text-xs md:text-sm font-medium text-[#374151]">SOC 2 Compliant</span>
           </div>
-          <div className="flex items-center gap-2 p-4 bg-white rounded-lg shadow-sm">
-            <span className="text-[#1E3A8A] font-bold">A</span>
-            <span className="text-sm font-medium text-gray-700">Industry Leading</span>
+          <div className="flex items-center gap-2 p-3 md:p-4 bg-[#FFFFFF] border border-[#E5E7EB] rounded-lg shadow-sm hover:bg-[#F9FAFB] hover:shadow-md transition-all duration-300">
+            <span className="text-[#374151] font-bold text-sm md:text-base">🏆</span>
+            <span className="text-xs md:text-sm font-medium text-[#374151]">Industry Leading</span>
           </div>
-          <div className="flex items-center gap-2 p-4 bg-white rounded-lg shadow-sm">
-            <span className="text-[#1E3A8A] font-bold">AI</span>
-            <span className="text-sm font-medium text-gray-700">AI Powered</span>
+          <div className="flex items-center gap-2 p-3 md:p-4 bg-[#FFFFFF] border border-[#E5E7EB] rounded-lg shadow-sm hover:bg-[#F9FAFB] hover:shadow-md transition-all duration-300">
+            <span className="text-[#374151] font-bold text-sm md:text-base">🤖</span>
+            <span className="text-xs md:text-sm font-medium text-[#374151]">AI Powered</span>
           </div>
         </div>
         
         {/* CTA Section */}
         <div className="text-center">
-          <h3 className="text-3xl font-bold text-white mb-4">Ready to Join These Success Stories?</h3>
-          <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+          <h3 className="text-2xl md:text-3xl font-bold text-[#374151] mb-4">Ready to Join These Success Stories?</h3>
+          <p className="text-lg md:text-xl text-[#6B7280] mb-6 md:mb-8 max-w-2xl mx-auto px-4">
             Experience the transformation that thousands of legal professionals have already discovered. 
             Start your journey with Chakshi today.
           </p>
           
-          <div className="flex flex-wrap justify-center items-center gap-4 mb-8">
-            <button className="px-6 py-3 bg-white text-[#1E3A8A] rounded-lg font-semibold hover:bg-gray-100 transition-all duration-300 flex items-center gap-2">
-              See Case Studies
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-3 md:gap-4 mb-6 md:mb-8 px-4">
+            <button className="w-full sm:w-auto px-4 py-2 md:px-6 md:py-3 bg-[#374151] text-[#FFFFFF] rounded-lg font-semibold hover:bg-[#6B7280] transition-all duration-300 flex items-center justify-center gap-2">
+              📊 See Case Studies
             </button>
-            <button className="px-6 py-3 bg-[#374151] text-white rounded-lg font-semibold hover:bg-[#374151]/90 transition-all duration-300">
-              Join the Community
+            <button className="w-full sm:w-auto px-4 py-2 md:px-6 md:py-3 bg-[#FFFFFF] border border-[#E5E7EB] text-[#374151] rounded-lg font-semibold hover:bg-[#F9FAFB] hover:border-[#374151] transition-all duration-300">
+              👥 Join the Community
             </button>
           </div>
           
           {/* Social Proof */}
-          <div className="flex flex-wrap justify-center items-center gap-6 text-sm text-white/90">
+          <div className="flex flex-wrap justify-center items-center gap-4 md:gap-6 text-xs md:text-sm text-[#9CA3AF] px-4">
             <div className="flex items-center gap-2">
-              <span className="text-green-400 font-bold">✓</span>
-              Trusted by 500+ firms
+              <span className="text-green-500 font-bold">✓</span>
+              <span>Trusted by 500+ firms</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-green-400 font-bold">✓</span>
-              99.9% uptime guarantee
+              <span className="text-green-500 font-bold">✓</span>
+              <span>99.9% uptime guarantee</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-green-400 font-bold">✓</span>
-              24/7 expert support
+              <span className="text-green-500 font-bold">✓</span>
+              <span>24/7 expert support</span>
             </div>
           </div>
         </div>

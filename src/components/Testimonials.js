@@ -155,110 +155,111 @@ const Testimonials = () => {
   const featuredTestimonial = filteredTestimonials[currentSlide];
 
   return (
-    <section className="relative min-h-screen bg-[#1E3A8A] text-[#FFFFFF] overflow-hidden">
+    <section className="relative min-h-screen bg-[#FFFFFF] text-[#374151] overflow-hidden">
       
       {/* Simple Background */}
       <div className="absolute inset-0">
         {/* Clean background without decorative elements */}
       </div>
       
-      <div className="relative z-10 pro-container pro-py-24">
+      <div className="relative z-10 pro-container pro-py-12 md:pro-py-24">
         
         {/* Header */}
-        <div className="text-center mb-16">
-          <div className="w-16 h-16 bg-[#1E3A8A] border-2 border-[#FFFFFF] pro-rounded-xl pro-flex-center mx-auto mb-6">
-            <span className="text-xl font-bold text-[#FFFFFF]">TESTIMONIALS</span>
+        <div className="text-center mb-12 md:mb-16">
+          <div className="w-12 h-12 md:w-16 md:h-16 bg-[#FFFFFF] border-2 border-[#E5E7EB] pro-rounded-xl pro-flex-center mx-auto mb-4 md:mb-6">
+            <span className="text-sm md:text-xl font-bold text-[#374151]">★</span>
           </div>
-          <h2 className="pro-heading-section text-[#FFFFFF] mb-4">
+          <h2 className="pro-heading-section text-[#374151] mb-4">
             Trusted by Legal Professionals
           </h2>
-          <p className="pro-text-lead text-[#FFFFFF] max-w-3xl mx-auto mb-8">
+          <p className="pro-text-lead text-[#6B7280] max-w-3xl mx-auto mb-6 md:mb-8 px-4">
             See what our users are saying about their experience with Chakshi Legal AI Suite. 
             Real stories from real professionals who've transformed their practice.
           </p>
           
           {/* Stats */}
-          <div className="pro-grid md:grid-cols-4 pro-gap-6 max-w-4xl mx-auto mb-12">
-            <div className="text-center pro-p-6 bg-[#FFFFFF] pro-rounded-xl border border-[#374151]">
-              <div className="pro-heading-xl font-bold text-[#1E3A8A] mb-1">{averageRating}</div>
-              <div className="pro-flex justify-center pro-gap-1 mb-2 text-[#1E3A8A]">
-                RATING
+          <div className="pro-grid grid-cols-2 md:grid-cols-4 pro-gap-3 md:pro-gap-6 max-w-4xl mx-auto mb-8 md:mb-12 px-4">
+            <div className="text-center pro-p-4 md:pro-p-6 bg-[#FFFFFF] pro-rounded-xl border border-[#E5E7EB] hover:bg-[#F9FAFB] transition-colors">
+              <div className="pro-heading-lg md:pro-heading-xl font-bold text-[#374151] mb-1">{averageRating}</div>
+              <div className="pro-flex justify-center pro-gap-1 mb-2 text-[#6B7280]">
+                ★★★★★
               </div>
-              <div className="pro-text-sm text-[#374151]">Average Rating</div>
+              <div className="pro-text-xs md:pro-text-sm text-[#9CA3AF]">Average Rating</div>
             </div>
-            <div className="text-center pro-p-6 bg-[#FFFFFF] pro-rounded-xl border border-[#374151]">
-              <div className="pro-heading-xl font-bold text-[#1E3A8A] mb-1">500+</div>
-              <div className="pro-text-sm text-[#374151]">Happy Users</div>
+            <div className="text-center pro-p-4 md:pro-p-6 bg-[#FFFFFF] pro-rounded-xl border border-[#E5E7EB] hover:bg-[#F9FAFB] transition-colors">
+              <div className="pro-heading-lg md:pro-heading-xl font-bold text-[#374151] mb-1">500+</div>
+              <div className="pro-text-xs md:pro-text-sm text-[#9CA3AF]">Happy Users</div>
             </div>
-            <div className="text-center pro-p-6 bg-[#FFFFFF] pro-rounded-xl border border-[#374151]">
-              <div className="pro-heading-xl font-bold text-[#1E3A8A] mb-1">98%</div>
-              <div className="pro-text-sm text-[#374151]">Satisfaction Rate</div>
+            <div className="text-center pro-p-4 md:pro-p-6 bg-[#FFFFFF] pro-rounded-xl border border-[#E5E7EB] hover:bg-[#F9FAFB] transition-colors">
+              <div className="pro-heading-lg md:pro-heading-xl font-bold text-[#374151] mb-1">98%</div>
+              <div className="pro-text-xs md:pro-text-sm text-[#9CA3AF]">Satisfaction Rate</div>
             </div>
-            <div className="text-center pro-p-6 bg-[#FFFFFF] pro-rounded-xl border border-[#374151]">
-              <div className="pro-heading-xl font-bold text-[#1E3A8A] mb-1">24/7</div>
-              <div className="pro-text-sm text-[#374151]">Support Available</div>
+            <div className="text-center pro-p-4 md:pro-p-6 bg-[#FFFFFF] pro-rounded-xl border border-[#E5E7EB] hover:bg-[#F9FAFB] transition-colors">
+              <div className="pro-heading-lg md:pro-heading-xl font-bold text-[#374151] mb-1">24/7</div>
+              <div className="pro-text-xs md:pro-text-sm text-[#9CA3AF]">Support Available</div>
             </div>
           </div>
         </div>
 
         {/* Featured Testimonial */}
-        <div className="mb-16 relative max-w-4xl mx-auto">
-          <div className="pro-card pro-p-8 bg-[#FFFFFF] border border-[#374151] rounded-2xl shadow-lg">
-            <div className="pro-flex flex-col md:flex-row items-start pro-gap-6">
-              <div className="w-20 h-20 bg-[#1E3A8A] pro-rounded-xl pro-flex-center text-[#FFFFFF] font-bold text-2xl flex-shrink-0">
+        <div className="mb-12 md:mb-16 relative max-w-4xl mx-auto px-4">
+          <div className="pro-card pro-p-6 md:pro-p-8 bg-[#FFFFFF] border border-[#E5E7EB] rounded-2xl shadow-sm hover:shadow-md transition-all">
+            <div className="pro-flex flex-col md:flex-row items-start pro-gap-4 md:pro-gap-6">
+              <div className="w-16 h-16 md:w-20 md:h-20 bg-[#374151] pro-rounded-xl pro-flex-center text-[#FFFFFF] font-bold text-lg md:text-2xl flex-shrink-0">
                 {featuredTestimonial.avatar}
               </div>
               
               <div className="flex-1">
-                <div className="pro-flex items-start justify-between mb-4">
+                <div className="pro-flex flex-col sm:flex-row items-start justify-between mb-4 gap-2">
                   <div>
-                    <h3 className="pro-heading-md text-[#1E3A8A]">{featuredTestimonial.name}</h3>
-                    <p className="pro-text-sm text-[#374151]">{featuredTestimonial.role} • {featuredTestimonial.company}</p>
+                    <h3 className="pro-heading-md text-[#374151]">{featuredTestimonial.name}</h3>
+                    <p className="pro-text-sm text-[#6B7280]">{featuredTestimonial.role} • {featuredTestimonial.company}</p>
                   </div>
-                  <div className="pro-flex pro-gap-1 text-[#1E3A8A]">
-                    Rating: {featuredTestimonial.rating}/5
+                  <div className="pro-flex pro-gap-1 text-[#374151]">
+                    <span className="text-sm">★★★★★</span>
+                    <span className="text-sm">({featuredTestimonial.rating}/5)</span>
                   </div>
                 </div>
                 
-                <p className="pro-text-body text-[#374151] mb-4 italic">"{featuredTestimonial.content}"</p>
+                <p className="pro-text-body text-[#6B7280] mb-4 italic">"{featuredTestimonial.content}"</p>
                 
-                <div className="pro-flex items-center pro-gap-2 mb-4">
-                  <span className="pro-text-xs px-2 py-1 bg-[#1E3A8A] text-[#FFFFFF] pro-rounded-lg font-medium">
+                <div className="pro-flex flex-wrap items-center pro-gap-2 mb-4">
+                  <span className="pro-text-xs px-2 py-1 bg-[#374151] text-[#FFFFFF] pro-rounded-lg font-medium">
                     {featuredTestimonial.highlight}
                   </span>
                   {featuredTestimonial.verified && (
-                    <div className="pro-flex items-center pro-gap-1 pro-text-xs text-[#1E3A8A]">
-                      VERIFIED USER
+                    <div className="pro-flex items-center pro-gap-1 pro-text-xs text-[#374151] font-medium">
+                      ✓ VERIFIED USER
                     </div>
                   )}
                 </div>
                 
-                <p className="pro-text-sm text-[#374151]">{featuredTestimonial.detailed.substring(0, 120)}...</p>
+                <p className="pro-text-sm text-[#9CA3AF]">{featuredTestimonial.detailed.substring(0, 120)}...</p>
               </div>
             </div>
           </div>
           
           {/* Carousel Controls */}
-          <div className="pro-flex items-center justify-center mt-6 pro-gap-4">
+          <div className="pro-flex items-center justify-center mt-6 pro-gap-2 md:pro-gap-4 flex-wrap">
             <button 
               onClick={prevSlide}
-              className="px-4 py-2 pro-flex-center bg-[#FFFFFF] pro-rounded border border-[#374151] hover:bg-[#1E3A8A] hover:text-[#FFFFFF] transition-all"
+              className="px-3 py-2 md:px-4 md:py-2 pro-flex-center bg-[#FFFFFF] pro-rounded border border-[#E5E7EB] hover:bg-[#F9FAFB] hover:border-[#374151] text-[#374151] transition-all text-sm"
             >
-              Previous
+              ← Previous
             </button>
             
             <button 
               onClick={toggleAutoPlay}
-              className="px-4 py-2 pro-flex-center bg-[#FFFFFF] pro-rounded border border-[#374151] hover:bg-[#1E3A8A] hover:text-[#FFFFFF] transition-all"
+              className="px-3 py-2 md:px-4 md:py-2 pro-flex-center bg-[#FFFFFF] pro-rounded border border-[#E5E7EB] hover:bg-[#F9FAFB] hover:border-[#374151] text-[#374151] transition-all text-sm"
             >
-              {isAutoPlaying ? "Pause" : "Play"}
+              {isAutoPlaying ? "⏸ Pause" : "▶ Play"}
             </button>
             
             <button 
               onClick={nextSlide}
-              className="px-4 py-2 pro-flex-center bg-[#FFFFFF] pro-rounded border border-[#374151] hover:bg-[#1E3A8A] hover:text-[#FFFFFF] transition-all"
+              className="px-3 py-2 md:px-4 md:py-2 pro-flex-center bg-[#FFFFFF] pro-rounded border border-[#E5E7EB] hover:bg-[#F9FAFB] hover:border-[#374151] text-[#374151] transition-all text-sm"
             >
-              Next
+              Next →
             </button>
           </div>
           
@@ -269,7 +270,7 @@ const Testimonials = () => {
                 key={index}
                 onClick={() => setCurrentSlide(index)}
                 className={`w-2 h-2 pro-rounded-full transition-all ${
-                  index === currentSlide ? 'bg-[#FFFFFF] w-6' : 'bg-[#FFFFFF]/50'
+                  index === currentSlide ? 'bg-[#374151] w-6' : 'bg-[#E5E7EB]'
                 }`}
               />
             ))}
@@ -277,24 +278,24 @@ const Testimonials = () => {
         </div>
 
         {/* Category Filters */}
-        <div className="pro-flex justify-center mb-12">
-          <div className="pro-flex flex-wrap items-center pro-gap-3 pro-p-2 bg-[#FFFFFF] pro-rounded-xl border border-[#374151]">
+        <div className="pro-flex justify-center mb-8 md:mb-12 px-4">
+          <div className="pro-flex flex-wrap items-center pro-gap-2 md:pro-gap-3 pro-p-2 bg-[#FFFFFF] pro-rounded-xl border border-[#E5E7EB] max-w-full overflow-x-auto">
             {categories.map((category) => {
               return (
                 <button
                   key={category.id}
-                  className={`pro-flex items-center pro-gap-2 px-4 py-2 pro-rounded-lg transition-all ${
+                  className={`pro-flex items-center pro-gap-1 md:pro-gap-2 px-2 py-1 md:px-4 md:py-2 pro-rounded-lg transition-all text-xs md:text-sm whitespace-nowrap ${
                     activeCategory === category.id 
-                      ? 'bg-[#1E3A8A] text-[#FFFFFF]' 
-                      : 'text-[#374151] hover:text-[#1E3A8A] hover:bg-[#FFFFFF]'
+                      ? 'bg-[#374151] text-[#FFFFFF]' 
+                      : 'text-[#6B7280] hover:text-[#374151] hover:bg-[#F9FAFB]'
                   }`}
                   onClick={() => handleCategoryClick(category.id)}
                 >
                   <span className="font-medium">{category.name}</span>
-                  <span className={`pro-text-xs px-2 py-0.5 pro-rounded-lg font-semibold ${
+                  <span className={`pro-text-xs px-1.5 py-0.5 md:px-2 md:py-0.5 pro-rounded-lg font-semibold ${
                     activeCategory === category.id 
-                      ? 'bg-[#1E3A8A] text-[#FFFFFF] border border-[#FFFFFF]' 
-                      : 'bg-[#FFFFFF] text-[#374151] border border-[#374151]'
+                      ? 'bg-[#6B7280] text-[#FFFFFF]' 
+                      : 'bg-[#F9FAFB] text-[#6B7280] border border-[#E5E7EB]'
                   }`}>
                     {category.count}
                   </span>
@@ -305,11 +306,11 @@ const Testimonials = () => {
         </div>
 
         {/* Testimonials Grid */}
-        <div className="pro-grid lg:grid-cols-3 md:grid-cols-2 pro-gap-8 mb-16">
+        <div className="pro-grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 pro-gap-4 md:pro-gap-6 lg:pro-gap-8 mb-12 md:mb-16 px-4">
           {filteredTestimonials.map((testimonial) => (
             <div 
               key={testimonial.id} 
-              className={`relative group cursor-pointer transition-all h-96 ${
+              className={`relative group cursor-pointer transition-all h-80 md:h-96 ${
                 flippedCard === testimonial.id ? '[transform:rotateY(180deg)]' : ''
               }`}
               style={{ transformStyle: 'preserve-3d', perspective: '1000px' }}
@@ -317,44 +318,44 @@ const Testimonials = () => {
             >
               {/* Card Front */}
               <div className="absolute inset-0 w-full h-full [backface-visibility:hidden]">
-                <div className="h-full pro-card pro-p-6 bg-[#FFFFFF] border border-[#374151] hover:shadow-lg transition-all flex flex-col">
+                <div className="h-full pro-card pro-p-4 md:pro-p-6 bg-[#FFFFFF] border border-[#E5E7EB] hover:shadow-md hover:bg-[#F9FAFB] transition-all flex flex-col">
                   <div className="pro-flex items-start justify-between mb-4">
-                    <div className="w-12 h-12 bg-[#1E3A8A] pro-rounded-xl pro-flex-center text-[#FFFFFF] font-bold">
+                    <div className="w-10 h-10 md:w-12 md:h-12 bg-[#374151] pro-rounded-xl pro-flex-center text-[#FFFFFF] font-bold text-sm">
                       {testimonial.avatar}
                     </div>
-                    <div className="text-[#1E3A8A] font-bold">QUOTE</div>
+                    <div className="text-[#374151] font-bold text-xs md:text-sm">★★★★★</div>
                   </div>
                   
-                  <p className="pro-text-body text-[#374151] mb-6 leading-relaxed flex-grow">
+                  <p className="pro-text-sm md:pro-text-body text-[#6B7280] mb-4 md:mb-6 leading-relaxed flex-grow line-clamp-4">
                     "{testimonial.content}"
                   </p>
                   
-                  <div className="pro-flex items-center justify-between mb-4">
-                    <div className="pro-text-sm font-medium text-[#1E3A8A]">
-                      Rating: {testimonial.rating}/5
+                  <div className="pro-flex items-center justify-between mb-3 md:mb-4">
+                    <div className="pro-text-xs md:pro-text-sm font-medium text-[#374151]">
+                      {testimonial.rating}/5 Rating
                     </div>
                     {testimonial.verified && (
-                      <div className="pro-flex items-center pro-gap-1 pro-text-xs text-[#1E3A8A] font-bold">
-                        VERIFIED
+                      <div className="pro-flex items-center pro-gap-1 pro-text-xs text-[#374151] font-medium">
+                        ✓ VERIFIED
                       </div>
                     )}
                   </div>
                   
-                  <div className="border-t border-[#374151] pt-4">
+                  <div className="border-t border-[#E5E7EB] pt-3 md:pt-4">
                     <div className="pro-flex items-center justify-between">
                       <div>
-                        <h4 className="pro-heading-sm text-[#1E3A8A]">{testimonial.name}</h4>
-                        <p className="pro-text-xs text-[#374151]">{testimonial.role}</p>
-                        <p className="pro-text-xs text-[#374151]">{testimonial.location}</p>
+                        <h4 className="pro-heading-sm text-[#374151] text-sm md:text-base">{testimonial.name}</h4>
+                        <p className="pro-text-xs text-[#6B7280]">{testimonial.role}</p>
+                        <p className="pro-text-xs text-[#9CA3AF]">{testimonial.location}</p>
                       </div>
                       <div className="text-right">
-                        <p className="pro-text-xs text-[#374151] font-medium">{testimonial.company}</p>
-                        <p className="pro-text-xs text-[#374151]">{testimonial.experience}</p>
+                        <p className="pro-text-xs text-[#6B7280] font-medium">{testimonial.company}</p>
+                        <p className="pro-text-xs text-[#9CA3AF]">{testimonial.experience}</p>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="mt-4 pro-flex items-center justify-center pro-text-xs text-[#1E3A8A]">
+                  <div className="mt-3 md:mt-4 pro-flex items-center justify-center pro-text-xs text-[#9CA3AF] hover:text-[#374151] transition-colors">
                     Click for detailed review →
                   </div>
                 </div>
@@ -362,45 +363,45 @@ const Testimonials = () => {
               
               {/* Card Back */}
               <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] overflow-y-auto">
-                <div className="h-full pro-card pro-p-6 bg-[#FFFFFF] border border-[#374151] hover:shadow-lg transition-all">
+                <div className="h-full pro-card pro-p-4 md:pro-p-6 bg-[#FFFFFF] border border-[#E5E7EB] hover:shadow-md transition-all">
                   <div className="pro-flex items-start justify-between mb-4">
-                    <div className="w-12 h-12 bg-[#1E3A8A] pro-rounded-xl pro-flex-center text-[#FFFFFF] font-bold">
+                    <div className="w-10 h-10 md:w-12 md:h-12 bg-[#374151] pro-rounded-xl pro-flex-center text-[#FFFFFF] font-bold text-sm">
                       {testimonial.avatar}
                     </div>
                     <button 
-                      className="px-3 py-1 pro-flex-center bg-[#1E3A8A] text-[#FFFFFF] pro-rounded-lg"
+                      className="px-2 py-1 md:px-3 md:py-1 pro-flex-center bg-[#374151] text-[#FFFFFF] pro-rounded-lg text-xs hover:bg-[#6B7280] transition-colors"
                       onClick={(e) => {
                         e.stopPropagation();
                         setFlippedCard(null);
                       }}
                     >
-                      Back
+                      ← Back
                     </button>
                   </div>
                   
-                  <h3 className="pro-heading-md text-[#1E3A8A] mb-3">Detailed Experience</h3>
-                  <p className="pro-text-sm text-[#374151] mb-6 leading-relaxed">
+                  <h3 className="pro-heading-md text-[#374151] mb-3 text-sm md:text-base">Detailed Experience</h3>
+                  <p className="pro-text-xs md:pro-text-sm text-[#6B7280] mb-4 md:mb-6 leading-relaxed">
                     {testimonial.detailed}
                   </p>
                   
-                  <div className="pro-flex items-center justify-between mb-4">
-                    <div className="pro-text-sm font-medium text-[#1E3A8A]">
-                      Rating: {testimonial.rating}/5
+                  <div className="pro-flex items-center justify-between mb-3 md:mb-4">
+                    <div className="pro-text-xs md:pro-text-sm font-medium text-[#374151]">
+                      ★★★★★ ({testimonial.rating}/5)
                     </div>
-                    <span className="pro-text-xs px-2 py-1 bg-[#1E3A8A] text-[#FFFFFF] pro-rounded-lg font-medium">
+                    <span className="pro-text-xs px-2 py-1 bg-[#374151] text-[#FFFFFF] pro-rounded-lg font-medium">
                       {testimonial.category}
                     </span>
                   </div>
                   
-                  <div className="border-t border-[#374151] pt-4">
+                  <div className="border-t border-[#E5E7EB] pt-3 md:pt-4">
                     <div className="pro-flex items-center justify-between">
                       <div>
-                        <h4 className="pro-heading-sm text-[#1E3A8A]">{testimonial.name}</h4>
-                        <p className="pro-text-xs text-[#374151]">{testimonial.role}</p>
+                        <h4 className="pro-heading-sm text-[#374151] text-sm">{testimonial.name}</h4>
+                        <p className="pro-text-xs text-[#6B7280]">{testimonial.role}</p>
                       </div>
                       {testimonial.verified && (
-                        <div className="pro-text-xs text-[#1E3A8A] bg-[#FFFFFF] border border-[#1E3A8A] px-2 py-1 pro-rounded-lg font-bold">
-                          VERIFIED REVIEW
+                        <div className="pro-text-xs text-[#374151] bg-[#F9FAFB] border border-[#E5E7EB] px-2 py-1 pro-rounded-lg font-medium">
+                          ✓ VERIFIED
                         </div>
                       )}
                     </div>
@@ -412,26 +413,26 @@ const Testimonials = () => {
         </div>
 
         {/* CTA Section */}
-        <div className="bg-[#FFFFFF] border border-[#374151] pro-rounded-xl pro-p-8 text-center relative overflow-hidden">
+        <div className="bg-[#FFFFFF] border border-[#E5E7EB] pro-rounded-xl pro-p-6 md:pro-p-8 text-center relative overflow-hidden mx-4 hover:bg-[#F9FAFB] transition-colors">
           <div className="relative z-10">
-            <div className="w-16 h-16 bg-[#1E3A8A] pro-rounded-xl pro-flex-center mx-auto mb-6">
-              <span className="text-[#FFFFFF] font-bold">JOIN</span>
+            <div className="w-12 h-12 md:w-16 md:h-16 bg-[#374151] pro-rounded-xl pro-flex-center mx-auto mb-4 md:mb-6">
+              <span className="text-[#FFFFFF] font-bold text-sm md:text-base">✨</span>
             </div>
-            <h3 className="pro-heading-xl text-[#1E3A8A] mb-4">Join Our Community</h3>
-            <p className="pro-text-body text-[#374151] mb-6 max-w-2xl mx-auto">
+            <h3 className="pro-heading-lg md:pro-heading-xl text-[#374151] mb-4">Join Our Community</h3>
+            <p className="pro-text-sm md:pro-text-body text-[#6B7280] mb-4 md:mb-6 max-w-2xl mx-auto">
               Be part of the growing community of legal professionals who are transforming their practice with AI. 
               Your success story could be next!
             </p>
-            <div className="pro-flex flex-wrap justify-center items-center pro-gap-4">
-              <button className="pro-btn pro-btn-primary bg-[#1E3A8A] border-0 hover:bg-[#1E3A8A]/80 transition-all text-[#FFFFFF]">
+            <div className="pro-flex flex-col sm:flex-row justify-center items-center pro-gap-3 md:pro-gap-4">
+              <button className="w-full sm:w-auto pro-btn pro-btn-primary bg-[#374151] border-0 hover:bg-[#6B7280] transition-all text-[#FFFFFF] px-4 py-2 md:px-6 md:py-3">
                 Start Your Free Trial →
               </button>
-              <button className="pro-btn pro-btn-ghost border border-[#374151] hover:border-[#1E3A8A] text-[#374151] hover:text-[#1E3A8A]">
+              <button className="w-full sm:w-auto pro-btn pro-btn-ghost border border-[#E5E7EB] hover:border-[#374151] hover:bg-[#F9FAFB] text-[#6B7280] hover:text-[#374151] px-4 py-2 md:px-6 md:py-3">
                 Read More Reviews
               </button>
             </div>
             
-            <div className="mt-6 pro-flex flex-wrap justify-center items-center pro-gap-6 pro-text-sm text-[#374151]">
+            <div className="mt-4 md:mt-6 pro-flex flex-wrap justify-center items-center pro-gap-3 md:pro-gap-6 pro-text-xs md:pro-text-sm text-[#9CA3AF]">
               <div className="pro-flex items-center pro-gap-2">
                 ✓ No credit card required
               </div>

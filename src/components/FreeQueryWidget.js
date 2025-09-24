@@ -18,7 +18,6 @@ const FreeQueryWidget = () => {
   const [queryStartTime, setQueryStartTime] = useState(null);
   const recognitionRef = useRef(null);
   const textareaRef = useRef(null);
-  // const widgetRef = useRef(null);
   const responseRef = useRef(null);
 
   // Enhanced quick question templates with categories and metadata
@@ -91,10 +90,10 @@ const FreeQueryWidget = () => {
 
   // Legal statistics for display
   const legalStats = [
-    { label: "Cases Analyzed", value: "2.5M+", text: "Database", color: "text-white" },
-    { label: "Accuracy Rate", value: "96.8%", text: "Accuracy", color: "text-white" },
-    { label: "Response Time", value: "<30sec", text: "Speed", color: "text-white" },
-    { label: "Legal Experts", value: "500+", text: "Experts", color: "text-white" }
+    { label: "Cases Analyzed", value: "2.5M+", text: "Database", color: "text-gray-900" },
+    { label: "Accuracy Rate", value: "96.8%", text: "Accuracy", color: "text-gray-900" },
+    { label: "Response Time", value: "<30sec", text: "Speed", color: "text-gray-900" },
+    { label: "Legal Experts", value: "500+", text: "Experts", color: "text-gray-900" }
   ];
 
   // Auto-resize textarea
@@ -115,7 +114,7 @@ const FreeQueryWidget = () => {
   useEffect(() => {
     if (response && response.confidence > 0) {
       let current = 0;
-      const increment = response.confidence / 30; // 30 frames animation
+      const increment = response.confidence / 30;
       const timer = setInterval(() => {
         current += increment;
         if (current >= response.confidence) {
@@ -145,7 +144,7 @@ const FreeQueryWidget = () => {
       case "time":
         return a.estimatedTime.localeCompare(b.estimatedTime);
       default:
-        return b.popularity - a.popularity; // Default to popularity
+        return b.popularity - a.popularity;
     }
   });
 
@@ -157,36 +156,17 @@ const FreeQueryWidget = () => {
     setQueryStartTime(Date.now());
     setConfidence(0);
     
-    // Add to query history
     const newQuery = {
       id: Date.now(),
       text: query.trim(),
       timestamp: new Date().toISOString(),
-      category: "Unknown", // Would be determined by AI
+      category: "Unknown",
       language: language
     };
-    setQueryHistory(prev => [newQuery, ...prev.slice(0, 9)]); // Keep last 10 queries
-    
-    // Simulate more realistic API call with progress updates
-    const processingSteps = [
-      "Analyzing your legal question...",
-      "Searching relevant case laws...",
-      "Cross-referencing legal databases...", 
-      "Consulting AI legal experts...",
-      "Preparing comprehensive response..."
-    ];
-    
-    let stepIndex = 0;
-    const stepInterval = setInterval(() => {
-      if (stepIndex < processingSteps.length - 1) {
-        stepIndex++;
-      }
-    }, 500);
+    setQueryHistory(prev => [newQuery, ...prev.slice(0, 9)]);
     
     setTimeout(() => {
-      clearInterval(stepInterval);
       setIsLoading(false);
-      
       const queryTime = ((Date.now() - queryStartTime) / 1000).toFixed(1);
       
       setResponse({
@@ -198,31 +178,26 @@ const FreeQueryWidget = () => {
           "Civil Procedure Code, 1908 - Legal Procedures",
           "Indian Contract Act, 1872 - Agreement Enforcement"
         ],
-        confidence: Math.floor(Math.random() * 8) + 92, // 92-99% confidence
+        confidence: Math.floor(Math.random() * 8) + 92,
         category: "Multi-jurisdictional",
         complexity: "Intermediate",
         processingTime: queryTime,
-        aiAgentsConsulted: Math.floor(Math.random() * 3) + 3, // 3-5 agents
-        casesSimilar: Math.floor(Math.random() * 500) + 100, // 100-599 similar cases
+        aiAgentsConsulted: Math.floor(Math.random() * 3) + 3,
+        casesSimilar: Math.floor(Math.random() * 500) + 100,
         lastUpdated: "Based on laws current as of " + new Date().toLocaleDateString()
       });
       setRemainingQueries(prev => prev - 1);
       setQuery("");
       setIsExpanded(true);
       
-      // Scroll to response
       setTimeout(() => {
-        responseRef.current?.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'start' 
-        });
+        responseRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 100);
     }, 2800);
   };
 
   const handleQuickQuestion = (question) => {
     setQuery(question.text);
-    // Auto-focus textarea after setting question
     setTimeout(() => {
       textareaRef.current?.focus();
     }, 100);
@@ -262,24 +237,14 @@ const FreeQueryWidget = () => {
       recognitionRef.current.interimResults = false;
       recognitionRef.current.continuous = false;
       
-      recognitionRef.current.onstart = () => {
-        setIsRecording(true);
-      };
-      
+      recognitionRef.current.onstart = () => setIsRecording(true);
       recognitionRef.current.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
         setQuery(prev => prev + (prev ? ' ' : '') + transcript);
         setIsRecording(false);
       };
-      
-      recognitionRef.current.onerror = (event) => {
-        console.error('Speech recognition error', event.error);
-        setIsRecording(false);
-      };
-      
-      recognitionRef.current.onend = () => {
-        setIsRecording(false);
-      };
+      recognitionRef.current.onerror = () => setIsRecording(false);
+      recognitionRef.current.onend = () => setIsRecording(false);
       
       try {
         recognitionRef.current.start();
@@ -296,13 +261,8 @@ const FreeQueryWidget = () => {
     }
   };
 
-  const clearQuery = () => {
-    setQuery("");
-  };
-
-  const toggleExpand = () => {
-    setIsExpanded(!isExpanded);
-  };
+  const clearQuery = () => setQuery("");
+  const toggleExpand = () => setIsExpanded(!isExpanded);
 
   const copyResponse = () => {
     if (response) {
@@ -314,187 +274,126 @@ const FreeQueryWidget = () => {
 
   const getCategoryColor = (category) => {
     switch (category) {
-      case 'Property': return 'bg-blue-500/20 text-blue-300 border-blue-400/30';
-      case 'Civil': return 'bg-purple-500/20 text-purple-300 border-purple-400/30';
-      case 'Consumer': return 'bg-green-500/20 text-green-300 border-green-400/30';
-      default: return 'bg-white/20 text-white/80 border-white/30';
+      case 'Property': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'Civil': return 'bg-purple-100 text-purple-800 border-purple-200';
+      case 'Consumer': return 'bg-green-100 text-green-800 border-green-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
   const getDifficultyColor = (difficulty) => {
     switch (difficulty) {
-      case 'Beginner': return 'bg-green-500/20 text-green-300';
-      case 'Intermediate': return 'bg-yellow-500/20 text-yellow-300';
-      case 'Advanced': return 'bg-red-500/20 text-red-300';
-      default: return 'bg-white/20 text-white/80';
+      case 'Beginner': return 'bg-green-100 text-green-800';
+      case 'Intermediate': return 'bg-yellow-100 text-yellow-800';
+      case 'Advanced': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
 
   return (
-    <section className="relative overflow-hidden" style={{background: '#1E3A8A', minHeight: '100vh'}}>
+    <section className="min-h-screen bg-white">
       {/* Enhanced Background Effects */}
-      <div className="absolute inset-0">
-        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-96 h-96 bg-white/5 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-0 right-0 w-64 h-64 bg-white/3 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute top-1/4 left-0 w-48 h-48 bg-white/4 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }}></div>
-        
-        {/* Grid pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(55,65,81,0.3)_1px,transparent_1px),linear-gradient(to_bottom,rgba(55,65,81,0.3)_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-20"></div>
-      </div>
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100"></div>
       
-      <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-20">{/* widgetRef removed */}
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
         
         {/* Enhanced Header with Stats */}
-        <div className="text-center mb-16">
-          <div className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-8" style={{backgroundColor: '#374151', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'}}>
-            <div className="text-white text-2xl font-bold">AI</div>
+        <div className="text-center mb-8 sm:mb-12 lg:mb-16">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white border border-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <div className="text-2xl sm:text-3xl">⚖️</div>
           </div>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 sm:mb-6">
             AI-Powered Legal Expert
-            <span className="block text-lg font-normal text-white/80 mt-2">
-              Get instant, comprehensive legal guidance in seconds
-            </span>
           </h2>
-          <p className="text-lg md:text-xl leading-relaxed text-white/80 max-w-4xl mx-auto">
-            Ask any legal question in plain English or Tamil. Our advanced AI analyzes your query 
-            using machine learning, thousands of case precedents, and current legal statutes to provide 
-            expert-level guidance with actionable recommendations.
+          <p className="text-lg sm:text-xl text-gray-600 max-w-4xl mx-auto mb-8 sm:mb-12">
+            Get instant, comprehensive legal guidance in seconds. Ask any legal question in plain English or Tamil.
           </p>
           
           {/* Live Stats Display */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-12 max-w-4xl mx-auto">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-4xl mx-auto">
             {legalStats.map((stat, index) => (
               <div 
                 key={index}
-                className={`backdrop-blur-xl border rounded-2xl p-6 text-center transform transition-all duration-700 hover:scale-105 ${
+                className={`bg-white border border-gray-200 rounded-xl p-4 sm:p-6 text-center transition-all duration-300 hover:shadow-lg ${
                   animateStats ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
                 }`}
-                style={{ 
-                  backgroundColor: 'rgba(55, 65, 81, 0.2)', 
-                  borderColor: 'rgba(55, 65, 81, 0.3)',
-                  transitionDelay: `${index * 150}ms`,
-                  boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
-                }}
+                style={{ transitionDelay: `${index * 150}ms` }}
               >
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3" style={{backgroundColor: 'rgba(55, 65, 81, 0.3)'}}>
-                  <span className="text-white font-semibold text-sm">{stat.text}</span>
-                </div>
-                <div className="text-2xl font-bold text-white mb-1">{stat.value}</div>
-                <div className="text-sm text-white/70">{stat.label}</div>
+                <div className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{stat.value}</div>
+                <div className="text-sm text-gray-600">{stat.label}</div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Enhanced Query Counter with Progress Ring */}
-        <div className="backdrop-blur-xl border rounded-2xl p-8 mb-10" style={{backgroundColor: 'rgba(55, 65, 81, 0.2)', borderColor: 'rgba(55, 65, 81, 0.3)', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'}}>
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-white flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{backgroundColor: '#374151'}}>
-                <span className="text-white text-sm font-bold">⚡</span>
-              </div>
-              Free Query Balance
-            </h3>
+        {/* Enhanced Query Counter */}
+        <div className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-8 mb-6 sm:mb-8 shadow-sm">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+              <h3 className="text-lg font-bold text-gray-900 mb-2">Free Query Balance</h3>
+              <p className="text-gray-600">{remainingQueries} of 5 queries remaining today</p>
+            </div>
             <div className="flex items-center gap-4">
               <div className="relative w-16 h-16">
                 <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 36 36">
-                  <path
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    fill="none"
-                    stroke="#374151"
-                    strokeWidth="3"
-                  />
-                  <path
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    fill="none"
-                    stroke={remainingQueries >= 4 ? "#FFFFFF" : remainingQueries >= 2 ? "#FFFFFF" : "#FFFFFF"}
-                    strokeWidth="3"
-                    strokeDasharray={`${(remainingQueries / 5) * 100}, 100`}
-                    className="transition-all duration-500"
-                  />
+                  <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
+                    fill="none" stroke="#E5E7EB" strokeWidth="3" />
+                  <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
+                    fill="none" stroke="#374151" strokeWidth="3" 
+                    strokeDasharray={`${(remainingQueries / 5) * 100}, 100`} />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-lg font-bold text-white">{remainingQueries}</span>
+                  <span className="text-lg font-bold text-gray-900">{remainingQueries}</span>
                 </div>
               </div>
-              <div>
-                <div className="text-sm font-semibold text-white/90 mb-1">
-                  {remainingQueries} of 5 remaining
-                </div>
-                <div className="text-xs text-white/70">
-                  Resets every 24 hours
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="relative">
-            <div className="w-full rounded-full h-3" style={{backgroundColor: '#374151'}}>
-              <div 
-                className={`h-3 rounded-full transition-all duration-500 relative overflow-hidden`}
-                style={{ 
-                  width: `${(remainingQueries / 5) * 100}%`,
-                  background: '#FFFFFF'
-                }}
-              >
-                <div className="absolute inset-0 bg-white/30 animate-pulse"></div>
-              </div>
-            </div>
-            <div className="flex justify-between text-xs text-white/70 mt-2">
-              <span>0 queries</span>
-              <span className="flex items-center gap-1">
-                <span className="text-yellow-400">👑</span>
-                Upgrade for unlimited
-              </span>
             </div>
           </div>
         </div>
 
         {/* Enhanced Main Query Interface */}
-        <div className="backdrop-blur-xl border rounded-2xl p-8 mb-10" style={{backgroundColor: 'rgba(55, 65, 81, 0.2)', borderColor: 'rgba(55, 65, 81, 0.3)', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'}}>
+        <div className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-8 mb-6 sm:mb-8 shadow-sm">
           
-          {/* Language Toggle with Enhanced Design */}
-          <div className="flex items-center justify-center mb-8">
-            <div className="flex rounded-2xl p-1" style={{backgroundColor: '#374151'}}>
+          {/* Language Toggle */}
+          <div className="flex justify-center mb-6 sm:mb-8">
+            <div className="flex bg-gray-100 rounded-2xl p-1">
               <button
                 type="button"
-                className={`flex items-center gap-2 px-6 py-3 rounded-xl transition-all duration-300 ${
+                className={`flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-xl transition-all duration-200 ${
                   language === 'english' 
-                    ? 'bg-white text-blue-600 shadow-lg transform scale-105' 
-                    : 'text-white/80 hover:text-white hover:bg-white/10'
+                    ? 'bg-white text-gray-900 shadow-sm' 
+                    : 'text-gray-600 hover:text-gray-900'
                 }`}
                 onClick={() => setLanguage('english')}
               >
-                <span className="text-sm">🌐</span>
+                <span>🌐</span>
                 <span className="font-medium">English</span>
               </button>
               <button
                 type="button"
-                className={`flex items-center gap-2 px-6 py-3 rounded-xl transition-all duration-300 ${
+                className={`flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-xl transition-all duration-200 ${
                   language === 'tamil' 
-                    ? 'bg-white text-blue-600 shadow-lg transform scale-105' 
-                    : 'text-white/80 hover:text-white hover:bg-white/10'
+                    ? 'bg-white text-gray-900 shadow-sm' 
+                    : 'text-gray-600 hover:text-gray-900'
                 }`}
                 onClick={() => setLanguage('tamil')}
               >
-                <span className="text-sm">🌐</span>
+                <span>🌐</span>
                 <span className="font-medium">தமிழ்</span>
               </button>
             </div>
           </div>
 
           {/* Category Filter and Sort */}
-          <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
             <div className="flex items-center gap-3">
-              <span className="text-white/80 text-sm font-medium">Filter</span>
+              <span className="text-gray-700 text-sm font-medium">Filter:</span>
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="rounded-xl border px-3 py-2 text-sm focus:ring-2 focus:ring-white/50 focus:border-white/50"
-                style={{backgroundColor: '#374151', borderColor: 'rgba(255, 255, 255, 0.3)', color: '#FFFFFF'}}
+                className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 {categories.map(category => (
-                  <option key={category.id} value={category.id} style={{backgroundColor: '#374151', color: '#FFFFFF'}}>
+                  <option key={category.id} value={category.id}>
                     {category.name} ({category.count})
                   </option>
                 ))}
@@ -502,74 +401,70 @@ const FreeQueryWidget = () => {
             </div>
             
             <div className="flex items-center gap-3">
-              <span className="text-white/80 text-sm font-medium">Sort</span>
+              <span className="text-gray-700 text-sm font-medium">Sort:</span>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="rounded-xl border px-3 py-2 text-sm focus:ring-2 focus:ring-white/50 focus:border-white/50"
-                style={{backgroundColor: '#374151', borderColor: 'rgba(255, 255, 255, 0.3)', color: '#FFFFFF'}}
+                className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
-                <option value="relevance" style={{backgroundColor: '#374151', color: '#FFFFFF'}}>Most Relevant</option>
-                <option value="popularity" style={{backgroundColor: '#374151', color: '#FFFFFF'}}>Most Popular</option>
-                <option value="difficulty" style={{backgroundColor: '#374151', color: '#FFFFFF'}}>By Difficulty</option>
-                <option value="time" style={{backgroundColor: '#374151', color: '#FFFFFF'}}>By Time</option>
+                <option value="relevance">Most Relevant</option>
+                <option value="popularity">Most Popular</option>
+                <option value="difficulty">By Difficulty</option>
+                <option value="time">By Time</option>
               </select>
             </div>
           </div>
 
           {/* Query Form */}
-          <form onSubmit={handleSubmit} className="space-y-8">
+          <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
             <div className="relative">
               <div className="relative">
                 <textarea
                   ref={textareaRef}
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder={`Describe your legal issue in detail in ${language === 'english' ? 'English' : 'Tamil'}... (e.g., timeline, parties involved, documents available)`}
+                  placeholder={`Describe your legal issue in detail in ${language === 'english' ? 'English' : 'Tamil'}...`}
                   rows="4"
                   maxLength="1000"
                   disabled={remainingQueries <= 0}
-                  className="w-full p-6 border-2 rounded-2xl focus:ring-2 focus:ring-white/50 focus:border-white/50 resize-none transition-all duration-300 pr-24 text-white placeholder-white/60"
-                  style={{backgroundColor: 'rgba(55, 65, 81, 0.3)', borderColor: 'rgba(255, 255, 255, 0.3)'}}
+                  className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none transition-all duration-200 pr-20 text-gray-900 placeholder-gray-500"
                 />
                 
-                {/* Enhanced Input Actions */}
-                <div className="absolute bottom-4 right-4 flex items-center gap-2">
+                {/* Input Actions */}
+                <div className="absolute bottom-3 right-3 flex items-center gap-2">
                   {query && (
                     <button
                       type="button"
-                      className="w-10 h-10 flex items-center justify-center rounded-xl text-white/60 hover:text-white hover:bg-white/10 transition-all duration-200 transform hover:scale-110"
+                      className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all"
                       onClick={clearQuery}
-                      aria-label="Clear text"
                     >
-                      <span className="text-lg">×</span>
+                      ×
                     </button>
                   )}
                   
                   <button
                     type="button"
-                    className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-300 transform hover:scale-110 ${
+                    className={`w-8 h-8 flex items-center justify-center rounded-lg transition-all ${
                       isRecording 
-                        ? 'bg-red-500/20 text-red-400 animate-pulse shadow-lg' 
-                        : 'hover:bg-white/10 text-white/60 hover:text-white hover:shadow-md'
+                        ? 'bg-red-100 text-red-600 animate-pulse' 
+                        : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
                     }`}
                     onClick={isRecording ? stopVoiceInput : startVoiceInput}
                     disabled={remainingQueries <= 0}
-                    aria-label={isRecording ? "Stop recording" : "Start voice input"}
                   >
-                    <span className="text-lg">{isRecording ? '🎙️' : '🎤'}</span>
+                    🎤
                   </button>
                 </div>
               </div>
               
-              <div className="flex justify-between items-center mt-3">
-                <span className="text-xs text-white/70">
+              <div className="flex justify-between items-center mt-2">
+                <span className="text-xs text-gray-500">
                   {query.length}/1000 characters
                 </span>
                 {isRecording && (
-                  <div className="flex items-center gap-2 text-red-400">
-                    <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div>
-                    <span className="text-xs font-medium">Recording... Speak clearly</span>
+                  <div className="flex items-center gap-2 text-red-600">
+                    <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
+                    <span className="text-xs font-medium">Recording...</span>
                   </div>
                 )}
               </div>
@@ -577,444 +472,240 @@ const FreeQueryWidget = () => {
 
             {/* Enhanced Quick Questions */}
             <div>
-              <h4 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
-                <span className="text-yellow-400">💡</span>
-                Popular Legal Questions:
-              </h4>
+              <h4 className="text-lg font-bold text-gray-900 mb-4">Popular Legal Questions:</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {sortedQuestions.map((question, index) => (
                   <button
                     key={index}
                     type="button"
-                    className="text-left p-5 border-2 rounded-2xl transition-all duration-300 group hover:shadow-lg transform hover:-translate-y-1"
-                    style={{
-                      borderColor: 'rgba(255, 255, 255, 0.3)',
-                      backgroundColor: 'rgba(55, 65, 81, 0.2)'
-                    }}
+                    className="text-left p-4 border border-gray-200 rounded-xl transition-all duration-200 hover:border-gray-300 hover:shadow-md bg-white group"
                     onClick={() => handleQuickQuestion(question)}
                     disabled={remainingQueries <= 0}
-                    onMouseEnter={(e) => {
-                      e.target.style.borderColor = 'rgba(255, 255, 255, 0.5)';
-                      e.target.style.backgroundColor = 'rgba(55, 65, 81, 0.3)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.borderColor = 'rgba(255, 255, 255, 0.3)';
-                      e.target.style.backgroundColor = 'rgba(55, 65, 81, 0.2)';
-                    }}
                   >
-                    <div className="flex items-start gap-3 mb-4">
-                      <div className="w-10 h-10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300" style={{backgroundColor: 'rgba(55, 65, 81, 0.3)'}}>
-                        <span className="text-white text-sm font-semibold">{question.label.slice(0, 2)}</span>
+                    <div className="flex items-start gap-3 mb-3">
+                      <div className={`text-xs px-2 py-1 rounded border font-medium ${getCategoryColor(question.category)}`}>
+                        {question.category}
                       </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className={`text-xs px-2 py-1 rounded-lg border font-medium ${getCategoryColor(question.category)}`}>
-                            {question.category}
-                          </span>
-                          <span className={`text-xs px-2 py-1 rounded-lg font-medium ${getDifficultyColor(question.difficulty)}`}>
-                            {question.difficulty}
-                          </span>
-                        </div>
+                      <div className={`text-xs px-2 py-1 rounded font-medium ${getDifficultyColor(question.difficulty)}`}>
+                        {question.difficulty}
                       </div>
                     </div>
                     
-                    <p className="text-sm text-white mb-4 line-clamp-2 group-hover:text-white/90 transition-colors">
+                    <p className="text-sm text-gray-700 mb-3 line-clamp-2 group-hover:text-gray-900">
                       {question.text}
                     </p>
                     
-                    <div className="flex items-center justify-between text-xs text-white/70">
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-1">
-                          <span>⏱️</span>
-                          <span>{question.estimatedTime}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <span>📈</span>
-                          <span>{question.popularity}% match</span>
-                        </div>
-                      </div>
-                      <span className="group-hover:translate-x-1 transition-transform duration-300">→</span>
-                    </div>
-                    
-                    {/* Tags */}
-                    <div className="flex flex-wrap gap-1 mt-3">
-                      {question.tags.slice(0, 2).map((tag, tagIndex) => (
-                        <span key={tagIndex} className="text-xs px-2 py-1 rounded-md" style={{backgroundColor: 'rgba(55, 65, 81, 0.4)', color: 'rgba(255, 255, 255, 0.8)'}}>
-                          {tag}
-                        </span>
-                      ))}
-                      {question.tags.length > 2 && (
-                        <span className="text-xs text-white/60">+{question.tags.length - 2}</span>
-                      )}
+                    <div className="flex items-center justify-between text-xs text-gray-500">
+                      <span>⏱️ {question.estimatedTime}</span>
+                      <span>📈 {question.popularity}% match</span>
                     </div>
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Advanced Options Toggle */}
-            <div className="border-t pt-6" style={{borderColor: 'rgba(255, 255, 255, 0.3)'}}>
+            {/* Advanced Options */}
+            <div className="border-t border-gray-200 pt-6">
               <button
                 type="button"
                 onClick={() => setShowAdvanced(!showAdvanced)}
-                className="flex items-center gap-2 text-sm text-white/80 hover:text-white transition-colors"
+                className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
               >
                 <span>⚙️</span>
                 Advanced Options
-                <span className="text-lg">{showAdvanced ? '↑' : '↓'}</span>
+                <span>{showAdvanced ? '↑' : '↓'}</span>
               </button>
               
               {showAdvanced && (
-                <div className="mt-4 p-4 rounded-xl space-y-4" style={{backgroundColor: 'rgba(55, 65, 81, 0.3)'}}>
+                <div className="mt-4 p-4 bg-gray-50 rounded-xl space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-white/90 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
                         Query Priority
                       </label>
-                      <select className="w-full rounded-xl border px-3 py-2 text-sm" style={{backgroundColor: '#374151', borderColor: 'rgba(255, 255, 255, 0.3)', color: '#FFFFFF'}}>
-                        <option style={{backgroundColor: '#374151', color: '#FFFFFF'}}>Standard Processing</option>
-                        <option style={{backgroundColor: '#374151', color: '#FFFFFF'}}>Fast Track (+30 sec faster)</option>
-                        <option style={{backgroundColor: '#374151', color: '#FFFFFF'}}>Deep Analysis (+60 sec thorough)</option>
+                      <select className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
+                        <option>Standard Processing</option>
+                        <option>Fast Track</option>
+                        <option>Deep Analysis</option>
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-white/90 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
                         Response Detail Level
                       </label>
-                      <select className="w-full rounded-xl border px-3 py-2 text-sm" style={{backgroundColor: '#374151', borderColor: 'rgba(255, 255, 255, 0.3)', color: '#FFFFFF'}}>
-                        <option style={{backgroundColor: '#374151', color: '#FFFFFF'}}>Comprehensive (Recommended)</option>
-                        <option style={{backgroundColor: '#374151', color: '#FFFFFF'}}>Concise Summary</option>
-                        <option style={{backgroundColor: '#374151', color: '#FFFFFF'}}>Detailed with Citations</option>
+                      <select className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
+                        <option>Comprehensive</option>
+                        <option>Concise Summary</option>
+                        <option>Detailed with Citations</option>
                       </select>
                     </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-2">
-                    <input type="checkbox" id="includeTemplates" className="rounded" />
-                    <label htmlFor="includeTemplates" className="text-sm text-white/90">
-                      Include document templates in response
-                    </label>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Enhanced Submit Button */}
+            {/* Submit Button */}
             <button
               type="submit"
-              className={`w-full flex items-center justify-center gap-3 px-8 py-4 rounded-2xl text-lg font-semibold text-white relative overflow-hidden group transition-all duration-300 ${
-                isLoading ? 'animate-pulse' : 'hover:shadow-2xl transform hover:-translate-y-1'
+              className={`w-full flex items-center justify-center gap-3 px-6 py-4 rounded-xl text-lg font-semibold text-white transition-all duration-200 ${
+                isLoading ? 'bg-gray-400 animate-pulse' : 'bg-gray-900 hover:bg-gray-800'
               }`}
-              style={{backgroundColor: '#374151'}}
               disabled={!query.trim() || remainingQueries <= 0 || isLoading}
-              onMouseEnter={(e) => !isLoading && (e.target.style.backgroundColor = 'rgba(55, 65, 81, 0.8)')}
-              onMouseLeave={(e) => !isLoading && (e.target.style.backgroundColor = '#374151')}
             >
-              <div className="relative z-10 flex items-center justify-center gap-3">
-                {isLoading ? (
-                  <>
-                    <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Analyzing your legal question...</span>
-                    <div className="flex items-center gap-1 text-xs bg-white/20 px-2 py-1 rounded-lg">
-                      <span>🧠</span>
-                      AI Working
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <span>📤</span>
-                    <span>Get Expert Legal Analysis</span>
-                    <div className="flex items-center gap-1 text-xs bg-white/20 px-2 py-1 rounded-lg">
-                      <span>⚡</span>
-                      {remainingQueries} left
-                    </div>
-                  </>
-                )}
-              </div>
+              {isLoading ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Analyzing your legal question...
+                </>
+              ) : (
+                <>
+                  <span>📤</span>
+                  Get Expert Legal Analysis
+                  <span className="text-sm bg-white/20 px-2 py-1 rounded">
+                    {remainingQueries} left
+                  </span>
+                </>
+              )}
             </button>
           </form>
         </div>
 
         {/* Enhanced Response Display */}
         {response && (
-          <div className="backdrop-blur-xl border rounded-2xl p-8 transform transition-all duration-500 hover:shadow-2xl" style={{backgroundColor: 'rgba(55, 65, 81, 0.2)', borderColor: 'rgba(55, 65, 81, 0.3)', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'}} ref={responseRef}>
-            <div className="flex items-center justify-between mb-8">
+          <div className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-8 shadow-sm" ref={responseRef}>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{backgroundColor: 'rgba(34, 197, 94, 0.2)'}}>
+                <div className="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center">
                   <span className="text-2xl">✅</span>
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold text-white mb-2">AI Legal Analysis Complete</h3>
-                  <div className="flex items-center flex-wrap gap-4 text-sm">
-                    <div className="flex items-center gap-1 text-white/80">
-                      <span>⏱️</span>
-                      <span>Generated in {response.processingTime}s</span>
-                    </div>
-                    <div className="flex items-center gap-1 text-green-400">
-                      <span>🎯</span>
-                      <span className="font-medium">{confidence}% confidence</span>
-                    </div>
-                    <div className="flex items-center gap-1 text-blue-400">
-                      <span>🤖</span>
-                      <span>{response.aiAgentsConsulted} AI agents consulted</span>
-                    </div>
-                    <span className={`text-xs px-3 py-1 rounded-full border font-medium ${getCategoryColor(response.category)}`}>
+                  <h3 className="text-xl font-bold text-gray-900 mb-1">AI Legal Analysis Complete</h3>
+                  <div className="flex flex-wrap gap-3 text-sm text-gray-600">
+                    <span>⏱️ {response.processingTime}s</span>
+                    <span className="text-green-600 font-medium">🎯 {confidence}% confidence</span>
+                    <span className={`text-xs px-2 py-1 rounded border ${getCategoryColor(response.category)}`}>
                       {response.category}
                     </span>
                   </div>
                 </div>
               </div>
               
-              <div className="flex items-center gap-2">
-                <button 
-                  className="px-4 py-2 rounded-xl text-white/80 hover:text-white hover:bg-white/10 transition-all duration-200"
-                  onClick={toggleExpand}
-                >
-                  <span className="text-lg">{isExpanded ? '↑' : '↓'}</span>
-                </button>
-              </div>
+              <button 
+                className="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors"
+                onClick={toggleExpand}
+              >
+                {isExpanded ? 'Show Less' : 'Show More'}
+              </button>
             </div>
 
             {/* Analysis Statistics */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-              <div className="rounded-xl p-4 border" style={{backgroundColor: 'rgba(59, 130, 246, 0.1)', borderColor: 'rgba(59, 130, 246, 0.3)'}}>
-                <div className="flex items-center gap-2 mb-2">
-                  <span>💾</span>
-                  <span className="text-sm font-medium text-blue-300">Cases Analyzed</span>
-                </div>
-                <div className="text-2xl font-bold text-blue-200">{response.casesSimilar}+</div>
-                <div className="text-xs text-blue-300">Similar cases reviewed</div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                <div className="text-sm font-medium text-blue-800 mb-1">Cases Analyzed</div>
+                <div className="text-2xl font-bold text-blue-900">{response.casesSimilar}+</div>
               </div>
               
-              <div className="rounded-xl p-4 border" style={{backgroundColor: 'rgba(168, 85, 247, 0.1)', borderColor: 'rgba(168, 85, 247, 0.3)'}}>
-                <div className="flex items-center gap-2 mb-2">
-                  <span>📊</span>
-                  <span className="text-sm font-medium text-purple-300">Complexity</span>
-                </div>
-                <div className="text-2xl font-bold text-purple-200">{response.complexity}</div>
-                <div className="text-xs text-purple-300">Legal complexity level</div>
+              <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
+                <div className="text-sm font-medium text-purple-800 mb-1">Complexity</div>
+                <div className="text-2xl font-bold text-purple-900">{response.complexity}</div>
               </div>
               
-              <div className="rounded-xl p-4 border" style={{backgroundColor: 'rgba(249, 115, 22, 0.1)', borderColor: 'rgba(249, 115, 22, 0.3)'}}>
-                <div className="flex items-center gap-2 mb-2">
-                  <span>🕒</span>
-                  <span className="text-sm font-medium text-orange-300">Last Updated</span>
-                </div>
-                <div className="text-xs text-orange-200 font-medium">{response.lastUpdated}</div>
-                <div className="text-xs text-orange-300">Current legal framework</div>
+              <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
+                <div className="text-sm font-medium text-orange-800 mb-1">Last Updated</div>
+                <div className="text-sm font-bold text-orange-900">{response.lastUpdated}</div>
               </div>
             </div>
 
-            <div className={`transition-all duration-500 ${isExpanded ? 'max-h-none' : 'max-h-40 overflow-hidden'}`}>
-              <div className="prose max-w-none mb-8">
-                {response.text.split('\n').map((paragraph, i) => {
-                  if (paragraph.trim().startsWith('**') && paragraph.trim().endsWith(':**')) {
-                    return (
-                      <h4 key={i} className="text-lg font-bold text-white mt-6 mb-3 flex items-center gap-2">
-                        <span>📖</span>
-                        {paragraph.replace(/\*\*/g, '').replace(':', '')}
-                      </h4>
-                    );
-                  }
-                  return paragraph.trim() && (
-                    <p key={i} className="text-white/90 mb-4 leading-relaxed">
-                      {paragraph}
+            <div className={`transition-all duration-300 ${isExpanded ? 'max-h-none' : 'max-h-40 overflow-hidden'}`}>
+              <div className="prose max-w-none mb-6">
+                {response.text.split('\n').map((paragraph, i) => (
+                  paragraph.trim() && (
+                    <p key={i} className="text-gray-700 mb-4 leading-relaxed">
+                      {paragraph.replace(/\*\*/g, '')}
                     </p>
-                  );
-                })}
+                  )
+                ))}
               </div>
 
-              {/* Enhanced Relevant Sections */}
-              <div className="mb-8">
-                <h4 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                  <span>📚</span>
-                  Relevant Legal Provisions & Statutes
-                </h4>
+              {/* Relevant Sections */}
+              <div className="mb-6">
+                <h4 className="text-lg font-bold text-gray-900 mb-3">Relevant Legal Provisions</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {response.relevantSections.map((section, index) => (
-                    <div key={index} className="flex items-center gap-3 border rounded-xl p-4 hover:bg-white/5 transition-colors duration-200" style={{backgroundColor: 'rgba(59, 130, 246, 0.1)', borderColor: 'rgba(59, 130, 246, 0.3)'}}>
-                      <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{backgroundColor: 'rgba(59, 130, 246, 0.2)'}}>
-                        <span>🛡️</span>
-                      </div>
-                      <div className="flex-1">
-                        <span className="text-sm font-semibold text-blue-200 block">{section}</span>
-                        <span className="text-xs text-blue-300">Click to view full text</span>
-                      </div>
-                      <span className="opacity-0 group-hover:opacity-100 transition-opacity">👁️</span>
+                    <div key={index} className="flex items-center gap-3 border border-gray-200 rounded-xl p-3 hover:bg-gray-50 transition-colors">
+                      <div className="text-blue-600">🛡️</div>
+                      <span className="text-sm text-gray-700">{section}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Enhanced Verification Badge */}
-              <div className="border rounded-2xl p-6 mb-8" style={{backgroundColor: 'rgba(34, 197, 94, 0.1)', borderColor: 'rgba(34, 197, 94, 0.3)'}}>
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{backgroundColor: 'rgba(34, 197, 94, 0.2)'}}>
-                    <span className="text-2xl">🏆</span>
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold text-green-200 mb-1">
-                      Verified by {response.aiAgentsConsulted} AI Legal Specialists
-                    </p>
-                    <p className="text-xs text-green-300">
-                      Cross-referenced with {response.casesSimilar}+ legal cases, statutes, and precedents from our comprehensive legal database
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-1 text-xs text-green-300 px-3 py-2 rounded-xl" style={{backgroundColor: 'rgba(34, 197, 94, 0.2)'}}>
-                    <span>✅</span>
-                    <span className="font-medium">Accuracy Verified</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Enhanced Action Buttons */}
+              {/* Action Buttons */}
               <div className="flex flex-wrap gap-3">
                 <button 
-                  className={`px-4 py-2 rounded-xl border transition-all duration-200 ${
-                    copied ? 'bg-green-500/20 text-green-400 border-green-400/30' : 'text-white/80 hover:text-white border-white/30 hover:bg-white/10'
+                  className={`px-4 py-2 border border-gray-300 rounded-lg transition-all ${
+                    copied ? 'bg-green-100 text-green-800 border-green-200' : 'text-gray-700 hover:bg-gray-50'
                   }`}
                   onClick={copyResponse}
                 >
-                  {copied ? (
-                    <>
-                      <span className="mr-2">✅</span>
-                      Copied!
-                    </>
-                  ) : (
-                    <>
-                      <span className="mr-2">📋</span>
-                      Copy Analysis
-                    </>
-                  )}
+                  {copied ? '✅ Copied!' : '📋 Copy Analysis'}
                 </button>
                 
                 <button 
-                  className="px-4 py-2 rounded-xl border text-white/80 hover:text-white border-white/30 hover:bg-white/10 transition-all duration-200"
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-all"
                   onClick={downloadResponse}
                 >
-                  <span className="mr-2">📥</span>
-                  Download PDF
+                  📥 Download PDF
                 </button>
                 
                 {navigator.share && (
                   <button 
-                    className="px-4 py-2 rounded-xl border text-white/80 hover:text-white border-white/30 hover:bg-white/10 transition-all duration-200"
+                    className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-all"
                     onClick={shareResponse}
                   >
-                    <span className="mr-2">📤</span>
-                    Share
+                    📤 Share
                   </button>
                 )}
-                
-                <button className="px-4 py-2 rounded-xl border text-white/80 hover:text-white border-white/30 hover:bg-white/10 transition-all duration-200">
-                  <span className="mr-2">🔍</span>
-                  Deep Research
-                </button>
-                
-                <button className="px-4 py-2 rounded-xl border text-white/80 hover:text-white border-white/30 hover:bg-white/10 transition-all duration-200">
-                  <span className="mr-2">📄</span>
-                  Generate Documents
-                </button>
-                
-                <button className="px-4 py-2 rounded-xl border text-white/80 hover:text-white border-white/30 hover:bg-white/10 transition-all duration-200">
-                  <span className="mr-2">🔖</span>
-                  Save to Library
-                </button>
               </div>
             </div>
           </div>
         )}
 
-        {/* Enhanced Queries Exhausted */}
+        {/* Queries Exhausted */}
         {remainingQueries <= 0 && (
-          <div className="backdrop-blur-xl border rounded-2xl p-8 text-center" style={{backgroundColor: 'rgba(55, 65, 81, 0.2)', borderColor: 'rgba(55, 65, 81, 0.3)', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'}}>
-            <div className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-lg" style={{backgroundColor: 'rgba(249, 115, 22, 0.2)'}}>
-              <span className="text-4xl animate-bounce">⚠️</span>
+          <div className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-8 text-center shadow-sm">
+            <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <span className="text-3xl">⚠️</span>
             </div>
-            <h3 className="text-3xl font-bold text-white mb-4">
+            <h3 className="text-xl font-bold text-gray-900 mb-2">
               You've Used All Your Free Queries!
             </h3>
-            <p className="text-white/80 mb-8 max-w-3xl mx-auto">
-              Upgrade to Chakshi Pro for unlimited legal queries, AI-powered document generation, 
-              detailed case law research, precedent analysis, and access to our complete legal research platform 
-              with expert consultation services.
+            <p className="text-gray-600 mb-6">
+              Upgrade to Chakshi Pro for unlimited legal queries and advanced features.
             </p>
             
-            {/* Upgrade Benefits */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 max-w-4xl mx-auto">
-              <div className="border rounded-xl p-6 text-center" style={{backgroundColor: 'rgba(59, 130, 246, 0.1)', borderColor: 'rgba(59, 130, 246, 0.3)'}}>
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3" style={{backgroundColor: 'rgba(59, 130, 246, 0.2)'}}>
-                  <span className="text-2xl">👑</span>
-                </div>
-                <h4 className="font-semibold text-blue-200 mb-2">Unlimited Queries</h4>
-                <p className="text-sm text-blue-300">Ask as many legal questions as you need, 24/7</p>
-              </div>
-              
-              <div className="border rounded-xl p-6 text-center" style={{backgroundColor: 'rgba(168, 85, 247, 0.1)', borderColor: 'rgba(168, 85, 247, 0.3)'}}>
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3" style={{backgroundColor: 'rgba(168, 85, 247, 0.2)'}}>
-                  <span className="text-2xl">📄</span>
-                </div>
-                <h4 className="font-semibold text-purple-200 mb-2">Document Generation</h4>
-                <p className="text-sm text-purple-300">Auto-generate legal documents and contracts</p>
-              </div>
-              
-              <div className="border rounded-xl p-6 text-center" style={{backgroundColor: 'rgba(34, 197, 94, 0.1)', borderColor: 'rgba(34, 197, 94, 0.3)'}}>
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3" style={{backgroundColor: 'rgba(34, 197, 94, 0.2)'}}>
-                  <span className="text-2xl">👥</span>
-                </div>
-                <h4 className="font-semibold text-green-200 mb-2">Expert Consultation</h4>
-                <p className="text-sm text-green-300">Connect with real lawyers for complex cases</p>
-              </div>
-            </div>
-            
-            <div className="flex flex-wrap justify-center items-center gap-4">
-              <button className="px-8 py-4 rounded-2xl text-lg font-semibold text-white transition-all duration-300 hover:shadow-2xl transform hover:-translate-y-1" style={{backgroundColor: '#374151'}}>
-                <span className="mr-2">👑</span>
-                Upgrade to Pro - ₹2,999/month
-                <span className="ml-2 bg-white/20 px-2 py-1 rounded-lg text-xs">
-                  Save 30% annually
-                </span>
-              </button>
-              <button className="px-8 py-4 rounded-2xl text-lg font-semibold text-white border transition-all duration-200 hover:bg-white/10" style={{borderColor: 'rgba(255, 255, 255, 0.3)'}}>
-                <span className="mr-2">✨</span>
-                Try 3 More Free Queries
-              </button>
-            </div>
-            
-            {/* Trial Offer */}
-            <div className="mt-8 p-4 rounded-xl border" style={{backgroundColor: 'rgba(245, 158, 11, 0.1)', borderColor: 'rgba(245, 158, 11, 0.3)'}}>
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <span className="text-yellow-400">⭐</span>
-                <span className="text-sm font-semibold text-yellow-200">Limited Time Offer</span>
-              </div>
-              <p className="text-sm text-yellow-300">
-                Get your first month of Chakshi Pro for just ₹999 - includes 500 queries, document templates, and expert consultations!
-              </p>
-            </div>
+            <button className="px-6 py-3 bg-gray-900 text-white rounded-lg font-semibold hover:bg-gray-800 transition-colors">
+              👑 Upgrade to Pro - ₹2,999/month
+            </button>
           </div>
         )}
 
-        {/* Query History (if enabled) */}
+        {/* Query History */}
         {queryHistory.length > 0 && (
-          <div className="backdrop-blur-xl border rounded-2xl p-8" style={{backgroundColor: 'rgba(55, 65, 81, 0.2)', borderColor: 'rgba(55, 65, 81, 0.3)', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'}}>
-            <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-              <span>📝</span>
-              Recent Query History
-            </h3>
+          <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Recent Query History</h3>
             <div className="space-y-3">
               {queryHistory.slice(0, 3).map((historyItem) => (
-                <div key={historyItem.id} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors duration-200" style={{backgroundColor: 'rgba(55, 65, 81, 0.3)'}}>
-                  <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{backgroundColor: 'rgba(55, 65, 81, 0.4)'}}>
-                    <span>💬</span>
-                  </div>
+                <div key={historyItem.id} className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                  <div className="text-gray-400">💬</div>
                   <div className="flex-1">
-                    <p className="text-sm text-white truncate">{historyItem.text}</p>
-                    <p className="text-xs text-white/70">
+                    <p className="text-sm text-gray-700 truncate">{historyItem.text}</p>
+                    <p className="text-xs text-gray-500">
                       {new Date(historyItem.timestamp).toLocaleDateString()} • {historyItem.language}
                     </p>
                   </div>
                   <button 
-                    className="text-xs text-blue-400 hover:text-blue-300 font-medium"
+                    className="text-sm text-blue-600 hover:text-blue-800 font-medium"
                     onClick={() => setQuery(historyItem.text)}
                   >
                     Reuse
