@@ -6,7 +6,7 @@ export default function Research() {
   const [isListening, setIsListening] = useState(false);
   const [analysisResults, setAnalysisResults] = useState(null);
   const [loading, setLoading] = useState(false);
-  const fileInputRef = useRef();
+  // const fileInputRef = useRef();
 
   // Mock AI analysis
   const handleInstantAnalysis = async () => {

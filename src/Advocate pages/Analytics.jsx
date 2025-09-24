@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Bar, Doughnut, Line, Pie } from 'react-chartjs-2';
+import { Bar, Doughnut, Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -48,7 +48,7 @@ const AnalyticsDashboard = () => {
     timeframe: '30d'
   });
 
-  const [activeMetric, setActiveMetric] = useState('overview');
+  // const [activeMetric, setActiveMetric] = useState('overview');
 
   // Calculate metrics
   const metrics = useMemo(() => {
@@ -318,7 +318,7 @@ const AnalyticsDashboard = () => {
                 onMouseLeave={(e) => {
                   e.target.style.borderColor = 'rgba(55, 65, 81, 0.1)';
                 }}
-                onClick={() => setActiveMetric(stat.title.toLowerCase().replace(' ', '_'))}
+                onClick={() => {}} // setActiveMetric(stat.title.toLowerCase().replace(' ', '_'))
               >
                 <div className="flex justify-between items-start mb-4">
                   <div className={`w-14 h-14 rounded-2xl bg-gradient-to-r ${stat.color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>

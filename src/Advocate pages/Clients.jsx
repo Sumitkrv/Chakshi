@@ -146,10 +146,10 @@ const ClientsPage = () => {
     console.log('Edit client:', client);
   };
 
-  const handleDeleteClient = (clientId) => {
-    // Handle delete functionality
-    console.log('Delete client:', clientId);
-  };
+  // const handleDeleteClient = (clientId) => {
+  //   // Handle delete functionality
+  //   console.log('Delete client:', clientId);
+  // };
 
   return (
     <div className="min-h-screen bg-gray-50">

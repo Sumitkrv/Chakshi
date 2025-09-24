@@ -41,17 +41,15 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-[#1E3A8A] text-[#FFFFFF] relative w-full z-10 print:hidden">
-      {/* Clean professional background */}
-      
+    <footer className="bg-white text-[#374151] relative w-full z-10 print:hidden border-t border-[#E5E7EB]">
       <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 py-12">
         {/* Newsletter Section */}
-        <div className="bg-[#FFFFFF] border border-[#374151] rounded-lg p-8 shadow-sm mb-12">
+        <div className="bg-white border border-[#E5E7EB] rounded-lg p-8 shadow-sm mb-12 hover:bg-[#F9FAFB] transition-all duration-200">
           <div className="max-w-4xl mx-auto">
-            <h3 className="text-xl font-bold text-[#1E3A8A] mb-3 tracking-tight">
+            <h3 className="text-xl font-bold text-[#374151] mb-3 tracking-tight">
               Subscribe to Our Legal Technology Newsletter
             </h3>
-            <p className="text-base text-[#374151] mb-6 leading-relaxed">
+            <p className="text-base text-[#6B7280] mb-6 leading-relaxed">
               Receive updates on legal technology, AI innovations, and industry best practices 
               delivered directly to your inbox.
             </p>
@@ -59,10 +57,10 @@ const Footer = () => {
               <input
                 type="email"
                 placeholder="Your email address"
-                className="w-full border border-[#374151] text-[#374151] px-4 py-2.5 rounded shadow-sm focus:outline-none focus:border-[#1E3A8A] focus:ring-1 focus:ring-[#1E3A8A]"
+                className="w-full border border-[#E5E7EB] text-[#374151] px-4 py-2.5 rounded shadow-sm focus:outline-none focus:border-[#374151] focus:ring-1 focus:ring-[#374151] hover:border-[#9CA3AF] transition-colors duration-200"
                 aria-label="Email address"
               />
-              <button className="w-full sm:w-auto px-6 py-2.5 bg-[#1E3A8A] text-[#FFFFFF] font-semibold rounded shadow-sm hover:bg-opacity-90 transition-all duration-200 whitespace-nowrap">
+              <button className="w-full sm:w-auto px-6 py-2.5 bg-[#374151] text-white font-semibold rounded shadow-sm hover:bg-[#4B5563] transition-all duration-200 whitespace-nowrap border border-[#374151]">
                 Subscribe
               </button>
             </div>
@@ -74,36 +72,36 @@ const Footer = () => {
           {/* Brand Section */}
           <div className="lg:col-span-2">
             <div className="flex items-center gap-3 mb-5">
-              <div className="w-12 h-12 bg-[#FFFFFF] rounded flex items-center justify-center text-[#1E3A8A] font-semibold text-sm">
+              <div className="w-12 h-12 bg-[#374151] rounded flex items-center justify-center text-white font-semibold text-sm">
                 CHAKSHI
               </div>
               <div className="flex flex-col">
-                <span className="text-xl font-semibold text-[#FFFFFF]">Chakshi</span>
-                <span className="text-xs text-[#FFFFFF] opacity-90">Legal AI Suite</span>
+                <span className="text-xl font-semibold text-[#374151]">Chakshi</span>
+                <span className="text-xs text-[#6B7280]">Legal AI Suite</span>
               </div>
             </div>
 
-            <p className="text-sm text-[#FFFFFF] leading-relaxed mb-6 max-w-md opacity-90">
+            <p className="text-sm text-[#6B7280] leading-relaxed mb-6 max-w-md">
               Empowering legal professionals with advanced AI technology to streamline 
               workflows, enhance research capabilities, and deliver exceptional client outcomes.
             </p>
 
             {/* Contact Info */}
             <div className="space-y-3 mb-6">
-              <div className="flex items-center gap-2 text-[#FFFFFF]">
-                <div className="w-6 h-6 bg-[#FFFFFF] rounded-sm flex items-center justify-center text-[#1E3A8A] font-semibold text-[10px]">
+              <div className="flex items-center gap-2 text-[#374151]">
+                <div className="w-6 h-6 bg-[#F9FAFB] border border-[#E5E7EB] rounded-sm flex items-center justify-center text-[#374151] font-semibold text-[10px]">
                   E
                 </div>
-                <a href="mailto:contact@chakshi.ai" className="text-sm hover:underline">contact@chakshi.ai</a>
+                <a href="mailto:contact@chakshi.ai" className="text-sm hover:underline hover:text-[#1F2937] transition-colors">contact@chakshi.ai</a>
               </div>
-              <div className="flex items-center gap-2 text-[#FFFFFF]">
-                <div className="w-6 h-6 bg-[#FFFFFF] rounded-sm flex items-center justify-center text-[#1E3A8A] font-semibold text-[10px]">
+              <div className="flex items-center gap-2 text-[#374151]">
+                <div className="w-6 h-6 bg-[#F9FAFB] border border-[#E5E7EB] rounded-sm flex items-center justify-center text-[#374151] font-semibold text-[10px]">
                   T
                 </div>
-                <a href="tel:+15551234567" className="text-sm hover:underline">+1 (555) 123-4567</a>
+                <a href="tel:+15551234567" className="text-sm hover:underline hover:text-[#1F2937] transition-colors">+1 (555) 123-4567</a>
               </div>
-              <div className="flex items-center gap-2 text-[#FFFFFF]">
-                <div className="w-6 h-6 bg-[#FFFFFF] rounded-sm flex items-center justify-center text-[#1E3A8A] font-semibold text-[10px]">
+              <div className="flex items-center gap-2 text-[#374151]">
+                <div className="w-6 h-6 bg-[#F9FAFB] border border-[#E5E7EB] rounded-sm flex items-center justify-center text-[#374151] font-semibold text-[10px]">
                   A
                 </div>
                 <span className="text-sm">San Francisco, CA</span>
@@ -114,21 +112,21 @@ const Footer = () => {
             <div className="flex space-x-4">
               <a 
                 href="#twitter"
-                className="px-4 py-2 bg-[#FFFFFF] rounded text-[#1E3A8A] text-xs font-semibold hover:bg-opacity-90 transition-all shadow-sm"
+                className="px-4 py-2 bg-[#F9FAFB] border border-[#E5E7EB] rounded text-[#374151] text-xs font-semibold hover:bg-[#374151] hover:text-white transition-all shadow-sm"
                 aria-label="Twitter"
               >
                 Twitter
               </a>
               <a 
                 href="#linkedin"
-                className="px-4 py-2 bg-[#FFFFFF] rounded text-[#1E3A8A] text-xs font-semibold hover:bg-opacity-90 transition-all shadow-sm"
+                className="px-4 py-2 bg-[#F9FAFB] border border-[#E5E7EB] rounded text-[#374151] text-xs font-semibold hover:bg-[#374151] hover:text-white transition-all shadow-sm"
                 aria-label="LinkedIn"
               >
                 LinkedIn
               </a>
               <a 
                 href="#github"
-                className="px-4 py-2 bg-[#FFFFFF] rounded text-[#1E3A8A] text-xs font-semibold hover:bg-opacity-90 transition-all shadow-sm"
+                className="px-4 py-2 bg-[#F9FAFB] border border-[#E5E7EB] rounded text-[#374151] text-xs font-semibold hover:bg-[#374151] hover:text-white transition-all shadow-sm"
                 aria-label="GitHub"
               >
                 GitHub
@@ -138,13 +136,13 @@ const Footer = () => {
 
           {/* Product Links */}
           <div>
-            <h4 className="text-sm font-bold uppercase tracking-wider text-[#FFFFFF] mb-5 border-b border-[#FFFFFF]/20 pb-2">Products</h4>
+            <h4 className="text-sm font-bold uppercase tracking-wider text-[#374151] mb-5 border-b border-[#E5E7EB] pb-2">Products</h4>
             <ul className="space-y-3">
               {footerLinks.product.map((link, index) => (
                 <li key={index}>
                   <a 
                     href={link.href}
-                    className="text-sm font-medium text-[#FFFFFF] opacity-85 hover:opacity-100 hover:underline transition-all duration-200"
+                    className="text-sm font-medium text-[#6B7280] hover:text-[#374151] hover:underline transition-all duration-200"
                   >
                     {link.name}
                   </a>
@@ -155,13 +153,13 @@ const Footer = () => {
 
           {/* Solutions Links */}
           <div>
-            <h4 className="text-sm font-bold uppercase tracking-wider text-[#FFFFFF] mb-5 border-b border-[#FFFFFF]/20 pb-2">Solutions</h4>
+            <h4 className="text-sm font-bold uppercase tracking-wider text-[#374151] mb-5 border-b border-[#E5E7EB] pb-2">Solutions</h4>
             <ul className="space-y-3">
               {footerLinks.solutions.map((link, index) => (
                 <li key={index}>
                   <a 
                     href={link.href}
-                    className="text-sm font-medium text-[#FFFFFF] opacity-85 hover:opacity-100 hover:underline transition-all duration-200"
+                    className="text-sm font-medium text-[#6B7280] hover:text-[#374151] hover:underline transition-all duration-200"
                   >
                     {link.name}
                   </a>
@@ -172,13 +170,13 @@ const Footer = () => {
 
           {/* Resources Links */}
           <div>
-            <h4 className="text-sm font-bold uppercase tracking-wider text-[#FFFFFF] mb-5 border-b border-[#FFFFFF]/20 pb-2">Resources</h4>
+            <h4 className="text-sm font-bold uppercase tracking-wider text-[#374151] mb-5 border-b border-[#E5E7EB] pb-2">Resources</h4>
             <ul className="space-y-3">
               {footerLinks.resources.map((link, index) => (
                 <li key={index}>
                   <a 
                     href={link.href}
-                    className="text-sm font-medium text-[#FFFFFF] opacity-85 hover:opacity-100 hover:underline transition-all duration-200"
+                    className="text-sm font-medium text-[#6B7280] hover:text-[#374151] hover:underline transition-all duration-200"
                   >
                     {link.name}
                   </a>
@@ -189,50 +187,50 @@ const Footer = () => {
         </div>
 
         {/* Certifications */}
-        <div className="border-t border-[#FFFFFF]/20 pt-10 pb-12 mb-8">
+        <div className="border-t border-[#E5E7EB] pt-10 pb-12 mb-8">
           <div className="flex flex-col lg:flex-row items-start justify-between gap-10">
             <div className="w-full lg:w-2/3">
-              <h4 className="text-lg font-bold text-[#FFFFFF] mb-6 tracking-wide">Security & Compliance</h4>
+              <h4 className="text-lg font-bold text-[#374151] mb-6 tracking-wide">Security & Compliance</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-6 gap-x-8">
                 {certifications.map((cert, index) => (
-                  <div key={index} className="flex items-center gap-3 text-[#FFFFFF]">
-                    <div className="px-3 py-2 bg-[#FFFFFF] rounded flex items-center justify-center text-[#1E3A8A] font-semibold text-xs">
+                  <div key={index} className="flex items-center gap-3 text-[#374151]">
+                    <div className="px-3 py-2 bg-[#F9FAFB] border border-[#E5E7EB] rounded flex items-center justify-center text-[#374151] font-semibold text-xs">
                       {cert.label}
                     </div>
-                    <span className="text-sm font-medium">{cert.text}</span>
+                    <span className="text-sm font-medium text-[#6B7280]">{cert.text}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Additional Security Badge */}
-            <div className="bg-[#FFFFFF] border border-[#374151] rounded-lg shadow-sm p-6 text-center w-full lg:w-auto">
-              <div className="w-14 h-14 bg-[#1E3A8A] rounded flex items-center justify-center mx-auto mb-4 text-[#FFFFFF] font-bold text-xs">
+            <div className="bg-white border border-[#E5E7EB] rounded-lg shadow-sm p-6 text-center w-full lg:w-auto hover:bg-[#F9FAFB] transition-colors duration-200">
+              <div className="w-14 h-14 bg-[#374151] rounded flex items-center justify-center mx-auto mb-4 text-white font-bold text-xs">
                 SECURITY
               </div>
-              <p className="text-sm font-semibold text-[#1E3A8A]">Enterprise Grade</p>
-              <p className="text-xs text-[#374151] mt-1">Security & Privacy</p>
+              <p className="text-sm font-semibold text-[#374151]">Enterprise Grade</p>
+              <p className="text-xs text-[#6B7280] mt-1">Security & Privacy</p>
             </div>
           </div>
         </div>
 
         {/* Bottom Copyright */}
-        <div className="border-t border-[#FFFFFF]/20 pt-8 pb-10">
+        <div className="border-t border-[#E5E7EB] pt-8 pb-10">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-              <p className="text-sm font-medium text-[#FFFFFF]">
+              <p className="text-sm font-medium text-[#374151]">
                 © {currentYear} Chakshi. All rights reserved.
               </p>
               <div className="flex items-center gap-5 text-sm">
-                <a href="#privacy" className="text-[#FFFFFF] hover:underline transition-all">Privacy Policy</a>
-                <span className="text-[#FFFFFF] text-opacity-50">•</span>
-                <a href="#terms" className="text-[#FFFFFF] hover:underline transition-all">Terms of Service</a>
-                <span className="text-[#FFFFFF] text-opacity-50">•</span>
-                <a href="#cookies" className="text-[#FFFFFF] hover:underline transition-all">Cookie Policy</a>
+                <a href="#privacy" className="text-[#6B7280] hover:text-[#374151] hover:underline transition-all">Privacy Policy</a>
+                <span className="text-[#E5E7EB]">•</span>
+                <a href="#terms" className="text-[#6B7280] hover:text-[#374151] hover:underline transition-all">Terms of Service</a>
+                <span className="text-[#E5E7EB]">•</span>
+                <a href="#cookies" className="text-[#6B7280] hover:text-[#374151] hover:underline transition-all">Cookie Policy</a>
               </div>
             </div>
             
-            <div className="bg-[#FFFFFF] bg-opacity-10 px-4 py-2 rounded text-sm font-medium text-[#FFFFFF]">
+            <div className="bg-[#F9FAFB] border border-[#E5E7EB] px-4 py-2 rounded text-sm font-medium text-[#6B7280]">
               Designed for legal professionals
             </div>
           </div>

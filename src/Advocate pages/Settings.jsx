@@ -7,25 +7,13 @@ import {
   CreditCard,
   Save,
   Shield,
-  Monitor,
-  Smartphone,
   Mail,
   Phone,
   FileText,
   Settings as SettingsIcon,
   Check,
   AlertCircle,
-  Crown,
-  Eye,
-  EyeOff,
-  Download,
-  Upload,
-  Trash2,
-  Edit,
-  Globe,
-  Lock,
-  Key,
-  Zap
+  Crown
 } from 'lucide-react';
 
 export default function Settings() {

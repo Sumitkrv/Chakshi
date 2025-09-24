@@ -79,8 +79,8 @@ const Navbar = () => {
       ref={navbarRef}
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${
         isScrolled 
-          ? 'backdrop-blur-md bg-[#1E3A8A]/95 border-b border-white/10 shadow-lg' 
-          : 'bg-transparent'
+          ? 'bg-white/95 backdrop-blur-md border-b border-[#E5E7EB] shadow-lg' 
+          : 'bg-white border-b border-[#E5E7EB]'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -94,14 +94,14 @@ const Navbar = () => {
             tabIndex={0}
             onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleHomeClick()}
           >
-            <div className="p-2 rounded-lg bg-[#374151] shadow-md group-hover:bg-[#374151]/80 transition-all duration-300">
-              <span className="text-lg font-bold text-white">⚖</span>
+            <div className="p-2 rounded-lg bg-[#F9FAFB] shadow-sm border border-[#E5E7EB] group-hover:bg-gray-50 transition-all duration-300">
+              <span className="text-lg font-bold text-[#374151]">⚖</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-xl font-bold text-white">
+              <span className="text-xl font-bold text-[#374151]">
                 Chakshi
               </span>
-              <span className="text-xs text-gray-300 font-medium -mt-1 tracking-wide">
+              <span className="text-xs text-[#6B7280] font-medium -mt-1 tracking-wide">
                 Legal Intelligence Platform
               </span>
             </div>
@@ -117,10 +117,10 @@ const Navbar = () => {
                   key={item.label}
                   href={item.href}
                   onClick={handleLinkClick}
-                  className="relative px-4 py-2 text-gray-300 hover:text-white font-medium transition-all duration-300 rounded-lg hover:bg-white/10 group"
+                  className="relative px-4 py-2 text-[#6B7280] hover:text-[#374151] font-medium transition-all duration-300 rounded-lg hover:bg-[#F9FAFB] group border border-transparent hover:border-[#E5E7EB]"
                 >
                   {item.label}
-                  <span className="absolute bottom-0 left-4 w-0 h-0.5 bg-white group-hover:w-[calc(100%-2rem)] transition-all duration-300" />
+                  <span className="absolute bottom-0 left-4 w-0 h-0.5 bg-[#374151] group-hover:w-[calc(100%-2rem)] transition-all duration-300" />
                 </a>
               ))}
             </div>
@@ -130,29 +130,29 @@ const Navbar = () => {
               <input
                 type="text"
                 placeholder="Search legal resources..."
-                className="bg-white/10 border border-white/20 hover:border-white/40 focus:border-white/60 text-white placeholder-gray-400 px-4 py-3 w-72 rounded-lg backdrop-blur-sm focus:bg-white/15 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white/30"
+                className="bg-[#F9FAFB] border border-[#E5E7EB] hover:border-[#9CA3AF] focus:border-[#374151] text-[#374151] placeholder-[#9CA3AF] px-4 py-2.5 w-72 rounded-lg focus:bg-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#374151]/10"
                 onFocus={() => setSearchFocused(true)}
                 onBlur={() => setSearchFocused(false)}
                 aria-label="Search legal resources"
               />
-              <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
-                <kbd className="px-2 py-1 text-xs font-semibold text-gray-400 bg-white/10 border border-white/20 rounded">
+              <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                <kbd className="px-2 py-1 text-xs font-semibold text-[#6B7280] bg-white border border-[#E5E7EB] rounded">
                   Ctrl+K
                 </kbd>
               </div>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-3">
               <button 
-                className="px-6 py-2.5 text-gray-300 hover:text-white font-medium transition-all duration-300 hover:bg-white/10 rounded-lg"
+                className="px-6 py-2.5 text-[#6B7280] hover:text-[#374151] font-medium transition-all duration-300 hover:bg-[#F9FAFB] rounded-lg border border-transparent hover:border-[#E5E7EB]"
                 onClick={handleLogin}
                 type="button"
               >
                 Sign In
               </button>
               <button 
-                className="px-6 py-2.5 text-gray-300 hover:text-white font-medium transition-all duration-300 hover:bg-white/10 rounded-lg"
+                className="px-6 py-2.5 bg-[#374151] text-white hover:bg-[#4B5563] font-medium transition-all duration-300 rounded-lg border border-[#374151] hover:border-[#4B5563] shadow-sm"
                 onClick={handleRegister}
                 type="button"
               >
@@ -162,38 +162,55 @@ const Navbar = () => {
           </div>
 
           {/* Mobile Menu Button */}
-          <button
-            className={`lg:hidden relative p-3 rounded-lg bg-white/10 hover:bg-white/20 text-white border border-white/20 hover:border-white/40 transition-all duration-300 ${
-              isOpen ? 'bg-white/20' : ''
-            }`}
-            onClick={toggleMenu}
-            aria-label="Toggle navigation menu"
-            aria-expanded={isOpen}
-            type="button"
-          >
-            {isOpen ? (
-              <span className="text-lg font-medium">✕</span>
-            ) : (
-              <span className="text-lg font-medium">Menu</span>
-            )}
-          </button>
+          <div className="flex lg:hidden items-center space-x-3">
+            {/* Mobile Search Trigger */}
+            <button 
+              className="p-2 rounded-lg bg-[#F9FAFB] hover:bg-gray-50 text-[#6B7280] border border-[#E5E7EB] transition-all duration-300"
+              aria-label="Open search"
+              type="button"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </button>
+            
+            <button
+              className={`relative p-3 rounded-lg bg-[#F9FAFB] hover:bg-gray-50 text-[#374151] border border-[#E5E7EB] hover:border-[#9CA3AF] transition-all duration-300 ${
+                isOpen ? 'bg-gray-50' : ''
+              }`}
+              onClick={toggleMenu}
+              aria-label="Toggle navigation menu"
+              aria-expanded={isOpen}
+              type="button"
+            >
+              {isOpen ? (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              )}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Navigation */}
         <div 
           className={`lg:hidden transition-all duration-500 overflow-hidden ${
-            isOpen ? 'max-h-screen opacity-100 pb-6' : 'max-h-0 opacity-0'
+            isOpen ? 'max-h-screen opacity-100 pb-4' : 'max-h-0 opacity-0'
           }`}
           aria-hidden={!isOpen}
         >
-          <div className="backdrop-blur-md bg-[#1E3A8A]/95 border border-white/20 rounded-lg mt-4 p-6 shadow-lg">
+          <div className="bg-white border border-[#E5E7EB] rounded-lg mt-4 p-6 shadow-lg">
             
             {/* Mobile Search */}
             <div className="relative mb-6">
               <input
                 type="text"
                 placeholder="Search legal resources..."
-                className="bg-white/10 border border-white/20 hover:border-white/40 focus:border-white/60 text-white placeholder-gray-400 px-4 py-3 w-full rounded-lg backdrop-blur-sm focus:bg-white/15 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white/30"
+                className="bg-[#F9FAFB] border border-[#E5E7EB] hover:border-[#9CA3AF] focus:border-[#374151] text-[#374151] placeholder-[#9CA3AF] px-4 py-3 w-full rounded-lg focus:bg-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#374151]/10"
                 aria-label="Search legal resources"
               />
             </div>
@@ -206,9 +223,12 @@ const Navbar = () => {
                     key={item.label}
                     href={item.href}
                     onClick={handleLinkClick}
-                    className="flex items-center justify-between text-gray-300 hover:text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 hover:bg-white/10 border border-transparent hover:border-white/20"
+                    className="flex items-center justify-between text-[#6B7280] hover:text-[#374151] font-medium py-3 px-4 rounded-lg transition-all duration-300 hover:bg-[#F9FAFB] border border-transparent hover:border-[#E5E7EB]"
                   >
                     <span>{item.label}</span>
+                    <svg className="w-4 h-4 text-[#9CA3AF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
                   </a>
                 ))}
               </div>
@@ -217,14 +237,14 @@ const Navbar = () => {
             {/* Mobile Auth Buttons */}
             <div className="flex flex-col space-y-3">
               <button 
-                className="w-full py-3 px-6 text-gray-300 hover:text-white font-medium transition-all duration-300 hover:bg-white/10 rounded-lg border border-white/20 hover:border-white/40"
+                className="w-full py-3 px-6 text-[#6B7280] hover:text-[#374151] font-medium transition-all duration-300 hover:bg-[#F9FAFB] rounded-lg border border-[#E5E7EB] hover:border-[#9CA3AF]"
                 onClick={handleLogin}
                 type="button"
               >
                 Sign In
               </button>
               <button 
-                className="w-full py-3 px-6 text-gray-300 hover:text-white font-medium transition-all duration-300 hover:bg-white/10 rounded-lg border border-white/20 hover:border-white/40"
+                className="w-full py-3 px-6 bg-[#374151] text-white hover:bg-[#4B5563] font-medium transition-all duration-300 rounded-lg border border-[#374151] hover:border-[#4B5563] shadow-sm"
                 onClick={handleRegister}
                 type="button"
               >

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate, Outlet, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Navbar from "./components/Navbar";
 import AdvocateNavbar from "./Advocate components/Navbar";

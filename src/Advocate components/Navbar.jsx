@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import LoadingOverlay from '../components/LoadingOverlay';
-import { Search, Menu, Bell, Grid3X3, Settings, User, LogOut, ChevronDown, X, Zap, Filter, Clock, ArrowRight, Check, Trash2, Mail, Phone, Shield, Moon, Sun, Globe, HelpCircle } from 'lucide-react';
 
 const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -95,7 +94,7 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [searchOpen, searchResults, selectedSearchIndex]);
+  }, [searchOpen, searchResults, selectedSearchIndex, handleResultClick]);
 
   // Enhanced search function with filters
   const searchAllContent = useCallback((query) => {
@@ -183,7 +182,7 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
     }
   };
 
-  const handleResultClick = (result) => {
+  const handleResultClick = useCallback((result) => {
     // Navigate based on category
     switch (result.category.toLowerCase()) {
       case 'cases':
@@ -216,7 +215,7 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
     }
     setSearchOpen(false);
     setSelectedSearchIndex(-1);
-  };
+  }, [navigate]);
 
   // Enhanced notification functions
   const markNotificationAsRead = (id) => {

@@ -4,7 +4,7 @@ const DocumentsPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedStatus, setSelectedStatus] = useState('All');
-  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
+  // const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
 
   // Sample documents data
   const [documents] = useState([
@@ -159,21 +159,21 @@ const DocumentsPage = () => {
     }
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'Active': return 'pro-status-success';
-      case 'Draft': return 'pro-status-warning';
-      case 'Filed': return 'pro-status-info';
-      case 'Archived': return 'pro-status-error';
-      default: return 'pro-status-info';
-    }
-  };
+  // const getStatusColor = (status) => {
+  //   switch (status) {
+  //     case 'Active': return 'pro-status-success';
+  //     case 'Draft': return 'pro-status-warning';
+  //     case 'Filed': return 'pro-status-info';
+  //     case 'Archived': return 'pro-status-error';
+  //     default: return 'pro-status-info';
+  //   }
+  // };
 
-  const formatFileSize = (sizeStr) => {
-    const size = parseFloat(sizeStr);
-    if (size < 1) return `${(size * 1024).toFixed(0)} KB`;
-    return sizeStr;
-  };
+  // const formatFileSize = (sizeStr) => {
+  //   const size = parseFloat(sizeStr);
+  //   if (size < 1) return `${(size * 1024).toFixed(0)} KB`;
+  //   return sizeStr;
+  // };
 
   const handleDocumentAction = (action, documentId) => {
     console.log(`${action} document:`, documentId);

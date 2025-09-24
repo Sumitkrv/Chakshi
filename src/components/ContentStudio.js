@@ -146,41 +146,41 @@ const ContentStudio = () => {
 
   const getQuestionTypeColor = (type) => {
     switch (type) {
-      case 'expertise': return 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30';
-      case 'credibility': return 'bg-blue-500/20 text-blue-300 border-blue-400/30';
-      case 'procedure': return 'bg-purple-500/20 text-purple-300 border-purple-400/30';
-      case 'substance': return 'bg-indigo-500/20 text-indigo-300 border-indigo-400/30';
-      case 'process': return 'bg-amber-500/20 text-amber-300 border-amber-400/30';
-      case 'causation': return 'bg-cyan-500/20 text-cyan-300 border-cyan-400/30';
-      default: return 'bg-gray-500/20 text-gray-300 border-gray-400/30';
+      case 'expertise': return 'bg-green-50 text-green-700 border-green-200';
+      case 'credibility': return 'bg-blue-50 text-blue-700 border-blue-200';
+      case 'procedure': return 'bg-purple-50 text-purple-700 border-purple-200';
+      case 'substance': return 'bg-indigo-50 text-indigo-700 border-indigo-200';
+      case 'process': return 'bg-yellow-50 text-yellow-700 border-yellow-200';
+      case 'causation': return 'bg-cyan-50 text-cyan-700 border-cyan-200';
+      default: return 'bg-gray-50 text-gray-700 border-gray-200';
     }
   };
 
   return (
-    <section className="min-h-screen py-16 md:py-20 relative overflow-hidden" style={{backgroundColor: '#1E3A8A'}}>
+    <section className="min-h-screen py-8 md:py-16 lg:py-20 relative overflow-hidden bg-white">
       {/* Background Elements */}
       <div className="absolute inset-0">
-        <div className="absolute top-1/4 left-1/6 w-80 h-80 md:w-96 md:h-96 bg-white/5 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute top-3/4 right-1/6 w-64 h-64 md:w-80 md:h-80 bg-white/3 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 left-1/2 w-60 h-60 md:w-72 md:h-72 bg-white/4 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-1/4 left-1/6 w-60 h-60 md:w-80 md:h-80 lg:w-96 lg:h-96 bg-gray-100/50 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-3/4 right-1/6 w-48 h-48 md:w-64 md:h-64 lg:w-80 lg:h-80 bg-gray-50/50 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 left-1/2 w-44 h-44 md:w-60 md:h-60 lg:w-72 lg:h-72 bg-gray-100/30 rounded-full blur-3xl animate-pulse"></div>
         
         {/* Grid pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(55,65,81,0.3)_1px,transparent_1px),linear-gradient(to_bottom,rgba(55,65,81,0.3)_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-20"></div>
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(229,231,235,0.5)_1px,transparent_1px),linear-gradient(to_bottom,rgba(229,231,235,0.5)_1px,transparent_1px)] bg-[size:3rem_3rem] md:bg-[size:4rem_4rem] opacity-30"></div>
         
         {/* Subtle gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/10 to-black/20"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-50/10 to-gray-100/20"></div>
       </div>
       
       <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 lg:px-8">{/* Header */}
-        <div className="text-center mb-16 md:mb-20">
-          <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 md:mb-8 shadow-xl" style={{backgroundColor: '#374151'}}>
-            <span className="text-lg md:text-xl font-bold text-white">Content Studio</span>
+        <div className="text-center mb-12 md:mb-16 lg:mb-20">
+          <div className="w-14 h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4 md:mb-6 lg:mb-8 shadow-lg border border-gray-200">
+            <span className="text-sm md:text-base lg:text-lg font-bold text-gray-700">CS</span>
           </div>
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 md:mb-6 leading-tight">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 mb-3 md:mb-4 lg:mb-6 leading-tight">
               Virtual Courtroom Experience
             </h2>
-            <p className="text-lg md:text-xl text-white/80 max-w-3xl mx-auto leading-relaxed font-medium">
+            <p className="text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed font-medium px-4 md:px-0">
               Step into the future of legal education. Practice cross-examination, observe real cases, 
               and develop your advocacy skills in our immersive courtroom simulator.
             </p>
@@ -188,56 +188,51 @@ const ContentStudio = () => {
         </div>
 
         {/* Case Type Selector */}
-        <div className="mb-12 md:mb-16">
-          <h3 className="text-2xl md:text-3xl font-bold text-white mb-6 md:mb-8 text-center">Choose Your Practice Area</h3>
-          <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-6 md:gap-8">
+        <div className="mb-10 md:mb-12 lg:mb-16">
+          <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 md:mb-6 lg:mb-8 text-center">Choose Your Practice Area</h3>
+          <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
             {caseTypes.map((caseType) => {
               const isSelected = selectedCase === caseType.value;
               
               return (
                 <button
                   key={caseType.value}
-                  className={`group relative overflow-hidden text-left transition-all duration-500 transform hover:scale-105 rounded-2xl ${
+                  className={`group relative overflow-hidden text-left transition-all duration-300 transform hover:scale-105 hover:bg-gray-50 rounded-2xl border-2 ${
                     isSelected 
-                      ? 'ring-2 ring-white/50 shadow-2xl' 
-                      : 'hover:shadow-xl'
+                      ? 'border-gray-400 bg-gray-50 shadow-lg' 
+                      : 'border-gray-200 bg-white hover:border-gray-300 shadow-sm hover:shadow-md'
                   }`}
                   onClick={() => handleCaseChange(caseType.value)}
-                  style={{
-                    backgroundColor: isSelected ? 'rgba(255, 255, 255, 0.15)' : 'rgba(55, 65, 81, 0.3)',
-                    borderColor: isSelected ? 'rgba(255, 255, 255, 0.3)' : 'rgba(55, 65, 81, 0.4)',
-                    border: '2px solid'
-                  }}
                 >
-                  <div className="p-6 md:p-8 h-full backdrop-blur-sm">
-                    <div className="flex items-start gap-4 md:gap-6">
-                      <div className={`w-12 h-12 md:w-16 md:h-16 rounded-xl flex items-center justify-center transition-all duration-500 shadow-lg ${
+                  <div className="p-4 md:p-6 lg:p-8 h-full">
+                    <div className="flex items-start gap-3 md:gap-4 lg:gap-6">
+                      <div className={`w-10 h-10 md:w-12 md:h-12 lg:w-16 lg:h-16 rounded-xl flex items-center justify-center transition-all duration-300 ${
                         isSelected 
-                          ? 'bg-white/20 text-white' 
-                          : 'bg-white/10 text-white/80 group-hover:bg-white/20'
+                          ? 'bg-gray-200 text-gray-700' 
+                          : 'bg-gray-100 text-gray-600 group-hover:bg-gray-200'
                       }`}>
-                        <span className="text-xs md:text-sm font-bold">{caseType.label.split(' ')[0]}</span>
+                        <span className="text-xs md:text-sm lg:text-base font-bold">{caseType.label.split(' ')[0]}</span>
                       </div>
                       <div className="flex-1">
-                        <h4 className={`text-lg md:text-xl font-bold mb-2 md:mb-3 transition-colors duration-500 ${
-                          isSelected ? 'text-white' : 'text-white/90 group-hover:text-white'
+                        <h4 className={`text-base md:text-lg lg:text-xl font-bold mb-2 md:mb-3 transition-colors duration-300 ${
+                          isSelected ? 'text-gray-900' : 'text-gray-800 group-hover:text-gray-900'
                         }`}>{caseType.label}</h4>
-                        <p className={`text-sm mb-3 md:mb-4 leading-relaxed transition-colors duration-500 ${
-                          isSelected ? 'text-white/90' : 'text-white/70'
+                        <p className={`text-sm md:text-base mb-3 md:mb-4 leading-relaxed transition-colors duration-300 ${
+                          isSelected ? 'text-gray-700' : 'text-gray-600'
                         }`}>
                           {scenarios[caseType.value].description}
                         </p>
-                        <div className="flex items-center gap-3 md:gap-4">
-                          <span className={`text-xs px-3 py-1.5 rounded-full border font-semibold transition-all duration-500 ${
-                            caseType.difficulty === 'Beginner' ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30' :
-                            caseType.difficulty === 'Intermediate' ? 'bg-amber-500/20 text-amber-300 border-amber-400/30' :
-                            'bg-rose-500/20 text-rose-300 border-rose-400/30'
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 md:gap-3 lg:gap-4">
+                          <span className={`text-xs px-2 md:px-3 py-1 md:py-1.5 rounded-full border font-semibold transition-all duration-300 ${
+                            caseType.difficulty === 'Beginner' ? 'bg-green-50 text-green-700 border-green-200' :
+                            caseType.difficulty === 'Intermediate' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
+                            'bg-red-50 text-red-700 border-red-200'
                           }`}>
                             {caseType.difficulty}
                           </span>
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs text-white/70 font-medium">Duration:</span>
-                            <span className="text-sm text-white/80 font-medium">
+                          <div className="flex items-center gap-1 md:gap-2">
+                            <span className="text-xs text-gray-500 font-medium">Duration:</span>
+                            <span className="text-sm text-gray-700 font-medium">
                               {scenarios[caseType.value].duration}
                             </span>
                           </div>
@@ -252,148 +247,134 @@ const ContentStudio = () => {
         </div>
 
         {/* Score Dashboard */}
-        <div className="relative mb-12 md:mb-16">
-          <div className="backdrop-blur-xl border-2 p-6 md:p-8 shadow-2xl rounded-2xl" style={{backgroundColor: 'rgba(55, 65, 81, 0.3)', borderColor: 'rgba(55, 65, 81, 0.4)'}}>
-            <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 md:mb-8">
-              <div className="flex items-center gap-3 md:gap-4 mb-4 md:mb-0">
-                <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center shadow-lg" style={{backgroundColor: '#374151'}}>
-                  <span className="text-xs md:text-sm font-bold text-white">Stats</span>
+        <div className="relative mb-10 md:mb-12 lg:mb-16">
+          <div className="bg-white border-2 border-gray-200 p-4 md:p-6 lg:p-8 shadow-lg rounded-2xl">
+            <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 md:mb-6 lg:mb-8">
+              <div className="flex items-center gap-2 md:gap-3 lg:gap-4 mb-3 md:mb-0">
+                <div className="w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 bg-gray-100 rounded-xl flex items-center justify-center shadow-sm border border-gray-200">
+                  <span className="text-xs md:text-sm lg:text-base font-bold text-gray-700">📊</span>
                 </div>
-                <h3 className="text-xl md:text-2xl font-bold text-white">Performance Dashboard</h3>
+                <h3 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900">Performance Dashboard</h3>
               </div>
               <button 
-                className="px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold transition-all duration-300 hover:scale-105 text-white border-2"
-                style={{backgroundColor: 'rgba(55, 65, 81, 0.5)', borderColor: 'rgba(255, 255, 255, 0.3)'}}
+                className="px-3 md:px-4 lg:px-6 py-2 md:py-2.5 lg:py-3 bg-white hover:bg-gray-50 border-2 border-gray-200 hover:border-gray-300 text-gray-700 hover:text-gray-900 rounded-xl font-semibold transition-all duration-300 hover:scale-105 text-sm md:text-base"
                 onClick={resetScore}
               >
-                <span className="text-sm mr-2">Reset</span>
                 Reset Score
               </button>
             </div>
             
-            <div className="grid md:grid-cols-3 gap-6 md:gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
               <div className="text-center group">
-                <div className={`relative w-20 h-20 md:w-24 md:h-24 rounded-2xl border-4 flex items-center justify-center mx-auto mb-3 md:mb-4 transition-all duration-500 group-hover:scale-110 shadow-lg ${
-                  score >= 12 ? 'border-emerald-400' : 
-                  score >= 8 ? 'border-white' : 
-                  score >= 4 ? 'border-amber-400' : 'border-gray-400'
-                }`} style={{backgroundColor: 'rgba(55, 65, 81, 0.5)'}}>
-                  <span className={`text-2xl md:text-3xl font-bold transition-colors duration-500 ${
-                    score >= 12 ? 'text-emerald-400' : 
-                    score >= 8 ? 'text-white' : 
-                    score >= 4 ? 'text-amber-400' : 'text-gray-400'
+                <div className={`relative w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-2xl border-4 flex items-center justify-center mx-auto mb-2 md:mb-3 lg:mb-4 transition-all duration-300 group-hover:scale-110 shadow-lg bg-white ${
+                  score >= 12 ? 'border-green-500' : 
+                  score >= 8 ? 'border-blue-500' : 
+                  score >= 4 ? 'border-yellow-500' : 'border-gray-300'
+                }`}>
+                  <span className={`text-xl md:text-2xl lg:text-3xl font-bold transition-colors duration-300 ${
+                    score >= 12 ? 'text-green-600' : 
+                    score >= 8 ? 'text-blue-600' : 
+                    score >= 4 ? 'text-yellow-600' : 'text-gray-500'
                   }`}>
                     {score}
                   </span>
                 </div>
-                <p className="text-base md:text-lg font-bold text-white mb-1">Total Score</p>
-                <p className="text-sm text-white/70">Points Earned</p>
+                <p className="text-sm md:text-base lg:text-lg font-bold text-gray-900 mb-1">Total Score</p>
+                <p className="text-xs md:text-sm text-gray-600">Points Earned</p>
               </div>
               
               <div className="text-center group">
-                <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-2xl border-4 border-white flex items-center justify-center mx-auto mb-3 md:mb-4 transition-all duration-500 group-hover:scale-110 shadow-lg" style={{backgroundColor: 'rgba(55, 65, 81, 0.5)'}}>
-                  <span className="text-2xl md:text-3xl font-bold text-white">
+                <div className="relative w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-2xl border-4 border-blue-500 bg-white flex items-center justify-center mx-auto mb-2 md:mb-3 lg:mb-4 transition-all duration-300 group-hover:scale-110 shadow-lg">
+                  <span className="text-xl md:text-2xl lg:text-3xl font-bold text-blue-600">
                     {questionsAnswered}
                   </span>
                 </div>
-                <p className="text-base md:text-lg font-bold text-white mb-1">Questions</p>
-                <p className="text-sm text-white/70">Answered</p>
+                <p className="text-sm md:text-base lg:text-lg font-bold text-gray-900 mb-1">Questions</p>
+                <p className="text-xs md:text-sm text-gray-600">Answered</p>
               </div>
               
               <div className="text-center group">
-                <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-2xl border-4 border-emerald-400 flex items-center justify-center mx-auto mb-3 md:mb-4 transition-all duration-500 group-hover:scale-110 shadow-lg" style={{backgroundColor: 'rgba(55, 65, 81, 0.5)'}}>
-                  <span className="text-2xl md:text-3xl font-bold text-emerald-400">
+                <div className="relative w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-2xl border-4 border-green-500 bg-white flex items-center justify-center mx-auto mb-2 md:mb-3 lg:mb-4 transition-all duration-300 group-hover:scale-110 shadow-lg">
+                  <span className="text-xl md:text-2xl lg:text-3xl font-bold text-green-600">
                     {questionsAnswered > 0 ? Math.round((score / (questionsAnswered * 5)) * 100) : 0}%
                   </span>
                 </div>
-                <p className="text-base md:text-lg font-bold text-white mb-1">Accuracy</p>
-                <p className="text-sm text-white/70">Performance</p>
+                <p className="text-sm md:text-base lg:text-lg font-bold text-gray-900 mb-1">Accuracy</p>
+                <p className="text-xs md:text-sm text-gray-600">Performance</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Main Simulator */}
-        <div className="grid lg:grid-cols-2 gap-8 md:gap-12 mb-16 md:mb-20">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 lg:gap-12 mb-12 md:mb-16 lg:mb-20">
           
           {/* Video Simulation */}
           <div className="relative">
-            <div className="backdrop-blur-xl border-2 p-6 md:p-8 shadow-2xl rounded-2xl" style={{backgroundColor: 'rgba(55, 65, 81, 0.3)', borderColor: 'rgba(55, 65, 81, 0.4)'}}>
-              <div className="flex items-center gap-3 md:gap-4 mb-6 md:mb-8">
-                <div className="w-12 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center shadow-lg" style={{backgroundColor: '#374151'}}>
-                  <span className="text-xs md:text-sm font-bold text-white">Video</span>
+            <div className="bg-white border-2 border-gray-200 p-4 md:p-6 lg:p-8 shadow-lg rounded-2xl">
+              <div className="flex items-center gap-2 md:gap-3 lg:gap-4 mb-4 md:mb-6 lg:mb-8">
+                <div className="w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 bg-gray-100 rounded-xl flex items-center justify-center shadow-sm border border-gray-200">
+                  <span className="text-xs md:text-sm lg:text-base font-bold text-gray-700">📹</span>
                 </div>
                 <div>
-                  <h3 className="text-lg md:text-xl font-bold text-white">Observe the Case</h3>
-                  <p className="text-white/80 font-medium">Watch real courtroom proceedings</p>
+                  <h3 className="text-base md:text-lg lg:text-xl font-bold text-gray-900">Observe the Case</h3>
+                  <p className="text-gray-600 font-medium text-sm md:text-base">Watch real courtroom proceedings</p>
                 </div>
               </div>
               
               <div 
-                className={`relative rounded-2xl aspect-video flex items-center justify-center cursor-pointer group overflow-hidden transition-all duration-500 ${
-                  isPlaying ? 'ring-4 ring-white/50 shadow-2xl' : 'hover:ring-2 hover:ring-white/30'
+                className={`relative rounded-2xl aspect-video flex items-center justify-center cursor-pointer group overflow-hidden transition-all duration-300 border-2 ${
+                  isPlaying ? 'border-blue-400 bg-blue-50 shadow-lg' : 'border-gray-200 bg-gray-50 hover:border-gray-300 hover:bg-gray-100'
                 }`}
-                style={{backgroundColor: '#1E3A8A'}}
                 onClick={toggleVideoPlay}
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/40"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-gray-900/20 via-transparent to-gray-900/20"></div>
                 
                 {/* Floating particles */}
                 <div className="absolute inset-0">
-                  <div className="w-2 h-2 bg-white/30 rounded-full absolute top-1/4 left-1/4 animate-pulse"></div>
-                  <div className="w-1.5 h-1.5 bg-white/40 rounded-full absolute top-3/4 right-1/3 animate-pulse" style={{animationDelay: '1s'}}></div>
-                  <div className="w-1 h-1 bg-white/50 rounded-full absolute bottom-1/4 left-1/2 animate-pulse" style={{animationDelay: '2s'}}></div>
+                  <div className="w-2 h-2 bg-gray-400/30 rounded-full absolute top-1/4 left-1/4 animate-pulse"></div>
+                  <div className="w-1.5 h-1.5 bg-gray-400/40 rounded-full absolute top-3/4 right-1/3 animate-pulse" style={{animationDelay: '1s'}}></div>
+                  <div className="w-1 h-1 bg-gray-400/50 rounded-full absolute bottom-1/4 left-1/2 animate-pulse" style={{animationDelay: '2s'}}></div>
                 </div>
                 
                 <div className="relative z-10 text-center">
-                  <div className={`w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mb-4 md:mb-6 transition-all duration-500 shadow-2xl ${
-                    isPlaying ? 'scale-110' : 'group-hover:scale-110'
-                  }`} style={{backgroundColor: 'rgba(55, 65, 81, 0.8)'}}>
+                  <div className={`w-14 h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 bg-white border-2 border-gray-300 rounded-full flex items-center justify-center mb-3 md:mb-4 lg:mb-6 transition-all duration-300 shadow-lg ${
+                    isPlaying ? 'scale-110 border-blue-400' : 'group-hover:scale-110 hover:border-gray-400'
+                  }`}>
                     {isPlaying ? (
-                      <span className="text-sm md:text-base font-bold text-white">Pause</span>
+                      <span className="text-xs md:text-sm lg:text-base font-bold text-gray-700">⏸️</span>
                     ) : (
-                      <span className="text-sm md:text-base font-bold text-white">Play</span>
+                      <span className="text-xs md:text-sm lg:text-base font-bold text-gray-700">▶️</span>
                     )}
                   </div>
-                  <h4 className="text-lg md:text-xl font-bold text-white mb-2 md:mb-3">
+                  <h4 className="text-base md:text-lg lg:text-xl font-bold text-gray-900 mb-1 md:mb-2 lg:mb-3">
                     {scenarios[selectedCase].title}
                   </h4>
-                  <p className="text-white/80 font-medium">
+                  <p className="text-gray-600 font-medium text-sm md:text-base">
                     {isPlaying ? 'Playing simulation...' : 'Click to start simulation'}
                   </p>
                 </div>
                 
                 {/* Progress Bar */}
                 {isPlaying && (
-                  <div className="absolute bottom-0 left-0 right-0 h-3 bg-black/30 rounded-b-2xl">
-                    <div className="h-full bg-white transition-all duration-1000 ease-linear rounded-bl-2xl" 
+                  <div className="absolute bottom-0 left-0 right-0 h-2 md:h-3 bg-gray-200 rounded-b-2xl">
+                    <div className="h-full bg-blue-500 transition-all duration-1000 ease-linear rounded-bl-2xl" 
                          style={{ width: '70%' }}></div>
                   </div>
                 )}
               </div>
               
-              <div className="flex items-center justify-between mt-6 md:mt-8">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between mt-4 md:mt-6 lg:mt-8 gap-3 md:gap-4">
                 <button 
-                  className="px-6 md:px-8 py-3 md:py-4 rounded-xl font-semibold transition-all duration-300 hover:scale-105 shadow-lg text-white"
-                  style={{backgroundColor: '#374151'}}
+                  className="px-4 md:px-6 lg:px-8 py-2 md:py-3 lg:py-4 bg-gray-800 hover:bg-gray-900 text-white rounded-xl font-semibold transition-all duration-300 hover:scale-105 shadow-lg text-sm md:text-base"
                   onClick={toggleVideoPlay}
                 >
-                  {isPlaying ? (
-                    <>
-                      <span className="text-sm mr-2 md:mr-3">Pause</span>
-                      Pause Simulation
-                    </>
-                  ) : (
-                    <>
-                      <span className="text-sm mr-2 md:mr-3">Play</span>
-                      Watch Simulation
-                    </>
-                  )}
+                  {isPlaying ? 'Pause Simulation' : 'Watch Simulation'}
                 </button>
                 
-                <div className="flex items-center gap-2 md:gap-3 text-white/80">
-                  <span className="text-xs md:text-sm">Audio</span>
-                  <span className="text-sm md:text-base font-medium">Audio Enabled</span>
+                <div className="flex items-center gap-1 md:gap-2 lg:gap-3 text-gray-600">
+                  <span className="text-xs md:text-sm">🔊</span>
+                  <span className="text-xs md:text-sm font-medium">Audio Enabled</span>
                 </div>
               </div>
             </div>
@@ -401,67 +382,58 @@ const ContentStudio = () => {
 
           {/* Interactive Practice */}
           <div className="relative">
-            <div className="backdrop-blur-xl border-2 p-6 md:p-8 shadow-2xl rounded-2xl" style={{backgroundColor: 'rgba(55, 65, 81, 0.3)', borderColor: 'rgba(55, 65, 81, 0.4)'}}>
-              <div className="flex items-center gap-3 md:gap-4 mb-6 md:mb-8">
-                <div className="w-12 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center shadow-lg" style={{backgroundColor: '#374151'}}>
-                  <span className="text-xs md:text-sm font-bold text-white">Practice</span>
+            <div className="bg-white border-2 border-gray-200 p-4 md:p-6 lg:p-8 shadow-lg rounded-2xl">
+              <div className="flex items-center gap-2 md:gap-3 lg:gap-4 mb-4 md:mb-6 lg:mb-8">
+                <div className="w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 bg-gray-100 rounded-xl flex items-center justify-center shadow-sm border border-gray-200">
+                  <span className="text-xs md:text-sm lg:text-base font-bold text-gray-700">💼</span>
                 </div>
                 <div>
-                  <h3 className="text-lg md:text-xl font-bold text-white">Practice Cross-Examination</h3>
-                  <p className="text-white/80 font-medium">Test your litigation skills</p>
+                  <h3 className="text-base md:text-lg lg:text-xl font-bold text-gray-900">Practice Cross-Examination</h3>
+                  <p className="text-gray-600 font-medium text-sm md:text-base">Test your litigation skills</p>
                 </div>
               </div>
               
               {/* Witness Statement */}
-              <div className="border-2 rounded-2xl p-4 md:p-6 mb-6 md:mb-8 shadow-lg" style={{backgroundColor: 'rgba(255, 255, 255, 0.1)', borderColor: 'rgba(255, 255, 255, 0.2)'}}>
-                <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
-                  <span className="text-xs md:text-sm font-bold text-white">Witness</span>
-                  <h4 className="text-base md:text-lg font-bold text-white">Witness Statement</h4>
+              <div className="bg-gray-50 border-2 border-gray-200 rounded-2xl p-3 md:p-4 lg:p-6 mb-4 md:mb-6 lg:mb-8 shadow-sm">
+                <div className="flex items-center gap-1 md:gap-2 lg:gap-3 mb-2 md:mb-3 lg:mb-4">
+                  <span className="text-xs md:text-sm lg:text-base font-bold text-gray-700">👤</span>
+                  <h4 className="text-sm md:text-base lg:text-lg font-bold text-gray-900">Witness Statement</h4>
                 </div>
-                <p className="text-white/90 leading-relaxed font-medium">
+                <p className="text-gray-800 leading-relaxed font-medium text-sm md:text-base">
                   "{scenarios[selectedCase].witnessStatement}"
                 </p>
               </div>
 
               {/* Question Selection */}
-              <div className="mb-6 md:mb-8">
-                <h4 className="text-base md:text-lg font-bold text-white mb-4 md:mb-6">
+              <div className="mb-4 md:mb-6 lg:mb-8">
+                <h4 className="text-sm md:text-base lg:text-lg font-bold text-gray-900 mb-3 md:mb-4 lg:mb-6">
                   Choose your cross-examination question:
                 </h4>
-                <div className="space-y-3 md:space-y-4">
+                <div className="space-y-2 md:space-y-3 lg:space-y-4">
                   {scenarios[selectedCase].questions.map((question) => (
                     <button
                       key={question.id}
-                      className={`w-full text-left transition-all duration-500 transform hover:scale-[1.02] rounded-2xl ${
+                      className={`w-full text-left transition-all duration-300 transform hover:scale-[1.02] rounded-2xl border-2 ${
                         userChoice?.id === question.id 
-                          ? 'ring-2 ring-white/50 shadow-xl' 
-                          : 'hover:shadow-lg'
+                          ? 'border-blue-400 bg-blue-50 shadow-md' 
+                          : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50 shadow-sm hover:shadow-md'
                       } ${showFeedback && userChoice?.id !== question.id ? 'opacity-50' : ''}`}
                       onClick={() => handleQuestionSelect(question)}
                       disabled={showFeedback && userChoice?.id !== question.id}
-                      style={{
-                        backgroundColor: userChoice?.id === question.id 
-                          ? 'rgba(255, 255, 255, 0.15)' 
-                          : 'rgba(55, 65, 81, 0.4)',
-                        borderColor: userChoice?.id === question.id 
-                          ? 'rgba(255, 255, 255, 0.3)' 
-                          : 'rgba(55, 65, 81, 0.5)',
-                        border: '2px solid'
-                      }}
                     >
-                      <div className="p-4 md:p-6">
-                        <div className="flex items-start gap-3 md:gap-4">
-                          <div className={`w-6 h-6 md:w-8 md:h-8 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all duration-500 ${
+                      <div className="p-3 md:p-4 lg:p-6">
+                        <div className="flex items-start gap-2 md:gap-3 lg:gap-4">
+                          <div className={`w-5 h-5 md:w-6 md:h-6 lg:w-8 lg:h-8 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all duration-300 ${
                             userChoice?.id === question.id 
-                              ? 'border-white bg-white shadow-lg' 
-                              : 'border-white/50 hover:border-white'
+                              ? 'border-blue-500 bg-blue-500 shadow-sm' 
+                              : 'border-gray-300 hover:border-gray-400'
                           }`}>
                             {userChoice?.id === question.id && (
-                              <span className="text-xs font-bold" style={{color: '#1E3A8A'}}>✓</span>
+                              <span className="text-xs font-bold text-white">✓</span>
                             )}
                           </div>
                           <div className="flex-1">
-                            <p className="text-white mb-2 md:mb-3 font-medium leading-relaxed">{question.text}</p>
+                            <p className="text-gray-900 mb-1 md:mb-2 lg:mb-3 font-medium leading-relaxed text-sm md:text-base">{question.text}</p>
                             <span className={`text-xs px-2 md:px-3 py-1 md:py-1.5 rounded-full border font-semibold ${getQuestionTypeColor(question.type)}`}>
                               {question.type}
                             </span>
@@ -475,33 +447,31 @@ const ContentStudio = () => {
 
               {/* AI Feedback */}
               {showFeedback && userChoice && (
-                <div className="border-2 rounded-2xl p-6 md:p-8 shadow-xl" style={{backgroundColor: 'rgba(55, 65, 81, 0.4)', borderColor: 'rgba(55, 65, 81, 0.5)'}}>
-                  <div className="flex items-center gap-3 md:gap-4 mb-4 md:mb-6">
-                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center shadow-lg" style={{backgroundColor: '#374151'}}>
-                      <span className="text-xs md:text-sm font-bold text-white">AI</span>
+                <div className="bg-gray-50 border-2 border-gray-200 rounded-2xl p-4 md:p-6 lg:p-8 shadow-lg">
+                  <div className="flex items-center gap-2 md:gap-3 lg:gap-4 mb-3 md:mb-4 lg:mb-6">
+                    <div className="w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 bg-gray-100 rounded-xl flex items-center justify-center shadow-sm border border-gray-200">
+                      <span className="text-xs md:text-sm lg:text-base font-bold text-gray-700">🤖</span>
                     </div>
-                    <h4 className="text-lg md:text-xl font-bold text-white">Expert AI Analysis</h4>
+                    <h4 className="text-base md:text-lg lg:text-xl font-bold text-gray-900">Expert AI Analysis</h4>
                   </div>
                   
-                  <p className="text-white/90 mb-4 md:mb-6 leading-relaxed font-medium text-base md:text-lg">
+                  <p className="text-gray-800 mb-3 md:mb-4 lg:mb-6 leading-relaxed font-medium text-sm md:text-base lg:text-lg">
                     {userChoice.feedback}
                   </p>
                   
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div className="flex items-center gap-2 md:gap-3">
-                      <span className="text-xs md:text-sm font-bold text-white">Award</span>
-                      <span className="text-base md:text-lg font-bold text-emerald-400">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4">
+                    <div className="flex items-center gap-1 md:gap-2 lg:gap-3">
+                      <span className="text-xs md:text-sm lg:text-base font-bold text-gray-700">🏆</span>
+                      <span className="text-sm md:text-base lg:text-lg font-bold text-green-600">
                         +{userChoice.score} points earned
                       </span>
                     </div>
                     
                     <button 
-                      className="px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold transition-all duration-300 hover:scale-105 text-white"
-                      style={{backgroundColor: '#374151'}}
+                      className="px-3 md:px-4 lg:px-6 py-2 md:py-2.5 lg:py-3 bg-gray-800 hover:bg-gray-900 text-white rounded-xl font-semibold transition-all duration-300 hover:scale-105 text-sm md:text-base"
                       onClick={resetDemo}
                     >
-                      Try Another Question
-                      <span className="text-sm ml-2">→</span>
+                      Try Another Question →
                     </button>
                   </div>
                 </div>
@@ -512,32 +482,30 @@ const ContentStudio = () => {
 
         {/* Demo Notice */}
         <div className="relative overflow-hidden">
-          <div className="backdrop-blur-xl border-2 p-8 md:p-12 text-center shadow-2xl rounded-2xl" style={{backgroundColor: 'rgba(55, 65, 81, 0.4)', borderColor: 'rgba(55, 65, 81, 0.5)'}}>
+          <div className="bg-white border-2 border-gray-200 p-6 md:p-8 lg:p-12 text-center shadow-lg rounded-2xl">
             {/* Background Elements */}
             <div className="absolute inset-0">
-              <div className="absolute top-6 left-6 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-              <div className="absolute bottom-6 right-6 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-56 h-56 bg-white/5 rounded-full blur-3xl"></div>
+              <div className="absolute top-4 left-4 md:top-6 md:left-6 w-24 h-24 md:w-32 md:h-32 bg-gray-100/30 rounded-full blur-2xl"></div>
+              <div className="absolute bottom-4 right-4 md:bottom-6 md:right-6 w-28 h-28 md:w-40 md:h-40 bg-gray-50/30 rounded-full blur-2xl"></div>
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40 md:w-56 md:h-56 bg-gray-100/20 rounded-full blur-3xl"></div>
             </div>
             
             <div className="relative z-10">
-              <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 md:mb-8 shadow-xl" style={{backgroundColor: '#374151'}}>
-                <span className="text-base md:text-lg font-bold text-white">Premium</span>
+              <div className="w-10 h-10 md:w-12 md:h-12 lg:w-16 lg:h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4 md:mb-6 lg:mb-8 shadow-lg border border-gray-200">
+                <span className="text-sm md:text-base lg:text-lg font-bold text-gray-700">⭐</span>
               </div>
-              <h3 className="text-3xl md:text-4xl font-bold text-white mb-4 md:mb-6">
+              <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 md:mb-4 lg:mb-6">
                 This is Just the Beginning
               </h3>
-              <p className="text-lg md:text-xl text-white/90 mb-8 md:mb-10 max-w-3xl mx-auto leading-relaxed">
+              <p className="text-base md:text-lg lg:text-xl text-gray-600 mb-6 md:mb-8 lg:mb-10 max-w-3xl mx-auto leading-relaxed">
                 Experience the full Cross-Examination Simulator with detailed scoring, multiple rounds, 
                 realistic courtroom environments, and comprehensive feedback with a premium subscription.
               </p>
-              <div className="flex flex-col sm:flex-row justify-center items-center gap-4 md:gap-6">
-                <button className="px-6 md:px-8 py-3 md:py-4 text-base md:text-lg font-bold rounded-xl transition-all duration-300 hover:scale-105 shadow-xl text-white" style={{backgroundColor: '#374151'}}>
-                  Start Free Trial
-                  <span className="text-sm ml-2 md:ml-3">→</span>
+              <div className="flex flex-col sm:flex-row justify-center items-center gap-3 md:gap-4 lg:gap-6">
+                <button className="px-4 md:px-6 lg:px-8 py-2 md:py-3 lg:py-4 text-sm md:text-base lg:text-lg font-bold bg-gray-800 hover:bg-gray-900 text-white rounded-xl transition-all duration-300 hover:scale-105 shadow-lg w-full sm:w-auto">
+                  Start Free Trial →
                 </button>
-                <button className="px-6 md:px-8 py-3 md:py-4 border-2 rounded-xl font-bold transition-all duration-300 hover:scale-105 backdrop-blur-sm text-white" style={{backgroundColor: 'rgba(255, 255, 255, 0.1)', borderColor: 'rgba(255, 255, 255, 0.3)'}}>
-                  <span className="text-sm mr-2 md:mr-3">Stats</span>
+                <button className="px-4 md:px-6 lg:px-8 py-2 md:py-3 lg:py-4 border-2 border-gray-300 hover:border-gray-400 bg-white hover:bg-gray-50 text-gray-700 hover:text-gray-900 rounded-xl font-bold transition-all duration-300 hover:scale-105 text-sm md:text-base lg:text-lg w-full sm:w-auto">
                   View Full Features
                 </button>
               </div>
