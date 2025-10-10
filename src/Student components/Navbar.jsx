@@ -167,10 +167,15 @@ const Navbar = () => {
 
   const handleLogout = useCallback(async () => {
     try {
+      // Clear authentication - this will trigger cleanup in other components
       await logout();
-      navigate('/');
+      
+      // Navigate to home page with replace to clear history
+      navigate('/', { replace: true });
     } catch (error) {
       console.error('Logout failed:', error);
+      // Still navigate even if there's an error
+      navigate('/', { replace: true });
     }
   }, [logout, navigate]);
 

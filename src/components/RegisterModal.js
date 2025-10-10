@@ -19,7 +19,7 @@ const RegisterModal = ({ isOpen, onClose }) => {
   const [hoveredRole, setHoveredRole] = useState(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, logoutEvent } = useAuth();
 
   const colors = {
     background: '#f5f5ef',
@@ -85,6 +85,13 @@ const RegisterModal = ({ isOpen, onClose }) => {
       setIsAnimating(false);
     }
   }, [isOpen, onClose]);
+
+  // Close modal when logout event occurs
+  useEffect(() => {
+    if (logoutEvent > 0 && isOpen) {
+      onClose();
+    }
+  }, [logoutEvent, isOpen, onClose]);
 
   const handleChange = (e) => {
     setFormData({
@@ -249,33 +256,32 @@ const RegisterModal = ({ isOpen, onClose }) => {
                   background: `linear-gradient(135deg, ${colors.golden}, ${colors.golden}DD)`
                 }}
               >
-                <span className="text-2xl sm:text-3xl text-white">📝</span>
+                <span className="text-2xl sm:text-3xl text-white">⚖️</span>
               </div>
               <h1 
                 id="register-modal-title"
                 className="text-xl sm:text-2xl font-bold mb-2"
                 style={{ color: colors.darkNavy }}
               >
-                Create Account
+                Create Professional Account
               </h1>
               <p 
                 className="text-sm sm:text-base"
                 style={{ color: colors.mediumGray }}
               >
-                Join our legal platform and get started
+                Join our legal platform and access professional tools
               </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
               
-              {/* Name Field */}
               <div>
                 <label 
                   htmlFor="name" 
                   className="block text-sm font-medium mb-2"
                   style={{ color: colors.darkNavy }}
                 >
-                  👤 Full Name
+                  Full Name
                 </label>
                 <input
                   type="text"
@@ -284,7 +290,7 @@ const RegisterModal = ({ isOpen, onClose }) => {
                   value={formData.name}
                   onChange={handleChange}
                   required
-                  placeholder="Enter your full name"
+                  placeholder="Enter your full professional name"
                   className="w-full p-3 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent"
                   style={{
                     backgroundColor: '#fafafa',
@@ -302,7 +308,7 @@ const RegisterModal = ({ isOpen, onClose }) => {
                   className="block text-sm font-medium mb-2"
                   style={{ color: colors.darkNavy }}
                 >
-                  📧 Email Address
+                  Email Address
                 </label>
                 <input
                   type="email"
@@ -311,7 +317,7 @@ const RegisterModal = ({ isOpen, onClose }) => {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  placeholder="Enter your email address"
+                  placeholder="Enter your professional email address"
                   className="w-full p-3 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent"
                   style={{
                     backgroundColor: '#fafafa',
@@ -329,7 +335,7 @@ const RegisterModal = ({ isOpen, onClose }) => {
                   className="block text-sm font-medium mb-2"
                   style={{ color: colors.darkNavy }}
                 >
-                  🔒 Password
+                  Password
                 </label>
                 <div className="relative">
                   <input
@@ -339,7 +345,7 @@ const RegisterModal = ({ isOpen, onClose }) => {
                     value={formData.password}
                     onChange={handleChange}
                     required
-                    placeholder="Create a password (min 6 characters)"
+                    placeholder="Create a secure password (minimum 6 characters)"
                     className="w-full p-3 pr-12 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent"
                     style={{
                       backgroundColor: '#fafafa',
@@ -387,14 +393,13 @@ const RegisterModal = ({ isOpen, onClose }) => {
                 )}
               </div>
 
-              {/* Confirm Password Field */}
               <div>
                 <label 
                   htmlFor="confirmPassword"
                   className="block text-sm font-medium mb-2"
                   style={{ color: colors.darkNavy }}
                 >
-                  🔐 Confirm Password
+                  Confirm Password
                 </label>
                 <div className="relative">
                   <input
@@ -404,7 +409,7 @@ const RegisterModal = ({ isOpen, onClose }) => {
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     required
-                    placeholder="Confirm your password"
+                    placeholder="Confirm your secure password"
                     className="w-full p-3 pr-12 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent"
                     style={{
                       backgroundColor: '#fafafa',
@@ -451,13 +456,12 @@ const RegisterModal = ({ isOpen, onClose }) => {
                 )}
               </div>
 
-              {/* Role Selection */}
               <div>
                 <label 
                   className="block text-sm font-medium mb-3"
                   style={{ color: colors.darkNavy }}
                 >
-                  👤 Select Your Role
+                  Professional Role
                 </label>
                 <div className="space-y-3">
                   {roles.map((role) => {
@@ -549,8 +553,7 @@ const RegisterModal = ({ isOpen, onClose }) => {
                   </>
                 ) : (
                   <>
-                    <span>🚀</span>
-                    Create Account
+                    Create Account Securely
                     <span>→</span>
                   </>
                 )}
@@ -596,13 +599,13 @@ const RegisterModal = ({ isOpen, onClose }) => {
                     className="text-sm font-semibold mb-1"
                     style={{ color: colors.darkNavy }}
                   >
-                    Demo Mode Active
+                    Demo Environment
                   </h4>
                   <p 
                     className="text-xs leading-relaxed"
                     style={{ color: colors.mediumGray }}
                   >
-                    Fill in all fields and select your role to create a demo account and explore the platform.
+                    Complete all fields and select your professional role to create a demonstration account and explore the platform capabilities.
                   </p>
                 </div>
               </div>

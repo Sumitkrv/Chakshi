@@ -16,7 +16,7 @@ const LoginModal = ({ isOpen, onClose }) => {
   const [hoveredRole, setHoveredRole] = useState(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, logoutEvent } = useAuth();
 
   const colors = {
     background: '#f5f5ef',
@@ -81,6 +81,13 @@ const LoginModal = ({ isOpen, onClose }) => {
       setIsAnimating(false);
     }
   }, [isOpen, onClose]);
+
+  // Close modal when logout event occurs
+  useEffect(() => {
+    if (logoutEvent > 0 && isOpen) {
+      onClose();
+    }
+  }, [logoutEvent, isOpen, onClose]);
 
   const handleChange = (e) => {
     setFormData({
@@ -199,20 +206,20 @@ const LoginModal = ({ isOpen, onClose }) => {
                 background: `linear-gradient(135deg, ${colors.golden}, ${colors.golden}DD)`
               }}
             >
-              <span className="text-2xl sm:text-3xl text-white">🔐</span>
+              <span className="text-2xl sm:text-3xl text-white">⚖️</span>
             </div>
             <h1 
               id="login-modal-title"
               className="text-xl sm:text-2xl font-bold mb-2"
               style={{ color: colors.darkNavy }}
             >
-              Welcome Back
+              Access Your Account
             </h1>
             <p 
               className="text-sm sm:text-base"
               style={{ color: colors.mediumGray }}
             >
-              Sign in to your legal platform account
+              Sign in to your legal platform account to continue
             </p>
           </div>
 
@@ -223,7 +230,7 @@ const LoginModal = ({ isOpen, onClose }) => {
                 className="block text-sm font-medium mb-2"
                 style={{ color: colors.darkNavy }}
               >
-                📧 Email Address
+                Email Address
               </label>
               <input
                 type="email"
@@ -232,7 +239,7 @@ const LoginModal = ({ isOpen, onClose }) => {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                placeholder="Enter your email"
+                placeholder="Enter your professional email"
                 className="w-full p-3 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent"
                 style={{
                   backgroundColor: '#fafafa',
@@ -249,7 +256,7 @@ const LoginModal = ({ isOpen, onClose }) => {
                 className="block text-sm font-medium mb-2"
                 style={{ color: colors.darkNavy }}
               >
-                🔒 Password
+                Password
               </label>
               <div className="relative">
                 <input
@@ -259,7 +266,7 @@ const LoginModal = ({ isOpen, onClose }) => {
                   value={formData.password}
                   onChange={handleChange}
                   required
-                  placeholder="Enter your password"
+                  placeholder="Enter your secure password"
                   className="w-full p-3 pr-12 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent"
                   style={{
                     backgroundColor: '#fafafa',
@@ -284,7 +291,7 @@ const LoginModal = ({ isOpen, onClose }) => {
                 className="block text-sm font-medium mb-3"
                 style={{ color: colors.darkNavy }}
               >
-                👤 Select Your Role
+                Professional Role
               </label>
               <div className="space-y-2 sm:space-y-3">
                 {roles.map((role) => {
@@ -376,8 +383,7 @@ const LoginModal = ({ isOpen, onClose }) => {
                 </>
               ) : (
                 <>
-                  <span>👤</span>
-                  Sign In
+                  Sign In Securely
                   <span>→</span>
                 </>
               )}
@@ -438,20 +444,20 @@ const LoginModal = ({ isOpen, onClose }) => {
                   background: `linear-gradient(135deg, ${colors.golden}, ${colors.golden}DD)`
                 }}
               >
-                <span className="text-sm sm:text-lg text-white">⭐</span>
+                <span className="text-sm sm:text-lg text-white">ℹ️</span>
               </div>
               <div>
                 <h4 
                   className="text-xs sm:text-sm font-semibold mb-1"
                   style={{ color: colors.darkNavy }}
                 >
-                  Demo Mode Active
+                  Demo Environment
                 </h4>
                 <p 
                   className="text-xs leading-relaxed"
                   style={{ color: colors.mediumGray }}
                 >
-                  You can sign in with any email and password. Just select your role and click "Sign In" to explore the platform.
+                  This is a demonstration environment. Please use any valid email format and password to access the platform features.
                 </p>
               </div>
             </div>

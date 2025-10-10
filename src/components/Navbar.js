@@ -1,24 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Search, Menu, X, ChevronDown, LogIn, UserPlus } from 'lucide-react';
+import { Menu, X, ChevronDown, LogIn, UserPlus } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 import LoginModal from './LoginModal';
 import RegisterModal from './RegisterModal';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const [activeSection, setActiveSection] = useState('home');
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
-  const [searchSuggestions, setSearchSuggestions] = useState([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [isSearching, setIsSearching] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const navbarRef = useRef(null);
-  const searchInputRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const { logoutEvent } = useAuth(); // Listen for logout events
 
   // Professional color palette
   const colors = {
@@ -91,30 +87,21 @@ const Navbar = () => {
       // Clear active section for auth/dashboard pages
       setActiveSection('');
     }
+    
+    // Always close modals and mobile menu when route changes
+    setShowLoginModal(false);
+    setShowRegisterModal(false);
+    setIsOpen(false);
   }, [location]);
 
-  // Keyboard shortcut for search
+  // Close modals when user logs out
   useEffect(() => {
-    const handleKeyPress = (event) => {
-      if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
-        event.preventDefault();
-        searchInputRef.current?.focus();
-      }
-      if (event.key === 'Escape') {
-        searchInputRef.current?.blur();
-        setIsSearchFocused(false);
-        setShowSuggestions(false);
-        setSearchQuery('');
-      }
-      if (event.key === 'Enter' && isSearchFocused) {
-        event.preventDefault();
-        handleSearch(event);
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyPress);
-    return () => document.removeEventListener('keydown', handleKeyPress);
-  }, [isSearchFocused, searchQuery]);
+    if (logoutEvent > 0) {
+      setShowLoginModal(false);
+      setShowRegisterModal(false);
+      setIsOpen(false);
+    }
+  }, [logoutEvent]);
 
   // Click outside handler
   useEffect(() => {
@@ -182,124 +169,12 @@ const Navbar = () => {
     setIsOpen(false);
   };
 
-  // Search suggestions data
-  const searchSuggestionsData = [
-    { title: 'Contract Analysis', type: 'feature', path: '/', section: 'features' },
-    { title: 'AI Legal Research', type: 'feature', path: '/', section: 'features' },
-    { title: 'Document Automation', type: 'feature', path: '/', section: 'features' },
-    { title: 'Risk Assessment', type: 'feature', path: '/', section: 'features' },
-    { title: 'Pricing Plans', type: 'section', path: '/', section: 'pricing' },
-    { title: 'Free Trial', type: 'action', path: '', section: '', action: 'register' },
-    { title: 'Customer Reviews', type: 'section', path: '/', section: 'testimonials' },
-    { title: 'Contact Support', type: 'section', path: '/', section: 'contact' },
-    { title: 'Legal Templates', type: 'resource', path: '/', section: 'features' },
-    { title: 'Case Studies', type: 'resource', path: '/', section: 'testimonials' },
-    { title: 'API Documentation', type: 'resource', path: '/', section: 'contact' },
-    { title: 'Security & Privacy', type: 'info', path: '/', section: 'features' }
-  ];
-
-  // Enhanced search with suggestions
-  useEffect(() => {
-    if (searchQuery.trim().length > 0) {
-      const filtered = searchSuggestionsData.filter(item => 
-        item.title.toLowerCase().includes(searchQuery.toLowerCase())
-      ).slice(0, 6);
-      setSearchSuggestions(filtered);
-      setShowSuggestions(true);
-    } else {
-      setSearchSuggestions([]);
-      setShowSuggestions(false);
-    }
-  }, [searchQuery]);
-
-  const handleSearch = async (e, suggestion = null) => {
-    e.preventDefault();
-    setIsSearching(true);
-    
-    try {
-      if (suggestion) {
-        // Handle suggestion click
-        setSearchQuery(suggestion.title);
-        setShowSuggestions(false);
-        
-        if (suggestion.action === 'register') {
-          // Open register modal
-          setShowRegisterModal(true);
-        } else if (suggestion.section) {
-          // Navigate to section
-          if (location.pathname !== suggestion.path) {
-            navigate(suggestion.path);
-            setTimeout(() => {
-              handleLinkClick(suggestion.section);
-            }, 300);
-          } else {
-            handleLinkClick(suggestion.section);
-          }
-        } else {
-          // Navigate to page
-          navigate(suggestion.path);
-        }
-      } else if (searchQuery.trim()) {
-        // Handle direct search
-        setShowSuggestions(false);
-        
-        // Check if query matches any section
-        const matchedSuggestion = searchSuggestionsData.find(item => 
-          item.title.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-        
-        if (matchedSuggestion && matchedSuggestion.section) {
-          // Navigate to matched section
-          if (location.pathname !== matchedSuggestion.path) {
-            navigate(matchedSuggestion.path);
-            setTimeout(() => {
-              handleLinkClick(matchedSuggestion.section);
-            }, 300);
-          } else {
-            handleLinkClick(matchedSuggestion.section);
-          }
-        } else {
-          // Create search results page route
-          navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
-        }
-      }
-    } catch (error) {
-      console.error('Search error:', error);
-    } finally {
-      setIsSearching(false);
-      setIsOpen(false);
-      setTimeout(() => {
-        setSearchQuery('');
-        searchInputRef.current?.blur();
-      }, 100);
-    }
-  };
-
-  const handleSearchInputChange = (e) => {
-    setSearchQuery(e.target.value);
-  };
-
-  const handleSearchFocus = () => {
-    setIsSearchFocused(true);
-    if (searchQuery.trim().length > 0) {
-      setShowSuggestions(true);
-    }
-  };
-
-  const handleSearchBlur = () => {
-    // Delay to allow suggestion clicks
-    setTimeout(() => {
-      setIsSearchFocused(false);
-      setShowSuggestions(false);
-    }, 200);
-  };
-
   const navigationItems = [
     { id: 'hero', label: 'Home', type: 'section', path: '/' },
     { id: 'features', label: 'Features', type: 'section', path: '/' },
     { id: 'pricing', label: 'Pricing', type: 'section', path: '/' },
     { id: 'testimonials', label: 'Reviews', type: 'section', path: '/' },
-    { id: 'contact', label: 'Contact', type: 'section', path: '/' }
+    { id: 'footer', label: 'Contact', type: 'section', path: '/' }
   ];
 
   return (
@@ -344,109 +219,6 @@ const Navbar = () => {
                 Chakshi
               </span> */}
             </div>
-          </div>
-
-          {/* Enhanced Search Bar - Desktop */}
-          <div className="hidden lg:flex items-center flex-1 max-w-md mx-8 relative">
-            <form onSubmit={handleSearch} className="relative w-full">
-              <div 
-                className={`relative flex items-center rounded-2xl border-2 transition-all duration-300 ${
-                  isSearchFocused ? 'border-opacity-80 shadow-lg' : 'border-opacity-40'
-                }`}
-                style={{
-                  backgroundColor: `${colors.neutral[50]}F5`,
-                  borderColor: isSearchFocused ? colors.primary[500] : colors.neutral[300]
-                }}
-              >
-                <Search 
-                  className="absolute left-4 w-5 h-5 transition-colors duration-200"
-                  style={{ color: isSearchFocused ? colors.primary[600] : colors.neutral[500] }}
-                />
-                <input
-                  ref={searchInputRef}
-                  type="text"
-                  value={searchQuery}
-                  onChange={handleSearchInputChange}
-                  onFocus={handleSearchFocus}
-                  onBlur={handleSearchBlur}
-                  placeholder="Search legal resources..."
-                  className="w-full pl-12 pr-20 py-3 bg-transparent border-none outline-none font-medium placeholder-opacity-70"
-                  style={{
-                    color: colors.neutral[800],
-                    fontSize: '14px'
-                  }}
-                  aria-label="Search legal resources"
-                  autoComplete="off"
-                />
-                <div 
-                  className="absolute right-3 px-2 py-1 rounded-lg text-xs font-bold border"
-                  style={{
-                    backgroundColor: colors.neutral[100],
-                    borderColor: colors.neutral[300],
-                    color: colors.neutral[600]
-                  }}
-                >
-                  ⌘K
-                </div>
-                
-                {/* Search Loading Indicator */}
-                {isSearching && (
-                  <div className="absolute right-12 flex items-center">
-                    <div 
-                      className="w-4 h-4 border-2 border-transparent rounded-full animate-spin"
-                      style={{
-                        borderTopColor: colors.primary[500],
-                        borderRightColor: colors.primary[500]
-                      }}
-                    ></div>
-                  </div>
-                )}
-              </div>
-              
-              {/* Search Suggestions Dropdown */}
-              {showSuggestions && searchSuggestions.length > 0 && (
-                <div 
-                  className="absolute top-full left-0 right-0 mt-2 rounded-2xl border shadow-xl backdrop-blur-lg z-50 max-h-80 overflow-y-auto"
-                  style={{
-                    backgroundColor: `${colors.neutral[50]}F8`,
-                    borderColor: colors.neutral[300]
-                  }}
-                >
-                  <div className="p-3">
-                    <div className="text-xs font-semibold text-gray-500 mb-2 px-2">Suggestions</div>
-                    {searchSuggestions.map((suggestion, index) => (
-                      <button
-                        key={index}
-                        onClick={(e) => handleSearch(e, suggestion)}
-                        className="w-full flex items-center justify-between px-3 py-3 rounded-xl transition-all duration-200 hover:bg-white/60 text-left group"
-                        style={{ color: colors.neutral[700] }}
-                      >
-                        <div className="flex items-center space-x-3">
-                          <div 
-                            className="w-2 h-2 rounded-full"
-                            style={{
-                              backgroundColor: suggestion.type === 'feature' ? colors.primary[500] :
-                                              suggestion.type === 'section' ? colors.accent[500] :
-                                              suggestion.type === 'action' ? '#10b981' : colors.neutral[400]
-                            }}
-                          ></div>
-                          <span className="font-medium">{suggestion.title}</span>
-                        </div>
-                        <div 
-                          className="text-xs font-semibold px-2 py-1 rounded-lg opacity-70 group-hover:opacity-100 transition-opacity"
-                          style={{
-                            backgroundColor: colors.neutral[200],
-                            color: colors.neutral[600]
-                          }}
-                        >
-                          {suggestion.type.charAt(0).toUpperCase() + suggestion.type.slice(1)}
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </form>
           </div>
 
           {/* Desktop Navigation */}
@@ -566,82 +338,6 @@ const Navbar = () => {
             }}
           >
             
-            {/* Mobile Search */}
-            <div className="mb-6 relative">
-              <form onSubmit={handleSearch} className="relative">
-                <div 
-                  className="relative flex items-center rounded-2xl border-2"
-                  style={{
-                    backgroundColor: `${colors.neutral[50]}F5`,
-                    borderColor: colors.neutral[300]
-                  }}
-                >
-                  <Search 
-                    className="absolute left-4 w-5 h-5"
-                    style={{ color: colors.neutral[500] }}
-                  />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={handleSearchInputChange}
-                    onFocus={handleSearchFocus}
-                    onBlur={handleSearchBlur}
-                    placeholder="Search legal resources..."
-                    className="w-full pl-12 pr-12 py-3 bg-transparent border-none outline-none font-medium placeholder-opacity-70"
-                    style={{
-                      color: colors.neutral[800],
-                      fontSize: '14px'
-                    }}
-                    aria-label="Search legal resources"
-                    autoComplete="off"
-                  />
-                  {isSearching && (
-                    <div className="absolute right-4 flex items-center">
-                      <div 
-                        className="w-4 h-4 border-2 border-transparent rounded-full animate-spin"
-                        style={{
-                          borderTopColor: colors.primary[500],
-                          borderRightColor: colors.primary[500]
-                        }}
-                      ></div>
-                    </div>
-                  )}
-                </div>
-                
-                {/* Mobile Search Suggestions */}
-                {showSuggestions && searchSuggestions.length > 0 && (
-                  <div 
-                    className="absolute top-full left-0 right-0 mt-2 rounded-2xl border shadow-xl backdrop-blur-lg z-50 max-h-60 overflow-y-auto"
-                    style={{
-                      backgroundColor: `${colors.neutral[50]}F8`,
-                      borderColor: colors.neutral[300]
-                    }}
-                  >
-                    <div className="p-2">
-                      {searchSuggestions.slice(0, 4).map((suggestion, index) => (
-                        <button
-                          key={index}
-                          onClick={(e) => handleSearch(e, suggestion)}
-                          className="w-full flex items-center space-x-3 px-3 py-2 rounded-xl transition-all duration-200 hover:bg-white/60 text-left"
-                          style={{ color: colors.neutral[700] }}
-                        >
-                          <div 
-                            className="w-2 h-2 rounded-full flex-shrink-0"
-                            style={{
-                              backgroundColor: suggestion.type === 'feature' ? colors.primary[500] :
-                                              suggestion.type === 'section' ? colors.accent[500] :
-                                              suggestion.type === 'action' ? '#10b981' : colors.neutral[400]
-                            }}
-                          ></div>
-                          <span className="font-medium text-sm">{suggestion.title}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </form>
-            </div>
-
             {/* Mobile Navigation Links */}
             <nav aria-label="Mobile navigation">
               <div className="space-y-3 mb-6">
@@ -737,46 +433,5 @@ export const navigateToSection = (sectionId) => {
     window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
   }
 };
-
-// CSS styles for search animations
-const searchStyles = `
-  .search-suggestion-enter {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  
-  .search-suggestion-enter-active {
-    opacity: 1;
-    transform: translateY(0);
-    transition: opacity 200ms, transform 200ms;
-  }
-  
-  .search-suggestion-exit {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  
-  .search-suggestion-exit-active {
-    opacity: 0;
-    transform: translateY(-10px);
-    transition: opacity 200ms, transform 200ms;
-  }
-  
-  .search-loading-spin {
-    animation: search-spin 1s linear infinite;
-  }
-  
-  @keyframes search-spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-`;
-
-// Inject styles
-if (typeof document !== 'undefined') {
-  const styleSheet = document.createElement('style');
-  styleSheet.textContent = searchStyles;
-  document.head.appendChild(styleSheet);
-}
 
 export default Navbar;

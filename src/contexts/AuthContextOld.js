@@ -60,6 +60,13 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {

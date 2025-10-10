@@ -473,51 +473,40 @@ const Stats = () => {
           <div className="relative z-10">
             <div className="mb-6">
               <span 
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-full text-sm font-bold tracking-wide border animate-pulse"
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-full text-sm font-semibold tracking-wide border"
                 style={{ 
                   background: 'linear-gradient(135deg, rgba(182, 157, 116, 0.2) 0%, rgba(182, 157, 116, 0.3) 100%)',
                   color: '#b69d74',
-                  border: '1px solid rgba(182, 157, 116, 0.5)',
-                  fontFamily: '"Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+                  border: '1px solid rgba(182, 157, 116, 0.5)'
                 }}
               >
                 <Briefcase className="w-4 h-4" />
-                🚀 Now Launching - Early Access Available
+                Transform Your Legal Practice
               </span>
             </div>
             
             <h3 
-              className="text-4xl md:text-5xl font-black mb-6 leading-tight tracking-tight"
-              style={{ 
-                color: '#1f2839',
-                fontFamily: '"Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-                letterSpacing: '-0.02em'
-              }}
+              className="text-4xl md:text-5xl font-bold mb-6 leading-tight"
+              style={{ color: '#1f2839' }}
             >
-              Be Among the First to Experience 
+              Ready to Join the 
               <span 
-                className="bg-gradient-to-r bg-clip-text text-transparent block mt-3"
+                className="bg-gradient-to-r bg-clip-text text-transparent block mt-2"
                 style={{ 
-                  backgroundImage: 'linear-gradient(135deg, #b69d74 0%, #b69d74 50%, #1f2839 100%)',
-                  fontFamily: '"Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-                  letterSpacing: '-0.01em'
+                  backgroundImage: 'linear-gradient(135deg, #b69d74 0%, #b69d74 50%, #1f2839 100%)'
                 }}
               >
-                Next-Gen Legal AI
+                Legal AI Revolution?
               </span>
             </h3>
             
             <p 
-              className="text-xl mb-10 max-w-3xl mx-auto leading-relaxed font-semibold"
-              style={{ 
-                color: '#6b7280',
-                fontFamily: '"Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-                letterSpacing: '0.01em'
-              }}
+              className="text-xl mb-10 max-w-3xl mx-auto leading-relaxed font-medium"
+              style={{ color: '#6b7280' }}
             >
-              Join the exclusive launch of our revolutionary platform designed to 
-              <span style={{ color: '#b69d74', fontWeight: '700' }}> transform legal workflows</span> 
-              with cutting-edge AI technology
+              Join legal professionals who are already using our platform to 
+              <span style={{ color: '#b69d74', fontWeight: '600' }}> streamline workflows and boost productivity</span> 
+              with AI-powered legal solutions
             </p>
             
             <div className="flex justify-center mb-10">
@@ -538,15 +527,15 @@ const Stats = () => {
                 }}
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <span className="relative flex items-center justify-center gap-3" style={{ fontFamily: '"Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif', fontWeight: '800' }}>
+                <span className="relative flex items-center justify-center gap-3">
                   <Clock className="w-5 h-5" />
-                  Get Early Access
+                Start Free Trial
                 </span>
               </a>
             </div>
             
             {/* Enhanced Legal Social Proof */}
-            <div className="flex flex-wrap justify-center items-center gap-8 text-sm font-bold" style={{ fontFamily: '"Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
+            <div className="flex flex-wrap justify-center items-center gap-8 text-sm font-medium">
               <div className="flex items-center gap-3 group">
                 <div 
                   className="w-10 h-10 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 border"
@@ -557,7 +546,7 @@ const Stats = () => {
                 >
                   <CheckCircle className="w-5 h-5 text-[#b69d74]" />
                 </div>
-                <span style={{ color: '#1f2839' }}>🚀 Fresh Launch</span>
+                <span style={{ color: '#1f2839' }}>Live & Operational</span>
               </div>
               <div className="flex items-center gap-3 group">
                 <div 
@@ -569,7 +558,7 @@ const Stats = () => {
                 >
                   <CheckCircle className="w-5 h-5 text-[#b69d74]" />
                 </div>
-                <span style={{ color: '#1f2839' }}>✨ Limited Early Access</span>
+                <span style={{ color: '#1f2839' }}>3 Days Free Trial Available</span>
               </div>
               <div className="flex items-center gap-3 group">
                 <div 
@@ -581,7 +570,7 @@ const Stats = () => {
                 >
                   <CheckCircle className="w-5 h-5 text-[#b69d74]" />
                 </div>
-                <span style={{ color: '#1f2839' }}>🎯 Beta Testing Phase</span>
+                <span style={{ color: '#1f2839' }}>24/7 Support</span>
               </div>
             </div>
           </div>

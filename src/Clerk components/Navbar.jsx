@@ -88,14 +88,21 @@ const Navbar = ({
   // Handle logout
   const handleLogout = async () => {
     try {
+      // Clear authentication - this will trigger cleanup in other components
       await logout();
-      navigate('/login');
+      
+      // Navigate to home page with replace to clear history
+      navigate('/', { replace: true });
+      
       addNotification({
         type: 'success',
         message: 'Logged out successfully',
         duration: 3000
       });
     } catch (error) {
+      // Still navigate even if there's an error
+      navigate('/', { replace: true });
+      
       addNotification({
         type: 'error',
         message: 'Logout failed',

@@ -129,9 +129,25 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
   const handleSignOut = async () => {
     setProfileOpen(false);
     setIsLoggingOut(true);
-    await new Promise(resolve => setTimeout(resolve, 800));
-    logout();
-    navigate('/');
+    
+    try {
+      // Short delay for UX
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Clear authentication - this will trigger cleanup in other components
+      logout();
+      
+      // Navigate to home page after a short delay to ensure cleanup
+      setTimeout(() => {
+        navigate('/', { replace: true });
+      }, 100);
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Still navigate even if there's an error
+      navigate('/', { replace: true });
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   const NavButton = ({ item, mobile = false }) => (
