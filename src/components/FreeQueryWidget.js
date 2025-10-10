@@ -798,7 +798,7 @@ const FreeQueryWidget = () => {
 
   return (
     <section 
-      className="relative py-24 overflow-hidden"
+      className="relative py-12 overflow-hidden"
       style={{ 
         backgroundColor: '#f5f5ef',
         backgroundImage: 'url("https://images.unsplash.com/photo-1521587760476-6c12a4b040da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80")',
@@ -839,7 +839,31 @@ const FreeQueryWidget = () => {
         />
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-16">{/* Changed padding */}
+      <div className="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-8">
+        
+        {/* Top Section with "Solve your queries here" */}
+        <div className="text-center mb-16">
+          <h2 className="text-4xl md:text-5xl font-black mb-6 leading-tight tracking-tight"
+              style={{ 
+                color: '#1f2839',
+                fontFamily: '"Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+                letterSpacing: '-0.02em'
+              }}>
+            <span className="bg-gradient-to-r bg-clip-text text-transparent"
+                  style={{ 
+                    backgroundImage: 'linear-gradient(135deg, #b69d74 0%, #b69d74 50%, #1f2839 100%)',
+                  }}>
+              Solve Your Legal Queries Here
+            </span>
+          </h2>
+          <p className="text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed font-semibold"
+             style={{ 
+               color: '#6b7280',
+               fontFamily: '"Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+             }}>
+            Get instant AI-powered legal assistance for your questions
+          </p>
+        </div>
         
         {/* Modern Professional Header */}
         <div className="text-center mb-20">
@@ -1427,9 +1451,16 @@ const FreeQueryWidget = () => {
 
         {/* Modern Query History */}
         {queryHistory.length > 0 && (
-          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-3xl shadow-xl p-10 mb-16">
-            <h3 className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
-              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+          <div 
+            className="backdrop-blur-sm border rounded-3xl shadow-xl p-10 mb-16"
+            style={{
+              background: 'rgba(255, 255, 255, 0.85)',
+              borderColor: 'rgba(182, 157, 116, 0.3)',
+              boxShadow: '0 15px 35px rgba(31, 40, 57, 0.15)'
+            }}
+          >
+            <h3 className="text-2xl font-bold mb-8 flex items-center gap-3" style={{ color: '#1f2839' }}>
+              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" style={{ color: '#b69d74' }}>
                 <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
                 <path fillRule="evenodd" d="M4 5a2 2 0 012-2v1a1 1 0 000 2H6a2 2 0 00-2 2v6a2 2 0 002 2h8a2 2 0 002-2V8a2 2 0 00-2-2h-1V5a1 1 0 100-2V3a2 2 0 00-2-2H6a2 2 0 00-2 2v2z" clipRule="evenodd" />
               </svg>
@@ -1440,23 +1471,57 @@ const FreeQueryWidget = () => {
               {queryHistory.slice(0, 3).map((historyItem) => (
                 <div 
                   key={historyItem.id} 
-                  className="flex items-center gap-4 p-6 border border-white/20 bg-white/5 backdrop-blur-sm rounded-2xl hover:bg-white/10 hover:shadow-md transition-all duration-300"
+                  className="flex items-center gap-4 p-6 border rounded-2xl hover:shadow-md transition-all duration-300"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.70)',
+                    borderColor: 'rgba(182, 157, 116, 0.3)',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.90)';
+                    e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.5)';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.70)';
+                    e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.3)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
                 >
-                  <div className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0">
-                    <svg className="w-6 h-6 text-[#b69d74]" fill="currentColor" viewBox="0 0 20 20">
+                  <div 
+                    className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                    style={{
+                      background: 'rgba(182, 157, 116, 0.2)',
+                      border: '1px solid rgba(182, 157, 116, 0.3)'
+                    }}
+                  >
+                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" style={{ color: '#b69d74' }}>
                       <path fillRule="evenodd" d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h3l3 3 3-3h3a2 2 0 002-2zM5 7a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm1 3a1 1 0 100 2h3a1 1 0 100-2H6z" clipRule="evenodd" />
                     </svg>
                   </div>
                   
                   <div className="flex-1 min-w-0">
-                    <p className="text-base font-medium text-white truncate">{historyItem.text}</p>
-                    <p className="text-sm text-gray-400 mt-1">
+                    <p className="text-base font-medium truncate" style={{ color: '#1f2839' }}>{historyItem.text}</p>
+                    <p className="text-sm mt-1" style={{ color: '#6b7280' }}>
                       {new Date(historyItem.timestamp).toLocaleDateString()} • {historyItem.language} • {historyItem.category}
                     </p>
                   </div>
                   
                   <button 
-                    className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl font-medium text-gray-300 hover:text-white transition-all duration-200 hover:scale-105"
+                    className="px-4 py-2 border rounded-xl font-medium transition-all duration-200 hover:scale-105"
+                    style={{
+                      background: 'rgba(182, 157, 116, 0.2)',
+                      borderColor: 'rgba(182, 157, 116, 0.4)',
+                      color: '#1f2839'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'rgba(182, 157, 116, 0.3)';
+                      e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.6)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'rgba(182, 157, 116, 0.2)';
+                      e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.4)';
+                    }}
                     onClick={() => setQuery(historyItem.text)}
                   >
                     Reuse
