@@ -71,36 +71,52 @@ export default function ExamPrep() {
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-6 bg-[#f5f5ef] min-h-screen">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">Exam Preparation Center</h1>
-          <p className="text-gray-600 mt-2">Welcome back, Chakshi! Let's continue your exam preparation journey.</p>
+          <h1 className="text-3xl font-bold text-[#1f2839]">Exam Preparation Center</h1>
+          <p className="text-[#6b7280] mt-2">Welcome back, Chakshi! Let's continue your exam preparation journey.</p>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex border-b border-gray-200 mb-6">
+        <div className="flex border-b border-[rgba(31,40,57,0.15)] mb-6">
           <button
-            className={`px-4 py-2 font-medium ${activeTab === 'quizzes' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
+            className={`px-4 py-2 font-medium transition-colors ${
+              activeTab === 'quizzes' 
+                ? 'text-[#b69d74] border-b-2 border-[#b69d74]' 
+                : 'text-[#6b7280] hover:text-[#1f2839]'
+            }`}
             onClick={() => setActiveTab('quizzes')}
           >
             <i className="fas fa-question-circle mr-2"></i>Daily Quizzes
           </button>
           <button
-            className={`px-4 py-2 font-medium ${activeTab === 'progress' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
+            className={`px-4 py-2 font-medium transition-colors ${
+              activeTab === 'progress' 
+                ? 'text-[#b69d74] border-b-2 border-[#b69d74]' 
+                : 'text-[#6b7280] hover:text-[#1f2839]'
+            }`}
             onClick={() => setActiveTab('progress')}
           >
             <i className="fas fa-chart-line mr-2"></i>Progress Tracker
           </button>
           <button
-            className={`px-4 py-2 font-medium ${activeTab === 'studyplan' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
+            className={`px-4 py-2 font-medium transition-colors ${
+              activeTab === 'studyplan' 
+                ? 'text-[#b69d74] border-b-2 border-[#b69d74]' 
+                : 'text-[#6b7280] hover:text-[#1f2839]'
+            }`}
             onClick={() => setActiveTab('studyplan')}
           >
             <i className="fas fa-calendar-check mr-2"></i>Study Planner
           </button>
           <button
-            className={`px-4 py-2 font-medium ${activeTab === 'mocks' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
+            className={`px-4 py-2 font-medium transition-colors ${
+              activeTab === 'mocks' 
+                ? 'text-[#b69d74] border-b-2 border-[#b69d74]' 
+                : 'text-[#6b7280] hover:text-[#1f2839]'
+            }`}
             onClick={() => setActiveTab('mocks')}
           >
             <i className="fas fa-file-alt mr-2"></i>Mock Tests
@@ -110,35 +126,35 @@ export default function ExamPrep() {
         {/* Content based on active tab */}
         {activeTab === 'quizzes' && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-white p-6 rounded-2xl shadow">
+            <div className="bg-white p-6 rounded-2xl shadow-lg border border-[rgba(31,40,57,0.15)] backdrop-blur-sm bg-[rgba(255,255,255,0.03)]">
               <div className="flex items-center mb-4">
-                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
-                  <i className="fas fa-brain text-blue-600"></i>
+                <div className="w-10 h-10 rounded-full bg-[rgba(182,157,116,0.15)] flex items-center justify-center mr-3">
+                  <i className="fas fa-brain text-[#b69d74]"></i>
                 </div>
-                <h3 className="font-semibold text-xl text-gray-800">Daily Quiz</h3>
+                <h3 className="font-semibold text-xl text-[#1f2839]">Daily Quiz</h3>
               </div>
-              <p className="text-sm text-slate-500 mb-6">AI-generated MCQs tailored to your progress and weak areas.</p>
+              <p className="text-sm text-[#6b7280] mb-6">AI-generated MCQs tailored to your progress and weak areas.</p>
               
               {!quizStarted && !showResults ? (
                 <div>
-                  <div className="bg-blue-50 p-4 rounded-lg mb-6">
-                    <h4 className="font-medium text-blue-800 mb-2">Today's Focus: Contract Law</h4>
-                    <p className="text-sm text-blue-600">Based on your recent performance, we've prepared questions on offer, acceptance, and consideration.</p>
+                  <div className="bg-[rgba(182,157,116,0.08)] p-4 rounded-lg mb-6 border border-[rgba(182,157,116,0.15)]">
+                    <h4 className="font-medium text-[#1f2839] mb-2">Today's Focus: Contract Law</h4>
+                    <p className="text-sm text-[#6b7280]">Based on your recent performance, we've prepared questions on offer, acceptance, and consideration.</p>
                   </div>
                   <button 
                     onClick={handleStartQuiz}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg text-lg font-medium transition-colors flex items-center justify-center"
+                    className="w-full bg-gradient-to-r from-[#b69d74] to-[#b69d74DD] hover:from-[#b69d74DD] hover:to-[#b69d74BB] text-white py-3 rounded-lg text-lg font-medium transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl"
                   >
                     <i className="fas fa-play-circle mr-2"></i> Start Today's Quiz
                   </button>
                 </div>
               ) : showResults ? (
                 <div className="text-center">
-                  <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-2xl font-bold text-blue-600">{score}/{quizQuestions.length}</span>
+                  <div className="w-24 h-24 bg-[rgba(182,157,116,0.15)] rounded-full flex items-center justify-center mx-auto mb-4 border border-[rgba(182,157,116,0.3)]">
+                    <span className="text-2xl font-bold text-[#1f2839]">{score}/{quizQuestions.length}</span>
                   </div>
-                  <h3 className="text-xl font-bold text-gray-800 mb-2">Quiz Completed!</h3>
-                  <p className="text-gray-600 mb-6">
+                  <h3 className="text-xl font-bold text-[#1f2839] mb-2">Quiz Completed!</h3>
+                  <p className="text-[#6b7280] mb-6">
                     {score === quizQuestions.length 
                       ? "Perfect score! Excellent work, Chakshi!" 
                       : `You scored ${score} out of ${quizQuestions.length}. Keep practicing!`}
@@ -146,13 +162,13 @@ export default function ExamPrep() {
                   <div className="flex space-x-4">
                     <button 
                       onClick={handleResetQuiz}
-                      className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 rounded-lg font-medium transition-colors"
+                      className="flex-1 bg-[rgba(31,40,57,0.05)] hover:bg-[rgba(31,40,57,0.1)] text-[#1f2839] py-2 rounded-lg font-medium transition-colors border border-[rgba(31,40,57,0.15)]"
                     >
                       Back to Quiz
                     </button>
                     <button 
                       onClick={() => setActiveTab('progress')}
-                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium transition-colors"
+                      className="flex-1 bg-gradient-to-r from-[#b69d74] to-[#b69d74DD] hover:from-[#b69d74DD] hover:to-[#b69d74BB] text-white py-2 rounded-lg font-medium transition-all duration-300"
                     >
                       View Progress
                     </button>
@@ -161,10 +177,10 @@ export default function ExamPrep() {
               ) : (
                 <div>
                   <div className="mb-4 flex justify-between items-center">
-                    <span className="text-sm text-gray-500">Question {currentQuestion + 1} of {quizQuestions.length}</span>
-                    <span className="text-sm font-medium text-blue-600">Score: {score}</span>
+                    <span className="text-sm text-[#6b7280]">Question {currentQuestion + 1} of {quizQuestions.length}</span>
+                    <span className="text-sm font-medium text-[#b69d74]">Score: {score}</span>
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                  <h3 className="text-lg font-semibold text-[#1f2839] mb-4">
                     {quizQuestions[currentQuestion].question}
                   </h3>
                   <div className="space-y-3">
@@ -172,9 +188,9 @@ export default function ExamPrep() {
                       <button
                         key={index}
                         onClick={() => handleAnswerClick(index)}
-                        className="w-full text-left p-4 bg-gray-50 hover:bg-blue-50 rounded-lg border border-gray-200 transition-colors"
+                        className="w-full text-left p-4 bg-[rgba(255,255,255,0.03)] hover:bg-[rgba(182,157,116,0.08)] rounded-lg border border-[rgba(31,40,57,0.15)] transition-all duration-200 hover:border-[rgba(182,157,116,0.3)] hover:shadow-md"
                       >
-                        {option}
+                        <span className="text-[#1f2839]">{option}</span>
                       </button>
                     ))}
                   </div>
@@ -182,60 +198,60 @@ export default function ExamPrep() {
               )}
             </div>
             
-            <div className="bg-white p-6 rounded-2xl shadow">
+            <div className="bg-white p-6 rounded-2xl shadow-lg border border-[rgba(31,40,57,0.15)] backdrop-blur-sm bg-[rgba(255,255,255,0.03)]">
               <div className="flex items-center mb-4">
-                <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mr-3">
-                  <i className="fas fa-trophy text-purple-600"></i>
+                <div className="w-10 h-10 rounded-full bg-[rgba(182,157,116,0.15)] flex items-center justify-center mr-3">
+                  <i className="fas fa-trophy text-[#b69d74]"></i>
                 </div>
-                <h3 className="font-semibold text-xl text-gray-800">Quiz Performance</h3>
+                <h3 className="font-semibold text-xl text-[#1f2839]">Quiz Performance</h3>
               </div>
-              <p className="text-sm text-slate-500 mb-6">Your performance across different legal subjects.</p>
+              <p className="text-sm text-[#6b7280] mb-6">Your performance across different legal subjects.</p>
               
               <div className="space-y-4">
                 <div>
                   <div className="flex justify-between mb-1">
-                    <span className="text-sm font-medium">Contract Law</span>
-                    <span className="text-sm font-medium">65%</span>
+                    <span className="text-sm font-medium text-[#1f2839]">Contract Law</span>
+                    <span className="text-sm font-medium text-[#1f2839]">65%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-blue-600 h-2 rounded-full" style={{width: '65%'}}></div>
-                  </div>
-                </div>
-                
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <span className="text-sm font-medium">Constitutional Law</span>
-                    <span className="text-sm font-medium">82%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-green-600 h-2 rounded-full" style={{width: '82%'}}></div>
+                  <div className="w-full bg-[rgba(31,40,57,0.1)] rounded-full h-2">
+                    <div className="bg-gradient-to-r from-[#b69d74] to-[#b69d74CC] h-2 rounded-full" style={{width: '65%'}}></div>
                   </div>
                 </div>
                 
                 <div>
                   <div className="flex justify-between mb-1">
-                    <span className="text-sm font-medium">Criminal Law</span>
-                    <span className="text-sm font-medium">78%</span>
+                    <span className="text-sm font-medium text-[#1f2839]">Constitutional Law</span>
+                    <span className="text-sm font-medium text-[#1f2839]">82%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-purple-600 h-2 rounded-full" style={{width: '78%'}}></div>
+                  <div className="w-full bg-[rgba(31,40,57,0.1)] rounded-full h-2">
+                    <div className="bg-gradient-to-r from-[#10b981] to-[#10b981CC] h-2 rounded-full" style={{width: '82%'}}></div>
                   </div>
                 </div>
                 
                 <div>
                   <div className="flex justify-between mb-1">
-                    <span className="text-sm font-medium">Tort Law</span>
-                    <span className="text-sm font-medium">59%</span>
+                    <span className="text-sm font-medium text-[#1f2839]">Criminal Law</span>
+                    <span className="text-sm font-medium text-[#1f2839]">78%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-red-600 h-2 rounded-full" style={{width: '59%'}}></div>
+                  <div className="w-full bg-[rgba(31,40,57,0.1)] rounded-full h-2">
+                    <div className="bg-gradient-to-r from-[#3b82f6] to-[#3b82f6CC] h-2 rounded-full" style={{width: '78%'}}></div>
+                  </div>
+                </div>
+                
+                <div>
+                  <div className="flex justify-between mb-1">
+                    <span className="text-sm font-medium text-[#1f2839]">Tort Law</span>
+                    <span className="text-sm font-medium text-[#1f2839]">59%</span>
+                  </div>
+                  <div className="w-full bg-[rgba(31,40,57,0.1)] rounded-full h-2">
+                    <div className="bg-gradient-to-r from-[#f59e0b] to-[#f59e0bCC] h-2 rounded-full" style={{width: '59%'}}></div>
                   </div>
                 </div>
               </div>
               
-              <div className="mt-6 pt-4 border-t border-gray-200">
-                <h4 className="font-medium text-gray-800 mb-2">Recommendations</h4>
-                <p className="text-sm text-gray-600">Focus more on Tort Law and Contract Law based on your performance trends.</p>
+              <div className="mt-6 pt-4 border-t border-[rgba(31,40,57,0.15)]">
+                <h4 className="font-medium text-[#1f2839] mb-2">Recommendations</h4>
+                <p className="text-sm text-[#6b7280]">Focus more on Tort Law and Contract Law based on your performance trends.</p>
               </div>
             </div>
           </div>
@@ -243,12 +259,12 @@ export default function ExamPrep() {
 
         {activeTab === 'progress' && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-white p-6 rounded-2xl shadow">
+            <div className="bg-white p-6 rounded-2xl shadow-lg border border-[rgba(31,40,57,0.15)] backdrop-blur-sm bg-[rgba(255,255,255,0.03)]">
               <div className="flex items-center mb-4">
-                <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
-                  <i className="fas fa-chart-bar text-green-600"></i>
+                <div className="w-10 h-10 rounded-full bg-[rgba(182,157,116,0.15)] flex items-center justify-center mr-3">
+                  <i className="fas fa-chart-bar text-[#b69d74]"></i>
                 </div>
-                <h3 className="font-semibold text-xl text-gray-800">Performance Overview</h3>
+                <h3 className="font-semibold text-xl text-[#1f2839]">Performance Overview</h3>
               </div>
               
               <div className="text-center mb-6">
@@ -259,7 +275,7 @@ export default function ExamPrep() {
                         a 15.9155 15.9155 0 0 1 0 31.831
                         a 15.9155 15.9155 0 0 1 0 -31.831"
                       fill="none"
-                      stroke="#eee"
+                      stroke="rgba(31,40,57,0.1)"
                       strokeWidth="3"
                     />
                     <path
@@ -267,31 +283,31 @@ export default function ExamPrep() {
                         a 15.9155 15.9155 0 0 1 0 31.831
                         a 15.9155 15.9155 0 0 1 0 -31.831"
                       fill="none"
-                      stroke="#4caf50"
+                      stroke="#b69d74"
                       strokeWidth="3"
                       strokeDasharray="78, 100"
                     />
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center flex-col">
-                    <span className="text-2xl font-bold text-gray-800">{performanceData.overallScore}%</span>
-                    <span className="text-xs text-gray-500">Overall Score</span>
+                    <span className="text-2xl font-bold text-[#1f2839]">{performanceData.overallScore}%</span>
+                    <span className="text-xs text-[#6b7280]">Overall Score</span>
                   </div>
                 </div>
               </div>
               
               <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="bg-blue-50 p-4 rounded-lg">
-                  <h4 className="font-medium text-blue-800 mb-1">Strong Areas</h4>
-                  <ul className="text-sm text-blue-600">
+                <div className="bg-[rgba(182,157,116,0.08)] p-4 rounded-lg border border-[rgba(182,157,116,0.15)]">
+                  <h4 className="font-medium text-[#1f2839] mb-1">Strong Areas</h4>
+                  <ul className="text-sm text-[#6b7280]">
                     {performanceData.strongAreas.map((area, index) => (
                       <li key={index} className="mb-1">• {area}</li>
                     ))}
                   </ul>
                 </div>
                 
-                <div className="bg-red-50 p-4 rounded-lg">
-                  <h4 className="font-medium text-red-800 mb-1">Weak Areas</h4>
-                  <ul className="text-sm text-red-600">
+                <div className="bg-[rgba(245,158,11,0.08)] p-4 rounded-lg border border-[rgba(245,158,11,0.15)]">
+                  <h4 className="font-medium text-[#1f2839] mb-1">Weak Areas</h4>
+                  <ul className="text-sm text-[#6b7280]">
                     {performanceData.weakAreas.map((area, index) => (
                       <li key={index} className="mb-1">• {area}</li>
                     ))}
@@ -300,30 +316,30 @@ export default function ExamPrep() {
               </div>
             </div>
             
-            <div className="bg-white p-6 rounded-2xl shadow">
+            <div className="bg-white p-6 rounded-2xl shadow-lg border border-[rgba(31,40,57,0.15)] backdrop-blur-sm bg-[rgba(255,255,255,0.03)]">
               <div className="flex items-center mb-4">
-                <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center mr-3">
-                  <i className="fas fa-history text-orange-600"></i>
+                <div className="w-10 h-10 rounded-full bg-[rgba(182,157,116,0.15)] flex items-center justify-center mr-3">
+                  <i className="fas fa-history text-[#b69d74]"></i>
                 </div>
-                <h3 className="font-semibold text-xl text-gray-800">Mock Test History</h3>
+                <h3 className="font-semibold text-xl text-[#1f2839]">Mock Test History</h3>
               </div>
               
               <div className="space-y-4">
                 {performanceData.mockTests.map((test, index) => (
-                  <div key={index} className="p-4 bg-gray-50 rounded-lg">
+                  <div key={index} className="p-4 bg-[rgba(255,255,255,0.03)] rounded-lg border border-[rgba(31,40,57,0.15)]">
                     <div className="flex justify-between items-center mb-2">
-                      <h4 className="font-medium text-gray-800">{test.name}</h4>
+                      <h4 className="font-medium text-[#1f2839]">{test.name}</h4>
                       <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                        test.score >= 80 ? 'bg-green-100 text-green-800' : 
-                        test.score >= 70 ? 'bg-yellow-100 text-yellow-800' : 
-                        'bg-red-100 text-red-800'
+                        test.score >= 80 ? 'bg-[rgba(16,185,129,0.15)] text-[#10b981] border border-[rgba(16,185,129,0.3)]' : 
+                        test.score >= 70 ? 'bg-[rgba(245,158,11,0.15)] text-[#f59e0b] border border-[rgba(245,158,11,0.3)]' : 
+                        'bg-[rgba(239,68,68,0.15)] text-[#ef4444] border border-[rgba(239,68,68,0.3)]'
                       }`}>
                         {test.score}%
                       </span>
                     </div>
-                    <div className="flex justify-between text-sm text-gray-600">
+                    <div className="flex justify-between text-sm text-[#6b7280]">
                       <span>{test.date}</span>
-                      <button className="text-blue-600 hover:text-blue-800 font-medium">
+                      <button className="text-[#b69d74] hover:text-[#1f2839] font-medium transition-colors">
                         View Details <i className="fas fa-arrow-right text-xs ml-1"></i>
                       </button>
                     </div>
@@ -331,7 +347,7 @@ export default function ExamPrep() {
                 ))}
               </div>
               
-              <button className="mt-6 w-full bg-white border border-blue-600 text-blue-600 hover:bg-blue-50 py-2 rounded-md text-sm font-medium transition-colors">
+              <button className="mt-6 w-full bg-white border border-[#b69d74] text-[#b69d74] hover:bg-[rgba(182,157,116,0.08)] py-2 rounded-md text-sm font-medium transition-all duration-200">
                 View All Test Results
               </button>
             </div>
@@ -339,23 +355,23 @@ export default function ExamPrep() {
         )}
 
         {activeTab === 'studyplan' && (
-          <div className="bg-white p-6 rounded-2xl shadow">
+          <div className="bg-white p-6 rounded-2xl shadow-lg border border-[rgba(31,40,57,0.15)] backdrop-blur-sm bg-[rgba(255,255,255,0.03)]">
             <div className="flex items-center mb-6">
-              <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center mr-3">
-                <i className="fas fa-calendar-alt text-indigo-600"></i>
+              <div className="w-10 h-10 rounded-full bg-[rgba(182,157,116,0.15)] flex items-center justify-center mr-3">
+                <i className="fas fa-calendar-alt text-[#b69d74]"></i>
               </div>
-              <h3 className="font-semibold text-xl text-gray-800">Personalized Study Plan</h3>
+              <h3 className="font-semibold text-xl text-[#1f2839]">Personalized Study Plan</h3>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               {studyPlan.map((topic, index) => (
-                <div key={index} className="p-4 border border-gray-200 rounded-lg">
+                <div key={index} className="p-4 border border-[rgba(31,40,57,0.15)] rounded-lg bg-[rgba(255,255,255,0.03)] hover:border-[rgba(182,157,116,0.3)] transition-all duration-200">
                   <div className="flex justify-between items-start mb-3">
-                    <h4 className="font-medium text-gray-800">{topic.topic}</h4>
-                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                      topic.priority === 'High' ? 'bg-red-100 text-red-800' : 
-                      topic.priority === 'Medium' ? 'bg-yellow-100 text-yellow-800' : 
-                      'bg-green-100 text-green-800'
+                    <h4 className="font-medium text-[#1f2839]">{topic.topic}</h4>
+                    <span className={`px-2 py-1 rounded-full text-xs font-semibold border ${
+                      topic.priority === 'High' ? 'bg-[rgba(239,68,68,0.15)] text-[#ef4444] border-[rgba(239,68,68,0.3)]' : 
+                      topic.priority === 'Medium' ? 'bg-[rgba(245,158,11,0.15)] text-[#f59e0b] border-[rgba(245,158,11,0.3)]' : 
+                      'bg-[rgba(16,185,129,0.15)] text-[#10b981] border-[rgba(16,185,129,0.3)]'
                     }`}>
                       {topic.priority} Priority
                     </span>
@@ -363,23 +379,23 @@ export default function ExamPrep() {
                   
                   <div className="mb-3">
                     <div className="flex justify-between text-sm mb-1">
-                      <span>Completion</span>
-                      <span>{topic.completion}%</span>
+                      <span className="text-[#6b7280]">Completion</span>
+                      <span className="text-[#1f2839] font-medium">{topic.completion}%</span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="w-full bg-[rgba(31,40,57,0.1)] rounded-full h-2">
                       <div 
-                        className={`h-2 rounded-full ${
-                          topic.completion >= 80 ? 'bg-green-600' : 
-                          topic.completion >= 50 ? 'bg-yellow-600' : 'bg-red-600'
+                        className={`h-2 rounded-full bg-gradient-to-r ${
+                          topic.completion >= 80 ? 'from-[#10b981] to-[#10b981CC]' : 
+                          topic.completion >= 50 ? 'from-[#f59e0b] to-[#f59e0bCC]' : 'from-[#ef4444] to-[#ef4444CC]'
                         }`} 
                         style={{width: `${topic.completion}%`}}
                       ></div>
                     </div>
                   </div>
                   
-                  <div className="flex justify-between text-sm text-gray-600">
+                  <div className="flex justify-between text-sm text-[#6b7280]">
                     <span><i className="far fa-clock mr-1"></i> {topic.timeAllocated}</span>
-                    <button className="text-blue-600 hover:text-blue-800 font-medium">
+                    <button className="text-[#b69d74] hover:text-[#1f2839] font-medium transition-colors">
                       Study Now <i className="fas fa-arrow-right text-xs ml-1"></i>
                     </button>
                   </div>
@@ -387,41 +403,41 @@ export default function ExamPrep() {
               ))}
             </div>
             
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <h4 className="font-medium text-blue-800 mb-2">Upcoming Revision</h4>
-              <p className="text-sm text-blue-600">Your next revision session is scheduled for tomorrow on Contract Law - Offer and Acceptance.</p>
+            <div className="bg-[rgba(182,157,116,0.08)] p-4 rounded-lg border border-[rgba(182,157,116,0.15)]">
+              <h4 className="font-medium text-[#1f2839] mb-2">Upcoming Revision</h4>
+              <p className="text-sm text-[#6b7280]">Your next revision session is scheduled for tomorrow on Contract Law - Offer and Acceptance.</p>
             </div>
           </div>
         )}
 
         {activeTab === 'mocks' && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-white p-6 rounded-2xl shadow">
+            <div className="bg-white p-6 rounded-2xl shadow-lg border border-[rgba(31,40,57,0.15)] backdrop-blur-sm bg-[rgba(255,255,255,0.03)]">
               <div className="flex items-center mb-4">
-                <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center mr-3">
-                  <i className="fas fa-stopwatch text-red-600"></i>
+                <div className="w-10 h-10 rounded-full bg-[rgba(182,157,116,0.15)] flex items-center justify-center mr-3">
+                  <i className="fas fa-stopwatch text-[#b69d74]"></i>
                 </div>
-                <h3 className="font-semibold text-xl text-gray-800">Timed Mock Tests</h3>
+                <h3 className="font-semibold text-xl text-[#1f2839]">Timed Mock Tests</h3>
               </div>
               
               <div className="space-y-4">
-                <div className="p-4 bg-gray-50 rounded-lg">
-                  <h4 className="font-medium text-gray-800 mb-2">Full-Length Practice Exam</h4>
-                  <p className="text-sm text-gray-600 mb-3">Simulate the actual exam experience with 100 questions in 3 hours.</p>
+                <div className="p-4 bg-[rgba(255,255,255,0.03)] rounded-lg border border-[rgba(31,40,57,0.15)]">
+                  <h4 className="font-medium text-[#1f2839] mb-2">Full-Length Practice Exam</h4>
+                  <p className="text-sm text-[#6b7280] mb-3">Simulate the actual exam experience with 100 questions in 3 hours.</p>
                   <div className="flex justify-between">
-                    <span className="text-sm text-gray-500">180 minutes • 100 questions</span>
-                    <button className="text-blue-600 hover:text-blue-800 font-medium">
+                    <span className="text-sm text-[#6b7280]">180 minutes • 100 questions</span>
+                    <button className="text-[#b69d74] hover:text-[#1f2839] font-medium transition-colors">
                       Start Test <i className="fas fa-arrow-right text-xs ml-1"></i>
                     </button>
                   </div>
                 </div>
                 
-                <div className="p-4 bg-gray-50 rounded-lg">
-                  <h4 className="font-medium text-gray-800 mb-2">Subject-wise Tests</h4>
-                  <p className="text-sm text-gray-600 mb-3">Focus on specific subjects with shorter tests.</p>
+                <div className="p-4 bg-[rgba(255,255,255,0.03)] rounded-lg border border-[rgba(31,40,57,0.15)]">
+                  <h4 className="font-medium text-[#1f2839] mb-2">Subject-wise Tests</h4>
+                  <p className="text-sm text-[#6b7280] mb-3">Focus on specific subjects with shorter tests.</p>
                   <div className="flex justify-between">
-                    <span className="text-sm text-gray-500">45 minutes • 25 questions</span>
-                    <button className="text-blue-600 hover:text-blue-800 font-medium">
+                    <span className="text-sm text-[#6b7280]">45 minutes • 25 questions</span>
+                    <button className="text-[#b69d74] hover:text-[#1f2839] font-medium transition-colors">
                       Choose Subject <i className="fas fa-arrow-right text-xs ml-1"></i>
                     </button>
                   </div>
@@ -429,46 +445,46 @@ export default function ExamPrep() {
               </div>
             </div>
             
-            <div className="bg-white p-6 rounded-2xl shadow">
+            <div className="bg-white p-6 rounded-2xl shadow-lg border border-[rgba(31,40,57,0.15)] backdrop-blur-sm bg-[rgba(255,255,255,0.03)]">
               <div className="flex items-center mb-4">
-                <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mr-3">
-                  <i className="fas fa-chart-pie text-purple-600"></i>
+                <div className="w-10 h-10 rounded-full bg-[rgba(182,157,116,0.15)] flex items-center justify-center mr-3">
+                  <i className="fas fa-chart-pie text-[#b69d74]"></i>
                 </div>
-                <h3 className="font-semibold text-xl text-gray-800">Performance Analytics</h3>
+                <h3 className="font-semibold text-xl text-[#1f2839]">Performance Analytics</h3>
               </div>
               
               <div className="mb-6">
-                <h4 className="font-medium text-gray-800 mb-3">Score Distribution</h4>
+                <h4 className="font-medium text-[#1f2839] mb-3">Score Distribution</h4>
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm">0-50%</span>
-                  <span className="text-sm">8 tests</span>
+                  <span className="text-sm text-[#6b7280]">0-50%</span>
+                  <span className="text-sm text-[#1f2839] font-medium">8 tests</span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
-                  <div className="bg-red-600 h-2 rounded-full" style={{width: '20%'}}></div>
+                <div className="w-full bg-[rgba(31,40,57,0.1)] rounded-full h-2 mb-4">
+                  <div className="bg-gradient-to-r from-[#ef4444] to-[#ef4444CC] h-2 rounded-full" style={{width: '20%'}}></div>
                 </div>
                 
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm">51-70%</span>
-                  <span className="text-sm">12 tests</span>
+                  <span className="text-sm text-[#6b7280]">51-70%</span>
+                  <span className="text-sm text-[#1f2839] font-medium">12 tests</span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
-                  <div className="bg-yellow-600 h-2 rounded-full" style={{width: '30%'}}></div>
-                </div>
-                
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm">71-90%</span>
-                  <span className="text-sm">15 tests</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
-                  <div className="bg-green-600 h-2 rounded-full" style={{width: '37.5%'}}></div>
+                <div className="w-full bg-[rgba(31,40,57,0.1)] rounded-full h-2 mb-4">
+                  <div className="bg-gradient-to-r from-[#f59e0b] to-[#f59e0bCC] h-2 rounded-full" style={{width: '30%'}}></div>
                 </div>
                 
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm">91-100%</span>
-                  <span className="text-sm">5 tests</span>
+                  <span className="text-sm text-[#6b7280]">71-90%</span>
+                  <span className="text-sm text-[#1f2839] font-medium">15 tests</span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-blue-600 h-2 rounded-full" style={{width: '12.5%'}}></div>
+                <div className="w-full bg-[rgba(31,40,57,0.1)] rounded-full h-2 mb-4">
+                  <div className="bg-gradient-to-r from-[#10b981] to-[#10b981CC] h-2 rounded-full" style={{width: '37.5%'}}></div>
+                </div>
+                
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-sm text-[#6b7280]">91-100%</span>
+                  <span className="text-sm text-[#1f2839] font-medium">5 tests</span>
+                </div>
+                <div className="w-full bg-[rgba(31,40,57,0.1)] rounded-full h-2">
+                  <div className="bg-gradient-to-r from-[#b69d74] to-[#b69d74CC] h-2 rounded-full" style={{width: '12.5%'}}></div>
                 </div>
               </div>
             </div>

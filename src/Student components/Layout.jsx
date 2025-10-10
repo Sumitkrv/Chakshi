@@ -4,7 +4,7 @@ import { FiMenu, FiX, FiWifi, FiWifiOff } from 'react-icons/fi';
 import { ErrorBoundary } from 'react-error-boundary';
 
 // Import your separate components
-import Sidebar from './Sidebar'; // Adjust path as needed
+// import Sidebar from './Sidebar'; // Adjust path as needed
 import Navbar from './Navbar';   // Adjust path as needed
 
 // Loading Component
@@ -99,13 +99,13 @@ const Layout = () => {
 
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
-      <div className="min-h-screen bg-gray-50 flex">
+      <div className="min-h-screen bg-gray-50 flex flex-col w-full overflow-x-hidden">
         {/* Offline Banner */}
         {!isOnline && (
           <div className="fixed top-0 left-0 right-0 bg-red-600 text-white text-center py-3 text-sm font-medium z-50 shadow-lg">
-            <div className="flex items-center justify-center space-x-2">
-              <FiWifiOff className="w-4 h-4" />
-              <span>You're currently offline. Some features may be unavailable.</span>
+            <div className="flex items-center justify-center space-x-2 px-4">
+              <FiWifiOff className="w-4 h-4 flex-shrink-0" />
+              <span className="truncate">You're currently offline. Some features may be unavailable.</span>
             </div>
           </div>
         )}
@@ -131,7 +131,7 @@ const Layout = () => {
           )}
         </button>
 
-        {/* Sidebar */}
+        {/* Sidebar
         <aside className={`
           fixed lg:static inset-y-0 left-0 z-40 w-80 bg-white border-r border-gray-200
           transform transition-transform duration-300 ease-in-out lg:translate-x-0
@@ -139,24 +139,24 @@ const Layout = () => {
           shadow-xl lg:shadow-none
         `}>
           <Sidebar />
-        </aside>
+        </aside> */}
 
         {/* Main Content */}
-        <div className="flex-1 flex flex-col min-h-screen lg:ml-0 transition-all duration-300">
+        <div className="flex-1 flex flex-col min-h-0 w-full"> {/* Changed min-h-screen to min-h-0 and added w-full */}
           {/* Header */}
-          <header className="sticky top-0 z-30 bg-white border-b border-gray-200 shadow-sm">
+          <header className="sticky top-0 z-30 bg-white border-b border-gray-200 shadow-sm w-full">
             <Navbar />
           </header>
 
           {/* Page Content */}
-          <main className="flex-1 relative overflow-auto">
-            <div className="absolute inset-0">
+          <main className="flex-1 relative overflow-hidden" id="main-content"> {/* Changed overflow-auto to overflow-hidden */}
+            <div className="absolute inset-0 overflow-y-auto"> {/* Added overflow-y-auto here */}
               {/* Loading Overlay */}
               {isLoading && <LoadingSpinner />}
               
               {/* Content Area */}
               <div className={`h-full transition-opacity duration-300 ${isLoading ? 'opacity-30' : 'opacity-100'}`}>
-                <div className="p-6 lg:p-8 max-w-7xl mx-auto">
+                <div className="p-4 sm:p-6 lg:p-8 w-full max-w-full mx-auto"> {/* Added w-full max-w-full and adjusted padding */}
                   <Suspense fallback={<LoadingSpinner />}>
                     <ErrorBoundary FallbackComponent={ErrorFallback}>
                       <Outlet />

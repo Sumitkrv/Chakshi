@@ -1,51 +1,85 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import LoadingOverlay from '../components/LoadingOverlay';
 
 const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [notifications] = useState([
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  
+  const notifications = [
     { id: 1, text: 'Hearing reminder for Case #C-2023-4582', time: '10 mins ago', read: false },
     { id: 2, text: 'New document uploaded by client', time: '45 mins ago', read: false },
     { id: 3, text: 'Court date changed for Smith v. Jones', time: '2 hours ago', read: true }
-  ]);
+  ];
   
   const searchRef = useRef(null);
   const notificationsRef = useRef(null);
   const profileRef = useRef(null);
+  const mobileMenuRef = useRef(null);
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, logout } = useAuth();
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
-  // Clean, professional color palette
+  // Updated color palette to match Hero.js
   const colors = {
-    background: '#FFFFFF',
-    border: '#E5E7EB',
-    textPrimary: '#374151',
-    textSecondary: '#6B7280',
-    textLight: '#9CA3AF',
-    hover: '#F9FAFB',
-    active: '#F3F4F6'
+    // Primary Brand Colors
+    background: '#f5f5ef', // Light cream background
+    textPrimary: '#1f2839', // Dark navy text
+    textSecondary: '#6b7280', // Medium gray
+    accent: '#b69d74', // Golden brown accent
+    border: 'rgba(31, 40, 57, 0.15)', // Light navy border
+    hover: 'rgba(182, 157, 116, 0.08)', // Light golden brown hover
+    active: 'rgba(182, 157, 116, 0.12)', // Medium golden brown active
+    shadow: '0 1px 3px 0 rgba(31, 40, 57, 0.1), 0 1px 2px 0 rgba(31, 40, 57, 0.06)',
+    
+    // Status Colors
+    success: '#10b981', // Green
+    warning: '#f59e0b', // Amber
+    info: '#3b82f6', // Blue
+    
+    // Additional functional colors
+    cardBackground: 'rgba(255, 255, 255, 0.03)',
+    overlay: 'rgba(255, 255, 255, 0.08)',
+  };
+
+  // Navigation items organized by category
+  const navItems = {
+    core: [
+      { name: 'Dashboard', path: '/advocate/dashboard' },
+      { name: 'Cases', path: '/advocate/cases' },
+      { name: 'Clients', path: '/advocate/clients' },
+      { name: 'Documents', path: '/advocate/documents' },
+    ],
+    tools: [
+      { name: 'Contract Analysis', path: '/advocate/contractcomparison' },
+      { name: 'Research', path: '/advocate/research' },
+      { name: 'Simulation', path: '/advocate/simulation' },
+    ],
+    insights: [
+      { name: 'Analytics', path: '/advocate/analytics' },
+      { name: 'Reports', path: '/advocate/reports' },
+    ]
   };
 
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (searchRef.current && !searchRef.current.contains(event.target)) {
-        setSearchOpen(false);
-      }
-      if (notificationsRef.current && !notificationsRef.current.contains(event.target)) {
-        setNotificationsOpen(false);
-      }
-      if (profileRef.current && !profileRef.current.contains(event.target)) {
-        setProfileOpen(false);
-      }
+      [searchRef, notificationsRef, profileRef, mobileMenuRef].forEach(ref => {
+        if (ref.current && !ref.current.contains(event.target)) {
+          if (ref === searchRef) setSearchOpen(false);
+          if (ref === notificationsRef) setNotificationsOpen(false);
+          if (ref === profileRef) setProfileOpen(false);
+          if (ref === mobileMenuRef) setMobileMenuOpen(false);
+        }
+      });
     };
 
     document.addEventListener('mousedown', handleClickOutside);
@@ -95,17 +129,6 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
     }
   };
 
-  const markNotificationAsRead = (id) => {
-    // Implementation would update notifications state
-  };
-
-  const handleNavigation = (path) => {
-    setProfileOpen(false);
-    navigate(path);
-  };
-
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
-
   const handleSignOut = async () => {
     setProfileOpen(false);
     setIsLoggingOut(true);
@@ -114,46 +137,152 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
     navigate('/');
   };
 
+  const NavButton = ({ item, mobile = false }) => (
+    <button
+      onClick={() => mobile ? (navigate(item.path), setMobileMenuOpen(false)) : navigate(item.path)}
+      className={`transition-all duration-200 ${
+        mobile 
+          ? 'w-full px-4 py-3 rounded-lg text-left border backdrop-blur-sm' 
+          : 'px-3 py-2 rounded-md text-sm font-medium'
+      }`}
+      style={{
+        color: location.pathname === item.path ? colors.accent : colors.textPrimary,
+        backgroundColor: location.pathname === item.path ? colors.active : 'transparent',
+        borderColor: mobile ? colors.border : 'transparent',
+        fontWeight: location.pathname === item.path ? '600' : '500',
+        border: location.pathname === item.path ? `1px solid ${colors.accent}40` : '1px solid transparent'
+      }}
+      onMouseEnter={(e) => {
+        if (!mobile && location.pathname !== item.path) {
+          e.target.style.backgroundColor = colors.hover;
+          e.target.style.borderColor = `${colors.accent}30`;
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (!mobile && location.pathname !== item.path) {
+          e.target.style.backgroundColor = 'transparent';
+          e.target.style.borderColor = 'transparent';
+        }
+      }}
+    >
+      <span>{item.name}</span>
+    </button>
+  );
+
   return (
     <>
       {isLoggingOut && <LoadingOverlay message="Signing out..." />}
       
       <nav 
-        className="bg-white border-b sticky top-0 z-50 shadow-sm"
+        className="border-b sticky top-0 z-50 backdrop-blur-sm"
         style={{ 
           backgroundColor: colors.background,
-          borderColor: colors.border
+          borderColor: colors.border,
+          boxShadow: colors.shadow
         }}
       >
         <div className="flex items-center justify-between h-16 px-6">
-          {/* Left side - Menu and Logo */}
-          <div className="flex items-center space-x-4">
-            <button 
-              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className="p-2 rounded-md hover:bg-gray-50 transition-colors"
-              style={{ color: colors.textPrimary }}
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-            
+          {/* Logo */}
+          <div className="flex items-center space-x-8">
             <div 
               className="flex items-center cursor-pointer"
               onClick={() => navigate('/advocate/dashboard')}
             >
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" style={{ color: colors.textPrimary }}>
-                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                  </svg>
-                </div>
-                <span 
-                  className="text-lg font-semibold tracking-tight"
+              <div 
+                className="w-8 h-8 rounded-lg flex items-center justify-center mr-3"
+                style={{
+                  background: `linear-gradient(135deg, ${colors.accent}, ${colors.accent}DD, ${colors.accent}BB)`
+                }}
+              >
+                <span className="text-white font-bold text-sm">CL</span>
+              </div>
+              <div>
+                <h1 
+                  className="text-lg font-bold"
                   style={{ color: colors.textPrimary }}
                 >
-                  CHAKSHI
-                </span>
+                  Chakshi Legal
+                </h1>
+                <p 
+                  className="text-xs"
+                  style={{ color: colors.textSecondary }}
+                >
+                  Professional Suite
+                </p>
+              </div>
+            </div>
+
+            {/* Desktop Navigation */}
+            <div className="hidden xl:flex items-center space-x-1">
+              {navItems.core.map(item => (
+                <NavButton key={item.path} item={item} />
+              ))}
+              
+              {/* Tools Dropdown */}
+              <div className="relative group">
+                <button 
+                  className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors border border-transparent"
+                  style={{
+                    color: colors.textPrimary,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = colors.hover;
+                    e.target.style.borderColor = `${colors.accent}30`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = 'transparent';
+                    e.target.style.borderColor = 'transparent';
+                  }}
+                >
+                  <span>Tools</span>
+                  <span className="text-xs" style={{ color: colors.accent }}>▼</span>
+                </button>
+                <div 
+                  className="absolute top-full left-0 mt-1 w-48 border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-30 backdrop-blur-sm"
+                  style={{
+                    backgroundColor: colors.background,
+                    borderColor: colors.border,
+                    boxShadow: `0 10px 25px ${colors.textPrimary}15`
+                  }}
+                >
+                  {navItems.tools.map(item => (
+                    <NavButton key={item.path} item={item} />
+                  ))}
+                </div>
+              </div>
+
+              {/* Insights Dropdown */}
+              <div className="relative group">
+                <button 
+                  className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors border border-transparent"
+                  style={{
+                    color: colors.textPrimary,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = colors.hover;
+                    e.target.style.borderColor = `${colors.accent}30`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = 'transparent';
+                    e.target.style.borderColor = 'transparent';
+                  }}
+                >
+                  <span>Insights</span>
+                  <span className="text-xs" style={{ color: colors.accent }}>▼</span>
+                </button>
+                <div 
+                  className="absolute top-full left-0 mt-1 w-48 border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-30 backdrop-blur-sm"
+                  style={{
+                    backgroundColor: colors.background,
+                    borderColor: colors.border,
+                    boxShadow: `0 10px 25px ${colors.textPrimary}15`
+                  }}
+                >
+                  {navItems.insights.map(item => (
+                    <NavButton key={item.path} item={item} />
+                  ))}
+                  <NavButton item={{ name: 'Settings', path: '/advocate/settings' }} />
+                </div>
               </div>
             </div>
           </div>
@@ -162,34 +291,31 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
           <div className="flex-1 max-w-md mx-8 relative" ref={searchRef}>
             <form onSubmit={handleSearchSubmit}>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: colors.textLight }}>
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </div>
                 <input
                   type="text"
                   placeholder="Search cases, clients, documents..."
-                  className="w-full pl-10 pr-10 py-2.5 text-sm border rounded-lg focus:ring-1 focus:border-blue-500 transition-colors"
-                  style={{ 
-                    backgroundColor: colors.background,
+                  className="w-full px-4 py-2 text-sm border rounded-lg focus:ring-2 transition-all duration-200 backdrop-blur-sm"
+                  style={{
+                    backgroundColor: colors.cardBackground,
                     borderColor: colors.border,
-                    color: colors.textPrimary
+                    color: colors.textPrimary,
+                    focusBorderColor: colors.accent,
+                    focusRingColor: `${colors.accent}40`
                   }}
                   value={searchQuery}
                   onChange={handleSearchChange}
                 />
                 {searchQuery && (
-                  <button
-                    type="button"
-                    onClick={clearSearch}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                    style={{ color: colors.textLight }}
-                  >
-                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                    <button
+                      type="button"
+                      onClick={clearSearch}
+                      className="text-sm transition-colors"
+                      style={{ color: colors.textSecondary }}
+                    >
+                      Clear
+                    </button>
+                  </div>
                 )}
               </div>
             </form>
@@ -197,30 +323,47 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
             {/* Search Results */}
             {searchOpen && searchResults.length > 0 && (
               <div 
-                className="absolute mt-1 w-full border rounded-lg shadow-lg z-50"
-                style={{ 
+                className="absolute mt-1 w-full border rounded-lg shadow-lg z-50 backdrop-blur-sm"
+                style={{
                   backgroundColor: colors.background,
-                  borderColor: colors.border
+                  borderColor: colors.border,
+                  boxShadow: `0 10px 25px ${colors.textPrimary}15`
                 }}
               >
                 <div className="py-2">
                   {searchResults.map((result, index) => (
                     <div
                       key={index}
-                      className="px-4 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors border-b last:border-b-0"
-                      style={{ borderColor: colors.border }}
+                      className="px-4 py-3 cursor-pointer transition-colors border-b last:border-b-0"
+                      style={{
+                        borderColor: colors.border,
+                        hoverBackground: colors.hover
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = colors.hover;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = 'transparent';
+                      }}
                       onClick={() => {
                         navigate(`/advocate/${result.category.toLowerCase()}s/${result.id}`);
                         setSearchOpen(false);
                       }}
                     >
-                      <div className="flex justify-between items-start">
-                        <span className="text-sm font-medium" style={{ color: colors.textPrimary }}>
+                      <div className="flex justify-between items-center">
+                        <span 
+                          className="text-sm font-medium"
+                          style={{ color: colors.textPrimary }}
+                        >
                           {result.title}
                         </span>
                         <span 
-                          className="text-xs px-2 py-1 rounded bg-gray-100"
-                          style={{ color: colors.textSecondary }}
+                          className="text-xs px-2 py-1 rounded"
+                          style={{
+                            backgroundColor: `${colors.accent}15`,
+                            color: colors.accent,
+                            border: `1px solid ${colors.accent}30`
+                          }}
                         >
                           {result.category}
                         </span>
@@ -233,24 +376,44 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
           </div>
 
           {/* Right side items */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-4">
+            {/* Mobile Menu Button */}
+            <button 
+              className="xl:hidden p-2 rounded-md transition-colors text-sm font-medium border border-transparent"
+              style={{ color: colors.textPrimary }}
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = colors.hover;
+                e.target.style.borderColor = `${colors.accent}30`;
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = 'transparent';
+                e.target.style.borderColor = 'transparent';
+              }}
+            >
+              Menu
+            </button>
+
             {/* Notifications */}
             <div className="relative" ref={notificationsRef}>
               <button 
-                className="p-2 rounded-md hover:bg-gray-50 transition-colors relative"
+                className="relative p-2 rounded-md transition-colors text-sm font-medium border border-transparent"
                 style={{ color: colors.textPrimary }}
                 onClick={() => setNotificationsOpen(!notificationsOpen)}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = colors.hover;
+                  e.target.style.borderColor = `${colors.accent}30`;
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = 'transparent';
+                  e.target.style.borderColor = 'transparent';
+                }}
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5-5-5h5zM12 2v1m0 18v1m-9-9h1m16 0h1M4.93 4.93l.71.71m12.73.71l.71-.71M4.93 19.07l.71-.71m12.73.71l-.71-.71" />
-                </svg>
+                Notifications
                 {unreadCount > 0 && (
                   <span 
-                    className="absolute -top-1 -right-1 h-4 w-4 rounded-full text-xs flex items-center justify-center"
-                    style={{ 
-                      backgroundColor: '#EF4444',
-                      color: '#FFFFFF'
-                    }}
+                    className="absolute -top-1 -right-1 h-4 w-4 rounded-full text-xs flex items-center justify-center text-white font-semibold"
+                    style={{ backgroundColor: colors.warning }}
                   >
                     {unreadCount}
                   </span>
@@ -259,18 +422,25 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
 
               {notificationsOpen && (
                 <div 
-                  className="absolute right-0 mt-2 w-80 border rounded-lg shadow-lg z-10"
-                  style={{ 
+                  className="absolute right-0 mt-2 w-80 border rounded-lg shadow-lg z-40 backdrop-blur-sm"
+                  style={{
                     backgroundColor: colors.background,
-                    borderColor: colors.border
+                    borderColor: colors.border,
+                    boxShadow: `0 10px 25px ${colors.textPrimary}15`
                   }}
                 >
                   <div className="p-4 border-b" style={{ borderColor: colors.border }}>
                     <div className="flex justify-between items-center">
-                      <h3 className="text-sm font-semibold" style={{ color: colors.textPrimary }}>
+                      <h3 
+                        className="text-sm font-semibold"
+                        style={{ color: colors.textPrimary }}
+                      >
                         Notifications
                       </h3>
-                      <span className="text-xs" style={{ color: colors.textSecondary }}>
+                      <span 
+                        className="text-xs"
+                        style={{ color: colors.textSecondary }}
+                      >
                         {unreadCount} unread
                       </span>
                     </div>
@@ -280,14 +450,28 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
                     {notifications.map(notification => (
                       <div 
                         key={notification.id}
-                        className="p-4 border-b hover:bg-gray-50 cursor-pointer transition-colors"
-                        style={{ borderColor: colors.border }}
-                        onClick={() => markNotificationAsRead(notification.id)}
+                        className="p-4 border-b cursor-pointer transition-colors"
+                        style={{
+                          borderColor: colors.border,
+                          backgroundColor: notification.read ? 'transparent' : `${colors.accent}08`
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.backgroundColor = colors.hover;
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.backgroundColor = notification.read ? 'transparent' : `${colors.accent}08`;
+                        }}
                       >
-                        <p className="text-sm mb-1" style={{ color: colors.textPrimary }}>
+                        <p 
+                          className="text-sm mb-1 font-medium"
+                          style={{ color: colors.textPrimary }}
+                        >
                           {notification.text}
                         </p>
-                        <span className="text-xs" style={{ color: colors.textLight }}>
+                        <span 
+                          className="text-xs"
+                          style={{ color: colors.textSecondary }}
+                        >
                           {notification.time}
                         </span>
                       </div>
@@ -300,98 +484,174 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
             {/* User Profile */}
             <div className="relative" ref={profileRef}>
               <button 
-                className="flex items-center space-x-3 p-1 rounded-md hover:bg-gray-50 transition-colors"
-                style={{ color: colors.textPrimary }}
+                className="flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors border backdrop-blur-sm"
+                style={{
+                  borderColor: colors.border,
+                  color: colors.textPrimary
+                }}
                 onClick={() => setProfileOpen(!profileOpen)}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = colors.hover;
+                  e.target.style.borderColor = colors.accent;
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = 'transparent';
+                  e.target.style.borderColor = colors.border;
+                }}
               >
                 <div 
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium"
-                  style={{ 
-                    backgroundColor: colors.active,
-                    color: colors.textPrimary
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-semibold"
+                  style={{
+                    background: `linear-gradient(135deg, ${colors.accent}, ${colors.accent}DD)`
                   }}
                 >
                   {user ? user.name?.charAt(0) || user.email?.charAt(0) : 'U'}
                 </div>
-                <div className="hidden md:block text-left">
-                  <p className="text-sm font-medium" style={{ color: colors.textPrimary }}>
+                <div className="hidden lg:block text-left">
+                  <p className="text-sm font-semibold" style={{ color: colors.textPrimary }}>
                     {user ? user.name?.split(' ')[0] : 'User'}
                   </p>
-                  <p className="text-xs" style={{ color: colors.textLight }}>
+                  <p className="text-xs" style={{ color: colors.textSecondary }}>
                     {user?.role || 'Legal Professional'}
                   </p>
                 </div>
-                <svg 
-                  className={`w-4 h-4 transition-transform ${profileOpen ? 'rotate-180' : ''}`}
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                  style={{ color: colors.textLight }}
+                <span 
+                  className={`text-xs transition-transform ${profileOpen ? 'rotate-180' : ''}`}
+                  style={{ color: colors.accent }}
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
+                  ▼
+                </span>
               </button>
 
               {profileOpen && (
                 <div 
-                  className="absolute right-0 mt-2 w-56 border rounded-lg shadow-lg z-10"
-                  style={{ 
+                  className="absolute right-0 mt-2 w-56 border rounded-lg shadow-lg z-40 backdrop-blur-sm"
+                  style={{
                     backgroundColor: colors.background,
-                    borderColor: colors.border
+                    borderColor: colors.border,
+                    boxShadow: `0 10px 25px ${colors.textPrimary}15`
                   }}
                 >
                   <div className="p-4 border-b" style={{ borderColor: colors.border }}>
                     <p className="text-sm font-medium" style={{ color: colors.textPrimary }}>
                       {user?.name || 'User'}
                     </p>
-                    <p className="text-xs truncate" style={{ color: colors.textLight }}>
+                    <p className="text-xs truncate" style={{ color: colors.textSecondary }}>
                       {user?.email || 'user@example.com'}
                     </p>
                   </div>
                   
-                  <div className="py-1">
+                  <div className="py-2">
                     <button 
-                      onClick={() => handleNavigation('/advocate/profile')}
-                      className="flex items-center space-x-3 w-full px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors"
+                      onClick={() => navigate('/advocate/profile')}
+                      className="flex items-center w-full px-4 py-2 text-sm transition-colors text-left"
                       style={{ color: colors.textPrimary }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = colors.hover;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = 'transparent';
+                      }}
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                      <span>Profile Settings</span>
+                      Profile Settings
                     </button>
-
                     <button 
-                      onClick={() => handleNavigation('/advocate/settings')}
-                      className="flex items-center space-x-3 w-full px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors"
+                      onClick={() => navigate('/advocate/settings')}
+                      className="flex items-center w-full px-4 py-2 text-sm transition-colors text-left"
                       style={{ color: colors.textPrimary }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = colors.hover;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = 'transparent';
+                      }}
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                      <span>Account Settings</span>
+                      Account Settings
                     </button>
                   </div>
 
-                  <div className="border-t" style={{ borderColor: colors.border }}></div>
-                  
-                  <button 
-                    onClick={handleSignOut}
-                    className="flex items-center space-x-3 w-full px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors"
-                    style={{ color: '#DC2626' }}
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                    <span>Sign Out</span>
-                  </button>
+                  <div className="border-t py-2" style={{ borderColor: colors.border }}>
+                    <button 
+                      onClick={handleSignOut}
+                      className="flex items-center w-full px-4 py-2 text-sm transition-colors text-left"
+                      style={{ color: colors.warning }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = `${colors.warning}15`;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = 'transparent';
+                      }}
+                    >
+                      Sign Out
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
           </div>
         </div>
       </nav>
+
+      {/* Mobile Navigation Menu */}
+      {mobileMenuOpen && (
+        <div 
+          ref={mobileMenuRef}
+          className="xl:hidden absolute top-16 left-0 right-0 z-40 border-b shadow-lg backdrop-blur-sm"
+          style={{
+            backgroundColor: colors.background,
+            borderColor: colors.border,
+            boxShadow: `0 10px 25px ${colors.textPrimary}15`
+          }}
+        >
+          <div className="px-6 py-4 space-y-1">
+            {/* Core Navigation */}
+            <div className="mb-4">
+              <h3 
+                className="text-xs font-semibold uppercase tracking-wider mb-2"
+                style={{ color: colors.textSecondary }}
+              >
+                Core
+              </h3>
+              <div className="space-y-1">
+                {navItems.core.map(item => (
+                  <NavButton key={item.path} item={item} mobile />
+                ))}
+              </div>
+            </div>
+
+            {/* Tools */}
+            <div className="mb-4">
+              <h3 
+                className="text-xs font-semibold uppercase tracking-wider mb-2"
+                style={{ color: colors.textSecondary }}
+              >
+                Tools
+              </h3>
+              <div className="space-y-1">
+                {navItems.tools.map(item => (
+                  <NavButton key={item.path} item={item} mobile />
+                ))}
+              </div>
+            </div>
+
+            {/* Insights */}
+            <div className="mb-4">
+              <h3 
+                className="text-xs font-semibold uppercase tracking-wider mb-2"
+                style={{ color: colors.textSecondary }}
+              >
+                Insights
+              </h3>
+              <div className="space-y-1">
+                {navItems.insights.map(item => (
+                  <NavButton key={item.path} item={item} mobile />
+                ))}
+                <NavButton item={{ name: 'Settings', path: '/advocate/settings' }} mobile />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };

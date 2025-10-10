@@ -1,11 +1,7 @@
-import React, { useState, useEffect, Suspense, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { FiMenu, FiX, FiWifi, FiWifiOff } from 'react-icons/fi';
 import { ErrorBoundary } from 'react-error-boundary';
-
-// Import your separate components
-import Sidebar from './Sidebar';
-import Navbar from './Navbar';
 
 // Loading Component
 const LoadingSpinner = () => (

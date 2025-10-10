@@ -12,8 +12,48 @@ const Login = () => {
   const [roleError, setRoleError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [hoveredRole, setHoveredRole] = useState(null);
   const navigate = useNavigate();
   const { login } = useAuth();
+
+  // Hero.js comprehensive color palette
+  const colors = {
+    // Primary Brand Colors
+    background: '#f5f5ef',
+    darkNavy: '#1f2839',
+    golden: '#b69d74',
+    mediumGray: '#6b7280',
+    
+    // Functional Status Colors
+    success: '#10b981',
+    warning: '#f59e0b',
+    info: '#3b82f6',
+    
+    // Transparency & Alpha Variations
+    whiteAlpha03: 'rgba(255, 255, 255, 0.03)',
+    whiteAlpha06: 'rgba(255, 255, 255, 0.06)',
+    whiteAlpha08: 'rgba(255, 255, 255, 0.08)',
+    whiteAlpha20: 'rgba(255, 255, 255, 0.20)',
+    goldenAlpha05: 'rgba(182, 157, 116, 0.05)',
+    goldenAlpha08: 'rgba(182, 157, 116, 0.08)',
+    goldenAlpha10: 'rgba(182, 157, 116, 0.10)',
+    goldenAlpha12: 'rgba(182, 157, 116, 0.12)',
+    goldenAlpha15: 'rgba(182, 157, 116, 0.15)',
+    goldenAlpha20: 'rgba(182, 157, 116, 0.20)',
+    goldenAlpha40: 'rgba(182, 157, 116, 0.40)',
+    goldenAlpha50: 'rgba(182, 157, 116, 0.50)',
+    goldenAlpha60: 'rgba(182, 157, 116, 0.60)',
+    navyAlpha05: 'rgba(31, 40, 57, 0.05)',
+    navyAlpha15: 'rgba(31, 40, 57, 0.15)',
+    navyAlpha20: 'rgba(31, 40, 57, 0.20)',
+    navyAlpha25: 'rgba(31, 40, 57, 0.25)',
+    
+    // Gradient Combinations
+    primaryButtonGradient: 'linear-gradient(135deg, #b69d74, #b69d74DD, #b69d74BB)',
+    textGradient: 'linear-gradient(135deg, #1f2839, #b69d74)',
+    progressGradient: 'linear-gradient(90deg, #b69d74, #b69d74CC)',
+    backgroundGradient: 'linear-gradient(135deg, #b69d7420, #b69d7410)'
+  };
 
   const roles = [
     {
@@ -22,7 +62,8 @@ const Login = () => {
       label: '⚖️ Legal Professional',
       route: '/advocate/dashboard',
       description: 'Legal professional practice management',
-      emoji: '⚖️'
+      emoji: '⚖️',
+      gradient: colors.primaryButtonGradient
     },
     {
       id: 'student',
@@ -30,7 +71,8 @@ const Login = () => {
       label: '🎓 Academic Learning',
       route: '/student/dashboard',
       description: 'Pursuing legal education and training',
-      emoji: '🎓'
+      emoji: '🎓',
+      gradient: `linear-gradient(135deg, ${colors.golden}, ${colors.golden}CC)`
     },
     {
       id: 'clerk',
@@ -38,7 +80,8 @@ const Login = () => {
       label: '📋 Administrative Support',
       route: '/clerk/dashboard',
       description: 'Court administration and case management',
-      emoji: '📋'
+      emoji: '📋',
+      gradient: `linear-gradient(135deg, ${colors.golden}, ${colors.golden}BB)`
     }
   ];
 
@@ -112,29 +155,90 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-4 sm:p-6 lg:p-8">
+    <div 
+      className="min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8"
+      style={{ backgroundColor: colors.background }}
+    >
       
-      {/* Background Pattern - Subtle */}
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100 pointer-events-none"></div>
+      {/* Background Elements */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div 
+          className="absolute top-20 right-10 w-96 h-96 rounded-full blur-3xl animate-pulse"
+          style={{ backgroundColor: colors.goldenAlpha10 }}
+        ></div>
+        <div 
+          className="absolute bottom-20 left-10 w-96 h-96 rounded-full blur-3xl animate-pulse"
+          style={{ 
+            backgroundColor: colors.goldenAlpha08,
+            animationDelay: '2s'
+          }}
+        ></div>
+        <div 
+          className="absolute top-1/2 left-1/2 w-96 h-96 rounded-full blur-3xl animate-pulse"
+          style={{ 
+            backgroundColor: colors.goldenAlpha05,
+            animationDelay: '4s'
+          }}
+        ></div>
+        
+        {/* Grid Pattern */}
+        <div 
+          className="absolute inset-0 opacity-20"
+          style={{
+            backgroundImage: `linear-gradient(to right, ${colors.goldenAlpha10} 1px, transparent 1px), linear-gradient(to bottom, ${colors.goldenAlpha10} 1px, transparent 1px)`,
+            backgroundSize: '4rem 4rem'
+          }}
+        ></div>
+      </div>
       
       <div className="w-full max-w-md relative z-10">
         
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-white border border-gray-200 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-sm">
+          <div 
+            className="w-16 h-16 border rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg hover:shadow-xl transition-all duration-300"
+            style={{
+              backgroundColor: colors.whiteAlpha20,
+              borderColor: colors.goldenAlpha40,
+              backdropFilter: 'blur(6px)',
+              ':hover': { borderColor: colors.goldenAlpha60 }
+            }}
+          >
             <span className="text-3xl">🔐</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">Welcome Back</h1>
-          <p className="text-lg sm:text-xl text-gray-600">Sign in to your legal platform account</p>
+          <h1 
+            className="text-3xl sm:text-4xl font-bold mb-2"
+            style={{ color: colors.darkNavy }}
+          >
+            Welcome Back
+          </h1>
+          <p 
+            className="text-lg sm:text-xl"
+            style={{ color: colors.mediumGray }}
+          >
+            Sign in to your legal platform account
+          </p>
         </div>
 
         {/* Main Form Card */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-8 mb-6 shadow-lg">
+        <div 
+          className="border rounded-2xl p-6 sm:p-8 mb-6 shadow-lg hover:shadow-xl transition-all duration-300"
+          style={{
+            backgroundColor: colors.whiteAlpha20,
+            borderColor: colors.goldenAlpha40,
+            backdropFilter: 'blur(6px)',
+            ':hover': { borderColor: colors.goldenAlpha60 }
+          }}
+        >
           <form onSubmit={handleSubmit} className="space-y-6">
             
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label 
+                htmlFor="email" 
+                className="block text-sm font-medium mb-2"
+                style={{ color: colors.darkNavy }}
+              >
                 📧 Email Address
               </label>
               <div className="relative">
@@ -146,7 +250,18 @@ const Login = () => {
                   onChange={handleChange}
                   required
                   placeholder="Enter your email"
-                  className="w-full p-3 sm:p-4 pl-4 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
+                  className="w-full p-3 sm:p-4 pl-4 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 hover:border-opacity-80"
+                  style={{
+                    backgroundColor: colors.whiteAlpha06,
+                    borderColor: colors.goldenAlpha40,
+                    color: colors.darkNavy,
+                    '::placeholder': { color: colors.mediumGray },
+                    ':focus': {
+                      ringColor: colors.golden,
+                      borderColor: 'transparent'
+                    },
+                    ':hover': { borderColor: colors.goldenAlpha60 }
+                  }}
                   disabled={loading}
                 />
               </div>
@@ -154,7 +269,11 @@ const Login = () => {
 
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <label 
+                htmlFor="password" 
+                className="block text-sm font-medium mb-2"
+                style={{ color: colors.darkNavy }}
+              >
                 🔒 Password
               </label>
               <div className="relative">
@@ -166,12 +285,27 @@ const Login = () => {
                   onChange={handleChange}
                   required
                   placeholder="Enter your password"
-                  className="w-full p-3 sm:p-4 pl-4 pr-12 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
+                  className="w-full p-3 sm:p-4 pl-4 pr-12 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 hover:border-opacity-80"
+                  style={{
+                    backgroundColor: colors.whiteAlpha06,
+                    borderColor: colors.goldenAlpha40,
+                    color: colors.darkNavy,
+                    '::placeholder': { color: colors.mediumGray },
+                    ':focus': {
+                      ringColor: colors.golden,
+                      borderColor: 'transparent'
+                    },
+                    ':hover': { borderColor: colors.goldenAlpha60 }
+                  }}
                   disabled={loading}
                 />
                 <button
                   type="button"
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 w-6 h-6 text-gray-500 hover:text-gray-700 transition-colors"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 w-6 h-6 transition-colors duration-200"
+                  style={{ 
+                    color: colors.mediumGray,
+                    ':hover': { color: colors.golden }
+                  }}
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? '🙈' : '👁️'}
@@ -181,33 +315,73 @@ const Login = () => {
 
             {/* Role Selection */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
+              <label 
+                className="block text-sm font-medium mb-3"
+                style={{ color: colors.darkNavy }}
+              >
                 👤 Select Your Role
               </label>
               <div className="space-y-3">
                 {roles.map((role) => {
+                  const isSelected = formData.role === role.id;
+                  const isHovered = hoveredRole === role.id;
+                  
                   return (
                     <div
                       key={role.id}
                       className={`p-3 sm:p-4 border-2 rounded-lg cursor-pointer transition-all duration-300 ${
-                        formData.role === role.id 
-                          ? `border-blue-500 bg-blue-50 ring-1 ring-blue-200` 
-                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                      } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        loading ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
+                      style={{
+                        borderColor: isSelected ? colors.golden : colors.goldenAlpha40,
+                        backgroundColor: isSelected ? colors.goldenAlpha10 : 'transparent',
+                        ...(isSelected && { 
+                          boxShadow: `0 0 0 1px ${colors.goldenAlpha20}` 
+                        }),
+                        ...(isHovered && !isSelected && { 
+                          borderColor: colors.goldenAlpha60,
+                          backgroundColor: colors.goldenAlpha05 
+                        })
+                      }}
                       onClick={() => !loading && handleChange({ target: { name: 'role', value: role.id } })}
+                      onMouseEnter={() => setHoveredRole(role.id)}
+                      onMouseLeave={() => setHoveredRole(null)}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-100 border border-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <span className="text-xl sm:text-2xl">{role.emoji}</span>
+                        <div 
+                          className={`w-10 h-10 sm:w-12 sm:h-12 border rounded-lg flex items-center justify-center flex-shrink-0 transition-transform duration-300 ${
+                            isHovered ? 'scale-110' : ''
+                          }`}
+                          style={{
+                            background: role.gradient,
+                            borderColor: colors.goldenAlpha60
+                          }}
+                        >
+                          <span className="text-xl sm:text-2xl text-white">{role.emoji}</span>
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between">
-                            <h4 className="text-base sm:text-lg font-semibold text-gray-900 truncate">{role.title}</h4>
-                            {formData.role === role.id && (
-                              <span className="text-green-500 text-lg sm:text-xl flex-shrink-0 ml-2">✅</span>
+                            <h4 
+                              className="text-base sm:text-lg font-semibold truncate"
+                              style={{ color: colors.darkNavy }}
+                            >
+                              {role.title}
+                            </h4>
+                            {isSelected && (
+                              <span 
+                                className="text-lg sm:text-xl flex-shrink-0 ml-2"
+                                style={{ color: colors.golden }}
+                              >
+                                ✅
+                              </span>
                             )}
                           </div>
-                          <p className="text-sm text-gray-600 truncate">{role.description}</p>
+                          <p 
+                            className="text-sm truncate"
+                            style={{ color: colors.mediumGray }}
+                          >
+                            {role.description}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -215,7 +389,10 @@ const Login = () => {
                 })}
               </div>
               {roleError && (
-                <div className="mt-2 flex items-center gap-2 text-sm text-red-600">
+                <div 
+                  className="mt-2 flex items-center gap-2 text-sm"
+                  style={{ color: colors.golden }}
+                >
                   <span>⚠️</span>
                   {roleError}
                 </div>
@@ -225,9 +402,13 @@ const Login = () => {
             {/* Submit Button */}
             <button 
               type="submit" 
-              className={`w-full bg-gray-900 hover:bg-gray-800 text-white py-3 sm:py-4 px-6 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
+              className={`w-full text-white py-3 sm:py-4 px-6 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 hover:scale-[1.02] shadow-lg ${
                 loading ? 'opacity-75 cursor-not-allowed' : ''
               }`}
+              style={{
+                background: colors.primaryButtonGradient,
+                boxShadow: `0 4px 15px ${colors.goldenAlpha40}`
+              }}
               disabled={loading}
             >
               {loading ? (
@@ -239,7 +420,7 @@ const Login = () => {
                 <>
                   <span>👤</span>
                   Sign In
-                  <span>→</span>
+                  <span className="group-hover:translate-x-1 transition-transform duration-300">→</span>
                 </>
               )}
             </button>
@@ -247,21 +428,46 @@ const Login = () => {
 
           {/* Error Message */}
           {error && (
-            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2">
-              <span className="text-red-500">⚠️</span>
-              <p className="text-sm text-red-700">{error}</p>
+            <div 
+              className="mt-4 p-3 border rounded-lg flex items-center gap-2"
+              style={{
+                backgroundColor: colors.goldenAlpha10,
+                borderColor: colors.goldenAlpha40
+              }}
+            >
+              <span style={{ color: colors.golden }}>⚠️</span>
+              <p 
+                className="text-sm"
+                style={{ color: colors.darkNavy }}
+              >
+                {error}
+              </p>
             </div>
           )}
         </div>
 
         {/* Register Link */}
-        <div className="text-center p-4 bg-gray-50 border border-gray-200 rounded-lg">
-          <p className="text-sm text-gray-600">
+        <div 
+          className="text-center p-4 border rounded-lg hover:bg-opacity-80 transition-all duration-300"
+          style={{
+            backgroundColor: colors.whiteAlpha06,
+            borderColor: colors.goldenAlpha40,
+            backdropFilter: 'blur(6px)'
+          }}
+        >
+          <p 
+            className="text-sm"
+            style={{ color: colors.mediumGray }}
+          >
             Don't have an account? {' '}
             <button 
-              className="text-gray-900 hover:text-gray-700 font-medium hover:underline transition-colors duration-200"
+              className="font-medium hover:underline transition-colors duration-200"
               onClick={() => !loading && navigate('/register')}
               disabled={loading}
+              style={{
+                color: colors.darkNavy,
+                ':hover': { color: colors.golden }
+              }}
             >
               Create one here
             </button>
@@ -269,14 +475,34 @@ const Login = () => {
         </div>
 
         {/* Demo Notice */}
-        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+        <div 
+          className="mt-6 p-4 border rounded-lg hover:bg-opacity-80 transition-all duration-300"
+          style={{
+            backgroundColor: colors.goldenAlpha10,
+            borderColor: colors.goldenAlpha40
+          }}
+        >
           <div className="flex items-start gap-3">
-            <div className="w-8 h-8 bg-blue-100 border border-blue-200 rounded-lg flex items-center justify-center flex-shrink-0">
-              <span className="text-xl">⭐</span>
+            <div 
+              className="w-8 h-8 border rounded-lg flex items-center justify-center flex-shrink-0"
+              style={{
+                background: colors.primaryButtonGradient,
+                borderColor: colors.goldenAlpha60
+              }}
+            >
+              <span className="text-xl text-white">⭐</span>
             </div>
             <div>
-              <h4 className="text-sm font-semibold text-gray-900 mb-1">Demo Mode Active</h4>
-              <p className="text-xs text-gray-700 leading-relaxed">
+              <h4 
+                className="text-sm font-semibold mb-1"
+                style={{ color: colors.darkNavy }}
+              >
+                Demo Mode Active
+              </h4>
+              <p 
+                className="text-xs leading-relaxed"
+                style={{ color: colors.mediumGray }}
+              >
                 You can sign in with any email and password. Just select your role and click "Sign In" to explore the platform.
               </p>
             </div>
@@ -286,8 +512,12 @@ const Login = () => {
         {/* Quick Access */}
         <div className="mt-4 text-center">
           <button 
-            className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1 mx-auto transition-colors duration-200"
+            className="flex items-center gap-1 mx-auto transition-colors duration-200 hover:underline text-sm"
             onClick={() => navigate('/')}
+            style={{
+              color: colors.mediumGray,
+              ':hover': { color: colors.golden }
+            }}
           >
             <span>🏠</span>
             Back to Home

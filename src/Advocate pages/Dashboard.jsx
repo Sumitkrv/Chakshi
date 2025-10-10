@@ -29,7 +29,9 @@ import {
   UserCheck,
   FileCheck,
   Sparkles,
-  Target
+  Target,
+  Bell,
+  Settings
 } from 'lucide-react';
 
 const Dashboard = () => {
@@ -173,60 +175,64 @@ const Dashboard = () => {
   // Data
   const stats = [
     { 
-      name: 'Total Cases', 
-      value: '24', 
-      change: '+12%', 
+      name: 'Active Matters', 
+      value: '18', 
+      change: '+3', 
       trend: 'up', 
       icon: Briefcase,
-      description: 'Active legal cases'
+      description: 'Currently active legal matters',
+      changeText: 'from last month'
     },
     { 
-      name: 'Active Cases', 
-      value: '18', 
+      name: 'Document Repository', 
+      value: '2,156', 
+      change: '+156', 
+      trend: 'up', 
+      icon: FileText,
+      description: 'Managed documents',
+      changeText: 'documents processed'
+    },
+    { 
+      name: 'Resolution Rate', 
+      value: '87%', 
       change: '+5%', 
       trend: 'up', 
-      icon: Activity,
-      description: 'Currently in progress'
-    },
-    { 
-      name: 'Success Rate', 
-      value: '87%', 
-      change: '+15%', 
-      trend: 'up', 
       icon: Award,
-      description: 'Case success rate'
+      description: 'Successful case outcomes',
+      changeText: 'improvement this quarter'
     },
     { 
-      name: 'High Risk', 
-      value: '3', 
-      change: '-2%', 
+      name: 'Pending Reviews', 
+      value: '4', 
+      change: '-2', 
       trend: 'down', 
-      icon: AlertTriangle,
-      description: 'Requiring attention'
+      icon: Clock,
+      description: 'Items requiring review',
+      changeText: 'reduction from last week'
     }
   ];
 
   const recentActivities = [
     { 
       type: 'case', 
-      title: 'Property Dispute Case Filed', 
-      description: 'New case filed for ABC vs XYZ Corporation',
+      title: 'Matter Initiated: M&A Transaction', 
+      description: 'Corporate merger and acquisition matter commenced',
       time: '2 hours ago', 
       status: 'active',
       priority: 'high'
     },
     { 
       type: 'document', 
-      title: 'Contract Analysis Completed', 
-      description: 'AI analysis completed for merger agreement',
+      title: 'Legal Analysis Completed', 
+      description: 'AI-powered contract analysis finalized for service agreement',
       time: '4 hours ago', 
       status: 'completed',
       priority: 'medium'
     },
     { 
       type: 'hearing', 
-      title: 'Court Hearing Scheduled', 
-      description: 'Hearing scheduled for Johnson v. Smith case',
+      title: 'Court Appearance Scheduled', 
+      description: 'Preliminary hearing scheduled for intellectual property litigation',
       time: '1 day ago', 
       status: 'upcoming',
       priority: 'high'
@@ -234,80 +240,81 @@ const Dashboard = () => {
   ];
 
   const quickActions = [
-    { name: 'New Case', description: 'Start a new legal case file', icon: FileText },
-    { name: 'Upload Docs', description: 'Upload legal documents', icon: Upload },
-    { name: 'Add Client', description: 'Register new client profile', icon: UserCheck },
-    { name: 'Schedule', description: 'Schedule client meeting', icon: Calendar },
-    { name: 'AI Analysis', description: 'Analyze documents with AI', icon: Brain },
-    { name: 'Generate Report', description: 'Create case reports', icon: FileCheck }
+    { name: 'New Matter', description: 'Initiate new legal matter', icon: FileText, color: 'blue' },
+    { name: 'Document Upload', description: 'Secure document repository', icon: Upload, color: 'green' },
+    { name: 'AI Analysis', description: 'Document intelligence suite', icon: Brain, color: 'purple' },
+    { name: 'Client Meeting', description: 'Schedule consultation', icon: Calendar, color: 'orange' }
   ];
 
   const tabs = [
-    { id: 'workspace', name: 'Dashboard', icon: Home },
-    { id: 'analytics', name: 'Analytics', icon: BarChart3 },
-    { id: 'contract-analysis', name: 'Contract AI', icon: Scale },
-    { id: 'case-management', name: 'Cases', icon: Folder },
-    { id: 'client-portal', name: 'Clients', icon: Users },
-    { id: 'ai-tools', name: 'AI Tools', icon: Brain }
+    { id: 'workspace', name: 'Overview', icon: Home },
+    { id: 'contract-analysis', name: 'Document Analysis', icon: Scale },
+    { id: 'case-management', name: 'Case Management', icon: Briefcase },
+    { id: 'analytics', name: 'Analytics', icon: BarChart3 }
   ];
 
   const upcomingEvents = [
-    { title: 'Court Hearing - Property Dispute', time: 'Today, 2:00 PM', type: 'hearing', urgent: true },
-    { title: 'Client Meeting - Tech Startup', time: 'Tomorrow, 10:00 AM', type: 'meeting', urgent: false },
-    { title: 'Document Review Deadline', time: 'Dec 25, 5:00 PM', type: 'deadline', urgent: true }
+    { title: 'Federal Court Hearing - IP Litigation', time: 'Today, 2:00 PM', type: 'hearing', urgent: true },
+    { title: 'Executive Client Consultation', time: 'Tomorrow, 10:00 AM', type: 'meeting', urgent: false },
+    { title: 'Filing Deadline - Motion for Summary Judgment', time: 'Dec 25, 5:00 PM', type: 'deadline', urgent: true }
   ];
 
   const aiAnalysisTools = [
-    { name: 'Risk Analysis', icon: Shield, description: 'Identify potential risks and missing clauses' },
-    { name: 'Document Summarizer', icon: BookOpen, description: 'Convert complex documents to plain language' },
-    { name: 'Authenticity Checker', icon: Search, description: 'Verify document authenticity' }
+    { name: 'Risk Assessment', icon: Shield, description: 'Comprehensive legal risk analysis and compliance evaluation' },
+    { name: 'Document Intelligence', icon: BookOpen, description: 'Advanced document summarization and key insights extraction' },
+    { name: 'Authenticity Verification', icon: Search, description: 'Document authenticity and integrity validation services' }
   ];
 
   // Render Functions
   const renderWorkspace = () => (
     <div className="space-y-6">
-      {/* Welcome Section */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
+      {/* Executive Summary */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
           <div>
             <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-              Good {new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 18 ? 'Afternoon' : 'Evening'}, {user?.name?.split(' ')[0] || 'Counsel'}
+              Executive Dashboard
             </h2>
-            <p className="text-gray-600">Here's your practice overview for today</p>
+            <p className="text-gray-600">Comprehensive legal practice analytics and case management overview</p>
           </div>
-          <div className="flex items-center space-x-6 mt-4 lg:mt-0">
+          <div className="flex items-center space-x-8 mt-4 lg:mt-0">
             <div className="text-center">
-              <div className="text-2xl font-semibold text-gray-900">24</div>
-              <div className="text-sm text-gray-600">Active Cases</div>
+              <div className="text-2xl font-bold text-gray-900">18</div>
+              <div className="text-sm text-gray-600 font-medium">Active Matters</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-semibold text-green-600">87%</div>
-              <div className="text-sm text-gray-600">Success Rate</div>
+              <div className="text-2xl font-bold text-emerald-600">87%</div>
+              <div className="text-sm text-gray-600 font-medium">Resolution Rate</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-600">$2.4M</div>
+              <div className="text-sm text-gray-600 font-medium">Annual Revenue</div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Key Performance Indicators */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, index) => {
           const IconComponent = stat.icon;
           return (
-            <div key={index} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-shadow">
+            <div key={index} className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">{stat.name}</p>
-                  <p className="text-2xl font-semibold text-gray-900 mt-1">{stat.value}</p>
-                  <div className="flex items-center mt-2">
-                    <span className={`text-sm font-medium ${
-                      stat.trend === 'up' ? 'text-green-600' : 'text-red-600'
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-600 uppercase tracking-wide">{stat.name}</p>
+                  <p className="text-3xl font-bold text-gray-900 mt-2">{stat.value}</p>
+                  <div className="flex items-center mt-3">
+                    <span className={`text-sm font-semibold ${
+                      stat.trend === 'up' ? 'text-emerald-600' : 'text-red-600'
                     }`}>
                       {stat.change}
                     </span>
+                    <span className="text-xs text-gray-500 ml-2">{stat.changeText}</span>
                   </div>
                 </div>
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <IconComponent className="w-6 h-6 text-gray-600" />
+                <div className="p-3 bg-gray-50 rounded-xl">
+                  <IconComponent className="w-7 h-7 text-gray-600" />
                 </div>
               </div>
             </div>
@@ -315,38 +322,45 @@ const Dashboard = () => {
         })}
       </div>
 
-      {/* Quick Actions */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
+      {/* Professional Actions */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-semibold text-gray-900">Quick Actions</h3>
+          <span className="text-sm text-gray-500">Streamlined workflow management</span>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {quickActions.map((action, index) => {
             const IconComponent = action.icon;
+            const colorClasses = {
+              blue: 'hover:border-blue-300 hover:bg-blue-50 group-hover:bg-blue-100 group-hover:text-blue-600',
+              green: 'hover:border-green-300 hover:bg-green-50 group-hover:bg-green-100 group-hover:text-green-600',
+              purple: 'hover:border-purple-300 hover:bg-purple-50 group-hover:bg-purple-100 group-hover:text-purple-600',
+              orange: 'hover:border-orange-300 hover:bg-orange-50 group-hover:bg-orange-100 group-hover:text-orange-600'
+            };
             return (
               <button
                 key={index}
-                className="flex flex-col items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 hover:bg-gray-50 transition-colors group"
+                className={`flex flex-col items-center p-4 border border-gray-200 rounded-xl transition-all duration-200 group ${colorClasses[action.color].split(' ').slice(0, 2).join(' ')}`}
               >
-                <div className="p-3 bg-gray-50 rounded-lg mb-3 group-hover:bg-gray-100 transition-colors">
-                  <IconComponent className="w-5 h-5 text-gray-600" />
+                <div className={`p-3 bg-gray-100 rounded-xl mb-3 transition-all duration-200 ${colorClasses[action.color].split(' ').slice(2).join(' ')}`}>
+                  <IconComponent className="w-6 h-6 text-gray-600 transition-colors duration-200" />
                 </div>
-                <span className="text-sm font-medium text-gray-900 mb-1">{action.name}</span>
-                <span className="text-xs text-gray-600 text-center">{action.description}</span>
+                <span className="text-sm font-semibold text-gray-900 mb-1 text-center">{action.name}</span>
+                <span className="text-xs text-gray-600 text-center leading-tight">{action.description}</span>
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* Recent Activities & Upcoming Events */}
+      {/* Business Intelligence & Calendar */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Activities */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
+        {/* Matter Activity Feed */}
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900">Recent Activities</h3>
-            <button className="text-sm text-blue-600 hover:text-blue-700 font-medium">
-              View All
+            <h3 className="text-lg font-semibold text-gray-900">Recent Matter Activity</h3>
+            <button className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors">
+              View All Activities
             </button>
           </div>
           <div className="space-y-4">
@@ -374,12 +388,12 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Upcoming Events */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
+        {/* Strategic Calendar */}
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900">Upcoming Events</h3>
-            <button className="text-sm text-blue-600 hover:text-blue-700 font-medium">
-              View Calendar
+            <h3 className="text-lg font-semibold text-gray-900">Strategic Calendar</h3>
+            <button className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors">
+              View Full Calendar
             </button>
           </div>
           <div className="space-y-4">
@@ -408,42 +422,44 @@ const Dashboard = () => {
 
   const renderContractAnalysis = () => (
     <div className="space-y-6">
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
         <div className="flex items-center space-x-4 mb-6">
-          <div className="p-3 bg-blue-50 rounded-lg">
-            <Brain className="w-6 h-6 text-blue-600" />
+          <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-sm">
+            <Brain className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h3 className="text-xl font-semibold text-gray-900">AI Contract Analysis</h3>
-            <p className="text-gray-600">Professional legal document analysis powered by AI</p>
+            <h3 className="text-xl font-semibold text-gray-900">Legal Intelligence Suite</h3>
+            <p className="text-gray-600">Enterprise-grade AI-powered document analysis and legal research platform</p>
           </div>
         </div>
         
-        {/* Contract Comparison */}
-        <div className="mb-8 p-6 bg-gray-50 rounded-lg border border-gray-200">
-          <h4 className="text-lg font-semibold text-gray-900 mb-4">Contract Comparison</h4>
+        {/* Enterprise Document Comparison */}
+        <div className="mb-8 p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+          <h4 className="text-lg font-semibold text-gray-900 mb-4">Enterprise Document Comparison Engine</h4>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">First Contract</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-3">Primary Legal Document</label>
               <div 
                 onClick={() => fileRef1.current?.click()}
-                className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-gray-400 transition-colors"
+                className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all duration-200"
               >
-                <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                <p className="text-sm text-gray-600">Click to upload contract</p>
+                <Upload className="w-10 h-10 text-gray-400 mx-auto mb-3" />
+                <p className="text-sm font-medium text-gray-700 mb-1">Upload Primary Document</p>
+                <p className="text-xs text-gray-500">Supported: PDF, DOCX, PNG, JPEG (Max 10MB)</p>
                 <input ref={fileRef1} type="file" className="hidden" />
               </div>
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Second Contract</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-3">Comparative Legal Document</label>
               <div 
                 onClick={() => fileRef2.current?.click()}
-                className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-gray-400 transition-colors"
+                className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all duration-200"
               >
-                <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                <p className="text-sm text-gray-600">Click to upload contract</p>
+                <Upload className="w-10 h-10 text-gray-400 mx-auto mb-3" />
+                <p className="text-sm font-medium text-gray-700 mb-1">Upload Comparison Document</p>
+                <p className="text-xs text-gray-500">Must match primary document format</p>
                 <input ref={fileRef2} type="file" className="hidden" />
               </div>
             </div>
@@ -452,32 +468,45 @@ const Dashboard = () => {
           <button
             onClick={handleContractComparison}
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
+            className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 px-6 rounded-xl hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-all duration-200 flex items-center justify-center shadow-sm"
           >
-            {loading ? 'Comparing...' : 'Compare Contracts'}
+            {loading ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-3"></div>
+                Processing Legal Analysis...
+              </>
+            ) : (
+              'Execute Document Comparison Analysis'
+            )}
           </button>
         </div>
 
-        {/* AI Tools */}
+        {/* Professional AI Tools */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {aiAnalysisTools.map((tool, index) => {
             const IconComponent = tool.icon;
+            const gradients = [
+              'from-red-500 to-red-600',
+              'from-green-500 to-green-600', 
+              'from-purple-500 to-purple-600'
+            ];
             return (
-              <div key={index} className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
-                <div className="p-3 bg-gray-50 rounded-lg w-fit mb-4">
-                  <IconComponent className="w-6 h-6 text-gray-600" />
+              <div key={index} className="border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all duration-200 bg-white">
+                <div className={`p-3 bg-gradient-to-br ${gradients[index]} rounded-xl w-fit mb-4 shadow-sm`}>
+                  <IconComponent className="w-6 h-6 text-white" />
                 </div>
-                <h5 className="font-semibold text-gray-900 mb-2">{tool.name}</h5>
-                <p className="text-sm text-gray-600 mb-4">{tool.description}</p>
+                <h5 className="font-semibold text-gray-900 mb-3 text-lg">{tool.name}</h5>
+                <p className="text-sm text-gray-600 mb-6 leading-relaxed">{tool.description}</p>
                 <input
                   type="file"
-                  className="w-full p-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full p-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                  placeholder="Select document for analysis"
                   onChange={(e) => {
                     const file = e.target.files[0];
                     if (file) {
-                      if (tool.name === 'Risk Analysis') handleRiskAnalysis(file);
-                      else if (tool.name === 'Document Summarizer') handleDocumentSummarizer(file);
-                      else if (tool.name === 'Authenticity Checker') handleAuthenticityCheck(file);
+                      if (tool.name === 'Risk Assessment') handleRiskAnalysis(file);
+                      else if (tool.name === 'Document Intelligence') handleDocumentSummarizer(file);
+                      else if (tool.name === 'Authenticity Verification') handleAuthenticityCheck(file);
                     }
                   }}
                 />
@@ -514,85 +543,45 @@ const Dashboard = () => {
 
   const renderCaseManagement = () => (
     <div className="space-y-6">
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Case Management</h3>
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-6">Enterprise Matter Management</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="p-4 border border-gray-200 rounded-lg">
-            <h4 className="font-medium text-gray-900 mb-2">Document Organization</h4>
-            <p className="text-sm text-gray-600 mb-3">Secure workspace with version control</p>
-            <button className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors">
-              Manage Documents
+          <div className="p-6 border border-gray-200 rounded-xl hover:shadow-lg transition-all duration-200 bg-gradient-to-br from-white to-blue-50">
+            <div className="flex items-center mb-4">
+              <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl mr-4 shadow-sm">
+                <Folder className="w-6 h-6 text-white" />
+              </div>
+              <h4 className="font-semibold text-gray-900">Document Repository</h4>
+            </div>
+            <p className="text-sm text-gray-600 mb-6 leading-relaxed">Centralized secure document management with advanced version control and audit trails</p>
+            <button className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm">
+              Access Repository
             </button>
           </div>
           
-          <div className="p-4 border border-gray-200 rounded-lg">
-            <h4 className="font-medium text-gray-900 mb-2">Case Tracking</h4>
-            <p className="text-sm text-gray-600 mb-3">Complete lifecycle management</p>
-            <button className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition-colors">
+          <div className="p-6 border border-gray-200 rounded-xl hover:shadow-lg transition-all duration-200 bg-gradient-to-br from-white to-green-50">
+            <div className="flex items-center mb-4">
+              <div className="p-3 bg-gradient-to-br from-green-500 to-green-600 rounded-xl mr-4 shadow-sm">
+                <Activity className="w-6 h-6 text-white" />
+              </div>
+              <h4 className="font-semibold text-gray-900">Matter Lifecycle</h4>
+            </div>
+            <p className="text-sm text-gray-600 mb-6 leading-relaxed">Comprehensive matter tracking with milestone management and progress analytics</p>
+            <button className="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors font-medium shadow-sm">
               View Timeline
             </button>
           </div>
           
-          <div className="p-4 border border-gray-200 rounded-lg">
-            <h4 className="font-medium text-gray-900 mb-2">Legal Strategies</h4>
-            <p className="text-sm text-gray-600 mb-3">AI-generated arguments</p>
-            <button className="w-full bg-purple-600 text-white py-2 rounded-md hover:bg-purple-700 transition-colors">
-              Generate Arguments
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderClientManagement = () => (
-    <div className="space-y-6">
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Client Management</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="p-4 border border-gray-200 rounded-lg text-center">
-            <div className="text-2xl mb-2">👥</div>
-            <h4 className="font-medium text-gray-900">Active Clients</h4>
-            <p className="text-2xl font-semibold text-gray-900">12</p>
-          </div>
-          <div className="p-4 border border-gray-200 rounded-lg text-center">
-            <div className="text-2xl mb-2">💬</div>
-            <h4 className="font-medium text-gray-900">Messages</h4>
-            <p className="text-2xl font-semibold text-gray-900">8</p>
-          </div>
-          <div className="p-4 border border-gray-200 rounded-lg text-center">
-            <div className="text-2xl mb-2">📄</div>
-            <h4 className="font-medium text-gray-900">Documents</h4>
-            <p className="text-2xl font-semibold text-gray-900">34</p>
-          </div>
-          <div className="p-4 border border-gray-200 rounded-lg text-center">
-            <div className="text-2xl mb-2">💰</div>
-            <h4 className="font-medium text-gray-900">Invoices</h4>
-            <p className="text-2xl font-semibold text-gray-900">5</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderAITools = () => (
-    <div className="space-y-6">
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">AI Legal Assistant</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="p-4 border border-gray-200 rounded-lg">
-            <h4 className="font-medium text-gray-900 mb-2">Case Analysis</h4>
-            <p className="text-sm text-gray-600 mb-3">Upload case files for legal pathway suggestions</p>
-            <button className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors">
-              Analyze Case
-            </button>
-          </div>
-          
-          <div className="p-4 border border-gray-200 rounded-lg">
-            <h4 className="font-medium text-gray-900 mb-2">Precedent Matching</h4>
-            <p className="text-sm text-gray-600 mb-3">AI-driven similar case identification</p>
-            <button className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition-colors">
-              Find Precedents
+          <div className="p-6 border border-gray-200 rounded-xl hover:shadow-lg transition-all duration-200 bg-gradient-to-br from-white to-purple-50">
+            <div className="flex items-center mb-4">
+              <div className="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl mr-4 shadow-sm">
+                <Brain className="w-6 h-6 text-white" />
+              </div>
+              <h4 className="font-semibold text-gray-900">Legal Intelligence</h4>
+            </div>
+            <p className="text-sm text-gray-600 mb-6 leading-relaxed">AI-powered legal research, precedent analysis, and strategic case development</p>
+            <button className="w-full bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 transition-colors font-medium shadow-sm">
+              Launch Research
             </button>
           </div>
         </div>
@@ -602,9 +591,50 @@ const Dashboard = () => {
 
   const renderAnalytics = () => (
     <div className="space-y-6">
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Analytics & Insights</h3>
-        <p className="text-gray-600">Comprehensive analytics dashboard coming soon...</p>
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-6">Business Intelligence Dashboard</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="text-center p-6 border border-gray-200 rounded-xl bg-gradient-to-br from-white to-blue-50 hover:shadow-md transition-all duration-200">
+            <div className="text-4xl font-bold text-gray-900 mb-2">18</div>
+            <div className="text-sm text-gray-600 font-medium">Active Legal Matters</div>
+            <div className="text-xs text-emerald-600 mt-2 font-semibold">+3 new this month</div>
+          </div>
+          <div className="text-center p-6 border border-gray-200 rounded-xl bg-gradient-to-br from-white to-green-50 hover:shadow-md transition-all duration-200">
+            <div className="text-4xl font-bold text-gray-900 mb-2">87%</div>
+            <div className="text-sm text-gray-600 font-medium">Matter Resolution Rate</div>
+            <div className="text-xs text-emerald-600 mt-2 font-semibold">+5% improvement YoY</div>
+          </div>
+          <div className="text-center p-6 border border-gray-200 rounded-xl bg-gradient-to-br from-white to-purple-50 hover:shadow-md transition-all duration-200">
+            <div className="text-4xl font-bold text-gray-900 mb-2">2,156</div>
+            <div className="text-sm text-gray-600 font-medium">Documents Processed</div>
+            <div className="text-xs text-blue-600 mt-2 font-semibold">+156 processed this week</div>
+          </div>
+          <div className="text-center p-6 border border-gray-200 rounded-xl bg-gradient-to-br from-white to-orange-50 hover:shadow-md transition-all duration-200">
+            <div className="text-4xl font-bold text-gray-900 mb-2">4</div>
+            <div className="text-sm text-gray-600 font-medium">Priority Reviews</div>
+            <div className="text-xs text-orange-600 mt-2 font-semibold">2 urgent items</div>
+          </div>
+        </div>
+        
+        {/* Additional Analytics Section */}
+        <div className="mt-8 p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+          <h4 className="text-lg font-semibold text-gray-900 mb-4">Advanced Analytics Suite</h4>
+          <p className="text-gray-600 mb-4">Comprehensive business intelligence and predictive analytics for legal practice optimization.</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <button className="p-4 bg-white rounded-lg border hover:shadow-md transition-all duration-200">
+              <PieChart className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+              <div className="text-sm font-medium text-gray-900">Revenue Analytics</div>
+            </button>
+            <button className="p-4 bg-white rounded-lg border hover:shadow-md transition-all duration-200">
+              <TrendingUp className="w-8 h-8 text-green-600 mx-auto mb-2" />
+              <div className="text-sm font-medium text-gray-900">Performance Metrics</div>
+            </button>
+            <button className="p-4 bg-white rounded-lg border hover:shadow-md transition-all duration-200">
+              <Target className="w-8 h-8 text-purple-600 mx-auto mb-2" />
+              <div className="text-sm font-medium text-gray-900">Strategic Insights</div>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -612,26 +642,34 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gray-900 rounded-lg flex items-center justify-center">
-                <span className="text-white font-semibold text-lg">L</span>
+            <div className="flex items-center space-x-4">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg flex items-center justify-center shadow-sm">
+                <Scale className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-semibold text-gray-900">Legal Practice Dashboard</h1>
-                <p className="text-sm text-gray-600">Welcome, {user?.name || 'Legal Professional'}</p>
+                <h1 className="text-xl font-semibold text-gray-900">Chakshi Legal Management</h1>
+                <p className="text-sm text-gray-600">Enterprise Legal Practice Suite</p>
               </div>
             </div>
             
-            <div className="flex items-center space-x-3">
-              <button className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
-                <span className="text-lg">🔔</span>
+            <div className="flex items-center space-x-2">
+              <button className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors relative">
+                <Bell className="w-5 h-5" />
+                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
               </button>
               <button className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
-                <span className="text-lg">⚙️</span>
+                <Settings className="w-5 h-5" />
               </button>
+              <div className="ml-4 flex items-center">
+                <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                  <span className="text-sm font-medium text-gray-700">
+                    {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -684,8 +722,6 @@ const Dashboard = () => {
         {activeTab === 'analytics' && renderAnalytics()}
         {activeTab === 'contract-analysis' && renderContractAnalysis()}
         {activeTab === 'case-management' && renderCaseManagement()}
-        {activeTab === 'client-portal' && renderClientManagement()}
-        {activeTab === 'ai-tools' && renderAITools()}
       </div>
     </div>
   );

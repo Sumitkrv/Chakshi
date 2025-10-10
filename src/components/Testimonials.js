@@ -17,10 +17,12 @@ const Testimonials = () => {
       rating: 5,
       category: "Legal Professionals",
       avatar: "RK",
+      gender: "male",
       company: "Kumar & Associates",
       verified: true,
       experience: "15+ years",
-      highlight: "70% time savings"
+      highlight: "70% time savings",
+      gradient: "from-[#b69d74] to-[#b69d74DD]"
     },
     {
       id: 2,
@@ -32,10 +34,12 @@ const Testimonials = () => {
       rating: 5,
       category: "Students & Education",
       avatar: "PS",
+      gender: "female",
       company: "National Law University",
       verified: true,
       experience: "3rd Year Student",
-      highlight: "Moot court success"
+      highlight: "Moot court success",
+      gradient: "from-[#b69d74] to-[#b69d74CC]"
     },
     {
       id: 3,
@@ -47,10 +51,12 @@ const Testimonials = () => {
       rating: 5,
       category: "Business Owners",
       avatar: "VM",
+      gender: "male",
       company: "Mehta Enterprises",
       verified: true,
       experience: "10+ years in business",
-      highlight: "Thousands saved"
+      highlight: "Thousands saved",
+      gradient: "from-[#b69d74] to-[#b69d74BB]"
     },
     {
       id: 4,
@@ -62,10 +68,12 @@ const Testimonials = () => {
       rating: 5,
       category: "Legal Professionals",
       avatar: "AS",
+      gender: "female",
       company: "Singh Legal Associates",
       verified: true,
       experience: "12+ years",
-      highlight: "Multi-jurisdiction compliance"
+      highlight: "Multi-jurisdiction compliance",
+      gradient: "from-[#b69d74] to-[#b69d74AA]"
     },
     {
       id: 5,
@@ -77,10 +85,12 @@ const Testimonials = () => {
       rating: 4,
       category: "Business Owners",
       avatar: "RK",
+      gender: "male",
       company: "TechStart Solutions",
       verified: true,
       experience: "Entrepreneur",
-      highlight: "Startup-friendly"
+      highlight: "Startup-friendly",
+      gradient: "from-[#b69d74] to-[#b69d7499]"
     },
     {
       id: 6,
@@ -92,10 +102,12 @@ const Testimonials = () => {
       rating: 5,
       category: "Students & Education",
       avatar: "MI",
+      gender: "female",
       company: "West Bengal National University",
       verified: true,
       experience: "20+ years teaching",
-      highlight: "Curriculum integration"
+      highlight: "Curriculum integration",
+      gradient: "from-[#b69d74] to-[#b69d7488]"
     }
   ];
 
@@ -148,129 +160,330 @@ const Testimonials = () => {
     setIsAutoPlaying(!isAutoPlaying);
   };
 
-  // Function to display rating is no longer needed as we're using text
-
   const averageRating = (filteredTestimonials.reduce((sum, t) => sum + t.rating, 0) / filteredTestimonials.length).toFixed(1);
   
   const featuredTestimonial = filteredTestimonials[currentSlide];
 
+  // Gender icon component
+  const GenderIcon = ({ gender, className = "w-4 h-4" }) => {
+    if (gender === 'male') {
+      return (
+        <svg className={className} fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+        </svg>
+      );
+    } else if (gender === 'female') {
+      return (
+        <svg className={className} fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+        </svg>
+      );
+    }
+    return null;
+  };
+
+  // Star rating component
+  const StarRating = ({ rating, size = "text-sm" }) => {
+    return (
+      <div className={`flex gap-0.5 ${size} text-[#b69d74]`}>
+        {[...Array(5)].map((_, i) => (
+          <span key={i}>{i < rating ? '★' : '☆'}</span>
+        ))}
+      </div>
+    );
+  };
+
   return (
-    <section className="relative min-h-screen bg-[#FFFFFF] text-[#374151] overflow-hidden">
+    <section 
+      id="testimonials" 
+      className="relative min-h-screen text-[#1f2839] overflow-hidden"
+      style={{ 
+        backgroundColor: '#f5f5ef',
+        backgroundImage: 'url("https://images.unsplash.com/photo-1521587760476-6c12a4b040da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80")',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
+    >
       
-      {/* Simple Background */}
+      {/* Background Elements */}
       <div className="absolute inset-0">
-        {/* Clean background without decorative elements */}
+        {/* Background overlay for readability */}
+        <div className="absolute inset-0" style={{ backgroundColor: 'rgba(245, 245, 239, 0.85)' }}></div>
+        
+        {/* Light Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-white/10"></div>
+        
+        {/* Animated Background Elements */}
+        <div 
+          className="absolute top-20 -left-20 w-80 h-80 rounded-full blur-3xl opacity-30"
+          style={{
+            background: `linear-gradient(135deg, rgba(182, 157, 116, 0.2), rgba(182, 157, 116, 0.1))`
+          }}
+        ></div>
+        <div 
+          className="absolute bottom-20 -right-20 w-96 h-96 rounded-full blur-3xl opacity-20"
+          style={{
+            background: `linear-gradient(135deg, rgba(182, 157, 116, 0.15), rgba(182, 157, 116, 0.08))`
+          }}
+        ></div>
+        
+        {/* Grid Pattern */}
+        <div 
+          className="absolute inset-0 opacity-5"
+          style={{
+            backgroundImage: `
+              linear-gradient(to right, #1f2839 1px, transparent 1px),
+              linear-gradient(to bottom, #1f2839 1px, transparent 1px)
+            `,
+            backgroundSize: '60px 60px',
+          }}
+        ></div>
       </div>
       
-      <div className="relative z-10 pro-container pro-py-12 md:pro-py-24">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-24">
         
         {/* Header */}
         <div className="text-center mb-12 md:mb-16">
-          <div className="w-12 h-12 md:w-16 md:h-16 bg-[#FFFFFF] border-2 border-[#E5E7EB] pro-rounded-xl pro-flex-center mx-auto mb-4 md:mb-6">
-            <span className="text-sm md:text-xl font-bold text-[#374151]">★</span>
+          <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-[#b69d74] to-[#b69d74DD] border border-[#b69d7460] rounded-xl flex items-center justify-center mx-auto mb-4 md:mb-6 shadow-lg">
+            <span className="text-white font-bold text-sm md:text-xl">★</span>
           </div>
-          <h2 className="pro-heading-section text-[#374151] mb-4">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#1f2839] mb-4">
             Trusted by Legal Professionals
           </h2>
-          <p className="pro-text-lead text-[#6B7280] max-w-3xl mx-auto mb-6 md:mb-8 px-4">
+          <p className="text-lg md:text-xl text-[#6b7280] max-w-3xl mx-auto mb-6 md:mb-8 px-4">
             See what our users are saying about their experience with Chakshi Legal AI Suite. 
             Real stories from real professionals who've transformed their practice.
           </p>
           
           {/* Stats */}
-          <div className="pro-grid grid-cols-2 md:grid-cols-4 pro-gap-3 md:pro-gap-6 max-w-4xl mx-auto mb-8 md:mb-12 px-4">
-            <div className="text-center pro-p-4 md:pro-p-6 bg-[#FFFFFF] pro-rounded-xl border border-[#E5E7EB] hover:bg-[#F9FAFB] transition-colors">
-              <div className="pro-heading-lg md:pro-heading-xl font-bold text-[#374151] mb-1">{averageRating}</div>
-              <div className="pro-flex justify-center pro-gap-1 mb-2 text-[#6B7280]">
-                ★★★★★
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 max-w-4xl mx-auto mb-8 md:mb-12 px-4">
+            <div 
+              className="text-center p-4 md:p-6 rounded-xl border transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+              style={{
+                background: 'rgba(255, 255, 255, 0.80)',
+                backdropFilter: 'blur(15px)',
+                border: '1px solid rgba(182, 157, 116, 0.3)',
+                boxShadow: '0 8px 25px rgba(31, 40, 57, 0.12)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.90)';
+                e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.6)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.80)';
+                e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.3)';
+              }}
+            >
+              <div className="text-xl md:text-2xl lg:text-3xl font-bold text-[#1f2839] mb-1">{averageRating}</div>
+              <div className="flex justify-center gap-1 mb-2">
+                <StarRating rating={5} />
               </div>
-              <div className="pro-text-xs md:pro-text-sm text-[#9CA3AF]">Average Rating</div>
+              <div className="text-xs md:text-sm text-[#6b7280]">Average Rating</div>
             </div>
-            <div className="text-center pro-p-4 md:pro-p-6 bg-[#FFFFFF] pro-rounded-xl border border-[#E5E7EB] hover:bg-[#F9FAFB] transition-colors">
-              <div className="pro-heading-lg md:pro-heading-xl font-bold text-[#374151] mb-1">500+</div>
-              <div className="pro-text-xs md:pro-text-sm text-[#9CA3AF]">Happy Users</div>
+            <div 
+              className="text-center p-4 md:p-6 rounded-xl border transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+              style={{
+                background: 'rgba(255, 255, 255, 0.80)',
+                backdropFilter: 'blur(15px)',
+                border: '1px solid rgba(182, 157, 116, 0.3)',
+                boxShadow: '0 8px 25px rgba(31, 40, 57, 0.12)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.90)';
+                e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.6)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.80)';
+                e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.3)';
+              }}
+            >
+              <div className="text-xl md:text-2xl lg:text-3xl font-bold text-[#1f2839] mb-1">500+</div>
+              <div className="text-xs md:text-sm text-[#6b7280]">Happy Users</div>
             </div>
-            <div className="text-center pro-p-4 md:pro-p-6 bg-[#FFFFFF] pro-rounded-xl border border-[#E5E7EB] hover:bg-[#F9FAFB] transition-colors">
-              <div className="pro-heading-lg md:pro-heading-xl font-bold text-[#374151] mb-1">98%</div>
-              <div className="pro-text-xs md:pro-text-sm text-[#9CA3AF]">Satisfaction Rate</div>
+            <div 
+              className="text-center p-4 md:p-6 rounded-xl border transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+              style={{
+                background: 'rgba(255, 255, 255, 0.80)',
+                backdropFilter: 'blur(15px)',
+                border: '1px solid rgba(182, 157, 116, 0.3)',
+                boxShadow: '0 8px 25px rgba(31, 40, 57, 0.12)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.90)';
+                e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.6)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.80)';
+                e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.3)';
+              }}
+            >
+              <div className="text-xl md:text-2xl lg:text-3xl font-bold text-[#1f2839] mb-1">98%</div>
+              <div className="text-xs md:text-sm text-[#6b7280]">Satisfaction Rate</div>
             </div>
-            <div className="text-center pro-p-4 md:pro-p-6 bg-[#FFFFFF] pro-rounded-xl border border-[#E5E7EB] hover:bg-[#F9FAFB] transition-colors">
-              <div className="pro-heading-lg md:pro-heading-xl font-bold text-[#374151] mb-1">24/7</div>
-              <div className="pro-text-xs md:pro-text-sm text-[#9CA3AF]">Support Available</div>
+            <div 
+              className="text-center p-4 md:p-6 rounded-xl border transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+              style={{
+                background: 'rgba(255, 255, 255, 0.80)',
+                backdropFilter: 'blur(15px)',
+                border: '1px solid rgba(182, 157, 116, 0.3)',
+                boxShadow: '0 8px 25px rgba(31, 40, 57, 0.12)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.90)';
+                e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.6)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.80)';
+                e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.3)';
+              }}
+            >
+              <div className="text-xl md:text-2xl lg:text-3xl font-bold text-[#1f2839] mb-1">24/7</div>
+              <div className="text-xs md:text-sm text-[#6b7280]">Support Available</div>
             </div>
           </div>
         </div>
 
         {/* Featured Testimonial */}
         <div className="mb-12 md:mb-16 relative max-w-4xl mx-auto px-4">
-          <div className="pro-card pro-p-6 md:pro-p-8 bg-[#FFFFFF] border border-[#E5E7EB] rounded-2xl shadow-sm hover:shadow-md transition-all">
-            <div className="pro-flex flex-col md:flex-row items-start pro-gap-4 md:pro-gap-6">
-              <div className="w-16 h-16 md:w-20 md:h-20 bg-[#374151] pro-rounded-xl pro-flex-center text-[#FFFFFF] font-bold text-lg md:text-2xl flex-shrink-0">
-                {featuredTestimonial.avatar}
-              </div>
-              
-              <div className="flex-1">
-                <div className="pro-flex flex-col sm:flex-row items-start justify-between mb-4 gap-2">
-                  <div>
-                    <h3 className="pro-heading-md text-[#374151]">{featuredTestimonial.name}</h3>
-                    <p className="pro-text-sm text-[#6B7280]">{featuredTestimonial.role} • {featuredTestimonial.company}</p>
-                  </div>
-                  <div className="pro-flex pro-gap-1 text-[#374151]">
-                    <span className="text-sm">★★★★★</span>
-                    <span className="text-sm">({featuredTestimonial.rating}/5)</span>
-                  </div>
-                </div>
-                
-                <p className="pro-text-body text-[#6B7280] mb-4 italic">"{featuredTestimonial.content}"</p>
-                
-                <div className="pro-flex flex-wrap items-center pro-gap-2 mb-4">
-                  <span className="pro-text-xs px-2 py-1 bg-[#374151] text-[#FFFFFF] pro-rounded-lg font-medium">
-                    {featuredTestimonial.highlight}
-                  </span>
-                  {featuredTestimonial.verified && (
-                    <div className="pro-flex items-center pro-gap-1 pro-text-xs text-[#374151] font-medium">
-                      ✓ VERIFIED USER
+          {featuredTestimonial && (
+            <div 
+              className="p-6 md:p-8 rounded-2xl border shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-2"
+              style={{
+                background: 'rgba(255, 255, 255, 0.80)',
+                backdropFilter: 'blur(15px)',
+                border: '1px solid rgba(182, 157, 116, 0.3)',
+                boxShadow: '0 8px 25px rgba(31, 40, 57, 0.12)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.90)';
+                e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.6)';
+                e.currentTarget.style.boxShadow = '0 15px 40px rgba(182, 157, 116, 0.25)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.80)';
+                e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.3)';
+                e.currentTarget.style.boxShadow = '0 8px 25px rgba(31, 40, 57, 0.12)';
+              }}
+            >
+              <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6">
+                <div className="flex flex-col items-center gap-2">
+                  <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-[#b69d74] to-[#b69d74DD] rounded-xl flex items-center justify-center text-white font-bold text-lg md:text-2xl flex-shrink-0 shadow-lg relative">
+                    {featuredTestimonial.avatar}
+                    <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 border border-[#b69d7440]">
+                      <GenderIcon gender={featuredTestimonial.gender} className="w-3 h-3 text-[#b69d74]" />
                     </div>
-                  )}
+                  </div>
                 </div>
                 
-                <p className="pro-text-sm text-[#9CA3AF]">{featuredTestimonial.detailed.substring(0, 120)}...</p>
+                <div className="flex-1">
+                  <div className="flex flex-col sm:flex-row items-start justify-between mb-4 gap-2">
+                    <div>
+                      <h3 className="text-lg md:text-xl font-semibold text-[#1f2839]">{featuredTestimonial.name}</h3>
+                      <p className="text-sm text-[#6b7280]">{featuredTestimonial.role} • {featuredTestimonial.company}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <StarRating rating={featuredTestimonial.rating} />
+                      <span className="text-sm text-[#6b7280]">({featuredTestimonial.rating}/5)</span>
+                    </div>
+                  </div>
+                  
+                  <p className="text-base text-[#6b7280] mb-4 italic">"{featuredTestimonial.content}"</p>
+                  
+                  <div className="flex flex-wrap items-center gap-2 mb-4">
+                    <span className="text-xs px-2 py-1 bg-gradient-to-r from-[#b69d74] to-[#b69d74DD] text-white rounded-lg font-medium">
+                      {featuredTestimonial.highlight}
+                    </span>
+                    {featuredTestimonial.verified && (
+                      <div className="flex items-center gap-1 text-xs text-[#b69d74] font-medium">
+                        ✓ VERIFIED USER
+                      </div>
+                    )}
+                  </div>
+                  
+                  <p className="text-sm text-[#6b7280]">{featuredTestimonial.detailed.substring(0, 120)}...</p>
+                </div>
               </div>
             </div>
-          </div>
+          )}
           
           {/* Carousel Controls */}
-          <div className="pro-flex items-center justify-center mt-6 pro-gap-2 md:pro-gap-4 flex-wrap">
+          <div className="flex items-center justify-center mt-6 gap-2 md:gap-4 flex-wrap">
             <button 
               onClick={prevSlide}
-              className="px-3 py-2 md:px-4 md:py-2 pro-flex-center bg-[#FFFFFF] pro-rounded border border-[#E5E7EB] hover:bg-[#F9FAFB] hover:border-[#374151] text-[#374151] transition-all text-sm"
+              className="px-3 py-2 md:px-4 md:py-2 flex items-center justify-center rounded-lg border text-[#1f2839] transition-all duration-300 text-sm hover:-translate-y-1"
+              style={{
+                background: 'rgba(255, 255, 255, 0.80)',
+                backdropFilter: 'blur(15px)',
+                border: '1px solid rgba(182, 157, 116, 0.3)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.95)';
+                e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.6)';
+                e.currentTarget.style.color = '#b69d74';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.80)';
+                e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.3)';
+                e.currentTarget.style.color = '#1f2839';
+              }}
             >
               ← Previous
             </button>
             
             <button 
               onClick={toggleAutoPlay}
-              className="px-3 py-2 md:px-4 md:py-2 pro-flex-center bg-[#FFFFFF] pro-rounded border border-[#E5E7EB] hover:bg-[#F9FAFB] hover:border-[#374151] text-[#374151] transition-all text-sm"
+              className="px-3 py-2 md:px-4 md:py-2 flex items-center justify-center rounded-lg border text-[#1f2839] transition-all duration-300 text-sm hover:-translate-y-1"
+              style={{
+                background: 'rgba(255, 255, 255, 0.80)',
+                backdropFilter: 'blur(15px)',
+                border: '1px solid rgba(182, 157, 116, 0.3)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.95)';
+                e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.6)';
+                e.currentTarget.style.color = '#b69d74';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.80)';
+                e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.3)';
+                e.currentTarget.style.color = '#1f2839';
+              }}
             >
               {isAutoPlaying ? "⏸ Pause" : "▶ Play"}
             </button>
             
             <button 
               onClick={nextSlide}
-              className="px-3 py-2 md:px-4 md:py-2 pro-flex-center bg-[#FFFFFF] pro-rounded border border-[#E5E7EB] hover:bg-[#F9FAFB] hover:border-[#374151] text-[#374151] transition-all text-sm"
+              className="px-3 py-2 md:px-4 md:py-2 flex items-center justify-center rounded-lg border text-[#1f2839] transition-all duration-300 text-sm hover:-translate-y-1"
+              style={{
+                background: 'rgba(255, 255, 255, 0.80)',
+                backdropFilter: 'blur(15px)',
+                border: '1px solid rgba(182, 157, 116, 0.3)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.95)';
+                e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.6)';
+                e.currentTarget.style.color = '#b69d74';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.80)';
+                e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.3)';
+                e.currentTarget.style.color = '#1f2839';
+              }}
             >
               Next →
             </button>
           </div>
           
           {/* Dots Indicator */}
-          <div className="pro-flex justify-center mt-4 pro-gap-2">
+          <div className="flex justify-center mt-4 gap-2">
             {filteredTestimonials.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentSlide(index)}
-                className={`w-2 h-2 pro-rounded-full transition-all ${
-                  index === currentSlide ? 'bg-[#374151] w-6' : 'bg-[#E5E7EB]'
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  index === currentSlide ? 'bg-[#b69d74] w-6' : 'bg-[#b69d7440]'
                 }`}
               />
             ))}
@@ -278,24 +491,31 @@ const Testimonials = () => {
         </div>
 
         {/* Category Filters */}
-        <div className="pro-flex justify-center mb-8 md:mb-12 px-4">
-          <div className="pro-flex flex-wrap items-center pro-gap-2 md:pro-gap-3 pro-p-2 bg-[#FFFFFF] pro-rounded-xl border border-[#E5E7EB] max-w-full overflow-x-auto">
+        <div className="flex justify-center mb-8 md:mb-12 px-4">
+          <div 
+            className="flex flex-wrap items-center gap-2 md:gap-3 p-2 rounded-xl border max-w-full overflow-x-auto"
+            style={{
+              background: 'rgba(255, 255, 255, 0.80)',
+              backdropFilter: 'blur(15px)',
+              border: '1px solid rgba(182, 157, 116, 0.3)'
+            }}
+          >
             {categories.map((category) => {
               return (
                 <button
                   key={category.id}
-                  className={`pro-flex items-center pro-gap-1 md:pro-gap-2 px-2 py-1 md:px-4 md:py-2 pro-rounded-lg transition-all text-xs md:text-sm whitespace-nowrap ${
+                  className={`flex items-center gap-1 md:gap-2 px-2 py-1 md:px-4 md:py-2 rounded-lg transition-all duration-300 text-xs md:text-sm whitespace-nowrap ${
                     activeCategory === category.id 
-                      ? 'bg-[#374151] text-[#FFFFFF]' 
-                      : 'text-[#6B7280] hover:text-[#374151] hover:bg-[#F9FAFB]'
+                      ? 'bg-gradient-to-r from-[#b69d74] to-[#b69d74DD] text-white' 
+                      : 'text-[#6b7280] hover:text-[#b69d74] hover:bg-white/60'
                   }`}
                   onClick={() => handleCategoryClick(category.id)}
                 >
                   <span className="font-medium">{category.name}</span>
-                  <span className={`pro-text-xs px-1.5 py-0.5 md:px-2 md:py-0.5 pro-rounded-lg font-semibold ${
+                  <span className={`text-xs px-1.5 py-0.5 md:px-2 md:py-0.5 rounded-lg font-semibold ${
                     activeCategory === category.id 
-                      ? 'bg-[#6B7280] text-[#FFFFFF]' 
-                      : 'bg-[#F9FAFB] text-[#6B7280] border border-[#E5E7EB]'
+                      ? 'bg-white/20 text-white' 
+                      : 'bg-[#b69d7410] text-[#6b7280] border border-[#b69d7440]'
                   }`}>
                     {category.count}
                   </span>
@@ -306,11 +526,11 @@ const Testimonials = () => {
         </div>
 
         {/* Testimonials Grid */}
-        <div className="pro-grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 pro-gap-4 md:pro-gap-6 lg:pro-gap-8 mb-12 md:mb-16 px-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8 mb-12 md:mb-16 px-4">
           {filteredTestimonials.map((testimonial) => (
             <div 
               key={testimonial.id} 
-              className={`relative group cursor-pointer transition-all h-80 md:h-96 ${
+              className={`relative group cursor-pointer transition-all duration-500 h-80 md:h-96 ${
                 flippedCard === testimonial.id ? '[transform:rotateY(180deg)]' : ''
               }`}
               style={{ transformStyle: 'preserve-3d', perspective: '1000px' }}
@@ -318,44 +538,67 @@ const Testimonials = () => {
             >
               {/* Card Front */}
               <div className="absolute inset-0 w-full h-full [backface-visibility:hidden]">
-                <div className="h-full pro-card pro-p-4 md:pro-p-6 bg-[#FFFFFF] border border-[#E5E7EB] hover:shadow-md hover:bg-[#F9FAFB] transition-all flex flex-col">
-                  <div className="pro-flex items-start justify-between mb-4">
-                    <div className="w-10 h-10 md:w-12 md:h-12 bg-[#374151] pro-rounded-xl pro-flex-center text-[#FFFFFF] font-bold text-sm">
-                      {testimonial.avatar}
+                <div 
+                  className="h-full p-4 md:p-6 rounded-xl border transition-all duration-300 flex flex-col hover:shadow-xl hover:-translate-y-2"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.80)',
+                    backdropFilter: 'blur(15px)',
+                    border: '1px solid rgba(182, 157, 116, 0.3)',
+                    boxShadow: '0 8px 25px rgba(31, 40, 57, 0.12)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.90)';
+                    e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.6)';
+                    e.currentTarget.style.boxShadow = '0 15px 40px rgba(182, 157, 116, 0.25)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.80)';
+                    e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.3)';
+                    e.currentTarget.style.boxShadow = '0 8px 25px rgba(31, 40, 57, 0.12)';
+                  }}
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="relative">
+                      <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-[#b69d74] to-[#b69d74DD] rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                        {testimonial.avatar}
+                      </div>
+                      <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 border border-[#b69d7440]">
+                        <GenderIcon gender={testimonial.gender} className="w-2.5 h-2.5 text-[#b69d74]" />
+                      </div>
                     </div>
-                    <div className="text-[#374151] font-bold text-xs md:text-sm">★★★★★</div>
+                    <StarRating rating={testimonial.rating} />
                   </div>
                   
-                  <p className="pro-text-sm md:pro-text-body text-[#6B7280] mb-4 md:mb-6 leading-relaxed flex-grow line-clamp-4">
+                  <p className="text-sm md:text-base text-[#6b7280] mb-4 md:mb-6 leading-relaxed flex-grow line-clamp-4">
                     "{testimonial.content}"
                   </p>
                   
-                  <div className="pro-flex items-center justify-between mb-3 md:mb-4">
-                    <div className="pro-text-xs md:pro-text-sm font-medium text-[#374151]">
+                  <div className="flex items-center justify-between mb-3 md:mb-4">
+                    <div className="text-xs md:text-sm font-medium text-[#1f2839]">
                       {testimonial.rating}/5 Rating
                     </div>
                     {testimonial.verified && (
-                      <div className="pro-flex items-center pro-gap-1 pro-text-xs text-[#374151] font-medium">
+                      <div className="flex items-center gap-1 text-xs text-[#b69d74] font-medium">
                         ✓ VERIFIED
                       </div>
                     )}
                   </div>
                   
-                  <div className="border-t border-[#E5E7EB] pt-3 md:pt-4">
-                    <div className="pro-flex items-center justify-between">
+                  <div className="border-t border-[#b69d7440] pt-3 md:pt-4">
+                    <div className="flex items-center justify-between">
                       <div>
-                        <h4 className="pro-heading-sm text-[#374151] text-sm md:text-base">{testimonial.name}</h4>
-                        <p className="pro-text-xs text-[#6B7280]">{testimonial.role}</p>
-                        <p className="pro-text-xs text-[#9CA3AF]">{testimonial.location}</p>
+                        <h4 className="text-sm md:text-base font-semibold text-[#1f2839]">{testimonial.name}</h4>
+                        <p className="text-xs text-[#6b7280]">{testimonial.role}</p>
+                        <p className="text-xs text-[#9CA3AF]">{testimonial.location}</p>
                       </div>
                       <div className="text-right">
-                        <p className="pro-text-xs text-[#6B7280] font-medium">{testimonial.company}</p>
-                        <p className="pro-text-xs text-[#9CA3AF]">{testimonial.experience}</p>
+                        <p className="text-xs text-[#6b7280] font-medium">{testimonial.company}</p>
+                        <p className="text-xs text-[#9CA3AF]">{testimonial.experience}</p>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="mt-3 md:mt-4 pro-flex items-center justify-center pro-text-xs text-[#9CA3AF] hover:text-[#374151] transition-colors">
+                  <div className="mt-3 md:mt-4 flex items-center justify-center text-xs text-[#6b7280] hover:text-[#b69d74] transition-colors duration-300">
                     Click for detailed review →
                   </div>
                 </div>
@@ -363,13 +606,26 @@ const Testimonials = () => {
               
               {/* Card Back */}
               <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] overflow-y-auto">
-                <div className="h-full pro-card pro-p-4 md:pro-p-6 bg-[#FFFFFF] border border-[#E5E7EB] hover:shadow-md transition-all">
-                  <div className="pro-flex items-start justify-between mb-4">
-                    <div className="w-10 h-10 md:w-12 md:h-12 bg-[#374151] pro-rounded-xl pro-flex-center text-[#FFFFFF] font-bold text-sm">
-                      {testimonial.avatar}
+                <div 
+                  className="h-full p-4 md:p-6 rounded-xl border transition-all duration-300"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.80)',
+                    backdropFilter: 'blur(15px)',
+                    border: '1px solid rgba(182, 157, 116, 0.3)',
+                    boxShadow: '0 8px 25px rgba(31, 40, 57, 0.12)'
+                  }}
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="relative">
+                      <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-[#b69d74] to-[#b69d74DD] rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                        {testimonial.avatar}
+                      </div>
+                      <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 border border-[#b69d7440]">
+                        <GenderIcon gender={testimonial.gender} className="w-2.5 h-2.5 text-[#b69d74]" />
+                      </div>
                     </div>
                     <button 
-                      className="px-2 py-1 md:px-3 md:py-1 pro-flex-center bg-[#374151] text-[#FFFFFF] pro-rounded-lg text-xs hover:bg-[#6B7280] transition-colors"
+                      className="px-2 py-1 md:px-3 md:py-1 flex items-center justify-center bg-gradient-to-r from-[#b69d74] to-[#b69d74DD] text-white rounded-lg text-xs hover:shadow-lg transition-all duration-300"
                       onClick={(e) => {
                         e.stopPropagation();
                         setFlippedCard(null);
@@ -379,28 +635,26 @@ const Testimonials = () => {
                     </button>
                   </div>
                   
-                  <h3 className="pro-heading-md text-[#374151] mb-3 text-sm md:text-base">Detailed Experience</h3>
-                  <p className="pro-text-xs md:pro-text-sm text-[#6B7280] mb-4 md:mb-6 leading-relaxed">
+                  <h3 className="text-lg md:text-xl font-semibold text-[#1f2839] mb-3">Detailed Experience</h3>
+                  <p className="text-xs md:text-sm text-[#6b7280] mb-4 md:mb-6 leading-relaxed">
                     {testimonial.detailed}
                   </p>
                   
-                  <div className="pro-flex items-center justify-between mb-3 md:mb-4">
-                    <div className="pro-text-xs md:pro-text-sm font-medium text-[#374151]">
-                      ★★★★★ ({testimonial.rating}/5)
-                    </div>
-                    <span className="pro-text-xs px-2 py-1 bg-[#374151] text-[#FFFFFF] pro-rounded-lg font-medium">
+                  <div className="flex items-center justify-between mb-3 md:mb-4">
+                    <StarRating rating={testimonial.rating} />
+                    <span className="text-xs px-2 py-1 bg-gradient-to-r from-[#b69d74] to-[#b69d74DD] text-white rounded-lg font-medium">
                       {testimonial.category}
                     </span>
                   </div>
                   
-                  <div className="border-t border-[#E5E7EB] pt-3 md:pt-4">
-                    <div className="pro-flex items-center justify-between">
+                  <div className="border-t border-[#b69d7440] pt-3 md:pt-4">
+                    <div className="flex items-center justify-between">
                       <div>
-                        <h4 className="pro-heading-sm text-[#374151] text-sm">{testimonial.name}</h4>
-                        <p className="pro-text-xs text-[#6B7280]">{testimonial.role}</p>
+                        <h4 className="text-sm font-semibold text-[#1f2839]">{testimonial.name}</h4>
+                        <p className="text-xs text-[#6b7280]">{testimonial.role}</p>
                       </div>
                       {testimonial.verified && (
-                        <div className="pro-text-xs text-[#374151] bg-[#F9FAFB] border border-[#E5E7EB] px-2 py-1 pro-rounded-lg font-medium">
+                        <div className="text-xs text-[#b69d74] bg-[#b69d7410] border border-[#b69d7440] px-2 py-1 rounded-lg font-medium">
                           ✓ VERIFIED
                         </div>
                       )}
@@ -413,36 +667,117 @@ const Testimonials = () => {
         </div>
 
         {/* CTA Section */}
-        <div className="bg-[#FFFFFF] border border-[#E5E7EB] pro-rounded-xl pro-p-6 md:pro-p-8 text-center relative overflow-hidden mx-4 hover:bg-[#F9FAFB] transition-colors">
+        <div 
+          className="border rounded-xl p-6 md:p-8 text-center relative overflow-hidden mx-4 transition-all duration-300 hover:-translate-y-2"
+          style={{
+            background: 'rgba(255, 255, 255, 0.80)',
+            backdropFilter: 'blur(15px)',
+            border: '1px solid rgba(182, 157, 116, 0.3)',
+            boxShadow: '0 8px 25px rgba(31, 40, 57, 0.12)'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.90)';
+            e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.6)';
+            e.currentTarget.style.boxShadow = '0 15px 40px rgba(182, 157, 116, 0.25)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.80)';
+            e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.3)';
+            e.currentTarget.style.boxShadow = '0 8px 25px rgba(31, 40, 57, 0.12)';
+          }}
+        >
           <div className="relative z-10">
-            <div className="w-12 h-12 md:w-16 md:h-16 bg-[#374151] pro-rounded-xl pro-flex-center mx-auto mb-4 md:mb-6">
-              <span className="text-[#FFFFFF] font-bold text-sm md:text-base">✨</span>
+            <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-[#b69d74] to-[#b69d74DD] border border-[#b69d7460] rounded-xl flex items-center justify-center mx-auto mb-4 md:mb-6 shadow-lg">
+              <span className="text-white font-bold text-sm md:text-base">✨</span>
             </div>
-            <h3 className="pro-heading-lg md:pro-heading-xl text-[#374151] mb-4">Join Our Community</h3>
-            <p className="pro-text-sm md:pro-text-body text-[#6B7280] mb-4 md:mb-6 max-w-2xl mx-auto">
+            <h3 className="text-2xl md:text-3xl font-bold text-[#1f2839] mb-4">Join Our Community</h3>
+            <p className="text-sm md:text-base text-[#6b7280] mb-4 md:mb-6 max-w-2xl mx-auto">
               Be part of the growing community of legal professionals who are transforming their practice with AI. 
               Your success story could be next!
             </p>
-            <div className="pro-flex flex-col sm:flex-row justify-center items-center pro-gap-3 md:pro-gap-4">
-              <button className="w-full sm:w-auto pro-btn pro-btn-primary bg-[#374151] border-0 hover:bg-[#6B7280] transition-all text-[#FFFFFF] px-4 py-2 md:px-6 md:py-3">
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-3 md:gap-4">
+              <button 
+                className="w-full sm:w-auto text-white border-0 px-4 py-2 md:px-6 md:py-3 rounded-lg font-semibold transition-all duration-300 hover:-translate-y-1 hover:scale-105"
+                style={{ 
+                  background: 'linear-gradient(135deg, #b69d74 0%, #b69d74 100%)',
+                  boxShadow: '0 10px 25px rgba(182, 157, 116, 0.40)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = '0 15px 40px rgba(182, 157, 116, 0.6)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = '0 10px 25px rgba(182, 157, 116, 0.40)';
+                }}
+              >
                 Start Your Free Trial →
               </button>
-              <button className="w-full sm:w-auto pro-btn pro-btn-ghost border border-[#E5E7EB] hover:border-[#374151] hover:bg-[#F9FAFB] text-[#6B7280] hover:text-[#374151] px-4 py-2 md:px-6 md:py-3">
+              <button 
+                className="w-full sm:w-auto px-4 py-2 md:px-6 md:py-3 rounded-lg font-semibold transition-all duration-300 hover:-translate-y-1"
+                style={{ 
+                  border: '1px solid rgba(182, 157, 116, 0.6)',
+                  color: '#6b7280',
+                  background: 'rgba(255, 255, 255, 0.8)',
+                  backdropFilter: 'blur(10px)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'linear-gradient(135deg, #b69d74 0%, #b69d74 100%)';
+                  e.currentTarget.style.color = 'white';
+                  e.currentTarget.style.borderColor = '#b69d74';
+                  e.currentTarget.style.boxShadow = '0 15px 40px rgba(182, 157, 116, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.8)';
+                  e.currentTarget.style.color = '#6b7280';
+                  e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.6)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              >
                 Read More Reviews
               </button>
             </div>
             
-            <div className="mt-4 md:mt-6 pro-flex flex-wrap justify-center items-center pro-gap-3 md:pro-gap-6 pro-text-xs md:pro-text-sm text-[#9CA3AF]">
-              <div className="pro-flex items-center pro-gap-2">
-                ✓ No credit card required
+            <div className="mt-4 md:mt-6 flex flex-wrap justify-center items-center gap-3 md:gap-6 text-xs md:text-sm text-[#6b7280]">
+              <div className="flex items-center gap-2">
+                <div 
+                  className="w-3 h-3 rounded-full flex items-center justify-center"
+                  style={{ background: '#b69d74' }}
+                >
+                  <span className="text-white text-xs">✓</span>
+                </div>
+                No credit card required
               </div>
-              <div className="pro-flex items-center pro-gap-2">
-                ✓ 14-day free trial
+              <div className="flex items-center gap-2">
+                <div 
+                  className="w-3 h-3 rounded-full flex items-center justify-center"
+                  style={{ background: '#b69d74' }}
+                >
+                  <span className="text-white text-xs">✓</span>
+                </div>
+                14-day free trial
               </div>
-              <div className="pro-flex items-center pro-gap-2">
-                ✓ Full feature access
+              <div className="flex items-center gap-2">
+                <div 
+                  className="w-3 h-3 rounded-full flex items-center justify-center"
+                  style={{ background: '#b69d74' }}
+                >
+                  <span className="text-white text-xs">✓</span>
+                </div>
+                Full feature access
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Brand Footer */}
+        <div className="mt-12 text-center">
+          <div className="flex items-center justify-center gap-2 text-[#6b7280] text-sm">
+            <div 
+              className="w-6 h-6 rounded flex items-center justify-center"
+              style={{ background: 'linear-gradient(135deg, #b69d74 0%, #b69d74 100%)' }}
+            >
+              <span className="text-xs font-bold text-white">C</span>
+            </div>
+            <span>Chakshi Legal AI Suite</span>
           </div>
         </div>
       </div>
