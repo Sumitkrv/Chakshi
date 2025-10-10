@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -13,6 +13,27 @@ import {
   Legend,
   Filler
 } from 'chart.js';
+import {
+  BarChart3,
+  TrendingUp,
+  DollarSign,
+  Target,
+  AlertTriangle,
+  BookOpen,
+  Clock,
+  Users,
+  FileText,
+  CheckCircle,
+  Search,
+  Filter,
+  Calendar,
+  Activity,
+  Scale,
+  Briefcase,
+  PieChart,
+  LineChart,
+  Menu
+} from 'lucide-react';
 
 // Register ChartJS components
 ChartJS.register(
@@ -29,13 +50,7 @@ ChartJS.register(
 );
 
 const AnalyticsDashboard = () => {
-  useEffect(() => {
-    // Temp debug: confirm component mounts
-    // This will appear in the browser console when navigating to /advocate/analytics
-    // Remove after debugging
-    console.log('[AnalyticsDashboard] mounted');
-  }, []);
-  // Hero.js Color Palette
+  // Professional color palette
   const colors = {
     cream: '#f5f5ef',
     navy: '#1f2839',
@@ -199,39 +214,39 @@ const AnalyticsDashboard = () => {
   };
 
   const statCards = [
-    { title: 'Total Cases', value: metrics.totalCases, icon: '📋', change: 12 },
-    { title: 'Active Cases', value: metrics.activeCases, icon: '⚡', change: 5 },
-    { title: 'Total Value', value: `$${(metrics.totalValue / 1000000).toFixed(1)}M`, icon: '💰', change: 8 },
-    { title: 'Success Rate', value: `${metrics.avgSuccessRate.toFixed(1)}%`, icon: '🎯', change: 3.2 }
+    { title: 'Total Cases', value: metrics.totalCases, icon: FileText, change: 12 },
+    { title: 'Active Cases', value: metrics.activeCases, icon: Activity, change: 5 },
+    { title: 'Total Value', value: `$${(metrics.totalValue / 1000000).toFixed(1)}M`, icon: DollarSign, change: 8 },
+    { title: 'Success Rate', value: `${metrics.avgSuccessRate.toFixed(1)}%`, icon: Target, change: 3.2 }
   ];
 
-  // Advanced Analytics Data
+  // Professional analytics sections
   const performanceMetrics = [
-    { title: 'Win/Loss Ratio', value: '78%', subtitle: 'Civil: 85%, Criminal: 72%', icon: '⚖️', trend: 'up' },
-    { title: 'Avg Case Duration', value: '8.2 months', subtitle: 'Down from 9.1 months', icon: '⏱️', trend: 'up' },
-    { title: 'Court Performance', value: '4.2/5', subtitle: 'High Court: 4.5, District: 3.9', icon: '🏛️', trend: 'stable' },
-    { title: 'Hearing Attendance', value: '94%', subtitle: '3 adjournments this month', icon: '📅', trend: 'down' }
+    { title: 'Win Rate', value: '78%', subtitle: 'Civil: 85%, Criminal: 72%', icon: Scale, trend: 'up' },
+    { title: 'Case Duration', value: '8.2 months', subtitle: 'Improved from 9.1 months', icon: Clock, trend: 'up' },
+    { title: 'Court Performance', value: '4.2/5', subtitle: 'High Court: 4.5, District: 3.9', icon: Briefcase, trend: 'stable' },
+    { title: 'Attendance Rate', value: '94%', subtitle: 'Excellent attendance record', icon: Calendar, trend: 'up' }
   ];
 
   const financialMetrics = [
-    { title: 'Monthly Revenue', value: '$45K', subtitle: '+15% vs last month', icon: '💵', trend: 'up' },
-    { title: 'Outstanding Fees', value: '$18K', subtitle: 'Avg age: 42 days', icon: '⏰', trend: 'down' },
-    { title: 'Expense Ratio', value: '28%', subtitle: 'Court fees: 12%, Travel: 8%', icon: '📊', trend: 'stable' },
-    { title: 'Client LTV', value: '$125K', subtitle: 'Avg client value', icon: '👥', trend: 'up' }
+    { title: 'Monthly Revenue', value: '$45K', subtitle: '+15% vs last month', icon: TrendingUp, trend: 'up' },
+    { title: 'Outstanding Fees', value: '$18K', subtitle: 'Average age: 42 days', icon: Clock, trend: 'down' },
+    { title: 'Expense Ratio', value: '28%', subtitle: 'Court fees: 12%, Travel: 8%', icon: PieChart, trend: 'stable' },
+    { title: 'Client Value', value: '$125K', subtitle: 'Average client lifetime value', icon: Users, trend: 'up' }
   ];
 
   const productivityMetrics = [
-    { title: 'Billable Hours', value: '156h', subtitle: 'This month', icon: '⏳', trend: 'up' },
-    { title: 'Doc Turnaround', value: '2.3 days', subtitle: 'Avg drafting time', icon: '📝', trend: 'up' },
-    { title: 'Research Efficiency', value: '65%', subtitle: 'Time saved with AI', icon: '🔍', trend: 'up' },
-    { title: 'Task Completion', value: '91%', subtitle: 'Deadlines met', icon: '✅', trend: 'stable' }
+    { title: 'Billable Hours', value: '156h', subtitle: 'Current month tracking', icon: Clock, trend: 'up' },
+    { title: 'Document Processing', value: '2.3 days', subtitle: 'Average drafting time', icon: FileText, trend: 'up' },
+    { title: 'Research Efficiency', value: '65%', subtitle: 'Time saved with technology', icon: BookOpen, trend: 'up' },
+    { title: 'Task Completion', value: '91%', subtitle: 'Deadlines successfully met', icon: CheckCircle, trend: 'stable' }
   ];
 
   const predictiveMetrics = [
-    { title: 'Case Success Probability', value: '76%', subtitle: 'AI prediction confidence', icon: '🎯', trend: 'up' },
-    { title: 'Hearing Delay Risk', value: 'Medium', subtitle: '2-3 weeks expected', icon: '⚠️', trend: 'stable' },
-    { title: 'Settlement Likelihood', value: '42%', subtitle: 'Recommend mediation', icon: '🤝', trend: 'up' },
-    { title: 'Judge Favorability', value: '68%', subtitle: 'Based on past rulings', icon: '👨‍⚖️', trend: 'up' }
+    { title: 'Success Probability', value: '76%', subtitle: 'AI prediction confidence', icon: Target, trend: 'up' },
+    { title: 'Delay Risk', value: 'Medium', subtitle: '2-3 weeks expected', icon: AlertTriangle, trend: 'stable' },
+    { title: 'Settlement Likelihood', value: '42%', subtitle: 'Mediation recommended', icon: Scale, trend: 'up' },
+    { title: 'Case Complexity', value: '68%', subtitle: 'Above average complexity', icon: Activity, trend: 'up' }
   ];
 
   return (
@@ -262,37 +277,40 @@ const AnalyticsDashboard = () => {
                     color: colors.navy
                   }}
                 >
-                  <span className="text-xl">☰</span>
+                  <Menu className="w-5 h-5" />
                 </button>
                 <div>
                   <h1 className="text-lg sm:text-xl font-bold" style={{color: colors.navy}}>
-                    Legal Analytics
+                    Legal Analytics Dashboard
                   </h1>
                   <p className="text-xs sm:text-sm hidden sm:block" style={{color: colors.gray}}>
-                    Practice performance insights
+                    Comprehensive practice performance insights
                   </p>
                 </div>
               </div>
               
               <div className="flex items-center gap-2">
-                <select 
-                  className="text-xs sm:text-sm px-2 sm:px-3 py-1.5 rounded-lg focus:outline-none transition-all"
-                  style={{
-                    background: `rgba(255, 255, 255, 0.06)`,
-                    border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`,
-                    color: colors.navy,
-                    backdropFilter: 'blur(6px)'
-                  }}
-                  value={filters.timeframe}
-                  onChange={(e) => setFilters({...filters, timeframe: e.target.value})}
-                  onFocus={(e) => e.target.style.borderColor = colors.golden}
-                  onBlur={(e) => e.target.style.borderColor = `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`}
-                >
-                  <option value="7d">7D</option>
-                  <option value="30d">30D</option>
-                  <option value="90d">90D</option>
-                  <option value="1y">1Y</option>
-                </select>
+                <div className="relative">
+                  <Filter className="absolute left-2 top-1/2 transform -translate-y-1/2 w-3 h-3" style={{ color: colors.gray }} />
+                  <select 
+                    className="text-xs sm:text-sm pl-7 pr-3 py-1.5 rounded-lg focus:outline-none transition-all appearance-none"
+                    style={{
+                      background: `rgba(255, 255, 255, 0.06)`,
+                      border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`,
+                      color: colors.navy,
+                      backdropFilter: 'blur(6px)'
+                    }}
+                    value={filters.timeframe}
+                    onChange={(e) => setFilters({...filters, timeframe: e.target.value})}
+                    onFocus={(e) => e.target.style.borderColor = colors.golden}
+                    onBlur={(e) => e.target.style.borderColor = `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`}
+                  >
+                    <option value="7d">7 Days</option>
+                    <option value="30d">30 Days</option>
+                    <option value="90d">90 Days</option>
+                    <option value="1y">1 Year</option>
+                  </select>
+                </div>
               </div>
             </div>
           </div>
@@ -317,7 +335,7 @@ const AnalyticsDashboard = () => {
                   <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center" style={{
                     background: `linear-gradient(135deg, ${colors.golden}20, ${colors.golden}10)`
                   }}>
-                    <span className="text-sm sm:text-lg">{stat.icon}</span>
+                    <stat.icon className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: colors.golden }} />
                   </div>
                   <div className="flex items-center gap-1">
                     <span className={`text-xs font-semibold`} style={{
@@ -355,7 +373,7 @@ const AnalyticsDashboard = () => {
                 <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center" style={{
                   background: `linear-gradient(135deg, ${colors.golden}20, ${colors.golden}10)`
                 }}>
-                  <span className="text-xs sm:text-sm">📊</span>
+                  <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: colors.golden }} />
                 </div>
               </div>
               <div style={{ height: '250px', minHeight: '200px' }}>
@@ -376,7 +394,7 @@ const AnalyticsDashboard = () => {
                 <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center" style={{
                   background: `linear-gradient(135deg, ${colors.golden}20, ${colors.golden}10)`
                 }}>
-                  <span className="text-xs sm:text-sm">⚠️</span>
+                  <AlertTriangle className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: colors.golden }} />
                 </div>
               </div>
               <div style={{ height: '250px', minHeight: '200px' }}>
@@ -404,7 +422,7 @@ const AnalyticsDashboard = () => {
               <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center" style={{
                 background: `linear-gradient(135deg, ${colors.golden}20, ${colors.golden}10)`
               }}>
-                <span className="text-xs sm:text-sm">📈</span>
+                <LineChart className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: colors.golden }} />
               </div>
             </div>
             <div style={{ height: '280px', minHeight: '250px' }}>
@@ -428,7 +446,7 @@ const AnalyticsDashboard = () => {
               <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{
                 background: `linear-gradient(135deg, ${colors.golden}20, ${colors.golden}10)`
               }}>
-                <span className="text-lg">📊</span>
+                <BarChart3 className="w-4 h-4" style={{ color: colors.golden }} />
               </div>
             </div>
             
@@ -442,7 +460,7 @@ const AnalyticsDashboard = () => {
                     <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{
                       background: `linear-gradient(135deg, ${colors.golden}15, ${colors.golden}08)`
                     }}>
-                      <span className="text-sm">{metric.icon}</span>
+                      <metric.icon className="w-4 h-4" style={{ color: colors.golden }} />
                     </div>
                     <div className={`w-2 h-2 rounded-full`} style={{
                       background: metric.trend === 'up' ? colors.green : metric.trend === 'down' ? '#ef4444' : colors.amber
@@ -470,7 +488,7 @@ const AnalyticsDashboard = () => {
               <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{
                 background: `linear-gradient(135deg, ${colors.golden}20, ${colors.golden}10)`
               }}>
-                <span className="text-lg">💰</span>
+                <DollarSign className="w-4 h-4" style={{ color: colors.golden }} />
               </div>
             </div>
             
@@ -484,7 +502,7 @@ const AnalyticsDashboard = () => {
                     <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{
                       background: `linear-gradient(135deg, ${colors.golden}15, ${colors.golden}08)`
                     }}>
-                      <span className="text-sm">{metric.icon}</span>
+                      <metric.icon className="w-4 h-4" style={{ color: colors.golden }} />
                     </div>
                     <div className={`w-2 h-2 rounded-full`} style={{
                       background: metric.trend === 'up' ? colors.green : metric.trend === 'down' ? '#ef4444' : colors.amber
@@ -512,7 +530,7 @@ const AnalyticsDashboard = () => {
               <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{
                 background: `linear-gradient(135deg, ${colors.golden}20, ${colors.golden}10)`
               }}>
-                <span className="text-lg">⚡</span>
+                <Activity className="w-4 h-4" style={{ color: colors.golden }} />
               </div>
             </div>
             
@@ -526,7 +544,7 @@ const AnalyticsDashboard = () => {
                     <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{
                       background: `linear-gradient(135deg, ${colors.golden}15, ${colors.golden}08)`
                     }}>
-                      <span className="text-sm">{metric.icon}</span>
+                      <metric.icon className="w-4 h-4" style={{ color: colors.golden }} />
                     </div>
                     <div className={`w-2 h-2 rounded-full`} style={{
                       background: metric.trend === 'up' ? colors.green : metric.trend === 'down' ? '#ef4444' : colors.amber
@@ -554,7 +572,7 @@ const AnalyticsDashboard = () => {
               <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{
                 background: `linear-gradient(135deg, ${colors.golden}20, ${colors.golden}10)`
               }}>
-                <span className="text-lg">🔮</span>
+                <Target className="w-4 h-4" style={{ color: colors.golden }} />
               </div>
             </div>
             
@@ -568,7 +586,7 @@ const AnalyticsDashboard = () => {
                     <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{
                       background: `linear-gradient(135deg, ${colors.golden}15, ${colors.golden}08)`
                     }}>
-                      <span className="text-sm">{metric.icon}</span>
+                      <metric.icon className="w-4 h-4" style={{ color: colors.golden }} />
                     </div>
                     <div className={`w-2 h-2 rounded-full`} style={{
                       background: metric.trend === 'up' ? colors.green : metric.trend === 'down' ? '#ef4444' : colors.amber
@@ -589,16 +607,24 @@ const AnalyticsDashboard = () => {
             border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`
           }}>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
-              <h3 className="text-base sm:text-lg font-semibold" style={{color: colors.navy}}>
-                Case Summary
-              </h3>
-              <div className="w-full sm:w-auto">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{
+                  background: `linear-gradient(135deg, ${colors.golden}20, ${colors.golden}10)`
+                }}>
+                  <FileText className="w-4 h-4" style={{ color: colors.golden }} />
+                </div>
+                <h3 className="text-base sm:text-lg font-semibold" style={{color: colors.navy}}>
+                  Case Summary
+                </h3>
+              </div>
+              <div className="w-full sm:w-auto relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" style={{ color: colors.gray }} />
                 <input
                   type="text"
                   placeholder="Search cases..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full sm:w-48 px-3 py-2 text-sm rounded-lg focus:outline-none transition-all"
+                  className="w-full sm:w-48 pl-10 pr-3 py-2 text-sm rounded-lg focus:outline-none transition-all"
                   style={{
                     background: `rgba(255, 255, 255, 0.06)`,
                     border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`,

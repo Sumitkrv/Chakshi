@@ -567,20 +567,41 @@ export default function Settings() {
   const renderProfileSettings = () => (
     <div className="space-y-6">
       {/* Profile Header */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
+      <div className="border rounded-lg p-6 backdrop-blur-md" 
+           style={{ 
+             backgroundColor: 'rgba(255, 255, 255, 0.6)', 
+             borderColor: 'rgba(182, 157, 116, 0.2)',
+             boxShadow: '0 0 25px rgba(182, 157, 116, 0.15)'
+           }}>
         <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-6">
-          <div className="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600 font-bold text-2xl">
+          <div className="w-20 h-20 rounded-lg flex items-center justify-center font-bold text-2xl border backdrop-blur-sm" 
+               style={{ 
+                 backgroundColor: 'rgba(182, 157, 116, 0.1)', 
+                 color: '#1f2839',
+                 borderColor: 'rgba(182, 157, 116, 0.3)',
+                 boxShadow: '0 0 15px rgba(182, 157, 116, 0.2)'
+               }}>
             {profile.name.charAt(0)}
           </div>
           <div className="flex-1">
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">Professional Profile</h3>
-            <p className="text-gray-600 mb-4">Manage your professional information and credentials</p>
+            <h3 className="text-xl font-semibold mb-2" style={{ color: '#1f2839' }}>Professional Profile</h3>
+            <p className="mb-4" style={{ color: '#6b7280' }}>Manage your professional information and credentials</p>
             <div className="flex flex-wrap gap-2">
-              <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium flex items-center">
+              <span className="px-3 py-1 rounded-full text-sm font-medium flex items-center backdrop-blur-sm border" 
+                    style={{ 
+                      backgroundColor: 'rgba(16, 185, 129, 0.1)', 
+                      color: '#10b981',
+                      borderColor: 'rgba(16, 185, 129, 0.3)'
+                    }}>
                 <Check className="w-3 h-3 mr-1" />
                 Verified Attorney
               </span>
-              <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium flex items-center">
+              <span className="px-3 py-1 rounded-full text-sm font-medium flex items-center backdrop-blur-sm border" 
+                    style={{ 
+                      backgroundColor: 'rgba(182, 157, 116, 0.1)', 
+                      color: '#b69d74',
+                      borderColor: 'rgba(182, 157, 116, 0.3)'
+                    }}>
                 <Crown className="w-3 h-3 mr-1" />
                 Pro Member
               </span>
@@ -590,13 +611,18 @@ export default function Settings() {
       </div>
 
       {/* Profile Form */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
+      <div className="border rounded-lg p-6 backdrop-blur-md" 
+           style={{ 
+             backgroundColor: 'rgba(255, 255, 255, 0.6)', 
+             borderColor: 'rgba(182, 157, 116, 0.2)',
+             boxShadow: '0 0 25px rgba(182, 157, 116, 0.15)'
+           }}>
         <form onSubmit={handleProfileSubmit}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-                  <User className="w-4 h-4 mr-2" />
+                <label className="block text-sm font-medium mb-2 flex items-center" style={{ color: '#1f2839' }}>
+                  <User className="w-4 h-4 mr-2" style={{ color: '#b69d74' }} />
                   Full Name
                 </label>
                 <input
@@ -604,13 +630,26 @@ export default function Settings() {
                   name="name"
                   value={profile.name}
                   onChange={handleProfileChange}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                    errors.name ? 'border-red-300' : 'border-gray-300'
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 backdrop-blur-sm transition-all duration-200 ${
+                    errors.name ? '' : ''
                   }`}
+                  style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                    borderColor: errors.name ? '#f59e0b' : 'rgba(182, 157, 116, 0.3)',
+                    color: '#1f2839'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#b69d74';
+                    e.target.style.boxShadow = '0 0 0 2px rgba(182, 157, 116, 0.2)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = errors.name ? '#f59e0b' : 'rgba(182, 157, 116, 0.3)';
+                    e.target.style.boxShadow = 'none';
+                  }}
                   required
                 />
                 {errors.name && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center">
+                  <p className="mt-1 text-sm flex items-center" style={{ color: '#f59e0b' }}>
                     <AlertCircle className="w-3 h-3 mr-1" />
                     {errors.name}
                   </p>
@@ -618,15 +657,28 @@ export default function Settings() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-                  <Briefcase className="w-4 h-4 mr-2" />
+                <label className="block text-sm font-medium mb-2 flex items-center" style={{ color: '#1f2839' }}>
+                  <Briefcase className="w-4 h-4 mr-2" style={{ color: '#b69d74' }} />
                   Legal Specialization
                 </label>
                 <select
                   name="specialization"
                   value={profile.specialization}
                   onChange={handleProfileChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 backdrop-blur-sm transition-all duration-200"
+                  style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                    borderColor: 'rgba(182, 157, 116, 0.3)',
+                    color: '#1f2839'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#b69d74';
+                    e.target.style.boxShadow = '0 0 0 2px rgba(182, 157, 116, 0.2)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = 'rgba(182, 157, 116, 0.3)';
+                    e.target.style.boxShadow = 'none';
+                  }}
                 >
                   <option>Intellectual Property Law</option>
                   <option>Criminal Law</option>
@@ -640,8 +692,8 @@ export default function Settings() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-                  <Shield className="w-4 h-4 mr-2" />
+                <label className="block text-sm font-medium mb-2 flex items-center" style={{ color: '#1f2839' }}>
+                  <Shield className="w-4 h-4 mr-2" style={{ color: '#b69d74' }} />
                   Bar Registration Number
                 </label>
                 <input
@@ -650,13 +702,24 @@ export default function Settings() {
                   value={profile.barRegistration}
                   onChange={handleProfileChange}
                   placeholder="e.g., CA-2020-18935"
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                    errors.barRegistration ? 'border-red-300' : 'border-gray-300'
-                  }`}
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 backdrop-blur-sm transition-all duration-200"
+                  style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                    borderColor: errors.barRegistration ? '#f59e0b' : 'rgba(182, 157, 116, 0.3)',
+                    color: '#1f2839'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#b69d74';
+                    e.target.style.boxShadow = '0 0 0 2px rgba(182, 157, 116, 0.2)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = errors.barRegistration ? '#f59e0b' : 'rgba(182, 157, 116, 0.3)';
+                    e.target.style.boxShadow = 'none';
+                  }}
                   required
                 />
                 {errors.barRegistration && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center">
+                  <p className="mt-1 text-sm flex items-center" style={{ color: '#f59e0b' }}>
                     <AlertCircle className="w-3 h-3 mr-1" />
                     {errors.barRegistration}
                   </p>
@@ -666,8 +729,8 @@ export default function Settings() {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-                  <Mail className="w-4 h-4 mr-2" />
+                <label className="block text-sm font-medium mb-2 flex items-center" style={{ color: '#1f2839' }}>
+                  <Mail className="w-4 h-4 mr-2" style={{ color: '#b69d74' }} />
                   Email Address
                 </label>
                 <input
@@ -675,13 +738,24 @@ export default function Settings() {
                   name="email"
                   value={profile.email}
                   onChange={handleProfileChange}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                    errors.email ? 'border-red-300' : 'border-gray-300'
-                  }`}
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 backdrop-blur-sm transition-all duration-200"
+                  style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                    borderColor: errors.email ? '#f59e0b' : 'rgba(182, 157, 116, 0.3)',
+                    color: '#1f2839'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#b69d74';
+                    e.target.style.boxShadow = '0 0 0 2px rgba(182, 157, 116, 0.2)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = errors.email ? '#f59e0b' : 'rgba(182, 157, 116, 0.3)';
+                    e.target.style.boxShadow = 'none';
+                  }}
                   required
                 />
                 {errors.email && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center">
+                  <p className="mt-1 text-sm flex items-center" style={{ color: '#f59e0b' }}>
                     <AlertCircle className="w-3 h-3 mr-1" />
                     {errors.email}
                   </p>
@@ -689,8 +763,8 @@ export default function Settings() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-                  <Phone className="w-4 h-4 mr-2" />
+                <label className="block text-sm font-medium mb-2 flex items-center" style={{ color: '#1f2839' }}>
+                  <Phone className="w-4 h-4 mr-2" style={{ color: '#b69d74' }} />
                   Phone Number
                 </label>
                 <input
@@ -699,12 +773,23 @@ export default function Settings() {
                   value={profile.phone}
                   onChange={handleProfileChange}
                   placeholder="(555) 123-4567"
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                    errors.phone ? 'border-red-300' : 'border-gray-300'
-                  }`}
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 backdrop-blur-sm transition-all duration-200"
+                  style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                    borderColor: errors.phone ? '#f59e0b' : 'rgba(182, 157, 116, 0.3)',
+                    color: '#1f2839'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#b69d74';
+                    e.target.style.boxShadow = '0 0 0 2px rgba(182, 157, 116, 0.2)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = errors.phone ? '#f59e0b' : 'rgba(182, 157, 116, 0.3)';
+                    e.target.style.boxShadow = 'none';
+                  }}
                 />
                 {errors.phone && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center">
+                  <p className="mt-1 text-sm flex items-center" style={{ color: '#f59e0b' }}>
                     <AlertCircle className="w-3 h-3 mr-1" />
                     {errors.phone}
                   </p>
@@ -712,8 +797,8 @@ export default function Settings() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-                  <FileText className="w-4 h-4 mr-2" />
+                <label className="block text-sm font-medium mb-2 flex items-center" style={{ color: '#1f2839' }}>
+                  <FileText className="w-4 h-4 mr-2" style={{ color: '#b69d74' }} />
                   Professional Bio
                 </label>
                 <textarea
@@ -722,21 +807,32 @@ export default function Settings() {
                   onChange={handleProfileChange}
                   rows="4"
                   maxLength="500"
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none ${
-                    errors.bio ? 'border-red-300' : 'border-gray-300'
-                  }`}
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 resize-none backdrop-blur-sm transition-all duration-200"
+                  style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                    borderColor: errors.bio ? '#f59e0b' : 'rgba(182, 157, 116, 0.3)',
+                    color: '#1f2839'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#b69d74';
+                    e.target.style.boxShadow = '0 0 0 2px rgba(182, 157, 116, 0.2)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = errors.bio ? '#f59e0b' : 'rgba(182, 157, 116, 0.3)';
+                    e.target.style.boxShadow = 'none';
+                  }}
                   placeholder="Tell us about your legal expertise and experience..."
                 ></textarea>
                 <div className="flex justify-between items-center mt-1">
                   <div>
                     {errors.bio && (
-                      <p className="text-sm text-red-600 flex items-center">
+                      <p className="text-sm flex items-center" style={{ color: '#f59e0b' }}>
                         <AlertCircle className="w-3 h-3 mr-1" />
                         {errors.bio}
                       </p>
                     )}
                   </div>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm" style={{ color: '#6b7280' }}>
                     {profile.bio.length}/500 characters
                   </p>
                 </div>
@@ -747,13 +843,13 @@ export default function Settings() {
           <div className="mt-6 flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
             <div className="flex items-center space-x-3">
               {saveStatus === 'success' && (
-                <div className="flex items-center text-green-600">
+                <div className="flex items-center" style={{ color: '#10b981' }}>
                   <Check className="w-4 h-4 mr-2" />
                   <span className="text-sm">Profile saved successfully!</span>
                 </div>
               )}
               {saveStatus === 'error' && (
-                <div className="flex items-center text-red-600">
+                <div className="flex items-center" style={{ color: '#f59e0b' }}>
                   <AlertCircle className="w-4 h-4 mr-2" />
                   <span className="text-sm">Error saving profile. Please try again.</span>
                 </div>
@@ -762,11 +858,30 @@ export default function Settings() {
             <button 
               type="submit"
               disabled={isLoading}
-              className={`px-6 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors flex items-center space-x-2 ${
+              className={`px-6 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 flex items-center space-x-2 text-white backdrop-blur-md border ${
                 isLoading 
-                  ? 'bg-gray-400 cursor-not-allowed' 
-                  : 'bg-blue-600 hover:bg-blue-700'
-              } text-white`}
+                  ? 'cursor-not-allowed opacity-50' 
+                  : 'hover:shadow-lg'
+              }`}
+              style={{
+                background: isLoading 
+                  ? 'linear-gradient(135deg, #6b7280, #6b7280)' 
+                  : 'linear-gradient(135deg, #b69d74, #b69d74DD, #b69d74BB)',
+                borderColor: 'rgba(182, 157, 116, 0.3)',
+                boxShadow: isLoading ? 'none' : '0 0 15px rgba(182, 157, 116, 0.3)'
+              }}
+              onMouseEnter={(e) => {
+                if (!isLoading) {
+                  e.target.style.transform = 'translateY(-2px)';
+                  e.target.style.boxShadow = '0 0 25px rgba(182, 157, 116, 0.4)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isLoading) {
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = '0 0 15px rgba(182, 157, 116, 0.3)';
+                }
+              }}
             >
               {isLoading ? (
                 <>
@@ -1319,12 +1434,21 @@ export default function Settings() {
   );
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen" style={{ backgroundColor: '#f5f5ef' }}>
       {/* Global Success/Error Toast */}
       {(saveStatus === 'success' || saveStatus === 'error') && (
-        <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg flex items-center space-x-3 ${
-          saveStatus === 'success' ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-red-100 text-red-800 border border-red-200'
-        }`}>
+        <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg flex items-center space-x-3 backdrop-blur-md ${
+          saveStatus === 'success' 
+            ? 'text-white border' 
+            : 'text-white border'
+        }`}
+        style={{
+          backgroundColor: saveStatus === 'success' ? '#10b981' : '#f59e0b',
+          borderColor: saveStatus === 'success' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(245, 158, 11, 0.3)',
+          boxShadow: saveStatus === 'success' 
+            ? '0 0 15px rgba(16, 185, 129, 0.4)' 
+            : '0 0 15px rgba(245, 158, 11, 0.4)'
+        }}>
           {saveStatus === 'success' ? (
             <Check className="w-5 h-5" />
           ) : (
@@ -1341,14 +1465,19 @@ export default function Settings() {
           {/* Header */}
           <div className="mb-8">
             <div className="flex items-center space-x-4 mb-4">
-              <div className="p-3 bg-gray-100 rounded-lg">
-                <SettingsIcon className="w-6 h-6 text-gray-600" />
+              <div className="p-3 rounded-lg backdrop-blur-md border" 
+                   style={{ 
+                     backgroundColor: 'rgba(182, 157, 116, 0.1)', 
+                     borderColor: 'rgba(182, 157, 116, 0.2)',
+                     boxShadow: '0 0 15px rgba(182, 157, 116, 0.2)'
+                   }}>
+                <SettingsIcon className="w-6 h-6" style={{ color: '#b69d74' }} />
               </div>
               <div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: '#1f2839' }}>
                   Settings & Preferences
                 </h1>
-                <p className="text-gray-600 mt-1">
+                <p className="mt-1" style={{ color: '#6b7280' }}>
                   Customize your legal practice workspace and preferences
                 </p>
               </div>
@@ -1358,29 +1487,61 @@ export default function Settings() {
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             {/* Sidebar Navigation */}
             <div className="lg:col-span-1">
-              <div className="bg-white border border-gray-200 rounded-lg p-4 sticky top-6 settings-sidebar">
-                <h3 className="font-semibold text-gray-800 mb-3 text-sm uppercase tracking-wide">
+              <div className="border rounded-lg p-4 sticky top-6 settings-sidebar backdrop-blur-md" 
+                   style={{ 
+                     backgroundColor: 'rgba(255, 255, 255, 0.6)', 
+                     borderColor: 'rgba(182, 157, 116, 0.2)',
+                     boxShadow: '0 0 25px rgba(182, 157, 116, 0.15)'
+                   }}>
+                <h3 className="font-semibold mb-3 text-sm uppercase tracking-wide" style={{ color: '#1f2839' }}>
                   Settings
                 </h3>
                 <nav className="space-y-1" role="navigation" aria-label="Settings navigation">
                   {settingsCategories.map((category) => {
                     const IconComponent = category.icon;
+                    const isActive = activeCategory === category.id;
                     return (
                       <button
                         key={category.id}
                         onClick={() => setActiveCategory(category.id)}
-                        className={`w-full flex items-center space-x-3 px-3 py-2 rounded-md text-left transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                          activeCategory === category.id
-                            ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                            : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
+                        className={`w-full flex items-center space-x-3 px-3 py-2 rounded-md text-left transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 backdrop-blur-sm ${
+                          isActive
+                            ? 'border'
+                            : 'hover:backdrop-blur-md'
                         }`}
-                        aria-pressed={activeCategory === category.id}
+                        style={{
+                          backgroundColor: isActive 
+                            ? 'rgba(182, 157, 116, 0.12)' 
+                            : 'transparent',
+                          borderColor: isActive 
+                            ? 'rgba(182, 157, 116, 0.3)' 
+                            : 'transparent',
+                          boxShadow: isActive 
+                            ? '0 0 15px rgba(182, 157, 116, 0.2)' 
+                            : 'none',
+                          color: isActive ? '#1f2839' : '#6b7280'
+                        }}
+                        onMouseEnter={(e) => {
+                          if (!isActive) {
+                            e.target.style.backgroundColor = 'rgba(182, 157, 116, 0.05)';
+                            e.target.style.color = '#1f2839';
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (!isActive) {
+                            e.target.style.backgroundColor = 'transparent';
+                            e.target.style.color = '#6b7280';
+                          }
+                        }}
+                        aria-pressed={isActive}
                         aria-describedby={`${category.id}-description`}
                       >
-                        <IconComponent className="w-4 h-4 flex-shrink-0" />
+                        <IconComponent className={`w-4 h-4 flex-shrink-0`} 
+                                     style={{ color: isActive ? '#b69d74' : '#6b7280' }} />
                         <div className="flex-1 min-w-0">
                           <div className="font-medium text-sm">{category.name}</div>
-                          <div id={`${category.id}-description`} className="text-xs text-gray-500 truncate">
+                          <div id={`${category.id}-description`} className="text-xs truncate" 
+                               style={{ color: '#6b7280' }}>
                             {category.description}
                           </div>
                         </div>
@@ -1390,9 +1551,13 @@ export default function Settings() {
                 </nav>
                 
                 {/* Keyboard shortcuts help */}
-                <div className="mt-6 p-3 bg-gray-50 rounded-md">
-                  <h4 className="text-xs font-medium text-gray-700 mb-2">Keyboard Shortcuts</h4>
-                  <div className="space-y-1 text-xs text-gray-600">
+                <div className="mt-6 p-3 rounded-md backdrop-blur-sm border" 
+                     style={{ 
+                       backgroundColor: 'rgba(182, 157, 116, 0.08)', 
+                       borderColor: 'rgba(182, 157, 116, 0.2)' 
+                     }}>
+                  <h4 className="text-xs font-medium mb-2" style={{ color: '#1f2839' }}>Keyboard Shortcuts</h4>
+                  <div className="space-y-1 text-xs" style={{ color: '#6b7280' }}>
                     <div>↑↓ Navigate categories</div>
                     <div>Ctrl+S Save settings</div>
                   </div>

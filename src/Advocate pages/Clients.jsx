@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Star, FileText, CreditCard, MessageSquare, Video, Upload, Download, Users, TrendingUp, Award, DollarSign, Phone, Mail, MapPin, Calendar, Clock, CheckCircle, AlertCircle, Eye, Edit, Plus, Search, Filter, X, Send, Paperclip, Bell } from 'lucide-react';
+import { Star, FileText, CreditCard, MessageSquare, Video, Upload, Download, Users, TrendingUp, Award, DollarSign, Phone, Mail, MapPin, Calendar, Clock, CheckCircle, AlertCircle, Eye, Edit, Plus, Search, Filter, X, Send, Paperclip, Bell, Building2, Handshake, User2, Briefcase, MoreHorizontal, TrendingDown, Minus, Trash2, History, ArrowRight, BarChart3, UserCheck, Globe } from 'lucide-react';
 
 const ClientsPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -46,46 +46,46 @@ const ClientsPage = () => {
       outstandingDues: 85000,
       lastContact: '2024-10-08',
       joinDate: '2022-03-15',
-      notes: 'High-value corporate client, excellent payment history',
+      notes: 'Premium corporate client with excellent payment track record and strong compliance protocols',
       avatar: null,
       idProofs: [
-        { type: 'Aadhaar', number: '1234-5678-9012', verified: true },
-        { type: 'PAN', number: 'ABCDE1234F', verified: true },
-        { type: 'GST', number: '07ABCDE1234F1ZZ', verified: true }
+        { type: 'Corporate Registration', number: 'CIN: L12345MH2019PTC654321', verified: true },
+        { type: 'Tax Registration', number: 'GSTIN: 07ABCDE1234F1ZZ', verified: true },
+        { type: 'Professional License', number: 'PL-2024-001234', verified: true }
       ],
       documents: [
-        { name: 'Incorporation Certificate', type: 'PDF', uploadDate: '2024-01-15', size: '2.3 MB' },
-        { name: 'Board Resolution', type: 'PDF', uploadDate: '2024-03-20', size: '1.1 MB' },
-        { name: 'Power of Attorney', type: 'PDF', uploadDate: '2024-05-10', size: '0.8 MB' }
+        { name: 'Certificate of Incorporation', type: 'PDF', uploadDate: '2024-01-15', size: '2.3 MB' },
+        { name: 'Board Resolution Authorization', type: 'PDF', uploadDate: '2024-03-20', size: '1.1 MB' },
+        { name: 'Legal Representation Agreement', type: 'PDF', uploadDate: '2024-05-10', size: '0.8 MB' }
       ],
       paymentHistory: [
-        { date: '2024-09-15', amount: 150000, method: 'Bank Transfer', status: 'Completed', invoice: 'INV-2024-001' },
-        { date: '2024-08-10', amount: 200000, method: 'Cheque', status: 'Completed', invoice: 'INV-2024-002' },
-        { date: '2024-07-05', amount: 75000, method: 'UPI', status: 'Completed', invoice: 'INV-2024-003' }
+        { date: '2024-09-15', amount: 150000, method: 'Wire Transfer', status: 'Completed', invoice: 'INV-2024-001' },
+        { date: '2024-08-10', amount: 200000, method: 'Corporate Cheque', status: 'Completed', invoice: 'INV-2024-002' },
+        { date: '2024-07-05', amount: 75000, method: 'Electronic Transfer', status: 'Completed', invoice: 'INV-2024-003' }
       ],
       communications: [
-        { date: '2024-10-08', type: 'Meeting', subject: 'Case Strategy Discussion', status: 'Completed' },
-        { date: '2024-10-05', type: 'Call', subject: 'Status Update', duration: '25 min', status: 'Completed' },
-        { date: '2024-10-02', type: 'Email', subject: 'Document Requirements', status: 'Sent' }
+        { date: '2024-10-08', type: 'Strategic Consultation', subject: 'Litigation Strategy & Risk Assessment', status: 'Completed' },
+        { date: '2024-10-05', type: 'Executive Call', subject: 'Case Progress & Timeline Review', duration: '45 min', status: 'Completed' },
+        { date: '2024-10-02', type: 'Legal Advisory', subject: 'Compliance Documentation Requirements', status: 'Delivered' }
       ],
       cases: [
-        { id: 'CIV/2024/001', title: 'Contract Dispute - Supplier Agreement', status: 'Active', court: 'High Court' },
-        { id: 'CIV/2024/015', title: 'Property Acquisition Matter', status: 'Active', court: 'District Court' },
-        { id: 'CIV/2023/088', title: 'Labor Dispute Resolution', status: 'Completed', court: 'Labor Court' }
+        { id: 'CIV/2024/001', title: 'Commercial Contract Dispute - Supply Chain Agreement', status: 'Active', court: 'High Court of Commerce' },
+        { id: 'CIV/2024/015', title: 'Corporate Asset Acquisition Matter', status: 'Active', court: 'National Company Law Tribunal' },
+        { id: 'CIV/2023/088', title: 'Employment & Labor Relations Dispute', status: 'Successfully Resolved', court: 'Industrial Relations Court' }
       ],
       insights: {
-        successRate: 85,
-        avgCaseDuration: 8.5,
+        successRate: 92,
+        avgCaseDuration: 6.8,
         totalRevenue: 1250000,
-        referralsGiven: 3,
-        satisfactionScore: 4.8
+        referralsProvided: 5,
+        clientSatisfactionIndex: 4.9
       }
     },
     {
       id: 2,
-      name: 'Priya Malhotra',
-      company: null,
-      email: 'priya.malhotra@email.com',
+      name: 'Dr. Priya Malhotra',
+      company: 'Independent Professional',
+      email: 'dr.priya.malhotra@healthcare.com',
       phone: '+91 87654 32109',
       address: '456, Green Park Extension, New Delhi - 110016',
       status: 'Active',
@@ -98,15 +98,16 @@ const ClientsPage = () => {
       outstandingDues: 25000,
       lastContact: '2024-10-07',
       joinDate: '2023-01-10',
-      notes: 'Family law matters, very responsive and cooperative',
+      notes: 'Distinguished medical professional requiring specialized legal advisory services with focus on healthcare compliance',
       avatar: null,
       idProofs: [
-        { type: 'Aadhaar', number: '9876-5432-1098', verified: true },
-        { type: 'PAN', number: 'XYZNM5678P', verified: true }
+        { type: 'Professional License', number: 'MCI-REG-2019-001234', verified: true },
+        { type: 'Tax Registration', number: 'PAN: XYZNM5678P', verified: true },
+        { type: 'Identity Verification', number: 'AADHAAR: 9876-5432-1098', verified: true }
       ],
       documents: [
-        { name: 'Marriage Certificate', type: 'PDF', uploadDate: '2024-02-10', size: '1.2 MB' },
-        { name: 'Property Papers', type: 'PDF', uploadDate: '2024-04-15', size: '3.5 MB' }
+        { name: 'Professional Qualification Certificate', type: 'PDF', uploadDate: '2024-02-10', size: '1.2 MB' },
+        { name: 'Healthcare Practice License', type: 'PDF', uploadDate: '2024-04-15', size: '3.5 MB' }
       ],
       paymentHistory: [
         { date: '2024-09-20', amount: 50000, method: 'UPI', status: 'Completed', invoice: 'INV-2024-045' },
@@ -216,10 +217,10 @@ const ClientsPage = () => {
 
   const getTypeIcon = (type) => {
     switch (type) {
-      case 'Corporate': return '🏢';
-      case 'Partnership': return '🤝';
-      case 'Individual': return '👤';
-      default: return '💼';
+      case 'Corporate': return <Building2 className="w-4 h-4" />;
+      case 'Partnership': return <Handshake className="w-4 h-4" />;
+      case 'Individual': return <User2 className="w-4 h-4" />;
+      default: return <Briefcase className="w-4 h-4" />;
     }
   };
 
@@ -250,7 +251,7 @@ const ClientsPage = () => {
 
   const handleSendMessage = () => {
     if (messageText.trim()) {
-      addNotification('Message sent successfully', 'success');
+      addNotification('Professional communication delivered successfully', 'success');
       setMessageText('');
     }
   };
@@ -266,7 +267,7 @@ const ClientsPage = () => {
           if (prev >= 100) {
             clearInterval(interval);
             setIsUploading(false);
-            addNotification('Documents uploaded successfully', 'success');
+            addNotification('Legal documents processed and uploaded to client repository', 'success');
             return 100;
           }
           return prev + 10;
@@ -278,18 +279,25 @@ const ClientsPage = () => {
   return (
     <div className="min-h-screen" style={{ background: colors.cream }}>
       {/* Header */}
-      <header className="border-b p-4 sm:p-6" style={{ 
-        background: `rgba(255, 255, 255, 0.03)`,
-        borderColor: `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`
+      <header className="border-b p-4 sm:p-6 shadow-sm" style={{ 
+        background: `linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85))`,
+        borderColor: `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.20)`
       }}>
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-2xl font-bold" style={{ color: colors.navy }}>
-              Client Management
-            </h1>
-            <p className="mt-1 text-sm" style={{ color: colors.gray }}>
-              Comprehensive client relationship management and insights
-            </p>
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-sm" style={{
+              background: `linear-gradient(135deg, ${colors.golden}, ${colors.golden}DD)`
+            }}>
+              <Users className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold" style={{ color: colors.navy }}>
+                Client Relationship Management
+              </h1>
+              <p className="mt-1 text-sm" style={{ color: colors.gray }}>
+                Enterprise client portfolio and engagement analytics
+              </p>
+            </div>
           </div>
           
           <div className="flex items-center gap-3 w-full sm:w-auto">
@@ -315,7 +323,7 @@ const ClientsPage = () => {
               onClick={() => setShowCommunicationHub(true)}
             >
               <MessageSquare className="w-4 h-4 inline mr-2" />
-              Communication Hub
+              Client Communications Center
             </button>
             <button 
               className="flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-medium transition-colors text-white"
@@ -325,7 +333,7 @@ const ClientsPage = () => {
               onClick={() => setShowNewClientModal(true)}
             >
               <Plus className="w-4 h-4 inline mr-2" />
-              Add Client
+              Onboard New Client
             </button>
           </div>
         </div>
@@ -336,10 +344,10 @@ const ClientsPage = () => {
         {/* Metrics Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           {[
-            { label: 'Total Clients', value: metrics.totalClients, icon: <Users className="w-5 h-5" />, change: '+12%', color: colors.blue },
-            { label: 'Active Clients', value: metrics.activeClients, icon: <CheckCircle className="w-5 h-5" />, change: '+8%', color: colors.green },
-            { label: 'Total Revenue', value: `₹${(metrics.totalRevenue / 100000).toFixed(1)}L`, icon: <DollarSign className="w-5 h-5" />, change: '+15%', color: colors.golden },
-            { label: 'Avg Rating', value: metrics.avgRating, icon: <Star className="w-5 h-5" />, change: '+0.2', color: colors.amber }
+            { label: 'Client Portfolio', value: metrics.totalClients, icon: <Users className="w-5 h-5" />, change: '+12%', color: colors.blue },
+            { label: 'Active Engagements', value: metrics.activeClients, icon: <CheckCircle className="w-5 h-5" />, change: '+8%', color: colors.green },
+            { label: 'Revenue Generated', value: `₹${(metrics.totalRevenue / 100000).toFixed(1)}L`, icon: <DollarSign className="w-5 h-5" />, change: '+15%', color: colors.golden },
+            { label: 'Client Satisfaction', value: metrics.avgRating, icon: <Star className="w-5 h-5" />, change: '+0.2', color: colors.amber }
           ].map((metric, index) => (
             <div key={index} className="p-4 rounded-lg backdrop-blur-sm transition-all hover:scale-105" style={{
               background: `rgba(255, 255, 255, 0.03)`,
@@ -371,7 +379,7 @@ const ClientsPage = () => {
           border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`
         }}>
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
-            <h2 className="text-lg font-semibold" style={{ color: colors.navy }}>Client Directory</h2>
+            <h2 className="text-lg font-semibold" style={{ color: colors.navy }}>Client Portfolio Management</h2>
             
             <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
               <div className="relative flex-1">
@@ -380,7 +388,7 @@ const ClientsPage = () => {
                 </div>
                 <input
                   type="text"
-                  placeholder="Search clients..."
+                  placeholder="Search client portfolio..."
                   className="pl-10 pr-4 py-2 rounded-lg focus:outline-none focus:ring-2 w-full text-sm transition-all"
                   style={{
                     background: `rgba(255, 255, 255, 0.03)`,
@@ -534,7 +542,7 @@ const ClientsPage = () => {
                       onClick={() => handleViewClient(client)}
                     >
                       <Eye className="w-4 h-4 inline mr-1" />
-                      View Details
+                      View Client Profile
                     </button>
                     <button 
                       className="px-3 py-2 text-sm font-medium rounded-lg transition-colors"
@@ -918,7 +926,7 @@ const ClientsPage = () => {
 
               {activeTab === 'insights' && (
                 <div className="space-y-6">
-                  <h3 className="text-lg font-semibold" style={{ color: colors.navy }}>Client Analytics & Insights</h3>
+                  <h3 className="text-lg font-semibold" style={{ color: colors.navy }}>Business Intelligence & Performance Analytics</h3>
                   
                   {/* Key Metrics */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -982,7 +990,7 @@ const ClientsPage = () => {
         </div>
       )}
 
-      {/* Communication Hub Modal */}
+      {/* Client Communications Center Modal */}
       {showCommunicationHub && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0, 0, 0, 0.5)' }}>
           <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-lg" style={{
@@ -992,7 +1000,7 @@ const ClientsPage = () => {
             <div className="flex justify-between items-center p-6 border-b" style={{
               borderColor: `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`
             }}>
-              <h2 className="text-xl font-bold" style={{ color: colors.navy }}>Communication Hub</h2>
+              <h2 className="text-xl font-bold" style={{ color: colors.navy }}>Client Communications Center</h2>
               <button
                 onClick={() => setShowCommunicationHub(false)}
                 className="p-2 rounded-lg transition-colors"
@@ -1047,12 +1055,12 @@ const ClientsPage = () => {
 
               {/* Message Composer */}
               <div className="space-y-3">
-                <h3 className="font-medium" style={{ color: colors.navy }}>Send Message</h3>
+                <h3 className="font-medium" style={{ color: colors.navy }}>Client Communication</h3>
                 <div className="space-y-3">
                   <textarea
                     value={messageText}
                     onChange={(e) => setMessageText(e.target.value)}
-                    placeholder="Type your message..."
+                    placeholder="Compose professional communication..."
                     className="w-full p-3 rounded-lg resize-none focus:outline-none transition-all"
                     style={{
                       background: `rgba(255, 255, 255, 0.03)`,
@@ -1077,7 +1085,7 @@ const ClientsPage = () => {
                       }}
                     >
                       <Send className="w-4 h-4" />
-                      Send Message
+                      Send Communication
                     </button>
                   </div>
                 </div>

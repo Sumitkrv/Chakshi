@@ -1,4 +1,31 @@
 import React, { useState, useRef } from 'react';
+import {
+  Search,
+  Mic,
+  MicOff,
+  FileText,
+  Upload,
+  Brain,
+  Scale,
+  Monitor,
+  BarChart3,
+  BookOpen,
+  Target,
+  Bell,
+  TrendingUp,
+  Gavel,
+  Building,
+  Heart,
+  Home,
+  Briefcase,
+  Shield,
+  FileCheck,
+  Users,
+  Activity,
+  Clock,
+  Filter,
+  Loader
+} from 'lucide-react';
 
 export default function Research() {
   const [activeTab, setActiveTab] = useState('ai-research');
@@ -7,6 +34,17 @@ export default function Research() {
   const [analysisResults, setAnalysisResults] = useState(null);
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef();
+
+  // Hero.js Color Palette
+  const colors = {
+    cream: '#f5f5ef',
+    navy: '#1f2839',
+    golden: '#b69d74',
+    gray: '#6b7280',
+    green: '#10b981',
+    amber: '#f59e0b',
+    blue: '#3b82f6'
+  };
 
   // Mock AI analysis
   const handleInstantAnalysis = async () => {
@@ -65,39 +103,65 @@ export default function Research() {
   };
 
   const tabs = [
-    { id: 'ai-research', name: 'AI Research', icon: '🤖' },
-    { id: 'precedent-matching', name: 'Precedent Matching', icon: '🔍' },
-    { id: 'case-monitoring', name: 'Case Monitoring', icon: '📡' },
-    { id: 'comparative-analysis', name: 'Comparative Analysis', icon: '📊' },
-    { id: 'specialized-research', name: 'Specialized Research', icon: '📚' }
+    { id: 'ai-research', name: 'AI Research', icon: Brain },
+    { id: 'precedent-matching', name: 'Precedent Matching', icon: Search },
+    { id: 'case-monitoring', name: 'Case Monitoring', icon: Monitor },
+    { id: 'comparative-analysis', name: 'Comparative Analysis', icon: BarChart3 },
+    { id: 'specialized-research', name: 'Specialized Research', icon: BookOpen }
   ];
 
   const renderAIResearch = () => (
     <div className="space-y-6">
-      {/* Voice Legal Assistant */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4 md:p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Legal Research Assistant</h3>
+      {/* Legal Research Assistant */}
+      <div className="rounded-lg p-4 md:p-6" style={{
+        background: `linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06))`,
+        backdropFilter: 'blur(6px)',
+        border: `1px solid rgba(182, 157, 116, 0.15)`
+      }}>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 rounded-lg" style={{ background: `rgba(182, 157, 116, 0.12)` }}>
+            <Brain className="w-5 h-5" style={{ color: colors.golden }} />
+          </div>
+          <h3 className="text-lg font-semibold" style={{ color: colors.navy }}>Legal Research Assistant</h3>
+        </div>
         <div className="flex flex-col md:flex-row gap-4 mb-4">
           <div className="flex-1">
             <textarea
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Describe your case or legal query... (e.g., 'Employment termination without proper notice period')"
-              className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-24 resize-none"
+              className="w-full p-3 rounded-md h-24 resize-none focus:outline-none transition-all"
+              style={{
+                border: `1px solid rgba(182, 157, 116, 0.25)`,
+                background: `rgba(255, 255, 255, 0.06)`,
+                color: colors.navy
+              }}
+              onFocus={(e) => e.target.style.borderColor = colors.golden}
+              onBlur={(e) => e.target.style.borderColor = `rgba(182, 157, 116, 0.25)`}
             />
           </div>
           <div className="flex flex-row md:flex-col gap-2 justify-center">
             <button
               onClick={handleVoiceSearch}
-              className={`p-3 rounded-md transition-colors ${
-                isListening 
-                  ? 'bg-red-600 text-white' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
+              className="p-3 rounded-md transition-all duration-200 flex items-center justify-center"
+              style={{
+                background: isListening ? '#ef4444' : `rgba(182, 157, 116, 0.08)`,
+                color: isListening ? '#ffffff' : colors.navy
+              }}
+              onMouseEnter={(e) => {
+                if (!isListening) {
+                  e.target.style.background = `rgba(182, 157, 116, 0.15)`;
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isListening) {
+                  e.target.style.background = `rgba(182, 157, 116, 0.08)`;
+                }
+              }}
             >
-              {isListening ? '🔴' : '🎤'}
+              {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
             </button>
-            <span className="text-xs text-gray-500 text-center md:block hidden">
+            <span className="text-xs text-center md:block hidden" style={{ color: colors.gray }}>
               {isListening ? 'Listening...' : 'Voice Search'}
             </span>
           </div>
@@ -107,12 +171,52 @@ export default function Research() {
           <button
             onClick={handleInstantAnalysis}
             disabled={loading}
-            className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            className="px-6 py-2 rounded-md font-medium disabled:opacity-50 transition-all duration-200 flex items-center gap-2 text-white"
+            style={{
+              background: `linear-gradient(135deg, ${colors.golden} 0%, rgba(182, 157, 116, 0.85) 100%)`,
+              boxShadow: `0 4px 12px rgba(182, 157, 116, 0.30)`
+            }}
+            onMouseEnter={(e) => {
+              if (!loading) {
+                e.target.style.transform = 'translateY(-1px)';
+                e.target.style.boxShadow = `0 6px 20px rgba(182, 157, 116, 0.40)`;
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!loading) {
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = `0 4px 12px rgba(182, 157, 116, 0.30)`;
+              }
+            }}
           >
-            {loading ? 'Analyzing...' : 'Instant Case Analysis'}
+            {loading ? (
+              <>
+                <Loader className="w-4 h-4 animate-spin" />
+                Analyzing...
+              </>
+            ) : (
+              <>
+                <Brain className="w-4 h-4" />
+                Instant Case Analysis
+              </>
+            )}
           </button>
           
-          <button className="bg-gray-100 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-200 transition-colors border border-gray-300">
+          <button className="px-6 py-2 rounded-md font-medium transition-all duration-200 flex items-center gap-2" style={{
+            background: `rgba(255, 255, 255, 0.06)`,
+            border: `1px solid rgba(182, 157, 116, 0.25)`,
+            color: colors.navy,
+            backdropFilter: 'blur(6px)'
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.background = `rgba(182, 157, 116, 0.08)`;
+            e.target.style.borderColor = colors.golden;
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.background = `rgba(255, 255, 255, 0.06)`;
+            e.target.style.borderColor = `rgba(182, 157, 116, 0.25)`;
+          }}>
+            <Upload className="w-4 h-4" />
             Upload Case Files
           </button>
         </div>
@@ -120,64 +224,77 @@ export default function Research() {
 
       {/* Analysis Results */}
       {analysisResults && (
-        <div className="bg-white rounded-lg border border-gray-200 p-4 md:p-6">
+        <div className="rounded-lg p-4 md:p-6" style={{
+          background: `linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06))`,
+          backdropFilter: 'blur(6px)',
+          border: `1px solid rgba(182, 157, 116, 0.15)`
+        }}>
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Analysis Results</h3>
-            <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg" style={{ background: `rgba(16, 185, 129, 0.12)` }}>
+                <Target className="w-5 h-5" style={{ color: colors.green }} />
+              </div>
+              <h3 className="text-lg font-semibold" style={{ color: colors.navy }}>Analysis Results</h3>
+            </div>
+            <span className="px-3 py-1 rounded-full text-sm font-medium" style={{
+              background: `rgba(16, 185, 129, 0.15)`,
+              color: colors.green,
+              border: `1px solid rgba(16, 185, 129, 0.25)`
+            }}>
               Confidence: {analysisResults.confidence}
             </span>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div>
-              <h4 className="font-medium text-gray-900 mb-3">Legal Pathways</h4>
+              <h4 className="font-medium mb-3" style={{ color: colors.navy }}>Legal Pathways</h4>
               <ul className="space-y-2">
                 {analysisResults.legalPathways.map((pathway, index) => (
                   <li key={index} className="flex items-start gap-2">
-                    <span className="text-blue-600 mt-1">•</span>
-                    <span className="text-gray-700">{pathway}</span>
+                    <Scale className="w-4 h-4 mt-1 flex-shrink-0" style={{ color: colors.golden }} />
+                    <span style={{ color: colors.gray }}>{pathway}</span>
                   </li>
                 ))}
               </ul>
             </div>
 
             <div>
-              <h4 className="font-medium text-gray-900 mb-3">Relevant Precedents</h4>
+              <h4 className="font-medium mb-3" style={{ color: colors.navy }}>Relevant Precedents</h4>
               <ul className="space-y-2">
                 {analysisResults.precedents.map((precedent, index) => (
                   <li key={index} className="flex items-start gap-2">
-                    <span className="text-gray-600 mt-1">⚖️</span>
-                    <span className="text-gray-700">{precedent}</span>
+                    <Gavel className="w-4 h-4 mt-1 flex-shrink-0" style={{ color: colors.golden }} />
+                    <span style={{ color: colors.gray }}>{precedent}</span>
                   </li>
                 ))}
               </ul>
             </div>
 
             <div>
-              <h4 className="font-medium text-gray-900 mb-3">Risk Assessment</h4>
+              <h4 className="font-medium mb-3" style={{ color: colors.navy }}>Risk Assessment</h4>
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Success Probability:</span>
-                  <span className="font-medium text-green-600">{analysisResults.riskAssessment.successProbability}</span>
+                  <span style={{ color: colors.gray }}>Success Probability:</span>
+                  <span className="font-medium" style={{ color: colors.green }}>{analysisResults.riskAssessment.successProbability}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Time Estimate:</span>
-                  <span className="font-medium text-gray-700">{analysisResults.riskAssessment.timeEstimate}</span>
+                  <span style={{ color: colors.gray }}>Time Estimate:</span>
+                  <span className="font-medium" style={{ color: colors.navy }}>{analysisResults.riskAssessment.timeEstimate}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Complexity:</span>
-                  <span className="font-medium text-orange-600">{analysisResults.riskAssessment.complexity}</span>
+                  <span style={{ color: colors.gray }}>Complexity:</span>
+                  <span className="font-medium" style={{ color: colors.amber }}>{analysisResults.riskAssessment.complexity}</span>
                 </div>
               </div>
             </div>
 
             <div>
-              <h4 className="font-medium text-gray-900 mb-3">Recommendations</h4>
+              <h4 className="font-medium mb-3" style={{ color: colors.navy }}>Recommendations</h4>
               <ul className="space-y-2">
                 {analysisResults.recommendations.map((rec, index) => (
                   <li key={index} className="flex items-start gap-2">
-                    <span className="text-gray-600 mt-1">•</span>
-                    <span className="text-gray-700">{rec}</span>
+                    <FileCheck className="w-4 h-4 mt-1 flex-shrink-0" style={{ color: colors.golden }} />
+                    <span style={{ color: colors.gray }}>{rec}</span>
                   </li>
                 ))}
               </ul>
@@ -186,29 +303,95 @@ export default function Research() {
         </div>
       )}
 
-      {/* Quick Tools */}
+      {/* Professional Tools */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <h4 className="font-medium text-gray-900 mb-2">Document Drafting</h4>
-          <p className="text-sm text-gray-600 mb-3">Generate legal documents with suggestions</p>
-          <button className="w-full bg-gray-100 text-gray-700 py-2 rounded-md hover:bg-gray-200 transition-colors">
+        <div className="rounded-lg p-4 transition-all duration-200 hover:scale-105" style={{
+          background: `linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06))`,
+          backdropFilter: 'blur(6px)',
+          border: `1px solid rgba(182, 157, 116, 0.15)`,
+          boxShadow: `0 4px 15px rgba(182, 157, 116, 0.10)`
+        }}>
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 rounded-lg" style={{ background: `rgba(182, 157, 116, 0.12)` }}>
+              <FileText className="w-4 h-4" style={{ color: colors.golden }} />
+            </div>
+            <h4 className="font-medium" style={{ color: colors.navy }}>Document Drafting</h4>
+          </div>
+          <p className="text-sm mb-3" style={{ color: colors.gray }}>Generate legal documents with AI assistance</p>
+          <button className="w-full py-2 rounded-md font-medium transition-all duration-200" style={{
+            background: `rgba(182, 157, 116, 0.08)`,
+            color: colors.navy,
+            border: `1px solid rgba(182, 157, 116, 0.20)`
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.background = `rgba(182, 157, 116, 0.15)`;
+            e.target.style.borderColor = colors.golden;
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.background = `rgba(182, 157, 116, 0.08)`;
+            e.target.style.borderColor = `rgba(182, 157, 116, 0.20)`;
+          }}>
             Start Drafting
           </button>
         </div>
 
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <h4 className="font-medium text-gray-900 mb-2">Alternative Arguments</h4>
-          <p className="text-sm text-gray-600 mb-3">AI-generated legal strategies</p>
-          <button className="w-full bg-gray-100 text-gray-700 py-2 rounded-md hover:bg-gray-200 transition-colors">
-            Generate Arguments
+        <div className="rounded-lg p-4 transition-all duration-200 hover:scale-105" style={{
+          background: `linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06))`,
+          backdropFilter: 'blur(6px)',
+          border: `1px solid rgba(182, 157, 116, 0.15)`,
+          boxShadow: `0 4px 15px rgba(182, 157, 116, 0.10)`
+        }}>
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 rounded-lg" style={{ background: `rgba(16, 185, 129, 0.12)` }}>
+              <Brain className="w-4 h-4" style={{ color: colors.green }} />
+            </div>
+            <h4 className="font-medium" style={{ color: colors.navy }}>Legal Strategies</h4>
+          </div>
+          <p className="text-sm mb-3" style={{ color: colors.gray }}>AI-generated legal arguments and approaches</p>
+          <button className="w-full py-2 rounded-md font-medium transition-all duration-200" style={{
+            background: `rgba(182, 157, 116, 0.08)`,
+            color: colors.navy,
+            border: `1px solid rgba(182, 157, 116, 0.20)`
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.background = `rgba(182, 157, 116, 0.15)`;
+            e.target.style.borderColor = colors.golden;
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.background = `rgba(182, 157, 116, 0.08)`;
+            e.target.style.borderColor = `rgba(182, 157, 116, 0.20)`;
+          }}>
+            Generate Strategies
           </button>
         </div>
 
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <h4 className="font-medium text-gray-900 mb-2">Case Strength Analysis</h4>
-          <p className="text-sm text-gray-600 mb-3">Automated evaluation scoring</p>
-          <button className="w-full bg-gray-100 text-gray-700 py-2 rounded-md hover:bg-gray-200 transition-colors">
-            Analyze Strength
+        <div className="rounded-lg p-4 transition-all duration-200 hover:scale-105" style={{
+          background: `linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06))`,
+          backdropFilter: 'blur(6px)',
+          border: `1px solid rgba(182, 157, 116, 0.15)`,
+          boxShadow: `0 4px 15px rgba(182, 157, 116, 0.10)`
+        }}>
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 rounded-lg" style={{ background: `rgba(59, 130, 246, 0.12)` }}>
+              <BarChart3 className="w-4 h-4" style={{ color: colors.blue }} />
+            </div>
+            <h4 className="font-medium" style={{ color: colors.navy }}>Case Analysis</h4>
+          </div>
+          <p className="text-sm mb-3" style={{ color: colors.gray }}>Comprehensive case strength evaluation</p>
+          <button className="w-full py-2 rounded-md font-medium transition-all duration-200" style={{
+            background: `rgba(182, 157, 116, 0.08)`,
+            color: colors.navy,
+            border: `1px solid rgba(182, 157, 116, 0.20)`
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.background = `rgba(182, 157, 116, 0.15)`;
+            e.target.style.borderColor = colors.golden;
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.background = `rgba(182, 157, 116, 0.08)`;
+            e.target.style.borderColor = `rgba(182, 157, 116, 0.20)`;
+          }}>
+            Analyze Case
           </button>
         </div>
       </div>
@@ -218,7 +401,12 @@ export default function Research() {
   const renderPrecedentMatching = () => (
     <div className="space-y-6">
       <div className="bg-white rounded-lg border border-gray-200 p-4 md:p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Precedent Matching</h3>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 bg-blue-50 rounded-lg">
+            <Search className="w-5 h-5 text-blue-600" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900">Precedent Matching</h3>
+        </div>
         
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">Case Facts or Legal Issue</label>
@@ -248,7 +436,8 @@ export default function Research() {
           </select>
         </div>
 
-        <button className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors">
+        <button className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2">
+          <Search className="w-4 h-4" />
           Find Similar Cases
         </button>
       </div>
@@ -303,7 +492,12 @@ export default function Research() {
   const renderCaseMonitoring = () => (
     <div className="space-y-6">
       <div className="bg-white rounded-lg border border-gray-200 p-4 md:p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Case Law Monitoring</h3>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 bg-blue-50 rounded-lg">
+            <Monitor className="w-5 h-5 text-blue-600" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900">Case Law Monitoring</h3>
+        </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div>
@@ -319,7 +513,8 @@ export default function Research() {
                 <option>Supreme Court Only</option>
                 <option>High Courts Only</option>
               </select>
-              <button className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors">
+              <button className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
+                <Bell className="w-4 h-4" />
                 Set Alert
               </button>
             </div>
@@ -383,7 +578,12 @@ export default function Research() {
   const renderComparativeAnalysis = () => (
     <div className="space-y-6">
       <div className="bg-white rounded-lg border border-gray-200 p-4 md:p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Case Comparison</h3>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 bg-blue-50 rounded-lg">
+            <BarChart3 className="w-5 h-5 text-blue-600" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900">Case Comparison</h3>
+        </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
@@ -392,7 +592,8 @@ export default function Research() {
               className="w-full p-3 border border-gray-300 rounded-md h-32 focus:ring-2 focus:ring-blue-500"
               placeholder="Enter case details or citation..."
             />
-            <button className="w-full mt-2 bg-gray-100 text-gray-700 py-2 rounded-md hover:bg-gray-200 transition-colors border border-gray-300">
+            <button className="w-full mt-2 bg-gray-100 text-gray-700 py-2 rounded-md hover:bg-gray-200 transition-colors border border-gray-300 flex items-center justify-center gap-2">
+              <Upload className="w-4 h-4" />
               Upload Document
             </button>
           </div>
@@ -403,14 +604,16 @@ export default function Research() {
               className="w-full p-3 border border-gray-300 rounded-md h-32 focus:ring-2 focus:ring-blue-500"
               placeholder="Enter case details or citation..."
             />
-            <button className="w-full mt-2 bg-gray-100 text-gray-700 py-2 rounded-md hover:bg-gray-200 transition-colors border border-gray-300">
+            <button className="w-full mt-2 bg-gray-100 text-gray-700 py-2 rounded-md hover:bg-gray-200 transition-colors border border-gray-300 flex items-center justify-center gap-2">
+              <Upload className="w-4 h-4" />
               Upload Document
             </button>
           </div>
         </div>
 
         <div className="mt-6 text-center">
-          <button className="bg-blue-600 text-white px-8 py-3 rounded-md hover:bg-blue-700 transition-colors">
+          <button className="bg-blue-600 text-white px-8 py-3 rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2 mx-auto">
+            <BarChart3 className="w-4 h-4" />
             Compare Cases
           </button>
         </div>
@@ -442,19 +645,23 @@ export default function Research() {
     <div className="space-y-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {[
-          { title: 'Matrimonial Law', icon: '💑', cases: '1,247' },
-          { title: 'Property Law', icon: '🏘️', cases: '2,156' },
-          { title: 'Commercial Law', icon: '💼', cases: '3,428' },
-          { title: 'Criminal Law', icon: '⚖️', cases: '4,532' },
-          { title: 'Constitutional Law', icon: '📜', cases: '1,876' },
-          { title: 'Corporate Law', icon: '🏢', cases: '2,943' }
+          { title: 'Family Law', icon: Heart, cases: '1,247' },
+          { title: 'Property Law', icon: Home, cases: '2,156' },
+          { title: 'Commercial Law', icon: Briefcase, cases: '3,428' },
+          { title: 'Criminal Law', icon: Shield, cases: '4,532' },
+          { title: 'Constitutional Law', icon: Scale, cases: '1,876' },
+          { title: 'Corporate Law', icon: Building, cases: '2,943' }
         ].map((module, index) => (
           <div key={index} className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-sm transition-shadow cursor-pointer">
             <div className="text-center">
-              <div className="text-3xl mb-2">{module.icon}</div>
+              <div className="flex justify-center mb-3">
+                <div className="p-3 bg-blue-50 rounded-lg">
+                  <module.icon className="w-6 h-6 text-blue-600" />
+                </div>
+              </div>
               <h4 className="font-medium text-gray-900 mb-1">{module.title}</h4>
               <p className="text-xl font-semibold text-gray-700">{module.cases}</p>
-              <p className="text-sm text-gray-600">cases</p>
+              <p className="text-sm text-gray-600">cases available</p>
             </div>
           </div>
         ))}
@@ -462,33 +669,44 @@ export default function Research() {
 
       {/* Research Tools */}
       <div className="bg-white rounded-lg border border-gray-200 p-4 md:p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Research Tools</h3>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 bg-blue-50 rounded-lg">
+            <BookOpen className="w-5 h-5 text-blue-600" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900">Research Tools</h3>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-3">
-            <h4 className="font-medium text-gray-900">Automation</h4>
+            <h4 className="font-medium text-gray-900">Automation Tools</h4>
             <div className="space-y-2">
-              <button className="w-full text-left p-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+              <button className="w-full text-left p-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors flex items-center gap-3">
+                <FileText className="w-4 h-4 text-gray-600" />
                 Citation Generator
               </button>
-              <button className="w-full text-left p-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+              <button className="w-full text-left p-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors flex items-center gap-3">
+                <Activity className="w-4 h-4 text-gray-600" />
                 Cross-Reference Builder
               </button>
-              <button className="w-full text-left p-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+              <button className="w-full text-left p-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors flex items-center gap-3">
+                <TrendingUp className="w-4 h-4 text-gray-600" />
                 Legal Trend Analysis
               </button>
             </div>
           </div>
           
           <div className="space-y-3">
-            <h4 className="font-medium text-gray-900">Intelligence</h4>
+            <h4 className="font-medium text-gray-900">Intelligence Tools</h4>
             <div className="space-y-2">
-              <button className="w-full text-left p-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+              <button className="w-full text-left p-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors flex items-center gap-3">
+                <Users className="w-4 h-4 text-gray-600" />
                 Judge Decision Patterns
               </button>
-              <button className="w-full text-left p-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+              <button className="w-full text-left p-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors flex items-center gap-3">
+                <Target className="w-4 h-4 text-gray-600" />
                 Success Rate Predictions
               </button>
-              <button className="w-full text-left p-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+              <button className="w-full text-left p-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors flex items-center gap-3">
+                <Clock className="w-4 h-4 text-gray-600" />
                 Case Duration Analytics
               </button>
             </div>
@@ -499,50 +717,94 @@ export default function Research() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{ 
+      backgroundColor: colors.cream,
+      backgroundImage: `
+        radial-gradient(circle at 20% 20%, rgba(182, 157, 116, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(31, 40, 57, 0.03) 0%, transparent 50%)
+      `
+    }}>
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 p-4 md:p-6">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Legal Research Dashboard</h1>
-        <p className="text-gray-600 mt-1">AI-powered legal analysis and monitoring</p>
+      <div className="border-b p-4 md:p-6" style={{
+        background: `linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(245, 245, 239, 0.95) 100%)`,
+        borderBottomColor: `rgba(182, 157, 116, 0.20)`,
+        backdropFilter: 'blur(15px)'
+      }}>
+        <div className="flex items-center gap-3">
+          <div className="p-3 rounded-xl" style={{ 
+            background: `linear-gradient(135deg, ${colors.navy} 0%, rgba(31, 40, 57, 0.85) 100%)`
+          }}>
+            <BookOpen className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold" style={{ color: colors.navy }}>Legal Research Dashboard</h1>
+            <p className="mt-1" style={{ color: colors.gray }}>AI-powered legal analysis and case monitoring</p>
+          </div>
+        </div>
       </div>
 
       {/* Stats Overview */}
       <div className="p-4 md:p-6">
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-6 mb-6">
           {[
-            { name: 'Cases Analyzed', value: '156', icon: '🔍' },
-            { name: 'AI Predictions', value: '89', icon: '🎯' },
-            { name: 'Precedents', value: '2,341', icon: '⚖️' },
-            { name: 'Active Alerts', value: '45', icon: '🔔' },
-            { name: 'Success Rate', value: '87%', icon: '📈' }
+            { name: 'Cases Analyzed', value: '156', icon: Search },
+            { name: 'AI Predictions', value: '89', icon: Target },
+            { name: 'Precedents', value: '2,341', icon: Gavel },
+            { name: 'Active Alerts', value: '45', icon: Bell },
+            { name: 'Success Rate', value: '87%', icon: TrendingUp }
           ].map((stat, index) => (
-            <div key={index} className="bg-white rounded-lg border border-gray-200 p-3">
+            <div key={index} className="rounded-lg p-3 transition-all duration-200 hover:scale-105" style={{
+              background: `linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06))`,
+              backdropFilter: 'blur(6px)',
+              border: `1px solid rgba(182, 157, 116, 0.15)`,
+              boxShadow: `0 4px 15px rgba(182, 157, 116, 0.10)`
+            }}>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs md:text-sm font-medium text-gray-600">{stat.name}</p>
-                  <p className="text-lg md:text-xl font-bold text-gray-900">{stat.value}</p>
+                  <p className="text-xs md:text-sm font-medium" style={{ color: colors.gray }}>{stat.name}</p>
+                  <p className="text-lg md:text-xl font-bold" style={{ color: colors.navy }}>{stat.value}</p>
                 </div>
-                <div className="text-xl md:text-2xl">{stat.icon}</div>
+                <div className="p-2 rounded-lg" style={{ background: `rgba(182, 157, 116, 0.12)` }}>
+                  <stat.icon className="w-4 h-4 md:w-5 md:h-5" style={{ color: colors.golden }} />
+                </div>
               </div>
             </div>
           ))}
         </div>
 
         {/* Navigation Tabs */}
-        <div className="bg-white rounded-t-lg border border-gray-200">
+        <div className="rounded-t-lg" style={{
+          background: `linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06))`,
+          backdropFilter: 'blur(6px)',
+          border: `1px solid rgba(182, 157, 116, 0.15)`
+        }}>
           <div className="px-4 md:px-6">
             <nav className="flex space-x-4 md:space-x-8 overflow-x-auto py-2">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 py-3 px-1 border-b-2 font-medium text-sm whitespace-nowrap transition-colors ${
+                  className={`flex items-center gap-2 py-3 px-1 border-b-2 font-medium text-sm whitespace-nowrap transition-all duration-200 ${
                     activeTab === tab.id
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700'
+                      ? ''
+                      : 'border-transparent hover:scale-105'
                   }`}
+                  style={{
+                    borderBottomColor: activeTab === tab.id ? colors.golden : 'transparent',
+                    color: activeTab === tab.id ? colors.golden : colors.gray
+                  }}
+                  onMouseEnter={(e) => {
+                    if (activeTab !== tab.id) {
+                      e.target.style.color = colors.navy;
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (activeTab !== tab.id) {
+                      e.target.style.color = colors.gray;
+                    }
+                  }}
                 >
-                  <span>{tab.icon}</span>
+                  <tab.icon className="w-4 h-4" />
                   <span className="hidden sm:block">{tab.name}</span>
                 </button>
               ))}
@@ -551,12 +813,21 @@ export default function Research() {
         </div>
 
         {/* Content */}
-        <div className="bg-white rounded-b-lg p-4 md:p-6">
+        <div className="rounded-b-lg p-4 md:p-6" style={{
+          background: `linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06))`,
+          backdropFilter: 'blur(6px)',
+          border: `1px solid rgba(182, 157, 116, 0.15)`,
+          borderTop: 'none'
+        }}>
           {loading && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white rounded-lg p-6 flex items-center gap-4">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-                <span>Analyzing...</span>
+            <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: 'rgba(31, 40, 57, 0.50)' }}>
+              <div className="rounded-lg p-6 flex items-center gap-4" style={{ 
+                background: `rgba(255, 255, 255, 0.95)`,
+                backdropFilter: 'blur(10px)',
+                border: `1px solid rgba(182, 157, 116, 0.20)`
+              }}>
+                <Loader className="w-6 h-6 animate-spin" style={{ color: colors.golden }} />
+                <span className="font-medium" style={{ color: colors.navy }}>Analyzing legal case...</span>
               </div>
             </div>
           )}

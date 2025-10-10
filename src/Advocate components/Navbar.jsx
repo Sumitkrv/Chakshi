@@ -63,10 +63,7 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
       { name: 'Research', path: '/advocate/research' },
       { name: 'Simulation', path: '/advocate/simulation' },
     ],
-    insights: [
-      { name: 'Analytics', path: '/advocate/analytics' },
-      { name: 'Reports', path: '/advocate/reports' },
-    ]
+    insights: []
   };
 
   // Close dropdowns when clicking outside
@@ -251,7 +248,7 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
                 </div>
               </div>
 
-              {/* Insights Dropdown */}
+              {/* Settings Dropdown */}
               <div className="relative group">
                 <button 
                   className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors border border-transparent"
@@ -267,7 +264,7 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
                     e.target.style.borderColor = 'transparent';
                   }}
                 >
-                  <span>Insights</span>
+                  <span>Settings</span>
                   <span className="text-xs" style={{ color: colors.accent }}>▼</span>
                 </button>
                 <div 
@@ -278,9 +275,6 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
                     boxShadow: `0 10px 25px ${colors.textPrimary}15`
                   }}
                 >
-                  {navItems.insights.map(item => (
-                    <NavButton key={item.path} item={item} />
-                  ))}
                   <NavButton item={{ name: 'Settings', path: '/advocate/settings' }} />
                 </div>
               </div>
@@ -634,18 +628,15 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
               </div>
             </div>
 
-            {/* Insights */}
+            {/* Settings */}
             <div className="mb-4">
               <h3 
                 className="text-xs font-semibold uppercase tracking-wider mb-2"
                 style={{ color: colors.textSecondary }}
               >
-                Insights
+                Settings
               </h3>
               <div className="space-y-1">
-                {navItems.insights.map(item => (
-                  <NavButton key={item.path} item={item} mobile />
-                ))}
                 <NavButton item={{ name: 'Settings', path: '/advocate/settings' }} mobile />
               </div>
             </div>
