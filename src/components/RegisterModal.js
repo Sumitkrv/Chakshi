@@ -39,22 +39,19 @@ const RegisterModal = ({ isOpen, onClose }) => {
       id: 'advocate',
       title: 'Advocate',
       description: 'Legal professional managing cases and clients',
-      route: '/advocate/dashboard',
-      emoji: '⚖️'
+      route: '/advocate/dashboard'
     },
     {
       id: 'student',
       title: 'Law Student',
       description: 'Student pursuing legal education',
-      route: '/student/dashboard',
-      emoji: '🎓'
+      route: '/student/dashboard'
     },
     {
       id: 'clerk',
       title: 'Court Clerk',
       description: 'Court administrative professional',
-      route: '/clerk/dashboard',
-      emoji: '📋'
+      route: '/clerk/dashboard'
     }
   ];
 
@@ -250,14 +247,6 @@ const RegisterModal = ({ isOpen, onClose }) => {
 
           <div className="p-4 sm:p-6 md:p-8">
             <div className="text-center mb-6 sm:mb-8">
-              <div 
-                className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-lg"
-                style={{
-                  background: `linear-gradient(135deg, ${colors.golden}, ${colors.golden}DD)`
-                }}
-              >
-                <span className="text-2xl sm:text-3xl text-white">⚖️</span>
-              </div>
               <h1 
                 id="register-modal-title"
                 className="text-xl sm:text-2xl font-bold mb-2"
@@ -487,14 +476,6 @@ const RegisterModal = ({ isOpen, onClose }) => {
                         onMouseLeave={() => setHoveredRole(null)}
                       >
                         <div className="flex items-center gap-3">
-                          <div 
-                            className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
-                            style={{
-                              background: `linear-gradient(135deg, ${colors.golden}, ${colors.golden}CC)`
-                            }}
-                          >
-                            <span className="text-xl text-white">{role.emoji}</span>
-                          </div>
                           <div className="flex-1">
                             <div className="flex items-center justify-between">
                               <h4 
@@ -503,14 +484,7 @@ const RegisterModal = ({ isOpen, onClose }) => {
                               >
                                 {role.title}
                               </h4>
-                              {isSelected && (
-                                <span 
-                                  className="text-lg"
-                                  style={{ color: colors.golden }}
-                                >
-                                  ✅
-                                </span>
-                              )}
+                              {/* checkmark icon removed for professionalism */}
                             </div>
                             <p 
                               className="text-sm"
@@ -585,29 +559,19 @@ const RegisterModal = ({ isOpen, onClose }) => {
                 borderColor: colors.goldenAlpha40
               }}
             >
-              <div className="flex items-start gap-2">
-                <div 
-                  className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
-                  style={{
-                    background: `linear-gradient(135deg, ${colors.golden}, ${colors.golden}DD)`
-                  }}
+              <div>
+                <h4 
+                  className="text-sm font-semibold mb-1"
+                  style={{ color: colors.darkNavy }}
                 >
-                  <span className="text-sm text-white">ℹ️</span>
-                </div>
-                <div>
-                  <h4 
-                    className="text-sm font-semibold mb-1"
-                    style={{ color: colors.darkNavy }}
-                  >
-                    Demo Environment
-                  </h4>
-                  <p 
-                    className="text-xs leading-relaxed"
-                    style={{ color: colors.mediumGray }}
-                  >
-                    Complete all fields and select your professional role to create a demonstration account and explore the platform capabilities.
-                  </p>
-                </div>
+                  Demo Environment
+                </h4>
+                <p 
+                  className="text-xs leading-relaxed"
+                  style={{ color: colors.mediumGray }}
+                >
+                  Complete all fields and select your professional role to create a demonstration account and explore the platform capabilities.
+                </p>
               </div>
             </div>
           </div>

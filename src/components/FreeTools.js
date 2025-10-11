@@ -3453,63 +3453,7 @@ Generated on: ${new Date().toLocaleString()}
           </div>
         )}
 
-        {/* Call to Action */}
-        <div 
-          className="rounded-2xl p-8 md:p-12 text-center border shadow-sm"
-          style={{
-            background: 'rgba(255, 255, 255, 0.80)',
-            backdropFilter: 'blur(10px)',
-            borderColor: 'rgba(182, 157, 116, 0.3)',
-            boxShadow: '0 6px 25px rgba(31, 40, 57, 0.12)'
-          }}
-        >
-          <h2 className="text-2xl md:text-3xl font-bold mb-4" style={{ color: '#1f2839' }}>
-            Need a Custom Legal Document?
-          </h2>
-          <p className="text-lg md:text-xl mb-8 max-w-2xl mx-auto" style={{ color: '#6b7280' }}>
-            Our <span style={{ color: '#b69d74', fontWeight: '600' }}>AI-powered legal assistant</span> can help you create custom documents tailored to your specific needs.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button 
-              className="px-6 md:px-8 py-3 md:py-4 rounded-xl font-semibold transition-all duration-300"
-              style={{
-                background: 'linear-gradient(135deg, #b69d74 0%, #b69d74 100%)',
-                color: '#ffffff',
-                boxShadow: '0 6px 20px rgba(182, 157, 116, 0.4)'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.transform = 'translateY(-2px)';
-                e.target.style.boxShadow = '0 12px 30px rgba(182, 157, 116, 0.5)';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.transform = 'translateY(0px)';
-                e.target.style.boxShadow = '0 6px 20px rgba(182, 157, 116, 0.4)';
-              }}
-            >
-              Get Professional Help
-            </button>
-            <button 
-              className="px-6 md:px-8 py-3 md:py-4 rounded-xl font-semibold border transition-all duration-300"
-              style={{
-                background: 'rgba(255, 255, 255, 0.60)',
-                color: '#1f2839',
-                borderColor: 'rgba(182, 157, 116, 0.4)'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.background = 'rgba(255, 255, 255, 0.90)';
-                e.target.style.borderColor = 'rgba(182, 157, 116, 0.6)';
-                e.target.style.transform = 'translateY(-2px)';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.background = 'rgba(255, 255, 255, 0.60)';
-                e.target.style.borderColor = 'rgba(182, 157, 116, 0.4)';
-                e.target.style.transform = 'translateY(0px)';
-              }}
-            >
-              Browse All Templates
-            </button>
-          </div>
-        </div>
+        {/* Call to Action removed per request */}
       </div>
 
       {/* Modal */}

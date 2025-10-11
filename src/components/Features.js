@@ -288,7 +288,7 @@ const Features = () => {
     <section 
       ref={sectionRef}
       id="features" 
-      className="relative py-24 overflow-hidden"
+      className="relative pt-0 pb-20 -mt-24 overflow-hidden"
       aria-labelledby="features-heading"
       style={{ 
         backgroundColor: '#f5f5ef',
@@ -330,18 +330,12 @@ const Features = () => {
         />
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-16 relative z-10">
+  <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-8 relative z-10">
         
         {/* Header Section */}
-        <div className="text-center mb-16">
-          <div className="flex items-center justify-center gap-4 mb-6">
-            <div className="w-16 h-16 bg-gradient-to-br from-[#b69d74] to-[#d4c4a8] rounded-2xl flex items-center justify-center shadow-2xl">
-              <span className="text-white font-bold text-2xl">C</span>
-            </div>
-            <div className="text-left">
-              <h2 className="text-3xl font-bold text-[#1f2839]">Chakshi Features</h2>
-              <p className="text-[#b69d74] font-medium text-lg">AI-Powered Legal Tools</p>
-            </div>
+  <div className="text-center mb-12">
+          <div className="text-center mb-6">
+            <h2 className="text-3xl font-bold text-[#1f2839]">Chakshi Features</h2>
           </div>
           <p className="text-gray-700 text-lg max-w-2xl mx-auto leading-relaxed">
             Comprehensive AI-powered features designed for modern legal professionals. 
@@ -388,7 +382,7 @@ const Features = () => {
           
           <div className="relative z-10">
             <div className="w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-6 shadow-lg bg-gradient-to-br from-[#b69d74] to-[#d4c4a8]">
-              <span className="text-white font-bold text-xl">✨</span>
+              {/* decorative badge removed */}
             </div>
             
             <h2 className="text-2xl md:text-3xl font-bold text-[#1f2839] mb-4">
@@ -399,26 +393,19 @@ const Features = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
-              <button 
-                className="flex items-center gap-2 px-8 py-4 text-white font-bold rounded-xl bg-gradient-to-r from-[#b69d74] to-[#d4c4a8] hover:shadow-lg transition-all duration-200 hover:scale-105"
-                aria-label="Start Free Trial"
-              >
-                Start Free Trial
-              </button>
-              <button 
-                className="flex items-center gap-2 px-8 py-4 text-[#1f2839] font-semibold rounded-xl border backdrop-blur-sm hover:shadow-md transition-all duration-200"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.60)',
-                  borderColor: 'rgba(182, 157, 116, 0.4)'
-                }}
-                aria-label="Schedule Demo"
-              >
-                Schedule Demo
-              </button>
+              <button
+                  type="button"
+                  onClick={() => window.dispatchEvent(new CustomEvent('open-register-modal'))}
+                  className="flex items-center gap-2 px-8 py-4 text-white font-bold rounded-xl bg-gradient-to-r from-[#b69d74] to-[#d4c4a8] hover:shadow-lg transition-all duration-200 hover:scale-105"
+                  aria-label="Start Free Trial - Open Register Modal"
+                >
+                  Start Free Trial
+                </button>
+              {/* Schedule Demo removed per request */}
             </div>
             
             <div className="flex flex-wrap justify-center items-center gap-4 text-gray-700">
-              {["14-day trial", "No credit card", "Cancel anytime"].map((item, index) => (
+              {["Credit card required", "Cancel anytime"].map((item, index) => (
                 <div key={index} className="flex items-center gap-2 text-sm">
                   <div className="w-4 h-4 bg-[#b69d74] rounded-full flex items-center justify-center">
                     <span className="text-xs text-white">✓</span>

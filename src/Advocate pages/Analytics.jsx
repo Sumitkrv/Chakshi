@@ -72,7 +72,7 @@ const AnalyticsDashboard = () => {
     { id: 7, name: 'Miller Bankruptcy', progress: 95, risk: 'Low', successProbability: 85, value: 50000, status: 'Completed', category: 'Bankruptcy' }
   ]);
 
-  const [filters, setFilters] = useState({ timeframe: '30d' });
+  const [filters, setFilters] = useState({ timeframe: '7d' });
   const [searchTerm, setSearchTerm] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -306,7 +306,6 @@ const AnalyticsDashboard = () => {
                     onBlur={(e) => e.target.style.borderColor = `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`}
                   >
                     <option value="7d">7 Days</option>
-                    <option value="30d">30 Days</option>
                     <option value="90d">90 Days</option>
                     <option value="1y">1 Year</option>
                   </select>

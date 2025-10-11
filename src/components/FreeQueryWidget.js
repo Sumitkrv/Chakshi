@@ -839,16 +839,17 @@ const FreeQueryWidget = () => {
         />
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-16">{/* Changed padding */}
+      <div className="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 pt-0 pb-10 -mt-24">{/* Pulled section further upward */}
         
-        {/* Modern Professional Header */}
-        <div className="text-center mb-20">
+  {/* Modern Professional Header */}
+  <div className="text-center mb-8">
           {/* Main Branding */}
           <div className="mb-12">
             <div className="mb-8">
             </div>
             
             <div className="max-w-4xl mx-auto">
+              <h2 className="text-3xl md:text-4xl font-semibold mb-2 text-[#1f2839]">Ask Queries</h2>
               <p 
                 className="text-xl md:text-2xl leading-relaxed font-medium mb-8 text-gray-700"
               >

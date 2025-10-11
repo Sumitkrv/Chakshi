@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { X, Eye, EyeOff } from 'lucide-react';
+import RegisterModal from './RegisterModal';
 
-const LoginModal = ({ isOpen, onClose }) => {
+const LoginModal = ({ isOpen, onClose, onOpenRegister }) => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -17,6 +18,7 @@ const LoginModal = ({ isOpen, onClose }) => {
   const [isAnimating, setIsAnimating] = useState(false);
   const navigate = useNavigate();
   const { login, logoutEvent } = useAuth();
+  const [showRegister, setShowRegister] = useState(false);
 
   const colors = {
     background: '#f5f5ef',
@@ -36,22 +38,19 @@ const LoginModal = ({ isOpen, onClose }) => {
       id: 'advocate',
       title: 'Advocate',
       route: '/advocate/dashboard',
-      description: 'Legal professional practice management',
-      emoji: '⚖️'
+      description: 'Legal professional practice management'
     },
     {
       id: 'student',
       title: 'Law Student',
       route: '/student/dashboard',
-      description: 'Pursuing legal education and training',
-      emoji: '🎓'
+      description: 'Pursuing legal education and training'
     },
     {
       id: 'clerk',
       title: 'Court Clerk',
       route: '/clerk/dashboard',
-      description: 'Court administration and case management',
-      emoji: '📋'
+      description: 'Court administration and case management'
     }
   ];
 
@@ -158,6 +157,7 @@ const LoginModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
+    <>
     <div 
       className={`fixed inset-0 z-[10000] transition-all duration-300 ${
         isAnimating ? 'opacity-100' : 'opacity-0 pointer-events-none'
@@ -200,14 +200,6 @@ const LoginModal = ({ isOpen, onClose }) => {
 
           <div className="p-4 sm:p-6 md:p-8">
           <div className="text-center mb-6 sm:mb-8">
-            <div 
-              className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-lg"
-              style={{
-                background: `linear-gradient(135deg, ${colors.golden}, ${colors.golden}DD)`
-              }}
-            >
-              <span className="text-2xl sm:text-3xl text-white">⚖️</span>
-            </div>
             <h1 
               id="login-modal-title"
               className="text-xl sm:text-2xl font-bold mb-2"
@@ -297,7 +289,6 @@ const LoginModal = ({ isOpen, onClose }) => {
                 {roles.map((role) => {
                   const isSelected = formData.role === role.id;
                   const isHovered = hoveredRole === role.id;
-                  
                   return (
                     <div
                       key={role.id}
@@ -317,14 +308,6 @@ const LoginModal = ({ isOpen, onClose }) => {
                       onMouseLeave={() => setHoveredRole(null)}
                     >
                       <div className="flex items-center gap-3">
-                        <div 
-                          className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center flex-shrink-0"
-                          style={{
-                            background: `linear-gradient(135deg, ${colors.golden}, ${colors.golden}CC)`
-                          }}
-                        >
-                          <span className="text-lg sm:text-xl text-white">{role.emoji}</span>
-                        </div>
                         <div className="flex-1">
                           <div className="flex items-center justify-between">
                             <h4 
@@ -338,7 +321,7 @@ const LoginModal = ({ isOpen, onClose }) => {
                                 className="text-base sm:text-lg"
                                 style={{ color: colors.golden }}
                               >
-                                ✅
+                                {/* checkmark icon removed for professionalism */}
                               </span>
                             )}
                           </div>
@@ -418,7 +401,14 @@ const LoginModal = ({ isOpen, onClose }) => {
                 className="font-medium hover:underline transition-colors duration-200"
                 onClick={() => {
                   onClose();
-                  navigate('/register');
+                  // Preferred: call the prop if provided
+                  if (typeof onOpenRegister === 'function') {
+                    onOpenRegister();
+                    return;
+                  }
+
+                  // Otherwise open the local RegisterModal instance
+                  setShowRegister(true);
                 }}
                 disabled={loading}
                 style={{
@@ -430,42 +420,13 @@ const LoginModal = ({ isOpen, onClose }) => {
             </p>
           </div>
 
-          <div 
-            className="mt-3 sm:mt-4 p-3 sm:p-4 rounded-lg"
-            style={{
-              backgroundColor: colors.goldenAlpha10,
-              borderColor: colors.goldenAlpha40
-            }}
-          >
-            <div className="flex items-start gap-2 sm:gap-3">
-              <div 
-                className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                style={{
-                  background: `linear-gradient(135deg, ${colors.golden}, ${colors.golden}DD)`
-                }}
-              >
-                <span className="text-sm sm:text-lg text-white">ℹ️</span>
-              </div>
-              <div>
-                <h4 
-                  className="text-xs sm:text-sm font-semibold mb-1"
-                  style={{ color: colors.darkNavy }}
-                >
-                  Demo Environment
-                </h4>
-                <p 
-                  className="text-xs leading-relaxed"
-                  style={{ color: colors.mediumGray }}
-                >
-                  This is a demonstration environment. Please use any valid email format and password to access the platform features.
-                </p>
-              </div>
-            </div>
-            </div>
+          {/* Secure & Private section removed for professionalism */}
           </div>
         </div>
       </div>
     </div>
+    <RegisterModal isOpen={showRegister} onClose={() => setShowRegister(false)} />
+    </>
   );
 };
 
