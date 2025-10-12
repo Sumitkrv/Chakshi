@@ -510,14 +510,17 @@ const Stats = () => {
             </p>
             
             <div className="flex justify-center mb-10">
-              <a 
-                href="/register"
+              <button
+                type="button"
+                onClick={() => window.dispatchEvent(new CustomEvent('open-register-modal'))}
                 className="group relative px-12 py-5 text-white rounded-2xl font-bold text-lg transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 overflow-hidden border"
                 style={{ 
                   background: 'linear-gradient(135deg, #b69d74 0%, #b69d74 100%)',
                   boxShadow: '0 10px 25px rgba(182, 157, 116, 0.40)',
                   border: '1px solid rgba(255, 255, 255, 0.2)',
-                  textDecoration: 'none'
+                  textDecoration: 'none',
+                  cursor: 'pointer',
+                  borderWidth: '1px'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.boxShadow = '0 15px 40px rgba(182, 157, 116, 0.6)';
@@ -525,13 +528,14 @@ const Stats = () => {
                 onMouseLeave={(e) => {
                   e.currentTarget.style.boxShadow = '0 10px 25px rgba(182, 157, 116, 0.40)';
                 }}
+                aria-label="Open Register Modal"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <span className="relative flex items-center justify-center gap-3">
                   <Clock className="w-5 h-5" />
                 Start Free Trial
                 </span>
-              </a>
+              </button>
             </div>
             
             {/* Enhanced Legal Social Proof */}

@@ -381,9 +381,6 @@ const Features = () => {
           </div>
           
           <div className="relative z-10">
-            <div className="w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-6 shadow-lg bg-gradient-to-br from-[#b69d74] to-[#d4c4a8]">
-              {/* decorative badge removed */}
-            </div>
             
             <h2 className="text-2xl md:text-3xl font-bold text-[#1f2839] mb-4">
               Ready to Transform Your Practice?

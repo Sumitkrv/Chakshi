@@ -6,33 +6,97 @@ const QuickActions = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const context = useOutletContext();
-  const { addNotification, theme, language, openModal } = context || {};
+  const { addNotification, theme, language } = context || {};
 
   // State management
-  const [customActions, setCustomActions] = useState([]);
   const [recentActions, setRecentActions] = useState([]);
   const [favoriteActions, setFavoriteActions] = useState(new Set());
   const [searchQuery, setSearchQuery] = useState('');
-  const [actionCategories, setActionCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [hoveredAction, setHoveredAction] = useState(null);
 
-  // Default quick actions
+  // Professional Icons Component
+  const Icon = ({ name, className = "h-6 w-6" }) => {
+    const icons = {
+      'case': (
+        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+        </svg>
+      ),
+      'search': (
+        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      ),
+      'hearing': (
+        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      ),
+      'sms': (
+        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+        </svg>
+      ),
+      'report': (
+        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      ),
+      'bulk': (
+        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+        </svg>
+      ),
+      'star': (
+        <svg className={className} fill="currentColor" viewBox="0 0 24 24">
+          <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
+        </svg>
+      ),
+      'time': (
+        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      ),
+      'all': (
+        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+        </svg>
+      ),
+      'calendar': (
+        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      ),
+      'communication': (
+        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+        </svg>
+      )
+    };
+
+    return icons[name] || null;
+  };
+
+  // Enhanced default actions with professional icons
   const defaultActions = [
     {
       id: 'new-case',
       name: language === 'ta' ? 'नया मामला जोड़ें' : 'Add New Case',
       description: language === 'ta' ? 'नया केस रिकॉर्ड बनाएं' : 'Create a new case record',
-      icon: '📁',
+      icon: 'case',
       category: 'Cases',
       shortcut: 'Ctrl+N',
       action: () => navigate('/clerk/cases/new'),
-      color: 'bg-blue-500'
+      color: 'from-[#b69d74] to-[#b69d74DD]',
+      bgColor: 'rgba(182, 157, 116, 0.08)',
+      iconColor: '#b69d74'
     },
     {
       id: 'quick-search',
       name: language === 'ta' ? 'केस खोजें' : 'Search Cases',
       description: language === 'ta' ? 'केस नंबर या पार्टी नाम से खोजें' : 'Search by case number or party name',
-      icon: '🔍',
+      icon: 'search',
       category: 'Search',
       shortcut: 'Ctrl+F',
       action: () => {
@@ -41,33 +105,39 @@ const QuickActions = () => {
           navigate(`/clerk/cases?search=${encodeURIComponent(searchTerm)}`);
         }
       },
-      color: 'bg-green-500'
+      color: 'from-[#3b82f6] to-[#3b82f6DD]',
+      bgColor: 'rgba(59, 130, 246, 0.08)',
+      iconColor: '#3b82f6'
     },
     {
       id: 'today-hearings',
       name: language === 'ta' ? 'आज की सुनवाई' : "Today's Hearings",
       description: language === 'ta' ? 'आज की अनुसूचित सुनवाई देखें' : 'View scheduled hearings for today',
-      icon: '⚖️',
+      icon: 'hearing',
       category: 'Calendar',
       shortcut: 'Ctrl+H',
       action: () => navigate('/clerk/calendar?date=today'),
-      color: 'bg-purple-500'
+      color: 'from-[#10b981] to-[#10b981DD]',
+      bgColor: 'rgba(16, 185, 129, 0.08)',
+      iconColor: '#10b981'
     },
     {
       id: 'send-sms',
       name: language === 'ta' ? 'SMS भेजें' : 'Send SMS',
       description: language === 'ta' ? 'क्लाइंट्स को SMS अलर्ट भेजें' : 'Send SMS alerts to clients',
-      icon: '📱',
+      icon: 'sms',
       category: 'Communication',
       shortcut: 'Ctrl+M',
       action: () => navigate('/clerk/sms'),
-      color: 'bg-orange-500'
+      color: 'from-[#f59e0b] to-[#f59e0bDD]',
+      bgColor: 'rgba(245, 158, 11, 0.08)',
+      iconColor: '#f59e0b'
     },
     {
       id: 'generate-report',
       name: language === 'ta' ? 'रिपोर्ट जेनरेट करें' : 'Generate Report',
       description: language === 'ta' ? 'केस स्टेटस रिपोर्ट बनाएं' : 'Create case status report',
-      icon: '📊',
+      icon: 'report',
       category: 'Reports',
       shortcut: 'Ctrl+R',
       action: () => {
@@ -75,7 +145,6 @@ const QuickActions = () => {
           type: 'info',
           message: language === 'ta' ? 'रिपोर्ट जेनरेशन शुरू हो गई है...' : 'Report generation started...'
         });
-        // Simulate report generation
         setTimeout(() => {
           addNotification?.({
             type: 'success',
@@ -83,70 +152,35 @@ const QuickActions = () => {
           });
         }, 3000);
       },
-      color: 'bg-indigo-500'
+      color: 'from-[#8b5cf6] to-[#8b5cf6DD]',
+      bgColor: 'rgba(139, 92, 246, 0.08)',
+      iconColor: '#8b5cf6'
     },
     {
       id: 'bulk-update',
       name: language === 'ta' ? 'बल्क अपडेट' : 'Bulk Update',
       description: language === 'ta' ? 'मल्टिपल केसेस अपडेट करें' : 'Update multiple cases at once',
-      icon: '📦',
+      icon: 'bulk',
       category: 'Cases',
       shortcut: 'Ctrl+B',
       action: () => navigate('/clerk/bulk-operations'),
-      color: 'bg-red-500'
-    },
-    {
-      id: 'backup-data',
-      name: language === 'ta' ? 'डेटा बैकअप' : 'Backup Data',
-      description: language === 'ta' ? 'सिस्टम डेटा का बैकअप लें' : 'Create system data backup',
-      icon: '💾',
-      category: 'System',
-      shortcut: 'Ctrl+Shift+B',
-      action: () => {
-        if (window.confirm(language === 'ta' ? 'क्या आप डेटा बैकअप करना चाहते हैं?' : 'Do you want to create a data backup?')) {
-          addNotification?.({
-            type: 'info',
-            message: language === 'ta' ? 'बैकअप प्रक्रिया शुरू हो गई है...' : 'Backup process started...'
-          });
-          setTimeout(() => {
-            addNotification?.({
-              type: 'success',
-              message: language === 'ta' ? 'डेटा बैकअप पूर्ण!' : 'Data backup completed!'
-            });
-          }, 5000);
-        }
-      },
-      color: 'bg-gray-500'
-    },
-    {
-      id: 'fake-case-check',
-      name: language === 'ta' ? 'फेक केस चेक' : 'Fake Case Check',
-      description: language === 'ta' ? 'संदिग्ध केसेस की जांच करें' : 'Check for suspicious cases',
-      icon: '🕵️',
-      category: 'Security',
-      shortcut: 'Ctrl+Shift+F',
-      action: () => navigate('/clerk/fake-case-checker'),
-      color: 'bg-yellow-500'
+      color: 'from-[#ef4444] to-[#ef4444DD]',
+      bgColor: 'rgba(239, 68, 68, 0.08)',
+      iconColor: '#ef4444'
     }
   ];
 
-  // Categories
+  // Enhanced categories with icons
   const categories = [
-    { key: 'all', name: language === 'ta' ? 'सभी' : 'All' },
-    { key: 'Cases', name: language === 'ta' ? 'मामले' : 'Cases' },
-    { key: 'Communication', name: language === 'ta' ? 'संचार' : 'Communication' },
-    { key: 'Reports', name: language === 'ta' ? 'रिपोर्ट्स' : 'Reports' },
-    { key: 'Calendar', name: language === 'ta' ? 'कैलेंडर' : 'Calendar' },
-    { key: 'System', name: language === 'ta' ? 'सिस्टम' : 'System' },
-    { key: 'Security', name: language === 'ta' ? 'सुरक्षा' : 'Security' },
-    { key: 'Search', name: language === 'ta' ? 'खोज' : 'Search' }
+    { key: 'all', name: language === 'ta' ? 'सभी' : 'All', icon: 'all' },
+    { key: 'Cases', name: language === 'ta' ? 'मामले' : 'Cases', icon: 'case' },
+    { key: 'Communication', name: language === 'ta' ? 'संचार' : 'Communication', icon: 'communication' },
+    { key: 'Reports', name: language === 'ta' ? 'रिपोर्ट्स' : 'Reports', icon: 'report' },
+    { key: 'Calendar', name: language === 'ta' ? 'कैलेंडर' : 'Calendar', icon: 'calendar' }
   ];
 
-  // Load data
+  // Load data from localStorage
   useEffect(() => {
-    setActionCategories(categories);
-    
-    // Load recent actions from localStorage
     const saved = localStorage.getItem('clerk-recent-actions');
     if (saved) {
       try {
@@ -156,7 +190,6 @@ const QuickActions = () => {
       }
     }
 
-    // Load favorite actions
     const favorites = localStorage.getItem('clerk-favorite-actions');
     if (favorites) {
       try {
@@ -165,14 +198,12 @@ const QuickActions = () => {
         console.error('Error loading favorite actions:', e);
       }
     }
-  }, [language]);
+  }, []);
 
-  // Setup keyboard shortcuts
+  // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (event) => {
-      if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
-        return;
-      }
+      if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') return;
 
       const action = defaultActions.find(a => {
         const keys = a.shortcut.toLowerCase().split('+');
@@ -195,35 +226,34 @@ const QuickActions = () => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [defaultActions]);
 
-  // Execute action
+  // Execute action with enhanced feedback
   const executeAction = (action) => {
     try {
-      // Add to recent actions
       const newRecent = [
         { ...action, executedAt: new Date().toISOString() },
-        ...recentActions.filter(a => a.id !== action.id).slice(0, 9)
+        ...recentActions.filter(a => a.id !== action.id).slice(0, 7)
       ];
       setRecentActions(newRecent);
       localStorage.setItem('clerk-recent-actions', JSON.stringify(newRecent));
 
-      // Execute the action
       action.action();
       
       addNotification?.({
-        type: 'info',
-        message: `${action.name} executed`
+        type: 'success',
+        message: `${action.name} ${language === 'ta' ? 'सफलतापूर्वक चलाया गया' : 'executed successfully'}`
       });
     } catch (error) {
       console.error('Error executing action:', error);
       addNotification?.({
         type: 'error',
-        message: 'Failed to execute action'
+        message: language === 'ta' ? 'कार्य निष्पादित करने में विफल' : 'Failed to execute action'
       });
     }
   };
 
-  // Toggle favorite
-  const toggleFavorite = (actionId) => {
+  // Toggle favorite with animation feedback
+  const toggleFavorite = (actionId, event) => {
+    event.stopPropagation();
     const newFavorites = new Set(favoriteActions);
     if (newFavorites.has(actionId)) {
       newFavorites.delete(actionId);
@@ -242,279 +272,240 @@ const QuickActions = () => {
     return matchesSearch && matchesCategory;
   });
 
-  // Create custom action
-  const createCustomAction = () => {
-    openModal?.({
-      title: language === 'ta' ? 'कस्टम एक्शन बनाएं' : 'Create Custom Action',
-      content: (
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {language === 'ta' ? 'एक्शन नाम' : 'Action Name'}
-            </label>
-            <input
-              type="text"
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              placeholder={language === 'ta' ? 'एक्शन का नाम दर्ज करें' : 'Enter action name'}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {language === 'ta' ? 'विवरण' : 'Description'}
-            </label>
-            <textarea
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              placeholder={language === 'ta' ? 'एक्शन का विवरण दर्ज करें' : 'Enter action description'}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {language === 'ta' ? 'URL/पाथ' : 'URL/Path'}
-            </label>
-            <input
-              type="text"
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              placeholder="/clerk/custom-page"
-            />
-          </div>
-        </div>
-      ),
-      actions: [
-        {
-          label: language === 'ta' ? 'रद्द करें' : 'Cancel',
-          variant: 'secondary',
-          onClick: () => {}
-        },
-        {
-          label: language === 'ta' ? 'बनाएं' : 'Create',
-          variant: 'primary',
-          onClick: () => {
-            addNotification?.({
-              type: 'success',
-              message: language === 'ta' ? 'कस्टम एक्शन बनाया गया!' : 'Custom action created!'
-            });
-          }
-        }
-      ]
-    });
-  };
-
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between">
-          <div className="flex-1">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-              {language === 'ta' ? 'त्वरित कार्य' : 'Quick Actions'}
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              {language === 'ta' ? 'सामान्य कार्यों के लिए शॉर्टकट और कीबोर्ड शॉर्टकट्स' : 'Shortcuts and keyboard shortcuts for common tasks'}
-            </p>
-          </div>
-
-          <div className="flex items-center space-x-3 mt-4 lg:mt-0">
-            <button
-              onClick={createCustomAction}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700"
-            >
-              <svg className="h-4 w-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-              {language === 'ta' ? 'कस्टम एक्शन' : 'Custom Action'}
-            </button>
-          </div>
+    <div className="min-h-screen bg-[#f5f5ef] p-6">
+      {/* Header Section */}
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-[#1f2839] mb-4 bg-gradient-to-r from-[#1f2839] to-[#b69d74] bg-clip-text text-transparent">
+            {language === 'ta' ? 'त्वरित कार्य' : 'Quick Actions'}
+          </h1>
+          <p className="text-lg text-[#6b7280] max-w-2xl mx-auto leading-relaxed">
+            {language === 'ta' 
+              ? 'अपने दैनिक कार्यों को तेजी से पूरा करने के लिए स्मार्ट शॉर्टकट' 
+              : 'Smart shortcuts to complete your daily tasks faster'}
+          </p>
         </div>
-      </div>
 
-      {/* Search and Filters */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
-        <div className="flex flex-col md:flex-row md:items-center space-y-3 md:space-y-0 md:space-x-4">
-          <div className="flex-1">
-            <div className="relative">
-              <svg className="absolute inset-y-0 left-0 pl-3 flex items-center h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+        {/* Search and Filter Section */}
+        <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-[#b69d7440] shadow-lg">
+          <div className="flex flex-col lg:flex-row gap-4 items-center">
+            {/* Search Input */}
+            <div className="flex-1 relative">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <Icon name="search" className="h-5 w-5 text-[#b69d74]" />
+              </div>
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
-                placeholder={language === 'ta' ? 'एक्शन खोजें...' : 'Search actions...'}
+                className="w-full pl-12 pr-4 py-3 bg-white/80 border border-[#b69d7440] rounded-xl text-[#1f2839] placeholder-[#6b7280] focus:outline-none focus:ring-2 focus:ring-[#b69d74] focus:border-transparent transition-all duration-300"
+                placeholder={language === 'ta' ? 'कार्य खोजें...' : 'Search actions...'}
               />
             </div>
-          </div>
 
-          <div className="flex items-center space-x-2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              {language === 'ta' ? 'श्रेणी:' : 'Category:'}
-            </label>
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-            >
+            {/* Category Filter */}
+            <div className="flex gap-2 flex-wrap justify-center">
               {categories.map((category) => (
-                <option key={category.key} value={category.key}>
+                <button
+                  key={category.key}
+                  onClick={() => setSelectedCategory(category.key)}
+                  className={`px-4 py-2 rounded-xl font-medium transition-all duration-300 flex items-center gap-2 ${
+                    selectedCategory === category.key
+                      ? 'bg-[#b69d74] text-white shadow-lg transform scale-105'
+                      : 'bg-white/80 text-[#1f2839] border border-[#b69d7440] hover:bg-[#b69d74] hover:text-white hover:shadow-md'
+                  }`}
+                >
+                  <Icon name={category.icon} className="h-4 w-4" />
                   {category.name}
-                </option>
+                </button>
               ))}
-            </select>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Favorite Actions */}
-      {favoriteActions.size > 0 && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-            <svg className="h-5 w-5 text-yellow-500 mr-2" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-            </svg>
-            {language === 'ta' ? 'पसंदीदा कार्य' : 'Favorite Actions'}
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {defaultActions
-              .filter(action => favoriteActions.has(action.id))
-              .map((action) => (
+        {/* Favorite Actions Section */}
+        {favoriteActions.size > 0 && (
+          <div className="mb-12">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-1 h-8 bg-gradient-to-b from-[#b69d74] to-[#b69d74DD] rounded-full"></div>
+              <h2 className="text-2xl font-bold text-[#1f2839] flex items-center gap-2">
+                <Icon name="star" className="h-6 w-6 text-[#b69d74]" />
+                {language === 'ta' ? 'पसंदीदा कार्य' : 'Favorite Actions'}
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {defaultActions
+                .filter(action => favoriteActions.has(action.id))
+                .map((action) => (
+                  <ActionCard
+                    key={action.id}
+                    action={action}
+                    isFavorite={true}
+                    onToggleFavorite={toggleFavorite}
+                    onExecute={executeAction}
+                    onHover={setHoveredAction}
+                    isHovered={hoveredAction === action.id}
+                    language={language}
+                    Icon={Icon}
+                  />
+                ))}
+            </div>
+          </div>
+        )}
+
+        {/* Recent Actions Section */}
+        {recentActions.length > 0 && (
+          <div className="mb-12">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-1 h-8 bg-gradient-to-b from-[#3b82f6] to-[#3b82f6DD] rounded-full"></div>
+              <h2 className="text-2xl font-bold text-[#1f2839] flex items-center gap-2">
+                <Icon name="time" className="h-6 w-6 text-[#3b82f6]" />
+                {language === 'ta' ? 'हाल के कार्य' : 'Recent Actions'}
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {recentActions.slice(0, 6).map((recentAction) => {
+                const action = defaultActions.find(a => a.id === recentAction.id);
+                return action ? (
+                  <ActionCard
+                    key={`recent-${action.id}`}
+                    action={action}
+                    isFavorite={favoriteActions.has(action.id)}
+                    onToggleFavorite={toggleFavorite}
+                    onExecute={executeAction}
+                    onHover={setHoveredAction}
+                    isHovered={hoveredAction === action.id}
+                    language={language}
+                    Icon={Icon}
+                    executedAt={recentAction.executedAt}
+                  />
+                ) : null;
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* All Actions Section */}
+        <div>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-1 h-8 bg-gradient-to-b from-[#10b981] to-[#10b981DD] rounded-full"></div>
+            <h2 className="text-2xl font-bold text-[#1f2839]">
+              {language === 'ta' ? 'सभी कार्य' : 'All Actions'}
+            </h2>
+            <span className="bg-[#b69d74] text-white px-3 py-1 rounded-full text-sm font-medium">
+              {filteredActions.length}
+            </span>
+          </div>
+          
+          {filteredActions.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredActions.map((action) => (
                 <ActionCard
                   key={action.id}
-                  action={action}
-                  isFavorite={true}
-                  onToggleFavorite={toggleFavorite}
-                  onExecute={executeAction}
-                  language={language}
-                />
-              ))}
-          </div>
-        </div>
-      )}
-
-      {/* Recent Actions */}
-      {recentActions.length > 0 && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-            <svg className="h-5 w-5 text-gray-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            {language === 'ta' ? 'हाल के कार्य' : 'Recent Actions'}
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {recentActions.slice(0, 8).map((recentAction) => {
-              const action = defaultActions.find(a => a.id === recentAction.id);
-              return action ? (
-                <ActionCard
-                  key={`recent-${action.id}`}
                   action={action}
                   isFavorite={favoriteActions.has(action.id)}
                   onToggleFavorite={toggleFavorite}
                   onExecute={executeAction}
+                  onHover={setHoveredAction}
+                  isHovered={hoveredAction === action.id}
                   language={language}
-                  executedAt={recentAction.executedAt}
+                  Icon={Icon}
                 />
-              ) : null;
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* All Actions */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          {language === 'ta' ? 'सभी कार्य' : 'All Actions'}
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {filteredActions.map((action) => (
-            <ActionCard
-              key={action.id}
-              action={action}
-              isFavorite={favoriteActions.has(action.id)}
-              onToggleFavorite={toggleFavorite}
-              onExecute={executeAction}
-              language={language}
-            />
-          ))}
-        </div>
-
-        {filteredActions.length === 0 && (
-          <div className="text-center py-8">
-            <svg className="h-12 w-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <p className="text-gray-500 dark:text-gray-400">
-              {language === 'ta' ? 'कोई एक्शन नहीं मिला' : 'No actions found'}
-            </p>
-          </div>
-        )}
-      </div>
-
-      {/* Keyboard Shortcuts Help */}
-      <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
-        <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">
-          {language === 'ta' ? 'कीबोर्ड शॉर्टकट्स:' : 'Keyboard Shortcuts:'}
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 text-xs text-blue-800 dark:text-blue-200">
-          {defaultActions.map((action) => (
-            <div key={action.id} className="flex items-center justify-between">
-              <span>{action.name}</span>
-              <kbd className="px-2 py-1 text-xs bg-blue-200 dark:bg-blue-800 rounded">
-                {action.shortcut}
-              </kbd>
+              ))}
             </div>
-          ))}
+          ) : (
+            <div className="text-center py-16 bg-white/60 backdrop-blur-sm rounded-2xl border border-[#b69d7440]">
+              <div className="w-24 h-24 mx-auto mb-4 bg-gradient-to-br from-[#b69d7420] to-[#b69d7410] rounded-full flex items-center justify-center">
+                <Icon name="search" className="h-12 w-12 text-[#b69d74]" />
+              </div>
+              <h3 className="text-xl font-semibold text-[#1f2839] mb-2">
+                {language === 'ta' ? 'कोई कार्य नहीं मिला' : 'No actions found'}
+              </h3>
+              <p className="text-[#6b7280] max-w-md mx-auto">
+                {language === 'ta' 
+                  ? 'अलग खोज मानदंड के साथ प्रयास करें या एक अलग श्रेणी चुनें'
+                  : 'Try different search criteria or select a different category'}
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 };
 
-// Action Card Component
-const ActionCard = ({ action, isFavorite, onToggleFavorite, onExecute, language, executedAt }) => {
+// Enhanced Action Card Component with theme-consistent buttons
+const ActionCard = ({ action, isFavorite, onToggleFavorite, onExecute, onHover, isHovered, language, Icon, executedAt }) => {
   return (
-    <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600 hover:shadow-md transition-shadow">
-      <div className="flex items-start justify-between mb-3">
-        <div className={`w-10 h-10 ${action.color} rounded-lg flex items-center justify-center text-white text-lg`}>
-          {action.icon}
+    <div
+      className="group relative bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-[#b69d7440] hover:border-[#b69d7460] transition-all duration-500 hover:shadow-2xl hover:transform hover:-translate-y-2 cursor-pointer"
+      onMouseEnter={() => onHover?.(action.id)}
+      onMouseLeave={() => onHover?.(null)}
+      onClick={() => onExecute(action)}
+      style={{
+        background: isHovered ? action.bgColor : 'rgba(255, 255, 255, 0.8)',
+        boxShadow: isHovered ? '0 25px 50px -12px rgba(182, 157, 116, 0.25)' : '0 4px 6px -1px rgba(31, 40, 57, 0.1)'
+      }}
+    >
+      {/* Animated Background Effect */}
+      <div className="absolute inset-0 bg-gradient-to-br from-transparent via-[#b69d7405] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
+      
+      {/* Header */}
+      <div className="relative flex items-start justify-between mb-4">
+        <div 
+          className="w-14 h-14 rounded-xl bg-gradient-to-br from-white to-white/80 flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300 border border-[#b69d7440]"
+          style={{ color: action.iconColor }}
+        >
+          <Icon name={action.icon} className="h-7 w-7" />
         </div>
         <button
-          onClick={() => onToggleFavorite(action.id)}
-          className={`p-1 rounded ${
+          onClick={(e) => onToggleFavorite(action.id, e)}
+          className={`p-2 rounded-xl transition-all duration-300 transform hover:scale-110 ${
             isFavorite 
-              ? 'text-yellow-500 hover:text-yellow-600' 
-              : 'text-gray-400 hover:text-gray-500'
+              ? 'text-[#b69d74] bg-[#b69d7410] shadow-md' 
+              : 'text-[#6b7280] bg-white/60 hover:bg-[#b69d7410] hover:text-[#b69d74]'
           }`}
         >
-          <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-          </svg>
+          <Icon name="star" className="h-5 w-5" />
         </button>
       </div>
       
-      <h3 className="font-semibold text-gray-900 dark:text-white text-sm mb-1">
-        {action.name}
-      </h3>
-      <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
-        {action.description}
-      </p>
-
-      {executedAt && (
-        <p className="text-xs text-gray-500 dark:text-gray-500 mb-2">
-          {language === 'ta' ? 'अंतिम बार:' : 'Last used:'} {new Date(executedAt).toLocaleString()}
+      {/* Content */}
+      <div className="relative">
+        <h3 className="font-bold text-[#1f2839] text-lg mb-2 leading-tight group-hover:text-[#b69d74] transition-colors duration-300">
+          {action.name}
+        </h3>
+        <p className="text-[#6b7280] text-sm leading-relaxed mb-4">
+          {action.description}
         </p>
-      )}
 
-      <div className="flex items-center justify-between">
-        <kbd className="px-2 py-1 text-xs bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded">
+        {executedAt && (
+          <div className="flex items-center gap-2 text-xs text-[#6b7280] mb-3">
+            <Icon name="time" className="h-3 w-3" />
+            {language === 'ta' ? 'अंतिम बार:' : 'Last used:'} {new Date(executedAt).toLocaleTimeString()}
+          </div>
+        )}
+      </div>
+
+      {/* Footer */}
+      <div className="relative flex items-center justify-between pt-4 border-t border-[#b69d7420]">
+        <kbd className="px-3 py-1.5 bg-gradient-to-r from-[#b69d74] to-[#b69d74DD] text-white text-xs rounded-lg font-mono shadow-md transform group-hover:scale-105 transition-transform">
           {action.shortcut}
         </kbd>
         <button
-          onClick={() => onExecute(action)}
-          className="px-3 py-1 text-xs font-medium text-white bg-gray-600 rounded hover:bg-gray-700 transition-colors"
+          onClick={(e) => {
+            e.stopPropagation();
+            onExecute(action);
+          }}
+          className="px-4 py-2 bg-gradient-to-r from-[#1f2839] to-[#1f2839DD] text-white text-sm font-medium rounded-lg hover:from-[#b69d74] hover:to-[#b69d74DD] transform group-hover:scale-105 transition-all duration-300 shadow-md hover:shadow-lg"
         >
           {language === 'ta' ? 'चलाएं' : 'Run'}
         </button>
       </div>
+
+      {/* Hover Glow Effect */}
+      <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-[#b69d7410] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
     </div>
   );
 };

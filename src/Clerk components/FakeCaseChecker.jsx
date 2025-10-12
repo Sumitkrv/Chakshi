@@ -23,6 +23,7 @@ const FakeCaseChecker = () => {
   });
   const [selectedCases, setSelectedCases] = useState(new Set());
   const [bulkActionLoading, setBulkActionLoading] = useState(false);
+  const [scanProgress, setScanProgress] = useState(0);
 
   // Mock data for suspicious cases
   const mockSuspiciousCases = [
@@ -110,7 +111,7 @@ const FakeCaseChecker = () => {
 
     const interval = setInterval(() => {
       performAutoScan();
-    }, 300000); // Auto-scan every 5 minutes
+    }, 300000);
 
     return () => clearInterval(interval);
   }, [autoScanEnabled]);
@@ -140,11 +141,12 @@ const FakeCaseChecker = () => {
   // Manual scan function
   const runManualScan = async () => {
     setScanning(true);
+    setScanProgress(0);
     try {
-      // Simulate scanning process
+      // Simulate scanning process with progress
       for (let i = 0; i <= 100; i += 10) {
         await new Promise(resolve => setTimeout(resolve, 200));
-        // Update progress if needed
+        setScanProgress(i);
       }
 
       const newResults = [
@@ -183,6 +185,7 @@ const FakeCaseChecker = () => {
       });
     } finally {
       setScanning(false);
+      setScanProgress(0);
     }
   };
 
@@ -264,118 +267,149 @@ const FakeCaseChecker = () => {
     }
   };
 
-  // Get risk color
+  // Get risk color based on new palette
   const getRiskColor = (riskScore) => {
-    if (riskScore >= 80) return 'text-red-600 bg-red-100 dark:bg-red-900/30 dark:text-red-300';
-    if (riskScore >= 60) return 'text-orange-600 bg-orange-100 dark:bg-orange-900/30 dark:text-orange-300';
-    return 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900/30 dark:text-yellow-300';
+    if (riskScore >= 80) return 'text-[#f59e0b] bg-[#f59e0b15] border-[#f59e0b40]';
+    if (riskScore >= 60) return 'text-[#3b82f6] bg-[#3b82f615] border-[#3b82f640]';
+    return 'text-[#10b981] bg-[#10b98115] border-[#10b98140]';
   };
 
-  // Export results
-  const exportResults = (format) => {
-    addNotification?.({
-      type: 'info',
-      message: `${format.toUpperCase()} export feature coming soon`
-    });
+  // Get status color
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'Under Review': return 'bg-[#f59e0b15] text-[#f59e0b] border-[#f59e0b40]';
+      case 'Flagged': return 'bg-[#3b82f615] text-[#3b82f6] border-[#3b82f640]';
+      case 'Verified': return 'bg-[#10b98115] text-[#10b981] border-[#10b98140]';
+      default: return 'bg-[#6b728015] text-[#6b7280] border-[#6b728040]';
+    }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fadeIn">
       {/* Header */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+      <div 
+        className="bg-[#f5f5ef] rounded-xl border border-[rgba(31,40,57,0.15)] p-6 backdrop-blur-sm transition-all duration-300 hover:shadow-lg"
+        style={{
+          background: 'linear-gradient(135deg, rgba(255,255,255,0.03), rgba(182,157,116,0.05))'
+        }}
+      >
         <div className="flex flex-col lg:flex-row lg:items-center justify-between">
           <div className="flex-1">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            <h1 className="text-2xl font-bold text-[#1f2839] mb-2 transition-all duration-300 hover:translate-x-1">
               {language === 'ta' ? 'नकली मामला चेकर' : 'Fake Case Checker'}
             </h1>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-[#6b7280] transition-colors duration-300">
               {language === 'ta' ? 'संदिग्ध और नकली मामलों की पहचान करने के लिए AI-संचालित उपकरण' : 'AI-powered tool to identify suspicious and potentially fake cases'}
             </p>
           </div>
 
           <div className="flex items-center space-x-3 mt-4 lg:mt-0">
-            <div className="flex items-center space-x-2">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <div className="flex items-center space-x-2 bg-white/50 rounded-lg px-3 py-2 border border-[rgba(182,157,116,0.15)]">
+              <label className="text-sm font-medium text-[#1f2839]">
                 {language === 'ta' ? 'ऑटो-स्कैन' : 'Auto-scan'}
               </label>
               <button
                 onClick={() => setAutoScanEnabled(!autoScanEnabled)}
-                className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors ${
-                  autoScanEnabled ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-600'
-                }`}
+                className={`relative inline-flex items-center h-6 rounded-full w-11 transition-all duration-300 ${
+                  autoScanEnabled 
+                    ? 'bg-gradient(135deg, #b69d74, #b69d74DD)' 
+                    : 'bg-[#6b728040]'
+                } transform hover:scale-105`}
               >
-                <span className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${
-                  autoScanEnabled ? 'translate-x-6' : 'translate-x-1'
-                }`} />
+                <span 
+                  className={`inline-block w-4 h-4 transform bg-white rounded-full transition-all duration-300 shadow-lg ${
+                    autoScanEnabled ? 'translate-x-6' : 'translate-x-1'
+                  }`} 
+                />
               </button>
             </div>
 
             <button
               onClick={runManualScan}
               disabled={scanning}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 disabled:opacity-50 flex items-center"
+              className="px-6 py-2 text-sm font-medium text-white bg-gradient(135deg, #b69d74, #b69d74DD, #b69d74BB) border border-transparent rounded-lg hover:shadow-lg disabled:opacity-50 flex items-center transition-all duration-300 transform hover:scale-105 disabled:transform-none"
             >
-              {scanning && <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>}
-              <svg className={`h-4 w-4 mr-2 ${scanning ? 'hidden' : 'inline'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {scanning && (
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+              )}
+              <svg 
+                className={`h-4 w-4 mr-2 transition-all duration-300 ${scanning ? 'hidden' : 'inline'}`} 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
               {language === 'ta' ? (scanning ? 'स्कैन हो रहा है...' : 'स्कैन शुरू करें') : (scanning ? 'Scanning...' : 'Run Scan')}
             </button>
-
-            <div className="relative">
-              <button className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700">
-                <svg className="h-4 w-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                {language === 'ta' ? 'निर्यात' : 'Export'}
-              </button>
-            </div>
           </div>
         </div>
 
         {/* Risk Threshold Slider */}
-        <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-          <div className="flex items-center justify-between mb-2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+        <div className="mt-6 pt-6 border-t border-[rgba(182,157,116,0.15)]">
+          <div className="flex items-center justify-between mb-3">
+            <label className="text-sm font-medium text-[#1f2839]">
               {language === 'ta' ? 'जोखिम थ्रेशहोल्ड' : 'Risk Threshold'}
             </label>
-            <span className="text-sm text-gray-500 dark:text-gray-400">{riskThreshold}%</span>
+            <span className="text-sm text-[#b69d74] font-semibold">{riskThreshold}%</span>
           </div>
-          <input
-            type="range"
-            min="50"
-            max="90"
-            value={riskThreshold}
-            onChange={(e) => setRiskThreshold(parseInt(e.target.value))}
-            className="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer"
-          />
-          <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
-            <span>Low</span>
-            <span>Medium</span>
-            <span>High</span>
+          <div className="relative">
+            <input
+              type="range"
+              min="50"
+              max="90"
+              value={riskThreshold}
+              onChange={(e) => setRiskThreshold(parseInt(e.target.value))}
+              className="w-full h-2 bg-gradient(90deg, #b69d74, #b69d74CC) rounded-lg appearance-none cursor-pointer transition-all duration-300"
+              style={{
+                background: `linear-gradient(90deg, #b69d74 ${riskThreshold}%, rgba(182,157,116,0.3) ${riskThreshold}%)`
+              }}
+            />
+            <div className="flex justify-between text-xs text-[#6b7280] mt-2">
+              <span className="transition-colors duration-300 hover:text-[#b69d74]">Low</span>
+              <span className="transition-colors duration-300 hover:text-[#b69d74]">Medium</span>
+              <span className="transition-colors duration-300 hover:text-[#b69d74]">High</span>
+            </div>
           </div>
         </div>
+
+        {/* Scan Progress Bar */}
+        {scanning && (
+          <div className="mt-4 pt-4 border-t border-[rgba(182,157,116,0.15)]">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm text-[#1f2839]">Scan Progress</span>
+              <span className="text-sm text-[#b69d74] font-semibold">{scanProgress}%</span>
+            </div>
+            <div className="w-full bg-[rgba(182,157,116,0.1)] rounded-full h-2 overflow-hidden">
+              <div 
+                className="bg-gradient(90deg, #b69d74, #b69d74CC) h-2 rounded-full transition-all duration-500 ease-out"
+                style={{ width: `${scanProgress}%` }}
+              ></div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Tabs Navigation */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-        <div className="border-b border-gray-200 dark:border-gray-700">
+      <div className="bg-[#f5f5ef] rounded-xl border border-[rgba(31,40,57,0.15)] backdrop-blur-sm transition-all duration-300 hover:shadow-lg">
+        <div className="border-b border-[rgba(182,157,116,0.15)]">
           <nav className="flex -mb-px">
             {[
-              { key: 'scanner', label: language === 'ta' ? 'स्कैनर' : 'Scanner' },
-              { key: 'suspicious', label: language === 'ta' ? 'संदिग्ध मामले' : 'Suspicious Cases' },
-              { key: 'history', label: language === 'ta' ? 'स्कैन इतिहास' : 'Scan History' },
-              { key: 'settings', label: language === 'ta' ? 'सेटिंग्स' : 'Settings' }
+              { key: 'scanner', label: language === 'ta' ? 'स्कैनर' : 'Scanner', icon: '🔍' },
+              { key: 'suspicious', label: language === 'ta' ? 'संदिग्ध मामले' : 'Suspicious Cases', icon: '⚠️' },
+              { key: 'history', label: language === 'ta' ? 'स्कैन इतिहास' : 'Scan History', icon: '📊' },
+              { key: 'settings', label: language === 'ta' ? 'सेटिंग्स' : 'Settings', icon: '⚙️' }
             ].map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
-                className={`py-4 px-6 text-sm font-medium border-b-2 ${
+                className={`flex items-center py-4 px-6 text-sm font-medium border-b-2 transition-all duration-300 ${
                   activeTab === tab.key
-                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'
+                    ? 'border-[#b69d74] text-[#b69d74]'
+                    : 'border-transparent text-[#6b7280] hover:text-[#b69d74] hover:border-[#b69d7460]'
                 }`}
               >
+                <span className="mr-2">{tab.icon}</span>
                 {tab.label}
               </button>
             ))}
@@ -385,102 +419,85 @@ const FakeCaseChecker = () => {
         <div className="p-6">
           {/* Scanner Tab */}
           {activeTab === 'scanner' && (
-            <div className="space-y-6">
+            <div className="space-y-6 animate-slideIn">
               {/* Scan Statistics */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-                  <div className="flex items-center">
-                    <svg className="h-8 w-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <div className="ml-4">
-                      <p className="text-sm font-medium text-blue-600 dark:text-blue-400">
-                        {language === 'ta' ? 'कुल स्कैन' : 'Total Scans'}
-                      </p>
-                      <p className="text-2xl font-semibold text-blue-900 dark:text-blue-100">
-                        {scanHistory.length}
-                      </p>
+                {[
+                  { 
+                    label: language === 'ta' ? 'कुल स्कैन' : 'Total Scans', 
+                    value: scanHistory.length, 
+                    color: 'bg-[#b69d7415] text-[#b69d74] border-[#b69d7440]',
+                    icon: '📈'
+                  },
+                  { 
+                    label: language === 'ta' ? 'संदिग्ध मामले' : 'Suspicious Cases', 
+                    value: suspiciousCases.length, 
+                    color: 'bg-[#f59e0b15] text-[#f59e0b] border-[#f59e0b40]',
+                    icon: '⚠️'
+                  },
+                  { 
+                    label: language === 'ta' ? 'समीक्षाधीन' : 'Under Review', 
+                    value: suspiciousCases.filter(c => c.status === 'Under Review').length, 
+                    color: 'bg-[#3b82f615] text-[#3b82f6] border-[#3b82f640]',
+                    icon: '🔍'
+                  },
+                  { 
+                    label: language === 'ta' ? 'सत्यापित' : 'Verified', 
+                    value: suspiciousCases.filter(c => c.status === 'Verified').length, 
+                    color: 'bg-[#10b98115] text-[#10b981] border-[#10b98140]',
+                    icon: '✅'
+                  }
+                ].map((stat, index) => (
+                  <div 
+                    key={index}
+                    className={`p-4 rounded-xl border backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:shadow-lg ${stat.color}`}
+                  >
+                    <div className="flex items-center">
+                      <span className="text-2xl mr-3">{stat.icon}</span>
+                      <div>
+                        <p className="text-sm font-medium opacity-80">{stat.label}</p>
+                        <p className="text-2xl font-semibold">{stat.value}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-
-                <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
-                  <div className="flex items-center">
-                    <svg className="h-8 w-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 18.5c-.77.833.192 2.5 1.732 2.5z" />
-                    </svg>
-                    <div className="ml-4">
-                      <p className="text-sm font-medium text-red-600 dark:text-red-400">
-                        {language === 'ta' ? 'संदिग्ध मामले' : 'Suspicious Cases'}
-                      </p>
-                      <p className="text-2xl font-semibold text-red-900 dark:text-red-100">
-                        {suspiciousCases.length}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg">
-                  <div className="flex items-center">
-                    <svg className="h-8 w-8 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <div className="ml-4">
-                      <p className="text-sm font-medium text-yellow-600 dark:text-yellow-400">
-                        {language === 'ta' ? 'समीक्षाधीन' : 'Under Review'}
-                      </p>
-                      <p className="text-2xl font-semibold text-yellow-900 dark:text-yellow-100">
-                        {suspiciousCases.filter(c => c.status === 'Under Review').length}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
-                  <div className="flex items-center">
-                    <svg className="h-8 w-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <div className="ml-4">
-                      <p className="text-sm font-medium text-green-600 dark:text-green-400">
-                        {language === 'ta' ? 'सत्यापित' : 'Verified'}
-                      </p>
-                      <p className="text-2xl font-semibold text-green-900 dark:text-green-100">
-                        {suspiciousCases.filter(c => c.status === 'Verified').length}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                ))}
               </div>
 
               {/* Recent Scan Results */}
               {scanResults.length > 0 && (
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                <div className="animate-fadeIn">
+                  <h3 className="text-lg font-semibold text-[#1f2839] mb-4 flex items-center">
+                    <span className="mr-2">🎯</span>
                     {language === 'ta' ? 'हाल के स्कैन परिणाम' : 'Recent Scan Results'}
                   </h3>
                   <div className="space-y-3">
                     {scanResults.map((result) => (
-                      <div key={result.id} className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+                      <div 
+                        key={result.id} 
+                        className="bg-gradient(135deg, rgba(245,158,11,0.05), rgba(245,158,11,0.02)) border border-[rgba(245,158,11,0.3)] rounded-xl p-4 backdrop-blur-sm transition-all duration-300 hover:shadow-md"
+                      >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-3">
-                            <div className={`w-3 h-3 rounded-full ${
-                              result.riskScore >= 80 ? 'bg-red-500' : result.riskScore >= 60 ? 'bg-orange-500' : 'bg-yellow-500'
-                            }`}></div>
+                            <div 
+                              className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                                result.riskScore >= 80 ? 'bg-[#f59e0b] animate-pulse' : 
+                                result.riskScore >= 60 ? 'bg-[#3b82f6]' : 'bg-[#10b981]'
+                              }`}
+                            ></div>
                             <div>
-                              <h4 className="font-medium text-gray-900 dark:text-gray-100">
+                              <h4 className="font-medium text-[#1f2839]">
                                 {result.caseNumber}
                               </h4>
-                              <p className="text-sm text-gray-600 dark:text-gray-400">
-                                Risk Score: {result.riskScore}%
+                              <p className="text-sm text-[#6b7280]">
+                                Risk Score: <span className="font-semibold">{result.riskScore}%</span>
                               </p>
                             </div>
                           </div>
                           <div className="flex items-center space-x-2">
-                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                            <span className="text-xs text-[#6b7280]">
                               {new Date(result.detectedAt).toLocaleString()}
                             </span>
-                            <button className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium">
+                            <button className="text-[#b69d74] hover:text-[#1f2839] text-sm font-medium transition-colors duration-300">
                               {language === 'ta' ? 'विस्तार से देखें' : 'View Details'}
                             </button>
                           </div>
@@ -488,7 +505,10 @@ const FakeCaseChecker = () => {
                         <div className="mt-2">
                           <div className="flex flex-wrap gap-1">
                             {result.flags.map((flag, index) => (
-                              <span key={index} className="text-xs px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 rounded">
+                              <span 
+                                key={index} 
+                                className="text-xs px-2 py-1 bg-[rgba(245,158,11,0.1)] text-[#f59e0b] rounded border border-[rgba(245,158,11,0.3)] transition-all duration-300 hover:scale-105"
+                              >
                                 {flag}
                               </span>
                             ))}
@@ -501,67 +521,49 @@ const FakeCaseChecker = () => {
               )}
 
               {/* AI Detection Algorithms */}
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              <div className="animate-slideIn">
+                <h3 className="text-lg font-semibold text-[#1f2839] mb-4 flex items-center">
+                  <span className="mr-2">🤖</span>
                   {language === 'ta' ? 'AI पहचान एल्गोरिदम' : 'AI Detection Algorithms'}
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                    <div className="flex items-center mb-2">
-                      <svg className="h-6 w-6 text-blue-600 dark:text-blue-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                      <h4 className="font-semibold text-gray-900 dark:text-gray-100">
-                        {language === 'ta' ? 'दस्तावेज़ विश्लेषण' : 'Document Analysis'}
-                      </h4>
-                    </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {language === 'ta' ? 'दस्तावेज़ों की प्रामाणिकता की जांच करता है' : 'Checks document authenticity and consistency'}
-                    </p>
-                    <div className="mt-2">
-                      <span className="text-xs px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded">
+                  {[
+                    {
+                      title: language === 'ta' ? 'दस्तावेज़ विश्लेषण' : 'Document Analysis',
+                      description: language === 'ta' ? 'दस्तावेज़ों की प्रामाणिकता की जांच करता है' : 'Checks document authenticity and consistency',
+                      icon: '📄',
+                      color: 'from-blue-500/10 to-blue-500/5',
+                      border: 'border-blue-500/20'
+                    },
+                    {
+                      title: language === 'ta' ? 'पार्टी सत्यापन' : 'Party Verification',
+                      description: language === 'ta' ? 'पार्टियों की जानकारी सत्यापित करता है' : 'Verifies party information and relationships',
+                      icon: '👥',
+                      color: 'from-purple-500/10 to-purple-500/5',
+                      border: 'border-purple-500/20'
+                    },
+                    {
+                      title: language === 'ta' ? 'पैटर्न पहचान' : 'Pattern Recognition',
+                      description: language === 'ta' ? 'संदिग्ध पैटर्न की पहचान करता है' : 'Identifies suspicious filing patterns',
+                      icon: '🔍',
+                      color: 'from-orange-500/10 to-orange-500/5',
+                      border: 'border-orange-500/20'
+                    }
+                  ].map((algo, index) => (
+                    <div 
+                      key={index}
+                      className={`bg-gradient(135deg, ${algo.color}) border ${algo.border} rounded-xl p-4 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:shadow-lg`}
+                    >
+                      <div className="flex items-center mb-3">
+                        <span className="text-2xl mr-3">{algo.icon}</span>
+                        <h4 className="font-semibold text-[#1f2839]">{algo.title}</h4>
+                      </div>
+                      <p className="text-sm text-[#6b7280] mb-2">{algo.description}</p>
+                      <span className="text-xs px-2 py-1 bg-[#10b98115] text-[#10b981] rounded border border-[#10b98140]">
                         Active
                       </span>
                     </div>
-                  </div>
-
-                  <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                    <div className="flex items-center mb-2">
-                      <svg className="h-6 w-6 text-purple-600 dark:text-purple-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                      </svg>
-                      <h4 className="font-semibold text-gray-900 dark:text-gray-100">
-                        {language === 'ta' ? 'पार्टी सत्यापन' : 'Party Verification'}
-                      </h4>
-                    </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {language === 'ta' ? 'पार्टियों की जानकारी सत्यापित करता है' : 'Verifies party information and relationships'}
-                    </p>
-                    <div className="mt-2">
-                      <span className="text-xs px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded">
-                        Active
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                    <div className="flex items-center mb-2">
-                      <svg className="h-6 w-6 text-orange-600 dark:text-orange-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                      </svg>
-                      <h4 className="font-semibold text-gray-900 dark:text-gray-100">
-                        {language === 'ta' ? 'पैटर्न पहचान' : 'Pattern Recognition'}
-                      </h4>
-                    </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {language === 'ta' ? 'संदिग्ध पैटर्न की पहचान करता है' : 'Identifies suspicious filing patterns'}
-                    </p>
-                    <div className="mt-2">
-                      <span className="text-xs px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded">
-                        Active
-                      </span>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -569,73 +571,78 @@ const FakeCaseChecker = () => {
 
           {/* Suspicious Cases Tab */}
           {activeTab === 'suspicious' && (
-            <div className="space-y-6">
+            <div className="space-y-6 animate-slideIn">
               {/* Filters */}
-              <div className="flex flex-wrap items-center gap-4">
-                <div className="flex items-center space-x-2">
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {language === 'ta' ? 'जोखिम स्तर' : 'Risk Level'}:
-                  </label>
-                  <select
-                    value={filters.riskLevel}
-                    onChange={(e) => setFilters({ ...filters, riskLevel: e.target.value })}
-                    className="text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                  >
-                    <option value="all">{language === 'ta' ? 'सभी' : 'All'}</option>
-                    <option value="high">{language === 'ta' ? 'उच्च' : 'High'}</option>
-                    <option value="medium">{language === 'ta' ? 'मध्यम' : 'Medium'}</option>
-                    <option value="low">{language === 'ta' ? 'कम' : 'Low'}</option>
-                  </select>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {language === 'ta' ? 'मामले का प्रकार' : 'Case Type'}:
-                  </label>
-                  <select
-                    value={filters.caseType}
-                    onChange={(e) => setFilters({ ...filters, caseType: e.target.value })}
-                    className="text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                  >
-                    <option value="all">{language === 'ta' ? 'सभी' : 'All'}</option>
-                    <option value="criminal">{language === 'ta' ? 'आपराधिक' : 'Criminal'}</option>
-                    <option value="civil">{language === 'ta' ? 'दीवानी' : 'Civil'}</option>
-                    <option value="family">{language === 'ta' ? 'पारिवारिक' : 'Family'}</option>
-                  </select>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {language === 'ta' ? 'स्थिति' : 'Status'}:
-                  </label>
-                  <select
-                    value={filters.status}
-                    onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-                    className="text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                  >
-                    <option value="all">{language === 'ta' ? 'सभी' : 'All'}</option>
-                    <option value="underreview">{language === 'ta' ? 'समीक्षाधीन' : 'Under Review'}</option>
-                    <option value="flagged">{language === 'ta' ? 'फ्लैग किया गया' : 'Flagged'}</option>
-                    <option value="verified">{language === 'ta' ? 'सत्यापित' : 'Verified'}</option>
-                  </select>
-                </div>
+              <div className="flex flex-wrap items-center gap-4 p-4 bg-gradient(135deg, rgba(255,255,255,0.05), rgba(182,157,116,0.08)) rounded-xl border border-[rgba(182,157,116,0.15)]">
+                {[
+                  {
+                    label: language === 'ta' ? 'जोखिम स्तर' : 'Risk Level',
+                    value: filters.riskLevel,
+                    options: [
+                      { value: 'all', label: language === 'ta' ? 'सभी' : 'All' },
+                      { value: 'high', label: language === 'ta' ? 'उच्च' : 'High' },
+                      { value: 'medium', label: language === 'ta' ? 'मध्यम' : 'Medium' },
+                      { value: 'low', label: language === 'ta' ? 'कम' : 'Low' }
+                    ],
+                    onChange: (value) => setFilters({ ...filters, riskLevel: value })
+                  },
+                  {
+                    label: language === 'ta' ? 'मामले का प्रकार' : 'Case Type',
+                    value: filters.caseType,
+                    options: [
+                      { value: 'all', label: language === 'ta' ? 'सभी' : 'All' },
+                      { value: 'criminal', label: language === 'ta' ? 'आपराधिक' : 'Criminal' },
+                      { value: 'civil', label: language === 'ta' ? 'दीवानी' : 'Civil' },
+                      { value: 'family', label: language === 'ta' ? 'पारिवारिक' : 'Family' }
+                    ],
+                    onChange: (value) => setFilters({ ...filters, caseType: value })
+                  },
+                  {
+                    label: language === 'ta' ? 'स्थिति' : 'Status',
+                    value: filters.status,
+                    options: [
+                      { value: 'all', label: language === 'ta' ? 'सभी' : 'All' },
+                      { value: 'underreview', label: language === 'ta' ? 'समीक्षाधीन' : 'Under Review' },
+                      { value: 'flagged', label: language === 'ta' ? 'फ्लैग किया गया' : 'Flagged' },
+                      { value: 'verified', label: language === 'ta' ? 'सत्यापित' : 'Verified' }
+                    ],
+                    onChange: (value) => setFilters({ ...filters, status: value })
+                  }
+                ].map((filter, index) => (
+                  <div key={index} className="flex items-center space-x-2">
+                    <label className="text-sm font-medium text-[#1f2839]">
+                      {filter.label}:
+                    </label>
+                    <select
+                      value={filter.value}
+                      onChange={(e) => filter.onChange(e.target.value)}
+                      className="text-sm border border-[rgba(182,157,116,0.3)] rounded-lg px-3 py-1 bg-white/50 text-[#1f2839] backdrop-blur-sm transition-all duration-300 hover:border-[#b69d74] focus:border-[#b69d74] focus:ring-1 focus:ring-[#b69d74]"
+                    >
+                      {filter.options.map(option => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                ))}
 
                 {selectedCases.size > 0 && (
                   <div className="flex items-center space-x-2 ml-auto">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                    <span className="text-sm text-[#6b7280]">
                       {selectedCases.size} selected
                     </span>
                     <button
                       onClick={() => handleBulkAction('verify')}
                       disabled={bulkActionLoading}
-                      className="text-sm px-3 py-1 text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900/30 rounded hover:bg-green-200 dark:hover:bg-green-900/50 disabled:opacity-50"
+                      className="text-sm px-3 py-1 text-[#10b981] bg-[#10b98115] border border-[#10b98140] rounded-lg hover:bg-[#10b98125] disabled:opacity-50 transition-all duration-300"
                     >
                       {language === 'ta' ? 'सत्यापित करें' : 'Verify'}
                     </button>
                     <button
                       onClick={() => handleBulkAction('investigate')}
                       disabled={bulkActionLoading}
-                      className="text-sm px-3 py-1 text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-900/30 rounded hover:bg-red-200 dark:hover:bg-red-900/50 disabled:opacity-50"
+                      className="text-sm px-3 py-1 text-[#f59e0b] bg-[#f59e0b15] border border-[#f59e0b40] rounded-lg hover:bg-[#f59e0b25] disabled:opacity-50 transition-all duration-300"
                     >
                       {language === 'ta' ? 'जांच करें' : 'Investigate'}
                     </button>
@@ -646,55 +653,67 @@ const FakeCaseChecker = () => {
               {/* Cases List */}
               <div className="space-y-4">
                 {filteredCases.map((caseItem) => (
-                  <div key={caseItem.id} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
+                  <div 
+                    key={caseItem.id} 
+                    className="bg-gradient(135deg, rgba(255,255,255,0.05), rgba(182,157,116,0.08)) rounded-xl p-4 border border-[rgba(182,157,116,0.15)] backdrop-blur-sm transition-all duration-300 hover:shadow-lg hover:scale-105"
+                  >
                     <div className="flex items-start justify-between">
-                      <div className="flex items-start space-x-3">
+                      <div className="flex items-start space-x-4">
                         <input
                           type="checkbox"
                           checked={selectedCases.has(caseItem.id)}
                           onChange={(e) => handleCaseSelection(caseItem.id, e.target.checked)}
-                          className="mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded"
+                          className="mt-1 h-4 w-4 text-[#b69d74] border-[rgba(182,157,116,0.5)] rounded transition-all duration-300 focus:ring-[#b69d74]"
                         />
                         <div className="flex-1">
-                          <div className="flex items-center space-x-3 mb-2">
-                            <h4 className="font-semibold text-gray-900 dark:text-gray-100">
+                          <div className="flex items-center space-x-3 mb-3">
+                            <h4 className="font-semibold text-[#1f2839]">
                               {caseItem.caseNumber}
                             </h4>
-                            <span className={`px-2 py-1 text-xs rounded-full font-medium ${getRiskColor(caseItem.riskScore)}`}>
+                            <span className={`px-3 py-1 text-xs rounded-full font-medium border transition-all duration-300 ${getRiskColor(caseItem.riskScore)}`}>
                               Risk: {caseItem.riskScore}%
                             </span>
-                            <span className={`px-2 py-1 text-xs rounded-full font-medium ${
-                              caseItem.status === 'Under Review' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' :
-                              caseItem.status === 'Flagged' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' :
-                              'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
-                            }`}>
+                            <span className={`px-3 py-1 text-xs rounded-full font-medium border transition-all duration-300 ${getStatusColor(caseItem.status)}`}>
                               {caseItem.status}
                             </span>
                           </div>
-                          <p className="text-gray-700 dark:text-gray-300 mb-2">
+                          <p className="text-[#1f2839] mb-3 font-medium">
                             {caseItem.title}
                           </p>
-                          <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400 mb-3">
-                            <span>{caseItem.court}</span>
+                          <div className="flex items-center space-x-4 text-sm text-[#6b7280] mb-4">
+                            <span className="flex items-center">
+                              <span className="mr-1">🏛️</span>
+                              {caseItem.court}
+                            </span>
                             <span>•</span>
-                            <span>{caseItem.caseType}</span>
+                            <span className="flex items-center">
+                              <span className="mr-1">📁</span>
+                              {caseItem.caseType}
+                            </span>
                             <span>•</span>
-                            <span>Filed: {new Date(caseItem.filingDate).toLocaleDateString()}</span>
+                            <span className="flex items-center">
+                              <span className="mr-1">📅</span>
+                              Filed: {new Date(caseItem.filingDate).toLocaleDateString()}
+                            </span>
                           </div>
-                          <div className="flex flex-wrap gap-1">
+                          <div className="flex flex-wrap gap-2">
                             {caseItem.flags.map((flag, index) => (
-                              <span key={index} className="text-xs px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 rounded">
+                              <span 
+                                key={index} 
+                                className="text-xs px-3 py-1 bg-[rgba(245,158,11,0.1)] text-[#f59e0b] rounded-lg border border-[rgba(245,158,11,0.3)] transition-all duration-300 hover:scale-105"
+                              >
                                 {flag}
                               </span>
                             ))}
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                      <div className="flex items-center space-x-3">
+                        <span className="text-xs text-[#6b7280]">
                           Detected: {new Date(caseItem.detectedAt).toLocaleDateString()}
                         </span>
-                        <button className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium">
+                        <button className="text-[#b69d74] hover:text-[#1f2839] text-sm font-medium transition-colors duration-300 flex items-center">
+                          <span className="mr-1">👁️</span>
                           {language === 'ta' ? 'विस्तार से देखें' : 'View Details'}
                         </button>
                       </div>
@@ -704,12 +723,13 @@ const FakeCaseChecker = () => {
               </div>
 
               {filteredCases.length === 0 && (
-                <div className="text-center py-8">
-                  <svg className="h-12 w-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <p className="text-gray-500 dark:text-gray-400">
+                <div className="text-center py-12 animate-fadeIn">
+                  <div className="text-6xl mb-4">🔍</div>
+                  <p className="text-[#6b7280] text-lg">
                     {language === 'ta' ? 'कोई संदिग्ध मामले नहीं मिले' : 'No suspicious cases found'}
+                  </p>
+                  <p className="text-[#6b7280] text-sm mt-2">
+                    {language === 'ta' ? 'अपनी खोज मानदंड समायोजित करें या एक नया स्कैन चलाएं' : 'Adjust your search criteria or run a new scan'}
                   </p>
                 </div>
               )}
@@ -718,32 +738,46 @@ const FakeCaseChecker = () => {
 
           {/* Scan History Tab */}
           {activeTab === 'history' && (
-            <div className="space-y-6">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <div className="space-y-6 animate-slideIn">
+              <h3 className="text-lg font-semibold text-[#1f2839] flex items-center">
+                <span className="mr-2">📊</span>
                 {language === 'ta' ? 'स्कैन इतिहास' : 'Scan History'}
               </h3>
-              <div className="space-y-3">
-                {scanHistory.map((scan) => (
-                  <div key={scan.id} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
+              <div className="space-y-4">
+                {scanHistory.map((scan, index) => (
+                  <div 
+                    key={scan.id}
+                    className="bg-gradient(135deg, rgba(255,255,255,0.05), rgba(182,157,116,0.08)) rounded-xl p-4 border border-[rgba(182,157,116,0.15)] backdrop-blur-sm transition-all duration-300 hover:shadow-lg"
+                    style={{ animationDelay: `${index * 100}ms` }}
+                  >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
-                        <div className="flex items-center space-x-2">
-                          <div className={`w-3 h-3 rounded-full ${scan.status === 'Completed' ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
-                          <span className="font-medium text-gray-900 dark:text-gray-100">
-                            {scan.triggeredBy} Scan
-                          </span>
-                        </div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400">
-                          <span>{scan.casesScanned} cases scanned</span>
-                          <span className="mx-2">•</span>
-                          <span className={scan.suspiciousFound > 0 ? 'text-red-600 dark:text-red-400 font-medium' : ''}>
-                            {scan.suspiciousFound} suspicious found
-                          </span>
-                          <span className="mx-2">•</span>
-                          <span>{scan.duration}</span>
+                        <div className="flex items-center space-x-3">
+                          <div className={`w-3 h-3 rounded-full animate-pulse ${
+                            scan.status === 'Completed' ? 'bg-[#10b981]' : 'bg-[#f59e0b]'
+                          }`}></div>
+                          <div>
+                            <span className="font-medium text-[#1f2839]">
+                              {scan.triggeredBy} Scan
+                            </span>
+                            <div className="text-sm text-[#6b7280] mt-1">
+                              <span className="flex items-center">
+                                <span className="mr-1">📁</span>
+                                {scan.casesScanned} cases scanned
+                              </span>
+                              <span className={`flex items-center ${scan.suspiciousFound > 0 ? 'text-[#f59e0b] font-medium' : ''}`}>
+                                <span className="mr-1">⚠️</span>
+                                {scan.suspiciousFound} suspicious found
+                              </span>
+                              <span className="flex items-center">
+                                <span className="mr-1">⏱️</span>
+                                {scan.duration}
+                              </span>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                      <div className="text-sm text-gray-500 dark:text-gray-400">
+                      <div className="text-sm text-[#6b7280]">
                         {new Date(scan.scanDate).toLocaleString()}
                       </div>
                     </div>
@@ -755,43 +789,75 @@ const FakeCaseChecker = () => {
 
           {/* Settings Tab */}
           {activeTab === 'settings' && (
-            <div className="space-y-6">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <div className="space-y-6 animate-slideIn">
+              <h3 className="text-lg font-semibold text-[#1f2839] flex items-center">
+                <span className="mr-2">⚙️</span>
                 {language === 'ta' ? 'स्कैनर सेटिंग्स' : 'Scanner Settings'}
               </h3>
               
               <div className="space-y-4">
-                <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                  <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-2">
-                    {language === 'ta' ? 'स्वचालित स्कैन' : 'Automatic Scanning'}
-                  </h4>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">
-                      {language === 'ta' ? 'नियमित अंतराल पर स्वचालित स्कैन सक्षम करें' : 'Enable automatic scanning at regular intervals'}
-                    </span>
-                    <button
-                      onClick={() => setAutoScanEnabled(!autoScanEnabled)}
-                      className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors ${
-                        autoScanEnabled ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-600'
-                      }`}
-                    >
-                      <span className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${
-                        autoScanEnabled ? 'translate-x-6' : 'translate-x-1'
-                      }`} />
-                    </button>
+                {[
+                  {
+                    title: language === 'ta' ? 'स्वचालित स्कैन' : 'Automatic Scanning',
+                    description: language === 'ta' ? 'नियमित अंतराल पर स्वचालित स्कैन सक्षम करें' : 'Enable automatic scanning at regular intervals',
+                    enabled: autoScanEnabled,
+                    toggle: () => setAutoScanEnabled(!autoScanEnabled)
+                  },
+                  {
+                    title: language === 'ta' ? 'ईमेल अलर्ट' : 'Email Alerts',
+                    description: language === 'ta' ? 'उच्च जोखिम मामलों के लिए ईमेल अलर्ट' : 'Email alerts for high-risk cases',
+                    enabled: true,
+                    toggle: () => {}
+                  },
+                  {
+                    title: language === 'ta' ? 'सूचनाएं' : 'Notifications',
+                    description: language === 'ta' ? 'स्कैन पूर्ण होने पर सूचना' : 'Notifications when scan completes',
+                    enabled: true,
+                    toggle: () => {}
+                  }
+                ].map((setting, index) => (
+                  <div 
+                    key={index}
+                    className="bg-gradient(135deg, rgba(255,255,255,0.05), rgba(182,157,116,0.08)) p-4 rounded-xl border border-[rgba(182,157,116,0.15)] backdrop-blur-sm transition-all duration-300 hover:shadow-lg"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium text-[#1f2839] mb-1">
+                          {setting.title}
+                        </h4>
+                        <p className="text-sm text-[#6b7280]">
+                          {setting.description}
+                        </p>
+                      </div>
+                      <button
+                        onClick={setting.toggle}
+                        className={`relative inline-flex items-center h-6 rounded-full w-11 transition-all duration-300 ${
+                          setting.enabled 
+                            ? 'bg-gradient(135deg, #b69d74, #b69d74DD)' 
+                            : 'bg-[#6b728040]'
+                        } transform hover:scale-105`}
+                      >
+                        <span 
+                          className={`inline-block w-4 h-4 transform bg-white rounded-full transition-all duration-300 shadow-lg ${
+                            setting.enabled ? 'translate-x-6' : 'translate-x-1'
+                          }`} 
+                        />
+                      </button>
+                    </div>
                   </div>
-                </div>
+                ))}
 
-                <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                  <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-2">
+                {/* Risk Threshold Setting */}
+                <div className="bg-gradient(135deg, rgba(255,255,255,0.05), rgba(182,157,116,0.08)) p-4 rounded-xl border border-[rgba(182,157,116,0.15)] backdrop-blur-sm">
+                  <h4 className="font-medium text-[#1f2839] mb-3">
                     {language === 'ta' ? 'जोखिम थ्रेशहोल्ड' : 'Risk Threshold'}
                   </h4>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                      <span className="text-sm text-[#6b7280]">
                         {language === 'ta' ? 'न्यूनतम जोखिम स्कोर सेट करें' : 'Set minimum risk score for detection'}
                       </span>
-                      <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{riskThreshold}%</span>
+                      <span className="text-sm font-medium text-[#b69d74]">{riskThreshold}%</span>
                     </div>
                     <input
                       type="range"
@@ -799,34 +865,11 @@ const FakeCaseChecker = () => {
                       max="90"
                       value={riskThreshold}
                       onChange={(e) => setRiskThreshold(parseInt(e.target.value))}
-                      className="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer"
+                      className="w-full h-2 bg-gradient(90deg, #b69d74, #b69d74CC) rounded-lg appearance-none cursor-pointer transition-all duration-300"
+                      style={{
+                        background: `linear-gradient(90deg, #b69d74 ${riskThreshold}%, rgba(182,157,116,0.3) ${riskThreshold}%)`
+                      }}
                     />
-                  </div>
-                </div>
-
-                <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                  <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-2">
-                    {language === 'ta' ? 'अलर्ट सेटिंग्स' : 'Alert Settings'}
-                  </h4>
-                  <div className="space-y-3">
-                    <label className="flex items-center">
-                      <input type="checkbox" className="h-4 w-4 text-blue-600 border-gray-300 rounded" defaultChecked />
-                      <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
-                        {language === 'ta' ? 'उच्च जोखिम मामलों के लिए ईमेल अलर्ट' : 'Email alerts for high-risk cases'}
-                      </span>
-                    </label>
-                    <label className="flex items-center">
-                      <input type="checkbox" className="h-4 w-4 text-blue-600 border-gray-300 rounded" defaultChecked />
-                      <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
-                        {language === 'ta' ? 'स्कैन पूर्ण होने पर सूचना' : 'Notifications when scan completes'}
-                      </span>
-                    </label>
-                    <label className="flex items-center">
-                      <input type="checkbox" className="h-4 w-4 text-blue-600 border-gray-300 rounded" />
-                      <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
-                        {language === 'ta' ? 'SMS अलर्ट' : 'SMS alerts'}
-                      </span>
-                    </label>
                   </div>
                 </div>
               </div>
@@ -834,6 +877,24 @@ const FakeCaseChecker = () => {
           )}
         </div>
       </div>
+
+      {/* Add CSS for animations */}
+      <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideIn {
+          from { opacity: 0; transform: translateX(-20px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.5s ease-out;
+        }
+        .animate-slideIn {
+          animation: slideIn 0.5s ease-out;
+        }
+      `}</style>
     </div>
   );
 };

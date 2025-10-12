@@ -1,5 +1,5 @@
 ﻿import React, { useEffect, useState } from 'react';
-import { ArrowRight, Play, FileText, Brain, CheckCheck, Search, Zap, ChevronDown, Sparkles, Shield, Clock, Star, Users, Award } from 'lucide-react';
+import { ArrowRight, FileText, Brain, CheckCheck, Search, Zap, ChevronDown, Sparkles, Shield, Clock, Star, Users, Award } from 'lucide-react';
 
 // Import Montserrat font
 const montserratFont = {
@@ -61,7 +61,7 @@ const Hero = () => {
 
   const animatedTexts = [
     "Document Intelligence",
-    "Risk Assessment", 
+    "Risk Assessment",
     "Compliance Automation"
   ];
 
@@ -267,37 +267,24 @@ const Hero = () => {
             
             {/* Enhanced CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 animate-slide-up" style={{ animationDelay: '1.8s', animationFillMode: 'both' }}>
-              <button 
+              <button
+                type="button"
+                onClick={() => window.dispatchEvent(new CustomEvent('open-register-modal'))}
                 className="group inline-flex items-center justify-center space-x-3 px-8 py-4 rounded-2xl text-lg font-bold transition-all duration-300 hover:-translate-y-2 hover:scale-105 shadow-xl hover:shadow-2xl transform"
                 style={{
                   ...montserratFont,
                   background: `linear-gradient(135deg, ${colors.accent}, ${colors.accent}DD, ${colors.accent}BB)`,
                   color: colors.background,
-                  boxShadow: `0 10px 25px ${colors.accent}40, 0 0 0 1px ${colors.accent}20`
+                  boxShadow: `0 10px 25px ${colors.accent}40, 0 0 0 1px ${colors.accent}20`,
+                  border: 'none',
+                  cursor: 'pointer'
                 }}
+                aria-label="Open Register Modal"
               >
                 <span className="font-black tracking-wide">Start Free Trial</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform duration-300" />
               </button>
-              
-              <button 
-                className="group inline-flex items-center justify-center space-x-3 px-8 py-4 rounded-2xl text-lg font-bold transition-all duration-300 hover:-translate-y-2 hover:scale-105 backdrop-blur-sm border-2 shadow-lg hover:shadow-xl transform"
-                style={{
-                  ...montserratFont,
-                  backgroundColor: `${colors.background}DD`,
-                  borderColor: colors.accent,
-                  color: colors.textDark,
-                  boxShadow: `0 8px 20px rgba(31, 40, 57, 0.15)`
-                }}
-              >
-                <div 
-                  className="p-2 rounded-full transition-all duration-300 group-hover:scale-110 group-hover:rotate-12"
-                  style={{ backgroundColor: `${colors.accent}20` }}
-                >
-                  <Play className="w-4 h-4" style={{ color: colors.accent }} />
-                </div>
-                <span className="font-black tracking-wide">Watch Demo</span>
-              </button>
+              {/* Watch Demo removed */}
             </div>
             
             {/* Enhanced Trust Indicators */}
@@ -765,7 +752,7 @@ const Hero = () => {
             className="text-sm font-medium"
             style={{ color: colors.textLight }}
           >
-            Discover Features
+            {/* Discover Features */}
           </span>
           <ChevronDown 
             className="w-5 h-5" 

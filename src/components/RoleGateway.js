@@ -379,11 +379,17 @@ const RoleGateway = () => {
             <div className={`relative overflow-hidden transition-all duration-700 delay-1000 ${
               isVisible ? 'translate-x-0 opacity-100' : 'translate-x-12 opacity-0'
             }`}>
-              <div 
-                className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-out"
+              <img
+                src={currentRole.image}
+                alt="Role visual"
+                aria-hidden="true"
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out pointer-events-none"
                 style={{
-                  backgroundImage: `url(${currentRole.image})`,
-                  transform: isVisible ? 'scale(1)' : 'scale(1.1)'
+                  transform: isVisible ? 'scale(1)' : 'scale(1.03)',
+                  transformOrigin: 'center center',
+                  willChange: 'transform, opacity',
+                  transitionProperty: 'transform, opacity',
+                  transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)'
                 }}
               />
               
@@ -392,15 +398,7 @@ const RoleGateway = () => {
               
               {/* Content Overlay */}
               <div className="absolute inset-0 p-8 text-white flex flex-col justify-between">
-                {/* Top Badge */}
-                <div className="flex justify-between items-start">
-                  <div className="bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg">
-                    <span className="text-[#b69d74] font-bold text-sm">Trusted by Professionals</span>
-                  </div>
-                  <div className="bg-black/40 backdrop-blur-sm rounded-full px-3 py-1">
-                    <span className="text-white/90 text-sm">⭐ 4.9/5 Rating</span>
-                  </div>
-                </div>
+                {/* Top Badge removed per request */}
 
                 {/* Bottom Content */}
                 <div className="space-y-6">

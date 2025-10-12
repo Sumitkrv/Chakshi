@@ -19,16 +19,97 @@ const Dashboard = () => {
     weather: null
   });
   const [loading, setLoading] = useState(true);
-  const [selectedWidget, setSelectedWidget] = useState(null);
-  const [widgetLayout, setWidgetLayout] = useState([
-    'stats', 'recent-cases', 'hearings', 'activities', 'notifications', 'quick-actions'
-  ]);
+  const [hoveredCard, setHoveredCard] = useState(null);
 
   const { user } = useAuth();
   const context = useOutletContext();
   const { addNotification, theme, language, isOnline } = context || {};
 
-  // Mock data - in real app, this would come from API
+  // Professional legal color palette
+  const colors = {
+    primary: {
+      cream: '#f5f5ef',
+      navy: '#1f2839',
+      gold: '#b69d74',
+      gray: '#6b7280'
+    },
+    status: {
+      success: '#10b981',
+      warning: '#f59e0b',
+      info: '#3b82f6'
+    },
+    gradients: {
+      gold: 'linear-gradient(135deg, #b69d74, #a58c66)',
+      navy: 'linear-gradient(135deg, #1f2839, #2d3748)',
+      card: 'linear-gradient(145deg, rgba(255,255,255,0.95), rgba(245,245,239,0.98))'
+    }
+  };
+
+  // Professional legal icons as SVG components
+  const LegalIcons = {
+    TotalCases: () => (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+    ),
+    ActiveCases: () => (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    ),
+    PendingCases: () => (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    ),
+    Hearings: () => (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+    ),
+    SMS: () => (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+      </svg>
+    ),
+    Documents: () => (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+    ),
+    NewCase: () => (
+      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
+      </svg>
+    ),
+    Upload: () => (
+      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+      </svg>
+    ),
+    Schedule: () => (
+      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+    ),
+    Report: () => (
+      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+      </svg>
+    ),
+    Search: () => (
+      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+    ),
+    Weather: () => (
+      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+      </svg>
+    )
+  };
+
+  // Mock data
   const mockData = {
     stats: {
       totalCases: 247,
@@ -42,18 +123,24 @@ const Dashboard = () => {
       { id: 1, number: '2023/CRL/001', title: 'State vs John Doe', status: 'Active', priority: 'High', lastUpdate: '2 hours ago' },
       { id: 2, number: '2023/CIV/045', title: 'Smith vs ABC Corp', status: 'Pending', priority: 'Medium', lastUpdate: '4 hours ago' },
       { id: 3, number: '2023/FAM/012', title: 'Divorce - Jane vs Mark', status: 'Active', priority: 'Low', lastUpdate: '1 day ago' },
-      { id: 4, number: '2023/CRL/002', title: 'State vs Crime Syndicate', status: 'Active', priority: 'Critical', lastUpdate: '2 days ago' }
+      { id: 4, number: '2023/CRL/002', title: 'State vs Crime Syndicate', status: 'Active', priority: 'Critical', lastUpdate: '2 days ago' },
+      { id: 5, number: '2023/CRL/003', title: 'State vs Robert Wilson', status: 'Pending', priority: 'Medium', lastUpdate: '3 days ago' },
+      { id: 6, number: '2023/CIV/078', title: 'Property Dispute - Johnson Estate', status: 'Active', priority: 'High', lastUpdate: '4 days ago' }
     ],
     upcomingHearings: [
       { id: 1, caseNumber: '2023/CRL/001', title: 'State vs John Doe', court: 'Court Room 1', judge: 'Hon. Justice Smith', time: '10:00 AM', date: 'Today' },
       { id: 2, caseNumber: '2023/CIV/045', title: 'Smith vs ABC Corp', court: 'Court Room 3', judge: 'Hon. Justice Brown', time: '2:30 PM', date: 'Today' },
-      { id: 3, caseNumber: '2023/FAM/012', title: 'Divorce - Jane vs Mark', court: 'Court Room 2', judge: 'Hon. Justice Wilson', time: '9:00 AM', date: 'Tomorrow' }
+      { id: 3, caseNumber: '2023/FAM/012', title: 'Divorce - Jane vs Mark', court: 'Court Room 2', judge: 'Hon. Justice Wilson', time: '9:00 AM', date: 'Tomorrow' },
+      { id: 4, caseNumber: '2023/CRL/002', title: 'State vs Crime Syndicate', court: 'Court Room 4', judge: 'Hon. Justice Davis', time: '11:00 AM', date: 'Tomorrow' },
+      { id: 5, caseNumber: '2023/CIV/078', title: 'Property Dispute - Johnson Estate', court: 'Court Room 1', judge: 'Hon. Justice Smith', time: '3:00 PM', date: 'Tomorrow' }
     ],
     recentActivities: [
       { id: 1, type: 'case_update', message: 'Case 2023/CRL/001 status updated to Active', time: '30 minutes ago', user: 'System' },
       { id: 2, type: 'document_upload', message: 'New evidence document uploaded for case 2023/CIV/045', time: '1 hour ago', user: 'Advocate Kumar' },
       { id: 3, type: 'hearing_scheduled', message: 'Hearing scheduled for case 2023/FAM/012', time: '2 hours ago', user: 'Registry' },
-      { id: 4, type: 'sms_sent', message: 'SMS notification sent to all parties in case 2023/CRL/001', time: '3 hours ago', user: 'Clerk Admin' }
+      { id: 4, type: 'sms_sent', message: 'SMS notification sent to all parties in case 2023/CRL/001', time: '3 hours ago', user: 'Clerk Admin' },
+      { id: 5, type: 'case_update', message: 'Case 2023/CRL/002 assigned to new judge', time: '4 hours ago', user: 'System' },
+      { id: 6, type: 'document_upload', message: 'Affidavit submitted for case 2023/FAM/012', time: '5 hours ago', user: 'Advocate Sharma' }
     ],
     weather: {
       temperature: 28,
@@ -68,11 +155,10 @@ const Dashboard = () => {
     const loadDashboardData = async () => {
       setLoading(true);
       try {
-        // Simulate API call
         setTimeout(() => {
           setDashboardData(mockData);
           setLoading(false);
-        }, 1000);
+        }, 1200);
       } catch (error) {
         console.error('Error loading dashboard data:', error);
         setLoading(false);
@@ -85,24 +171,6 @@ const Dashboard = () => {
 
     loadDashboardData();
   }, []);
-
-  // Real-time updates simulation
-  useEffect(() => {
-    if (!isOnline) return;
-
-    const interval = setInterval(() => {
-      // Simulate real-time updates
-      setDashboardData(prevData => ({
-        ...prevData,
-        stats: {
-          ...prevData.stats,
-          unreadSMS: Math.max(0, prevData.stats.unreadSMS + Math.floor(Math.random() * 3) - 1)
-        }
-      }));
-    }, 30000); // Update every 30 seconds
-
-    return () => clearInterval(interval);
-  }, [isOnline]);
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -129,419 +197,853 @@ const Dashboard = () => {
 
   const getPriorityColor = (priority) => {
     switch (priority?.toLowerCase()) {
-      case 'critical': return 'text-red-600 bg-red-100 dark:bg-red-900/30';
-      case 'high': return 'text-orange-600 bg-orange-100 dark:bg-orange-900/30';
-      case 'medium': return 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900/30';
-      case 'low': return 'text-green-600 bg-green-100 dark:bg-green-900/30';
-      default: return 'text-gray-600 bg-gray-100 dark:bg-gray-700';
+      case 'critical': 
+        return { 
+          background: 'rgba(245, 158, 11, 0.15)', 
+          text: colors.status.warning,
+          border: 'rgba(245, 158, 11, 0.4)'
+        };
+      case 'high': 
+        return { 
+          background: 'rgba(182, 157, 116, 0.15)', 
+          text: colors.primary.gold,
+          border: 'rgba(182, 157, 116, 0.4)'
+        };
+      case 'medium': 
+        return { 
+          background: 'rgba(59, 130, 246, 0.15)', 
+          text: colors.status.info,
+          border: 'rgba(59, 130, 246, 0.4)'
+        };
+      case 'low': 
+        return { 
+          background: 'rgba(16, 185, 129, 0.15)', 
+          text: colors.status.success,
+          border: 'rgba(16, 185, 129, 0.4)'
+        };
+      default: 
+        return { 
+          background: 'rgba(107, 114, 128, 0.15)', 
+          text: colors.primary.gray,
+          border: 'rgba(107, 114, 128, 0.4)'
+        };
     }
   };
 
-  const getActivityIcon = (type) => {
-    switch (type) {
-      case 'case_update':
-        return (
-          <svg className="h-5 w-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-        );
-      case 'document_upload':
-        return (
-          <svg className="h-5 w-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-          </svg>
-        );
-      case 'hearing_scheduled':
-        return (
-          <svg className="h-5 w-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-        );
-      case 'sms_sent':
-        return (
-          <svg className="h-5 w-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-          </svg>
-        );
-      default:
-        return (
-          <svg className="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        );
-    }
-  };
+  // Loading skeleton component
+  const LoadingSkeleton = () => (
+    <div className="space-y-6 animate-pulse">
+      {/* Header Skeleton */}
+      <div className="rounded-2xl p-8 border-2" style={{ 
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        borderColor: 'rgba(31, 40, 57, 0.1)'
+      }}>
+        <div className="flex flex-col md:flex-row md:items-center justify-between">
+          <div className="space-y-3">
+            <div className="h-8 rounded-lg w-48" style={{ backgroundColor: 'rgba(31, 40, 57, 0.1)' }}></div>
+            <div className="h-4 rounded-lg w-64" style={{ backgroundColor: 'rgba(107, 114, 128, 0.1)' }}></div>
+          </div>
+          <div className="mt-4 md:mt-0 rounded-xl p-6 w-32 h-20" style={{ backgroundColor: 'rgba(182, 157, 116, 0.1)' }}></div>
+        </div>
+      </div>
+
+      {/* Stats Grid Skeleton */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-5">
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className="rounded-xl p-6 border-2" style={{ 
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+            borderColor: 'rgba(31, 40, 57, 0.1)'
+          }}>
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="p-3 rounded-xl w-12 h-12" style={{ backgroundColor: 'rgba(182, 157, 116, 0.1)' }}></div>
+              </div>
+              <div className="ml-4 space-y-2">
+                <div className="h-6 rounded-lg w-16" style={{ backgroundColor: 'rgba(31, 40, 57, 0.1)' }}></div>
+                <div className="h-4 rounded-lg w-20" style={{ backgroundColor: 'rgba(107, 114, 128, 0.1)' }}></div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Content Grid Skeleton */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="rounded-2xl border-2 overflow-hidden" style={{ 
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+            borderColor: 'rgba(31, 40, 57, 0.1)'
+          }}>
+            <div className="p-6 border-b-2" style={{ borderColor: 'rgba(182, 157, 116, 0.2)' }}>
+              <div className="h-6 rounded-lg w-32" style={{ backgroundColor: 'rgba(31, 40, 57, 0.1)' }}></div>
+            </div>
+            <div className="p-6 space-y-4">
+              {[...Array(4)].map((_, j) => (
+                <div key={j} className="rounded-xl p-4 space-y-2 border" style={{ 
+                  backgroundColor: 'rgba(245, 245, 239, 0.5)',
+                  borderColor: 'rgba(31, 40, 57, 0.1)'
+                }}>
+                  <div className="h-4 rounded-lg w-3/4" style={{ backgroundColor: 'rgba(31, 40, 57, 0.1)' }}></div>
+                  <div className="h-3 rounded-lg w-1/2" style={{ backgroundColor: 'rgba(107, 114, 128, 0.1)' }}></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <span className="ml-2 text-gray-600 dark:text-gray-400">
-          {language === 'ta' ? 'लोड हो रहा है...' : 'Loading dashboard...'}
-        </span>
+      <div className="min-h-screen overflow-auto" style={{ backgroundColor: colors.primary.cream }}>
+        <div className="container mx-auto p-6">
+          <LoadingSkeleton />
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header Section */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              {getGreeting()}, {user?.name || 'Court Clerk'}!
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">
-              {getCurrentDate()}
-            </p>
-            {!isOnline && (
-              <div className="flex items-center mt-2 text-yellow-600 dark:text-yellow-400">
-                <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.268 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                </svg>
-                <span className="text-sm">
-                  {language === 'ta' ? 'ऑफ़लाइन मोड में काम कर रहे हैं' : 'Working in offline mode'}
-                </span>
+    <div 
+      className="min-h-screen overflow-auto"
+      style={{ 
+        backgroundColor: colors.primary.cream,
+        // Ensure proper scrolling
+        height: '100vh',
+        overflowY: 'auto',
+        overflowX: 'hidden'
+      }}
+    >
+      <div className="container mx-auto p-6 pb-20">
+        {/* Header Section */}
+        <div 
+          className="rounded-2xl p-8 relative overflow-hidden transform transition-all duration-700 hover:shadow-2xl mb-8"
+          style={{
+            background: colors.gradients.card,
+            border: `2px solid ${colors.primary.navy}20`,
+            boxShadow: '0 20px 60px rgba(31, 40, 57, 0.12)',
+            backdropFilter: 'blur(20px)'
+          }}
+        >
+          {/* Animated background elements */}
+          <div className="absolute inset-0 overflow-hidden">
+            <div 
+              className="absolute -top-32 -right-32 w-64 h-64 rounded-full opacity-20 animate-float"
+              style={{ 
+                background: `radial-gradient(circle, ${colors.primary.gold}30 0%, transparent 70%)`,
+                animation: 'float 6s ease-in-out infinite'
+              }}
+            ></div>
+            <div 
+              className="absolute -bottom-32 -left-32 w-64 h-64 rounded-full opacity-15 animate-float-reverse"
+              style={{ 
+                background: `radial-gradient(circle, ${colors.primary.navy}20 0%, transparent 70%)`,
+                animation: 'float-reverse 8s ease-in-out infinite'
+              }}
+            ></div>
+          </div>
+          
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between">
+            <div className="flex-1">
+              <h1 
+                className="text-4xl font-bold mb-3 transform transition-transform duration-500 hover:scale-105"
+                style={{
+                  background: colors.gradients.text,
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
+                }}
+              >
+                {getGreeting()}, {user?.name || 'Court Clerk'}!
+              </h1>
+              <p style={{ 
+                color: colors.primary.gray, 
+                fontSize: '18px', 
+                margin: 0,
+                fontWeight: '500'
+              }}>
+                {getCurrentDate()}
+              </p>
+              {!isOnline && (
+                <div 
+                  className="flex items-center mt-4 px-4 py-3 rounded-xl w-fit transform transition-all duration-300 hover:scale-105"
+                  style={{
+                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                    border: `2px solid ${colors.status.warning}30`
+                  }}
+                >
+                  <div 
+                    className="w-3 h-3 rounded-full mr-3 animate-pulse"
+                    style={{ backgroundColor: colors.status.warning }}
+                  ></div>
+                  <span style={{ 
+                    color: colors.status.warning, 
+                    fontSize: '14px', 
+                    fontWeight: '600' 
+                  }}>
+                    {language === 'ta' ? 'ऑफ़लाइन मोड में काम कर रहे हैं' : 'Working in offline mode'}
+                  </span>
+                </div>
+              )}
+            </div>
+            
+            {dashboardData.weather && (
+              <div 
+                className="mt-6 md:mt-0 rounded-2xl p-6 border-2 transition-all duration-500 hover:scale-105 hover:shadow-xl"
+                style={{
+                  background: colors.gradients.card,
+                  border: `2px solid ${colors.primary.gold}30`,
+                  backdropFilter: 'blur(20px)',
+                  boxShadow: '0 15px 50px rgba(31, 40, 57, 0.15)'
+                }}
+              >
+                <div className="flex items-center space-x-4">
+                  <div style={{ color: colors.primary.gold }}>
+                    <LegalIcons.Weather />
+                  </div>
+                  <div>
+                    <div style={{ 
+                      color: colors.primary.navy, 
+                      fontSize: '28px', 
+                      fontWeight: '700' 
+                    }}>
+                      {dashboardData.weather.temperature}°C
+                    </div>
+                    <div style={{ 
+                      color: colors.primary.gray, 
+                      fontWeight: '600',
+                      fontSize: '16px'
+                    }}>
+                      {dashboardData.weather.condition}
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
           </div>
-          
-          {dashboardData.weather && (
-            <div className="mt-4 md:mt-0 bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
-              <div className="flex items-center space-x-3">
-                <div className="text-blue-600 dark:text-blue-400">
-                  <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                  </svg>
-                </div>
-                <div>
-                  <div className="text-lg font-semibold text-blue-900 dark:text-blue-100">
-                    {dashboardData.weather.temperature}°C
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
+          {[
+            { key: 'totalCases', label: 'Total Cases', icon: LegalIcons.TotalCases, color: colors.status.info },
+            { key: 'activeCases', label: 'Active Cases', icon: LegalIcons.ActiveCases, color: colors.status.success },
+            { key: 'pendingCases', label: 'Pending Cases', icon: LegalIcons.PendingCases, color: colors.status.warning },
+            { key: 'todayHearings', label: "Today's Hearings", icon: LegalIcons.Hearings, color: colors.primary.gold },
+            { key: 'unreadSMS', label: 'Unread SMS', icon: LegalIcons.SMS, color: '#6366f1' },
+            { key: 'pendingDocuments', label: 'Pending Docs', icon: LegalIcons.Documents, color: '#ef4444' }
+          ].map((stat, index) => (
+            <div
+              key={stat.key}
+              className="rounded-2xl p-6 transition-all duration-500 cursor-pointer relative group overflow-hidden"
+              style={{
+                background: colors.gradients.card,
+                border: `2px solid ${hoveredCard === stat.key ? colors.primary.gold : colors.primary.navy}20`,
+                boxShadow: hoveredCard === stat.key ? 
+                  `0 25px 60px ${colors.primary.navy}15` : 
+                  '0 10px 40px rgba(31, 40, 57, 0.1)',
+                transform: hoveredCard === stat.key ? 'translateY(-12px) scale(1.02)' : 'translateY(0) scale(1)',
+                backdropFilter: 'blur(20px)'
+              }}
+              onMouseEnter={() => setHoveredCard(stat.key)}
+              onMouseLeave={() => setHoveredCard(null)}
+            >
+              {/* Animated background overlay */}
+              <div 
+                className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-700"
+                style={{ 
+                  background: `linear-gradient(135deg, ${stat.color}08, transparent 50%)`
+                }}
+              ></div>
+              
+              {/* Shine effect */}
+              <div 
+                className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                style={{
+                  background: 'linear-gradient(135deg, transparent, rgba(255,255,255,0.4), transparent)',
+                  transform: 'translateX(-100%)'
+                }}
+              ></div>
+              
+              <div className="relative z-10 flex items-center">
+                <div className="flex-shrink-0">
+                  <div 
+                    className="p-4 rounded-2xl transition-all duration-500 group-hover:scale-110 group-hover:rotate-3"
+                    style={{
+                      background: `linear-gradient(135deg, ${stat.color}15, ${stat.color}08)`,
+                      border: `2px solid ${stat.color}30`,
+                      boxShadow: '0 8px 32px rgba(31, 40, 57, 0.12)'
+                    }}
+                  >
+                    <div style={{ color: stat.color }}>
+                      <stat.icon />
+                    </div>
                   </div>
-                  <div className="text-sm text-blue-600 dark:text-blue-300">
-                    {dashboardData.weather.condition}
+                </div>
+                <div className="ml-5">
+                  <div 
+                    style={{ 
+                      color: hoveredCard === stat.key ? colors.primary.gold : colors.primary.navy,
+                      fontSize: '28px',
+                      fontWeight: '800',
+                      transition: 'all 0.5s ease',
+                      textShadow: hoveredCard === stat.key ? `0 0 20px ${colors.primary.gold}40` : 'none'
+                    }}
+                  >
+                    {dashboardData.stats[stat.key]}
+                  </div>
+                  <div style={{ 
+                    color: colors.primary.gray, 
+                    fontSize: '14px', 
+                    fontWeight: '600',
+                    letterSpacing: '0.5px'
+                  }}>
+                    {language === 'ta' ? 
+                      (stat.key === 'totalCases' ? 'कुल मामले' :
+                       stat.key === 'activeCases' ? 'सक्रिय मामले' :
+                       stat.key === 'pendingCases' ? 'लंबित मामले' :
+                       stat.key === 'todayHearings' ? 'आज की सुनवाई' :
+                       stat.key === 'unreadSMS' ? 'अपठित SMS' : 'लंबित दस्तावेज़') 
+                      : stat.label}
                   </div>
                 </div>
               </div>
-            </div>
-          )}
-        </div>
-      </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        {/* Total Cases */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <div className="bg-blue-100 dark:bg-blue-900/30 p-3 rounded-lg">
-                <svg className="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              </div>
-            </div>
-            <div className="ml-4">
-              <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                {dashboardData.stats.totalCases}
-              </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">
-                {language === 'ta' ? 'कुल मामले' : 'Total Cases'}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Active Cases */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <div className="bg-green-100 dark:bg-green-900/30 p-3 rounded-lg">
-                <svg className="h-6 w-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-            </div>
-            <div className="ml-4">
-              <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                {dashboardData.stats.activeCases}
-              </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">
-                {language === 'ta' ? 'सक्रिय मामले' : 'Active Cases'}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Pending Cases */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <div className="bg-yellow-100 dark:bg-yellow-900/30 p-3 rounded-lg">
-                <svg className="h-6 w-6 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-            </div>
-            <div className="ml-4">
-              <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                {dashboardData.stats.pendingCases}
-              </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">
-                {language === 'ta' ? 'लंबित मामले' : 'Pending Cases'}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Today's Hearings */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <div className="bg-purple-100 dark:bg-purple-900/30 p-3 rounded-lg">
-                <svg className="h-6 w-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </div>
-            </div>
-            <div className="ml-4">
-              <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                {dashboardData.stats.todayHearings}
-              </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">
-                {language === 'ta' ? 'आज की सुनवाई' : "Today's Hearings"}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Unread SMS */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <div className="bg-indigo-100 dark:bg-indigo-900/30 p-3 rounded-lg">
-                <svg className="h-6 w-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
-              </div>
-            </div>
-            <div className="ml-4">
-              <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                {dashboardData.stats.unreadSMS}
-              </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">
-                {language === 'ta' ? 'अपठित SMS' : 'Unread SMS'}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Pending Documents */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <div className="bg-red-100 dark:bg-red-900/30 p-3 rounded-lg">
-                <svg className="h-6 w-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                </svg>
-              </div>
-            </div>
-            <div className="ml-4">
-              <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                {dashboardData.stats.pendingDocuments}
-              </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">
-                {language === 'ta' ? 'लंबित दस्तावेज़' : 'Pending Docs'}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {/* Recent Cases */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {language === 'ta' ? 'हाल के मामले' : 'Recent Cases'}
-              </h3>
-              <Link
-                to="/clerk/cases"
-                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium"
+              {/* Animated progress bar */}
+              <div 
+                className="absolute bottom-0 left-0 w-full h-1 rounded-b-2xl overflow-hidden"
+                style={{ backgroundColor: 'rgba(31, 40, 57, 0.1)' }}
               >
-                {language === 'ta' ? 'सभी देखें' : 'View All'}
-              </Link>
+                <div 
+                  style={{ 
+                    height: '100%',
+                    background: colors.gradients.gold,
+                    width: hoveredCard === stat.key ? '100%' : '0%',
+                    transition: 'width 1.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                    boxShadow: `0 0 20px ${colors.primary.gold}40`
+                  }}
+                ></div>
+              </div>
             </div>
-          </div>
-          <div className="p-6 space-y-4">
-            {dashboardData.recentCases.map((case_) => (
-              <div key={case_.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                <div className="flex-1">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm font-medium text-gray-900 dark:text-white">
-                      {case_.number}
-                    </span>
-                    <span className={`px-2 py-1 text-xs rounded-full font-medium ${getPriorityColor(case_.priority)}`}>
-                      {case_.priority}
-                    </span>
-                  </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    {case_.title}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                    {case_.lastUpdate}
-                  </p>
-                </div>
+          ))}
+        </div>
+
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 mb-8">
+          {/* Recent Cases */}
+          <div 
+            className="rounded-2xl overflow-hidden transition-all duration-700 hover:scale-[1.02] group"
+            style={{
+              background: colors.gradients.card,
+              border: `2px solid ${colors.primary.navy}20`,
+              boxShadow: '0 20px 60px rgba(31, 40, 57, 0.12)',
+              backdropFilter: 'blur(20px)'
+            }}
+          >
+            <div 
+              className="p-7 border-b-2 transition-all duration-500 group-hover:border-b-4"
+              style={{
+                borderColor: colors.primary.gold,
+                background: `linear-gradient(135deg, ${colors.primary.navy}05, ${colors.primary.gold}03)`
+              }}
+            >
+              <div className="flex items-center justify-between">
+                <h3 style={{ 
+                  color: colors.primary.navy, 
+                  fontSize: '22px', 
+                  fontWeight: '800', 
+                  margin: 0,
+                  letterSpacing: '0.5px'
+                }}>
+                  {language === 'ta' ? 'हाल के मामले' : 'Recent Cases'}
+                </h3>
                 <Link
-                  to={`/clerk/case/${case_.id}`}
-                  className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium"
+                  to="/clerk/cases"
+                  className="px-5 py-2.5 rounded-xl transition-all duration-500 hover:scale-110 hover:shadow-lg"
+                  style={{
+                    color: colors.primary.gold,
+                    backgroundColor: 'rgba(182, 157, 116, 0.1)',
+                    fontSize: '14px',
+                    fontWeight: '700',
+                    textDecoration: 'none',
+                    border: `2px solid ${colors.primary.gold}30`
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = 'rgba(182, 157, 116, 0.2)';
+                    e.target.style.color = colors.primary.navy;
+                    e.target.style.borderColor = colors.primary.gold;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = 'rgba(182, 157, 116, 0.1)';
+                    e.target.style.color = colors.primary.gold;
+                    e.target.style.borderColor = `${colors.primary.gold}30`;
+                  }}
                 >
-                  {language === 'ta' ? 'देखें' : 'View'}
+                  {language === 'ta' ? 'सभी देखें' : 'View All'} →
                 </Link>
               </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Upcoming Hearings */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {language === 'ta' ? 'आगामी सुनवाई' : 'Upcoming Hearings'}
-              </h3>
-              <Link
-                to="/clerk/calendar"
-                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium"
-              >
-                {language === 'ta' ? 'कैलेंडर' : 'Calendar'}
-              </Link>
+            </div>
+            <div className="p-7 space-y-5 max-h-96 overflow-y-auto">
+              {dashboardData.recentCases.map((case_, index) => {
+                const priorityColors = getPriorityColor(case_.priority);
+                return (
+                  <div
+                    key={case_.id}
+                    className="rounded-xl p-5 border-2 transition-all duration-500 hover:scale-105 hover:shadow-2xl cursor-pointer group/case"
+                    style={{
+                      backgroundColor: 'rgba(245, 245, 239, 0.7)',
+                      border: `2px solid ${colors.primary.navy}15`,
+                      animationDelay: `${index * 100}ms`,
+                      animation: 'slideInUp 0.8s ease-out forwards'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor = colors.primary.gold;
+                      e.currentTarget.style.boxShadow = `0 15px 40px ${colors.primary.navy}15`;
+                      e.currentTarget.style.transform = 'translateY(-5px) scale(1.02)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = `${colors.primary.navy}15`;
+                      e.currentTarget.style.boxShadow = 'none';
+                      e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                    }}
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <span style={{ 
+                        color: colors.primary.navy, 
+                        fontSize: '15px', 
+                        fontWeight: '700',
+                        fontFamily: 'monospace'
+                      }}>
+                        {case_.number}
+                      </span>
+                      <span 
+                        className="px-4 py-2 text-xs rounded-xl font-bold border-2 transition-all duration-300 hover:scale-110 hover:shadow-lg"
+                        style={{
+                          background: priorityColors.background,
+                          color: priorityColors.text,
+                          borderColor: priorityColors.border,
+                          textTransform: 'uppercase',
+                          letterSpacing: '1px'
+                        }}
+                      >
+                        {case_.priority}
+                      </span>
+                    </div>
+                    <p style={{ 
+                      color: colors.primary.gray, 
+                      fontSize: '14px', 
+                      margin: '0 0 12px 0', 
+                      lineHeight: '1.5',
+                      fontWeight: '500'
+                    }}>
+                      {case_.title}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <span style={{ 
+                        color: colors.primary.gray, 
+                        fontSize: '12px',
+                        fontWeight: '600'
+                      }}>
+                        {case_.lastUpdate}
+                      </span>
+                      <Link
+                        to={`/clerk/case/${case_.id}`}
+                        style={{
+                          color: colors.primary.gold,
+                          fontSize: '13px',
+                          fontWeight: '700',
+                          textDecoration: 'none',
+                          transition: 'all 0.3s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.color = colors.primary.navy;
+                          e.target.style.textDecoration = 'underline';
+                          e.target.style.transform = 'translateX(5px)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.color = colors.primary.gold;
+                          e.target.style.textDecoration = 'none';
+                          e.target.style.transform = 'translateX(0)';
+                        }}
+                      >
+                        {language === 'ta' ? 'देखें' : 'View'} →
+                      </Link>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
-          <div className="p-6 space-y-4">
-            {dashboardData.upcomingHearings.map((hearing) => (
-              <div key={hearing.id} className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-gray-900 dark:text-white">
-                    {hearing.caseNumber}
-                  </span>
-                  <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">
-                    {hearing.date}
-                  </span>
-                </div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                  {hearing.title}
-                </p>
-                <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-500">
-                  <span>{hearing.court} - {hearing.judge}</span>
-                  <span className="font-medium">{hearing.time}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
 
-        {/* Recent Activities */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              {language === 'ta' ? 'हाल की गतिविधि' : 'Recent Activities'}
-            </h3>
-          </div>
-          <div className="p-6 space-y-4">
-            {dashboardData.recentActivities.map((activity) => (
-              <div key={activity.id} className="flex items-start space-x-3">
-                <div className="flex-shrink-0 mt-1">
-                  {getActivityIcon(activity.type)}
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm text-gray-900 dark:text-white">
-                    {activity.message}
-                  </p>
-                  <div className="flex items-center justify-between mt-1">
-                    <span className="text-xs text-gray-500 dark:text-gray-500">
-                      {activity.user}
+          {/* Upcoming Hearings */}
+          <div 
+            className="rounded-2xl overflow-hidden transition-all duration-700 hover:scale-[1.02] group"
+            style={{
+              background: colors.gradients.card,
+              border: `2px solid ${colors.primary.navy}20`,
+              boxShadow: '0 20px 60px rgba(31, 40, 57, 0.12)',
+              backdropFilter: 'blur(20px)'
+            }}
+          >
+            <div 
+              className="p-7 border-b-2 transition-all duration-500 group-hover:border-b-4"
+              style={{
+                borderColor: colors.primary.gold,
+                background: `linear-gradient(135deg, ${colors.primary.navy}05, ${colors.primary.gold}03)`
+              }}
+            >
+              <div className="flex items-center justify-between">
+                <h3 style={{ 
+                  color: colors.primary.navy, 
+                  fontSize: '22px', 
+                  fontWeight: '800', 
+                  margin: 0,
+                  letterSpacing: '0.5px'
+                }}>
+                  {language === 'ta' ? 'आगामी सुनवाई' : 'Upcoming Hearings'}
+                </h3>
+                <Link
+                  to="/clerk/calendar"
+                  className="px-5 py-2.5 rounded-xl transition-all duration-500 hover:scale-110 hover:shadow-lg"
+                  style={{
+                    color: colors.primary.gold,
+                    backgroundColor: 'rgba(182, 157, 116, 0.1)',
+                    fontSize: '14px',
+                    fontWeight: '700',
+                    textDecoration: 'none',
+                    border: `2px solid ${colors.primary.gold}30`
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = 'rgba(182, 157, 116, 0.2)';
+                    e.target.style.color = colors.primary.navy;
+                    e.target.style.borderColor = colors.primary.gold;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = 'rgba(182, 157, 116, 0.1)';
+                    e.target.style.color = colors.primary.gold;
+                    e.target.style.borderColor = `${colors.primary.gold}30`;
+                  }}
+                >
+                  {language === 'ta' ? 'कैलेंडर' : 'Calendar'} →
+                </Link>
+              </div>
+            </div>
+            <div className="p-7 space-y-5 max-h-96 overflow-y-auto">
+              {dashboardData.upcomingHearings.map((hearing, index) => (
+                <div
+                  key={hearing.id}
+                  className="rounded-xl p-5 border-2 transition-all duration-500 hover:scale-105 hover:shadow-2xl cursor-pointer group/hearing"
+                  style={{
+                    backgroundColor: 'rgba(245, 245, 239, 0.7)',
+                    border: `2px solid ${colors.primary.navy}15`,
+                    animationDelay: `${index * 150}ms`,
+                    animation: 'slideInUp 0.8s ease-out forwards'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = colors.primary.gold;
+                    e.currentTarget.style.boxShadow = `0 15px 40px ${colors.primary.navy}15`;
+                    e.currentTarget.style.transform = 'translateY(-5px) scale(1.02)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = `${colors.primary.navy}15`;
+                    e.currentTarget.style.boxShadow = 'none';
+                    e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                  }}
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <span style={{ 
+                      color: colors.primary.navy, 
+                      fontSize: '15px', 
+                      fontWeight: '700',
+                      fontFamily: 'monospace'
+                    }}>
+                      {hearing.caseNumber}
                     </span>
-                    <span className="text-xs text-gray-500 dark:text-gray-500">
-                      {activity.time}
+                    <span 
+                      className="px-3 py-2 text-xs rounded-xl font-bold border-2"
+                      style={{
+                        color: colors.primary.gold,
+                        backgroundColor: 'rgba(182, 157, 116, 0.1)',
+                        borderColor: 'rgba(182, 157, 116, 0.4)',
+                        fontWeight: '700'
+                      }}
+                    >
+                      {hearing.date}
+                    </span>
+                  </div>
+                  <p style={{ 
+                    color: colors.primary.gray, 
+                    fontSize: '14px', 
+                    margin: '0 0 12px 0',
+                    fontWeight: '500'
+                  }}>
+                    {hearing.title}
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <span style={{ 
+                      color: colors.primary.gray, 
+                      fontSize: '12px', 
+                      maxWidth: '60%',
+                      fontWeight: '600'
+                    }}>
+                      {hearing.court} - {hearing.judge}
+                    </span>
+                    <span style={{ 
+                      color: colors.primary.navy, 
+                      fontSize: '13px', 
+                      fontWeight: '800',
+                      background: colors.gradients.gold,
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      backgroundClip: 'text'
+                    }}>
+                      {hearing.time}
                     </span>
                   </div>
                 </div>
-              </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Recent Activities */}
+          <div 
+            className="rounded-2xl overflow-hidden transition-all duration-700 hover:scale-[1.02] group"
+            style={{
+              background: colors.gradients.card,
+              border: `2px solid ${colors.primary.navy}20`,
+              boxShadow: '0 20px 60px rgba(31, 40, 57, 0.12)',
+              backdropFilter: 'blur(20px)'
+            }}
+          >
+            <div 
+              className="p-7 border-b-2 transition-all duration-500 group-hover:border-b-4"
+              style={{
+                borderColor: colors.primary.gold,
+                background: `linear-gradient(135deg, ${colors.primary.navy}05, ${colors.primary.gold}03)`
+              }}
+            >
+              <h3 style={{ 
+                color: colors.primary.navy, 
+                fontSize: '22px', 
+                fontWeight: '800', 
+                margin: 0,
+                letterSpacing: '0.5px'
+              }}>
+                {language === 'ta' ? 'हाल की गतिविधि' : 'Recent Activities'}
+              </h3>
+            </div>
+            <div className="p-7 space-y-5 max-h-96 overflow-y-auto">
+              {dashboardData.recentActivities.map((activity, index) => (
+                <div
+                  key={activity.id}
+                  className="flex items-start space-x-4 p-4 rounded-xl border-2 transition-all duration-500 hover:scale-105 hover:shadow-xl cursor-pointer group/activity"
+                  style={{
+                    backgroundColor: 'rgba(245, 245, 239, 0.7)',
+                    border: `2px solid ${colors.primary.navy}15`,
+                    animationDelay: `${index * 200}ms`,
+                    animation: 'slideInUp 0.8s ease-out forwards'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+                    e.currentTarget.style.borderColor = colors.primary.gold;
+                    e.currentTarget.style.transform = 'translateX(10px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(245, 245, 239, 0.7)';
+                    e.currentTarget.style.borderColor = `${colors.primary.navy}15`;
+                    e.currentTarget.style.transform = 'translateX(0)';
+                  }}
+                >
+                  <div 
+                    className="flex-shrink-0 mt-1 p-2 rounded-lg transition-all duration-500 group-hover/activity:scale-110 group-hover/activity:rotate-12"
+                    style={{
+                      backgroundColor: 'rgba(182, 157, 116, 0.1)',
+                      border: `2px solid ${colors.primary.gold}30`
+                    }}
+                  >
+                    {activity.type === 'case_update' ? <LegalIcons.TotalCases /> :
+                     activity.type === 'document_upload' ? <LegalIcons.Documents /> :
+                     activity.type === 'hearing_scheduled' ? <LegalIcons.Hearings /> : <LegalIcons.SMS />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p style={{ 
+                      color: colors.primary.navy, 
+                      fontSize: '14px', 
+                      margin: '0 0 6px 0', 
+                      lineHeight: '1.4',
+                      fontWeight: '500'
+                    }}>
+                      {activity.message}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <span style={{ 
+                        color: colors.primary.gray, 
+                        fontSize: '12px', 
+                        fontWeight: '600'
+                      }}>
+                        {activity.user}
+                      </span>
+                      <span style={{ 
+                        color: colors.primary.gold, 
+                        fontSize: '12px', 
+                        fontWeight: '700'
+                      }}>
+                        {activity.time}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div 
+          className="rounded-2xl p-8 transition-all duration-700 hover:scale-[1.01] group"
+          style={{
+            background: colors.gradients.card,
+            border: `2px solid ${colors.primary.navy}20`,
+            boxShadow: '0 20px 60px rgba(31, 40, 57, 0.12)',
+            backdropFilter: 'blur(20px)'
+          }}
+        >
+          <h3 style={{ 
+            color: colors.primary.navy, 
+            fontSize: '26px', 
+            fontWeight: '800', 
+            margin: '0 0 40px 0',
+            textAlign: 'center',
+            letterSpacing: '1px'
+          }}>
+            {language === 'ta' ? 'त्वरित कार्य' : 'Quick Actions'}
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+            {[
+              { label: 'New Case', icon: LegalIcons.NewCase, ta: 'नया मामला' },
+              { label: 'Upload Doc', icon: LegalIcons.Upload, ta: 'दस्तावेज़ अपलोड' },
+              { label: 'Send SMS', icon: LegalIcons.SMS, ta: 'SMS भेजें' },
+              { label: 'Schedule', icon: LegalIcons.Schedule, ta: 'सुनवाई शेड्यूल' },
+              { label: 'Report', icon: LegalIcons.Report, ta: 'रिपोर्ट' },
+              { label: 'Search', icon: LegalIcons.Search, ta: 'खोजें' }
+            ].map((action, index) => (
+              <button
+                key={action.label}
+                className="flex flex-col items-center p-6 rounded-2xl border-2 transition-all duration-500 hover:scale-110 hover:shadow-2xl group/action relative overflow-hidden"
+                style={{
+                  background: colors.gradients.card,
+                  border: `2px solid ${colors.primary.gold}30`,
+                  animationDelay: `${index * 100}ms`,
+                  animation: 'bounceIn 0.8s ease-out forwards'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = `linear-gradient(135deg, ${colors.primary.gold}15, ${colors.primary.gold}08)`;
+                  e.currentTarget.style.borderColor = colors.primary.gold;
+                  e.currentTarget.style.boxShadow = `0 20px 40px ${colors.primary.navy}20`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = colors.gradients.card;
+                  e.currentTarget.style.borderColor = `${colors.primary.gold}30`;
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              >
+                {/* Hover shine effect */}
+                <div 
+                  className="absolute inset-0 rounded-2xl opacity-0 group-hover/action:opacity-100 transition-opacity duration-500"
+                  style={{
+                    background: 'linear-gradient(135deg, transparent, rgba(255,255,255,0.6), transparent)',
+                    transform: 'translateX(-100%)'
+                  }}
+                ></div>
+                
+                <div 
+                  className="relative z-10 p-3 rounded-xl mb-4 transition-all duration-500 group-hover/action:scale-125 group-hover/action:rotate-6"
+                  style={{
+                    backgroundColor: 'rgba(182, 157, 116, 0.1)',
+                    border: `2px solid ${colors.primary.gold}30`
+                  }}
+                >
+                  <div style={{ color: colors.primary.gold }}>
+                    <action.icon />
+                  </div>
+                </div>
+                <span style={{ 
+                  color: colors.primary.navy,
+                  fontSize: '14px',
+                  fontWeight: '700',
+                  textAlign: 'center',
+                  letterSpacing: '0.5px'
+                }}>
+                  {language === 'ta' ? action.ta : action.label}
+                </span>
+              </button>
             ))}
           </div>
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          {language === 'ta' ? 'त्वरित कार्य' : 'Quick Actions'}
-        </h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          {/* New Case */}
-          <button className="flex flex-col items-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors">
-            <svg className="h-8 w-8 text-blue-600 dark:text-blue-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            <span className="text-sm font-medium text-blue-900 dark:text-blue-100">
-              {language === 'ta' ? 'नया मामला' : 'New Case'}
-            </span>
-          </button>
+      {/* Custom CSS for animations */}
+      <style jsx>{`
+        @keyframes slideInUp {
+          from {
+            opacity: 0;
+            transform: translateY(40px) scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+        
+        @keyframes bounceIn {
+          0% {
+            opacity: 0;
+            transform: scale(0.3) rotate(-10deg);
+          }
+          50% {
+            opacity: 1;
+            transform: scale(1.05) rotate(5deg);
+          }
+          70% {
+            transform: scale(0.95) rotate(-2deg);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1) rotate(0deg);
+          }
+        }
+        
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(0px) rotate(0deg);
+          }
+          50% {
+            transform: translateY(-20px) rotate(180deg);
+          }
+        }
+        
+        @keyframes float-reverse {
+          0%, 100% {
+            transform: translateY(0px) rotate(0deg);
+          }
+          50% {
+            transform: translateY(20px) rotate(-180deg);
+          }
+        }
+        
+        .line-clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
 
-          {/* Upload Document */}
-          <button className="flex flex-col items-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors">
-            <svg className="h-8 w-8 text-green-600 dark:text-green-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-            </svg>
-            <span className="text-sm font-medium text-green-900 dark:text-green-100">
-              {language === 'ta' ? 'दस्तावेज़ अपलोड' : 'Upload Doc'}
-            </span>
-          </button>
-
-          {/* Send SMS */}
-          <button className="flex flex-col items-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors">
-            <svg className="h-8 w-8 text-purple-600 dark:text-purple-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-            </svg>
-            <span className="text-sm font-medium text-purple-900 dark:text-purple-100">
-              {language === 'ta' ? 'SMS भेजें' : 'Send SMS'}
-            </span>
-          </button>
-
-          {/* Schedule Hearing */}
-          <button className="flex flex-col items-center p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg hover:bg-yellow-100 dark:hover:bg-yellow-900/30 transition-colors">
-            <svg className="h-8 w-8 text-yellow-600 dark:text-yellow-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            <span className="text-sm font-medium text-yellow-900 dark:text-yellow-100">
-              {language === 'ta' ? 'सुनवाई शेड्यूल' : 'Schedule'}
-            </span>
-          </button>
-
-          {/* Generate Report */}
-          <button className="flex flex-col items-center p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors">
-            <svg className="h-8 w-8 text-indigo-600 dark:text-indigo-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-            <span className="text-sm font-medium text-indigo-900 dark:text-indigo-100">
-              {language === 'ta' ? 'रिपोर्ट' : 'Report'}
-            </span>
-          </button>
-
-          {/* Search */}
-          <button className="flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
-            <svg className="h-8 w-8 text-gray-600 dark:text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-              {language === 'ta' ? 'खोजें' : 'Search'}
-            </span>
-          </button>
-        </div>
-      </div>
+        /* Ensure proper scrolling */
+        .container {
+          min-height: calc(100vh + 100px);
+        }
+      `}</style>
     </div>
   );
 };
