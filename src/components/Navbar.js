@@ -56,19 +56,27 @@ const Navbar = () => {
       setIsScrolled(scrollY > 10);
       
       // Update active section based on scroll position
-      const sections = ['hero', 'features', 'pricing', 'testimonials', 'contact'];
-      const currentSection = sections.find(section => {
-        const element = document.getElementById(section);
-        if (element) {
-          const rect = element.getBoundingClientRect();
-          return rect.top <= 120 && rect.bottom >= 120;
+        const sections = ['hero', 'features', 'pricing', 'testimonials', 'footer'];
+        let currentSection = sections.find(section => {
+          const element = document.getElementById(section);
+          if (element) {
+            const rect = element.getBoundingClientRect();
+            // For footer, highlight if near bottom of page
+            if (section === 'footer') {
+              const nearBottom = (window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 40);
+              return nearBottom;
+            }
+            return rect.top <= 120 && rect.bottom >= 120;
+          }
+          return false;
+        });
+        // If no section is active and we're at the very bottom, highlight footer
+        if (!currentSection && (window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 10)) {
+          currentSection = 'footer';
         }
-        return false;
-      });
-      
-      if (currentSection) {
-        setActiveSection(currentSection);
-      }
+        if (currentSection) {
+          setActiveSection(currentSection);
+        }
     };
     
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -102,6 +110,13 @@ const Navbar = () => {
       setIsOpen(false);
     }
   }, [logoutEvent]);
+
+  // Listen for external requests to open the register modal (e.g., from Features CTA)
+  useEffect(() => {
+    const openRegisterHandler = () => setShowRegisterModal(true);
+    window.addEventListener('open-register-modal', openRegisterHandler);
+    return () => window.removeEventListener('open-register-modal', openRegisterHandler);
+  }, []);
 
   // Click outside handler
   useEffect(() => {
@@ -152,10 +167,15 @@ const Navbar = () => {
         // If already on home page, just scroll
         const element = document.getElementById(section);
         if (element) {
-          const offset = 100; // Account for fixed navbar
-          const elementPosition = element.getBoundingClientRect().top;
-          const offsetPosition = elementPosition + window.pageYOffset - offset;
-          window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+          // For footer, scroll to the very bottom to ensure it's visible
+          if (section === 'footer') {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          } else {
+            const offset = 100; // Account for fixed navbar
+            const elementPosition = element.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - offset;
+            window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+          }
         }
       }
     }
@@ -412,6 +432,7 @@ const Navbar = () => {
       <LoginModal 
         isOpen={showLoginModal} 
         onClose={() => setShowLoginModal(false)} 
+        onOpenRegister={() => setShowRegisterModal(true)}
       />
       
       {/* Register Modal */}
@@ -427,10 +448,15 @@ const Navbar = () => {
 export const navigateToSection = (sectionId) => {
   const element = document.getElementById(sectionId);
   if (element) {
-    const offset = 100;
-    const elementPosition = element.getBoundingClientRect().top;
-    const offsetPosition = elementPosition + window.pageYOffset - offset;
-    window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+    // For footer, scroll to the very bottom to ensure it's visible
+    if (sectionId === 'footer') {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      const offset = 100;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - offset;
+      window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+    }
   }
 };
 

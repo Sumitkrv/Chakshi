@@ -17,7 +17,7 @@ import Pricing from "./components/Pricing";
 import Testimonials from "./components/Testimonials";
 import Footer from "./components/Footer";
 import Login from "./components/Login";
-import Register from "./components/Register";
+import RegisterRedirect from "./components/RegisterRedirect";
 import SearchResults from "./components/SearchResults";
 import Dashboard from "./components/Dashboard";
 import AnalyticsDashboard from "./Advocate pages/Analytics";
@@ -56,6 +56,10 @@ import ClerkIntegrations from "./Clerk components/Integrations";
 import ClerkSettings from "./Clerk components/Settings";
 import ProtectedRoute from "./components/ProtectedRoute";
 import "./App.css";
+import AdminLayout from './Admin/AdminLayout';
+import AdminDashboard from './Admin/Dashboard';
+import AdminUsers from './Admin/Users';
+import AdminSettings from './Admin/Settings';
 
 // Loading component with professional SaaS styling
 const SaaSLoader = () => (
@@ -222,7 +226,7 @@ function AppContent() {
         <Route path="/register" element={
           <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 zoom-in">
             <div className="flex-grow">
-              <Register />
+              <RegisterRedirect />
             </div>
             <Footer />
           </div>
@@ -304,6 +308,17 @@ function AppContent() {
           <Route path="offline-mode" element={<OfflineModeToggle />} />
           <Route path="integrations" element={<ClerkIntegrations />} />
           <Route path="settings" element={<ClerkSettings />} />
+          <Route index element={<Navigate to="dashboard" replace />} />
+        </Route>
+        {/* Admin Routes */}
+        <Route path="/admin/*" element={
+          <ProtectedRoute>
+            <AdminLayout />
+          </ProtectedRoute>
+        }>
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="users" element={<AdminUsers />} />
+          <Route path="settings" element={<AdminSettings />} />
           <Route index element={<Navigate to="dashboard" replace />} />
         </Route>
         
