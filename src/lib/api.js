@@ -2,6 +2,15 @@ import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:5000'; // Replace with your actual backend API base URL
 
+// Helper function to create authenticated axios instances
+const createAuthInstance = (token) => {
+  return axios.create({
+    baseURL: API_BASE_URL,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
 
 export const loginUser = async (token) => {
   try {
@@ -23,15 +32,41 @@ export const verifySupabaseToken = async (token) => {
 
 export const getCurrentUserProfile = async (token) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/auth/me`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const authAxios = createAuthInstance(token);
+    const response = await authAxios.get(`/auth/me`);
     return response.data;
   } catch (error) {
     throw error.response.data;
   }
 };
 
-// Add other API functions here as needed
+// Template and Category API functions
+export const getTemplateCategories = async (token) => {
+  try {
+    const authAxios = createAuthInstance(token);
+    const response = await authAxios.get(`/templates/categories`);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const getTemplates = async (token, params = {}) => {
+  try {
+    const authAxios = createAuthInstance(token);
+    const response = await authAxios.get(`/templates`, { params });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const getTemplateById = async (token, id) => {
+  try {
+    const authAxios = createAuthInstance(token);
+    const response = await authAxios.get(`/templates/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};

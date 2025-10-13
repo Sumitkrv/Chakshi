@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabaseClient';
+import { loginUser as backendLoginUser } from '../lib/api'; // Renamed to avoid conflict
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -96,27 +98,6 @@ const Login = () => {
     setError('');
   };
 
-  // Demo authentication - replace with actual API call
-  const authenticateUser = async (credentials) => {
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // For demo purposes, allow any email/password combination
-    // In production, this should make a real API call
-    if (credentials.email && credentials.password && credentials.role) {
-      return {
-        id: Date.now(),
-        email: credentials.email,
-        role: credentials.role,
-        name: credentials.email.split('@')[0],
-        token: `demo-token-${Date.now()}`,
-        isAuthenticated: true
-      };
-    } else {
-      throw new Error('Invalid credentials');
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -136,11 +117,41 @@ const Login = () => {
     }
 
     try {
-      // Authenticate user (replace with actual API call)
-      const userData = await authenticateUser(formData);
+      // 1. Sign in with Supabase
+      const { data, error: supabaseError } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (supabaseError) {
+        throw new Error(supabaseError.message);
+      }
+
+      if (!data || !data.session || !data.session.access_token) {
+        throw new Error('Supabase login failed: No session or token received.');
+      }
+
+      const supabaseToken = data.session.access_token;
+
+      // 2. Send Supabase JWT to our backend for local user creation/update
+      const backendResponse = await backendLoginUser(supabaseToken);
+
+      if (!backendResponse.success) {
+        throw new Error(backendResponse.message || 'Backend login failed.');
+      }
+
+      const userProfile = backendResponse.data.user;
+
+      // Ensure the role from the backend matches the selected role in the form
+      if (userProfile.role.toLowerCase() !== formData.role) {
+        // This scenario might require specific handling, e.g., redirecting to a role selection page
+        // or showing an error that the selected role doesn't match the registered role.
+        // For now, we'll throw an error.
+        throw new Error(`Role mismatch: You are registered as ${userProfile.role}, but tried to log in as ${formData.role}.`);
+      }
       
       // Store user data in context and localStorage
-      login(userData);
+      login({ ...userProfile, token: supabaseToken });
       
       // Get the selected role's route
       const selectedRole = roles.find(role => role.id === formData.role);
