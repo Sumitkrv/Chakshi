@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabaseClient';
-import { loginUser } from '../lib/api';
+
 import { 
   Mail, 
   Lock, 
@@ -21,6 +21,7 @@ import {
   LogIn,
   UserCheck
 } from 'lucide-react';
+import { loginUser as backendLoginUser } from '../lib/api'; // Renamed to avoid conflict
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -32,33 +33,76 @@ const Login = () => {
   const [roleError, setRoleError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [hoveredRole, setHoveredRole] = useState(null);
   const navigate = useNavigate();
   const { login } = useAuth();
+
+  // Hero.js comprehensive color palette
+  const colors = {
+    // Primary Brand Colors
+    background: '#f5f5ef',
+    darkNavy: '#1f2839',
+    golden: '#b69d74',
+    mediumGray: '#6b7280',
+    
+    // Functional Status Colors
+    success: '#10b981',
+    warning: '#f59e0b',
+    info: '#3b82f6',
+    
+    // Transparency & Alpha Variations
+    whiteAlpha03: 'rgba(255, 255, 255, 0.03)',
+    whiteAlpha06: 'rgba(255, 255, 255, 0.06)',
+    whiteAlpha08: 'rgba(255, 255, 255, 0.08)',
+    whiteAlpha20: 'rgba(255, 255, 255, 0.20)',
+    goldenAlpha05: 'rgba(182, 157, 116, 0.05)',
+    goldenAlpha08: 'rgba(182, 157, 116, 0.08)',
+    goldenAlpha10: 'rgba(182, 157, 116, 0.10)',
+    goldenAlpha12: 'rgba(182, 157, 116, 0.12)',
+    goldenAlpha15: 'rgba(182, 157, 116, 0.15)',
+    goldenAlpha20: 'rgba(182, 157, 116, 0.20)',
+    goldenAlpha40: 'rgba(182, 157, 116, 0.40)',
+    goldenAlpha50: 'rgba(182, 157, 116, 0.50)',
+    goldenAlpha60: 'rgba(182, 157, 116, 0.60)',
+    navyAlpha05: 'rgba(31, 40, 57, 0.05)',
+    navyAlpha15: 'rgba(31, 40, 57, 0.15)',
+    navyAlpha20: 'rgba(31, 40, 57, 0.20)',
+    navyAlpha25: 'rgba(31, 40, 57, 0.25)',
+    
+    // Gradient Combinations
+    primaryButtonGradient: 'linear-gradient(135deg, #b69d74, #b69d74DD, #b69d74BB)',
+    textGradient: 'linear-gradient(135deg, #1f2839, #b69d74)',
+    progressGradient: 'linear-gradient(90deg, #b69d74, #b69d74CC)',
+    backgroundGradient: 'linear-gradient(135deg, #b69d7420, #b69d7410)'
+  };
 
   const roles = [
     {
       id: 'advocate',
       title: 'Advocate',
-      icon: Scale,
+      label: '⚖️ Legal Professional',
       route: '/advocate/dashboard',
-      description: 'Legal professional',
-      gradient: 'from-blue-500 to-indigo-600'
+      description: 'Legal professional practice management',
+      emoji: '⚖️',
+      gradient: colors.primaryButtonGradient
     },
     {
       id: 'student',
       title: 'Law Student',
-      icon: GraduationCap,
+      label: '🎓 Academic Learning',
       route: '/student/dashboard',
-      description: 'Pursuing legal education',
-      gradient: 'from-green-500 to-emerald-600'
+      description: 'Pursuing legal education and training',
+      emoji: '🎓',
+      gradient: `linear-gradient(135deg, ${colors.golden}, ${colors.golden}CC)`
     },
     {
       id: 'clerk',
       title: 'Court Clerk',
-      icon: FileText,
+      label: '📋 Administrative Support',
       route: '/clerk/dashboard',
-      description: 'Court administration',
-      gradient: 'from-purple-500 to-violet-600'
+      description: 'Court administration and case management',
+      emoji: '📋',
+      gradient: `linear-gradient(135deg, ${colors.golden}, ${colors.golden}BB)`
     }
   ];
 
@@ -93,6 +137,7 @@ const Login = () => {
 
     try {
       // 1. Authenticate with Supabase
+      // 1. Sign in with Supabase
       const { data, error: supabaseError } = await supabase.auth.signInWithPassword({
         email: formData.email,
         password: formData.password,
@@ -102,14 +147,28 @@ const Login = () => {
         throw new Error(supabaseError.message);
       }
 
-      if (!data.session) {
-        throw new Error('Supabase session not found after sign-in.');
+      if (!data || !data.session || !data.session.access_token) {
+        throw new Error('Supabase login failed: No session or token received.');
       }
 
-      const supabaseAccessToken = data.session.access_token;
+      const supabaseToken = data.session.access_token;
 
-      // 2. Call backend login API with Supabase JWT
-      const backendResponse = await loginUser(supabaseAccessToken);
+      // 2. Send Supabase JWT to our backend for local user creation/update
+      const backendResponse = await backendLoginUser(supabaseToken);
+
+      if (!backendResponse.success) {
+        throw new Error(backendResponse.message || 'Backend login failed.');
+      }
+
+      const userProfile = backendResponse.data.user;
+
+      // Ensure the role from the backend matches the selected role in the form
+      if (userProfile.role.toLowerCase() !== formData.role) {
+        // This scenario might require specific handling, e.g., redirecting to a role selection page
+        // or showing an error that the selected role doesn't match the registered role.
+        // For now, we'll throw an error.
+        throw new Error(`Role mismatch: You are registered as ${userProfile.role}, but tried to log in as ${formData.role}.`);
+      }
       
       if (!backendResponse.success) {
         throw new Error(backendResponse.message || 'Backend login failed.');
@@ -119,7 +178,7 @@ const Login = () => {
       const backendToken = supabaseAccessToken; // Use Supabase token for frontend session
 
       // Store user data in context and localStorage
-      login({ ...userData, token: backendToken });
+      login({ ...userProfile, token: supabaseToken });
       
       // Get the selected role's route
       const selectedRole = roles.find(role => role.id === formData.role);
@@ -134,33 +193,93 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pro-flex items-center justify-center pro-p-4">
+    <div 
+      className="min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8"
+      style={{ backgroundColor: colors.background }}
+    >
       
-      {/* Background Pattern */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none"></div>
+      {/* Background Elements */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div 
+          className="absolute top-20 right-10 w-96 h-96 rounded-full blur-3xl animate-pulse"
+          style={{ backgroundColor: colors.goldenAlpha10 }}
+        ></div>
+        <div 
+          className="absolute bottom-20 left-10 w-96 h-96 rounded-full blur-3xl animate-pulse"
+          style={{ 
+            backgroundColor: colors.goldenAlpha08,
+            animationDelay: '2s'
+          }}
+        ></div>
+        <div 
+          className="absolute top-1/2 left-1/2 w-96 h-96 rounded-full blur-3xl animate-pulse"
+          style={{ 
+            backgroundColor: colors.goldenAlpha05,
+            animationDelay: '4s'
+          }}
+        ></div>
+        
+        {/* Grid Pattern */}
+        <div 
+          className="absolute inset-0 opacity-20"
+          style={{
+            backgroundImage: `linear-gradient(to right, ${colors.goldenAlpha10} 1px, transparent 1px), linear-gradient(to bottom, ${colors.goldenAlpha10} 1px, transparent 1px)`,
+            backgroundSize: '4rem 4rem'
+          }}
+        ></div>
+      </div>
       
       <div className="w-full max-w-md relative z-10">
         
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 pro-rounded-xl pro-flex-center mx-auto mb-4">
-            <LogIn className="w-8 h-8 text-white" />
+          <div 
+            className="w-16 h-16 border rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg hover:shadow-xl transition-all duration-300"
+            style={{
+              backgroundColor: colors.whiteAlpha20,
+              borderColor: colors.goldenAlpha40,
+              backdropFilter: 'blur(6px)',
+              ':hover': { borderColor: colors.goldenAlpha60 }
+            }}
+          >
+            <span className="text-3xl">🔐</span>
           </div>
-          <h1 className="pro-heading-xl text-gray-900 mb-2">Welcome Back</h1>
-          <p className="pro-text-body text-gray-600">Sign in to your legal platform account</p>
+          <h1 
+            className="text-3xl sm:text-4xl font-bold mb-2"
+            style={{ color: colors.darkNavy }}
+          >
+            Welcome Back
+          </h1>
+          <p 
+            className="text-lg sm:text-xl"
+            style={{ color: colors.mediumGray }}
+          >
+            Sign in to your legal platform account
+          </p>
         </div>
 
         {/* Main Form Card */}
-        <div className="pro-dashboard-card pro-p-8 mb-6">
+        <div 
+          className="border rounded-2xl p-6 sm:p-8 mb-6 shadow-lg hover:shadow-xl transition-all duration-300"
+          style={{
+            backgroundColor: colors.whiteAlpha20,
+            borderColor: colors.goldenAlpha40,
+            backdropFilter: 'blur(6px)',
+            ':hover': { borderColor: colors.goldenAlpha60 }
+          }}
+        >
           <form onSubmit={handleSubmit} className="space-y-6">
             
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block pro-text-sm font-medium text-gray-700 mb-2">
-                Email Address
+              <label 
+                htmlFor="email" 
+                className="block text-sm font-medium mb-2"
+                style={{ color: colors.darkNavy }}
+              >
+                📧 Email Address
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type="email"
                   id="email"
@@ -169,7 +288,18 @@ const Login = () => {
                   onChange={handleChange}
                   required
                   placeholder="Enter your email"
-                  className="w-full pro-p-3 pl-12 border border-gray-300 pro-rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                  className="w-full p-3 sm:p-4 pl-4 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 hover:border-opacity-80"
+                  style={{
+                    backgroundColor: colors.whiteAlpha06,
+                    borderColor: colors.goldenAlpha40,
+                    color: colors.darkNavy,
+                    '::placeholder': { color: colors.mediumGray },
+                    ':focus': {
+                      ringColor: colors.golden,
+                      borderColor: 'transparent'
+                    },
+                    ':hover': { borderColor: colors.goldenAlpha60 }
+                  }}
                   disabled={loading}
                 />
               </div>
@@ -177,11 +307,14 @@ const Login = () => {
 
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block pro-text-sm font-medium text-gray-700 mb-2">
-                Password
+              <label 
+                htmlFor="password" 
+                className="block text-sm font-medium mb-2"
+                style={{ color: colors.darkNavy }}
+              >
+                🔒 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type={showPassword ? "text" : "password"}
                   id="password"
@@ -190,49 +323,103 @@ const Login = () => {
                   onChange={handleChange}
                   required
                   placeholder="Enter your password"
-                  className="w-full pro-p-3 pl-12 pr-12 border border-gray-300 pro-rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                  className="w-full p-3 sm:p-4 pl-4 pr-12 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 hover:border-opacity-80"
+                  style={{
+                    backgroundColor: colors.whiteAlpha06,
+                    borderColor: colors.goldenAlpha40,
+                    color: colors.darkNavy,
+                    '::placeholder': { color: colors.mediumGray },
+                    ':focus': {
+                      ringColor: colors.golden,
+                      borderColor: 'transparent'
+                    },
+                    ':hover': { borderColor: colors.goldenAlpha60 }
+                  }}
                   disabled={loading}
                 />
                 <button
                   type="button"
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 w-6 h-6 transition-colors duration-200"
+                  style={{ 
+                    color: colors.mediumGray,
+                    ':hover': { color: colors.golden }
+                  }}
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? '🙈' : '👁️'}
                 </button>
               </div>
             </div>
 
             {/* Role Selection */}
             <div>
-              <label className="block pro-text-sm font-medium text-gray-700 mb-3">
-                Select Your Role
+              <label 
+                className="block text-sm font-medium mb-3"
+                style={{ color: colors.darkNavy }}
+              >
+                👤 Select Your Role
               </label>
               <div className="space-y-3">
                 {roles.map((role) => {
-                  const IconComponent = role.icon;
+                  const isSelected = formData.role === role.id;
+                  const isHovered = hoveredRole === role.id;
+                  
                   return (
                     <div
                       key={role.id}
-                      className={`pro-p-4 border-2 pro-rounded-lg cursor-pointer transition-all duration-300 ${
-                        formData.role === role.id 
-                          ? `border-blue-500 bg-blue-50 ring-2 ring-blue-200` 
-                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                      } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      className={`p-3 sm:p-4 border-2 rounded-lg cursor-pointer transition-all duration-300 ${
+                        loading ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
+                      style={{
+                        borderColor: isSelected ? colors.golden : colors.goldenAlpha40,
+                        backgroundColor: isSelected ? colors.goldenAlpha10 : 'transparent',
+                        ...(isSelected && { 
+                          boxShadow: `0 0 0 1px ${colors.goldenAlpha20}` 
+                        }),
+                        ...(isHovered && !isSelected && { 
+                          borderColor: colors.goldenAlpha60,
+                          backgroundColor: colors.goldenAlpha05 
+                        })
+                      }}
                       onClick={() => !loading && handleChange({ target: { name: 'role', value: role.id } })}
+                      onMouseEnter={() => setHoveredRole(role.id)}
+                      onMouseLeave={() => setHoveredRole(null)}
                     >
-                      <div className="pro-flex items-center pro-gap-3">
-                        <div className={`w-12 h-12 bg-gradient-to-r ${role.gradient} pro-rounded-lg pro-flex-center flex-shrink-0`}>
-                          <IconComponent className="w-6 h-6 text-white" />
+                      <div className="flex items-center gap-3">
+                        <div 
+                          className={`w-10 h-10 sm:w-12 sm:h-12 border rounded-lg flex items-center justify-center flex-shrink-0 transition-transform duration-300 ${
+                            isHovered ? 'scale-110' : ''
+                          }`}
+                          style={{
+                            background: role.gradient,
+                            borderColor: colors.goldenAlpha60
+                          }}
+                        >
+                          <span className="text-xl sm:text-2xl text-white">{role.emoji}</span>
                         </div>
-                        <div className="flex-1">
-                          <div className="pro-flex items-center justify-between">
-                            <h4 className="pro-heading-sm text-gray-900">{role.title}</h4>
-                            {formData.role === role.id && (
-                              <CheckCircle className="w-5 h-5 text-blue-500" />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <h4 
+                              className="text-base sm:text-lg font-semibold truncate"
+                              style={{ color: colors.darkNavy }}
+                            >
+                              {role.title}
+                            </h4>
+                            {isSelected && (
+                              <span 
+                                className="text-lg sm:text-xl flex-shrink-0 ml-2"
+                                style={{ color: colors.golden }}
+                              >
+                                ✅
+                              </span>
                             )}
                           </div>
-                          <p className="pro-text-xs text-gray-600">{role.description}</p>
+                          <p 
+                            className="text-sm truncate"
+                            style={{ color: colors.mediumGray }}
+                          >
+                            {role.description}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -240,8 +427,11 @@ const Login = () => {
                 })}
               </div>
               {roleError && (
-                <div className="mt-2 pro-flex items-center pro-gap-2 pro-text-sm text-red-600">
-                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                <div 
+                  className="mt-2 flex items-center gap-2 text-sm"
+                  style={{ color: colors.golden }}
+                >
+                  <span>⚠️</span>
                   {roleError}
                 </div>
               )}
@@ -250,21 +440,25 @@ const Login = () => {
             {/* Submit Button */}
             <button 
               type="submit" 
-              className={`w-full pro-btn pro-btn-primary pro-flex items-center justify-center pro-gap-2 ${
+              className={`w-full text-white py-3 sm:py-4 px-6 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 hover:scale-[1.02] shadow-lg ${
                 loading ? 'opacity-75 cursor-not-allowed' : ''
               }`}
+              style={{
+                background: colors.primaryButtonGradient,
+                boxShadow: `0 4px 15px ${colors.goldenAlpha40}`
+              }}
               disabled={loading}
             >
               {loading ? (
                 <>
-                  <Loader className="w-5 h-5 animate-spin" />
+                  <span className="animate-spin">⏳</span>
                   Signing In...
                 </>
               ) : (
                 <>
-                  <UserCheck className="w-5 h-5" />
+                  <span>👤</span>
                   Sign In
-                  <ArrowRight className="w-5 h-5" />
+                  <span className="group-hover:translate-x-1 transition-transform duration-300">→</span>
                 </>
               )}
             </button>
@@ -272,21 +466,46 @@ const Login = () => {
 
           {/* Error Message */}
           {error && (
-            <div className="mt-4 pro-p-3 bg-red-50 border border-red-200 pro-rounded-lg pro-flex items-center pro-gap-2">
-              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-              <p className="pro-text-sm text-red-700">{error}</p>
+            <div 
+              className="mt-4 p-3 border rounded-lg flex items-center gap-2"
+              style={{
+                backgroundColor: colors.goldenAlpha10,
+                borderColor: colors.goldenAlpha40
+              }}
+            >
+              <span style={{ color: colors.golden }}>⚠️</span>
+              <p 
+                className="text-sm"
+                style={{ color: colors.darkNavy }}
+              >
+                {error}
+              </p>
             </div>
           )}
         </div>
 
         {/* Register Link */}
-        <div className="text-center pro-p-4 bg-white border border-gray-200 pro-rounded-lg">
-          <p className="pro-text-sm text-gray-600">
+        <div 
+          className="text-center p-4 border rounded-lg hover:bg-opacity-80 transition-all duration-300"
+          style={{
+            backgroundColor: colors.whiteAlpha06,
+            borderColor: colors.goldenAlpha40,
+            backdropFilter: 'blur(6px)'
+          }}
+        >
+          <p 
+            className="text-sm"
+            style={{ color: colors.mediumGray }}
+          >
             Don't have an account? {' '}
             <button 
-              className="text-blue-600 hover:text-blue-700 font-medium hover:underline transition-colors duration-200"
+              className="font-medium hover:underline transition-colors duration-200"
               onClick={() => !loading && navigate('/register')}
               disabled={loading}
+              style={{
+                color: colors.darkNavy,
+                ':hover': { color: colors.golden }
+              }}
             >
               Create one here
             </button>
@@ -294,14 +513,34 @@ const Login = () => {
         </div>
 
         {/* Demo Notice */}
-        <div className="mt-6 pro-p-4 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 pro-rounded-lg">
-          <div className="pro-flex items-start pro-gap-3">
-            <div className="w-8 h-8 bg-blue-500 pro-rounded-lg pro-flex-center flex-shrink-0">
-              <Star className="w-4 h-4 text-white" />
+        <div 
+          className="mt-6 p-4 border rounded-lg hover:bg-opacity-80 transition-all duration-300"
+          style={{
+            backgroundColor: colors.goldenAlpha10,
+            borderColor: colors.goldenAlpha40
+          }}
+        >
+          <div className="flex items-start gap-3">
+            <div 
+              className="w-8 h-8 border rounded-lg flex items-center justify-center flex-shrink-0"
+              style={{
+                background: colors.primaryButtonGradient,
+                borderColor: colors.goldenAlpha60
+              }}
+            >
+              <span className="text-xl text-white">⭐</span>
             </div>
             <div>
-              <h4 className="pro-text-sm font-semibold text-blue-900 mb-1">Demo Mode Active</h4>
-              <p className="pro-text-xs text-blue-700 leading-relaxed">
+              <h4 
+                className="text-sm font-semibold mb-1"
+                style={{ color: colors.darkNavy }}
+              >
+                Demo Mode Active
+              </h4>
+              <p 
+                className="text-xs leading-relaxed"
+                style={{ color: colors.mediumGray }}
+              >
                 You can sign in with any email and password. Just select your role and click "Sign In" to explore the platform.
               </p>
             </div>
@@ -311,10 +550,14 @@ const Login = () => {
         {/* Quick Access */}
         <div className="mt-4 text-center">
           <button 
-            className="pro-text-sm text-gray-500 hover:text-gray-700 pro-flex items-center pro-gap-1 mx-auto transition-colors duration-200"
+            className="flex items-center gap-1 mx-auto transition-colors duration-200 hover:underline text-sm"
             onClick={() => navigate('/')}
+            style={{
+              color: colors.mediumGray,
+              ':hover': { color: colors.golden }
+            }}
           >
-            <Home className="w-4 h-4" />
+            <span>🏠</span>
             Back to Home
           </button>
         </div>

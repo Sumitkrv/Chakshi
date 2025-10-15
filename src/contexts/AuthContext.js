@@ -9,6 +9,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate(); // Initialize useNavigate
+  const [logoutEvent, setLogoutEvent] = useState(0); // Track logout events
 
   useEffect(() => {
     const checkAuthStatus = async () => {
@@ -64,7 +65,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = (userData) => {
     // Store both user data and a token
-    const token = userData.token; // Token should now always come from backend response
+    const token = userData.token || `demo-token-${Date.now()}`;
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
     localStorage.setItem('token', token);
@@ -74,14 +75,21 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
-    await supabase.auth.signOut(); // Ensure Supabase session is also cleared
+    // Increment logout event counter to trigger cleanup in components
+    setLogoutEvent(prev => prev + 1);
+  };
+
+  const isAuthenticated = () => {
+    return !!user && !!localStorage.getItem('token');
   };
 
   const value = {
     user,
     login,
     logout,
-    loading
+    loading,
+    isAuthenticated,
+    logoutEvent // Components can listen to this for cleanup
   };
 
   return (

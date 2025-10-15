@@ -1,357 +1,336 @@
-import React, { useState } from 'react';
-import { 
-  Check, 
-  Star, 
-  Crown, 
-  Users, 
-  GraduationCap, 
-  Scale, 
-  ArrowRight, 
-  Zap, 
-  Shield, 
-  Headphones, 
-  Sparkles,
-  Gift,
-  Clock,
-  TrendingUp,
-  Award,
-  Target,
-  CheckCircle
-} from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 
 const Pricing = () => {
   const [billingCycle, setBillingCycle] = useState('monthly');
+  const [loadingPlan, setLoadingPlan] = useState(null);
+  const [paymentStatus, setPaymentStatus] = useState(null);
+
+  // Load Razorpay script
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    document.body.appendChild(script);
+    
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
 
   const toggleBillingCycle = () => {
     setBillingCycle(billingCycle === 'monthly' ? 'yearly' : 'monthly');
   };
 
-  const pricingData = {
-    enlightenment: {
-      title: "Enlightenment Tier",
-      subtitle: "All-Inclusive Access",
-      monthlyPrice: "₹4,999",
-      yearlyPrice: "₹49,999",
-      originalMonthlyPrice: "₹5,999",
-      originalYearlyPrice: "₹59,999",
-      description: "Complete access to all platform features with priority support",
-      icon: Crown,
-      gradient: "from-purple-500 to-pink-600",
-      bgGradient: "from-purple-50 to-pink-50",
-      features: [
-        { text: "All Document Templates", icon: CheckCircle },
-        { text: "Full Research Database", icon: CheckCircle },
-        { text: "Courtroom Simulation", icon: CheckCircle },
-        { text: "Priority Support", icon: CheckCircle },
-        { text: "All User Workspaces", icon: CheckCircle },
-        { text: "Advanced Analytics", icon: CheckCircle },
-        { text: "API Access", icon: CheckCircle },
-        { text: "Custom Integrations", icon: CheckCircle }
-      ],
-      popular: true,
-      badge: "Most Popular",
-      savings: "Save ₹12,000/year"
-    },
-    professional: {
-      title: "Professional Tier",
-      subtitle: "For Legal Professionals",
-      monthlyPrice: "₹2,999",
-      yearlyPrice: "₹29,999",
-      originalMonthlyPrice: "₹3,499",
-      originalYearlyPrice: "₹35,999",
-      description: "Comprehensive tools tailored for advocates and clerks",
-      icon: Scale,
-      gradient: "from-blue-500 to-indigo-600",
-      bgGradient: "from-blue-50 to-indigo-50",
-      features: [
-        { text: "Legal Document Templates", icon: Check },
-        { text: "Research Database", icon: Check },
-        { text: "Case Management Tools", icon: Check },
-        { text: "Basic Simulation", icon: Check },
-        { text: "Email Support", icon: Check },
-        { text: "Client Portal", icon: Check },
-        { text: "Document Analytics", icon: Check }
-      ],
-      popular: false,
-      badge: "Best Value",
-      savings: "Save ₹6,000/year"
-    },
-    student: {
-      title: "Student & Public Tier",
-      subtitle: "For Learning & Basic Needs",
-      monthlyPrice: "₹499",
-      yearlyPrice: "₹4,999",
-      originalMonthlyPrice: "₹599",
-      originalYearlyPrice: "₹5,999",
-      description: "Essential resources for students and basic legal needs",
-      icon: GraduationCap,
-      gradient: "from-green-500 to-emerald-600",
-      bgGradient: "from-green-50 to-emerald-50",
-      features: [
-        { text: "Limited Document Access", icon: Check },
-        { text: "Educational Resources", icon: Check },
-        { text: "Basic Research Tools", icon: Check },
-        { text: "Community Support", icon: Check },
-        { text: "Micropayment Options", icon: Check },
-        { text: "Study Materials", icon: Check }
-      ],
-      popular: false,
-      badge: "Best for Students",
-      savings: "Save ₹1,200/year"
+  const handlePayment = async (role) => {
+    setLoadingPlan(role);
+    
+    try {
+      const plan = pricingData[role];
+      const amount = billingCycle === 'monthly' 
+        ? parseInt(plan.monthlyPrice.replace('₹', '').replace(',', '')) 
+        : parseInt(plan.yearlyPrice.replace('₹', '').replace(',', ''));
+
+      // Create order on your backend
+      const orderResponse = await fetch('/api/create-order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          amount: amount * 100,
+          currency: 'INR',
+          planName: plan.title,
+          billingCycle: billingCycle,
+          userRole: role
+        })
+      });
+
+      if (!orderResponse.ok) {
+        throw new Error('Failed to create order');
+      }
+
+      const order = await orderResponse.json();
+
+      const options = {
+        key: process.env.REACT_APP_RAZORPAY_KEY_ID,
+        amount: order.amount,
+        currency: order.currency,
+        name: 'Legal Platform',
+        description: `${plan.title} - ${billingCycle}`,
+        order_id: order.id,
+        handler: function (response) {
+          setPaymentStatus('success');
+          setLoadingPlan(null);
+          setTimeout(() => setPaymentStatus(null), 3000);
+        },
+        prefill: {
+          name: 'User Name',
+          email: 'user@example.com',
+          contact: '9999999999'
+        },
+        theme: {
+          color: '#b69d74'
+        },
+        modal: {
+          ondismiss: function () {
+            setLoadingPlan(null);
+            setPaymentStatus('cancelled');
+            setTimeout(() => setPaymentStatus(null), 3000);
+          }
+        }
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+
+    } catch (error) {
+      console.error('Payment initiation failed:', error);
+      setPaymentStatus('error');
+      setLoadingPlan(null);
+      setTimeout(() => setPaymentStatus(null), 5000);
     }
   };
 
-  const features = [
-    { icon: Shield, title: "Enterprise Security", description: "Bank-grade encryption and compliance" },
-    { icon: Headphones, title: "24/7 Support", description: "Round-the-clock expert assistance" },
-    { icon: Zap, title: "Fast Performance", description: "Optimized for speed and reliability" },
-    { icon: Target, title: "99.9% Uptime", description: "Guaranteed service availability" }
-  ];
+  const pricingData = {
+    student: {
+      title: "Student",
+      monthlyPrice: "₹99",
+      yearlyPrice: "₹999",
+      description: "Perfect for law students",
+      features: [
+        "Case Law Access",
+        "Study Materials",
+        "Notes Organization",
+        "Basic Support",
+        "Mobile App Access",
+        "Legal Dictionary"
+      ],
+      popular: false,
+      backgroundImage: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
+    },
+    advocate: {
+      title: "Advocate",
+      monthlyPrice: "₹499",
+      yearlyPrice: "₹4,999",
+      description: "For practicing advocates",
+      features: [
+        "Case Management",
+        "Document Storage",
+        "Client Portal",
+        "Priority Support",
+        "Case Tracking",
+        "Legal Research Tools"
+      ],
+      popular: true,
+      backgroundImage: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
+    },
+    clerk: {
+      title: "Clerk",
+      monthlyPrice: "₹299",
+      yearlyPrice: "₹2,999",
+      description: "For court clerks",
+      features: [
+        "Case Tracking",
+        "Document Management",
+        "Court Calendar",
+        "Email Support",
+        "SMS Notifications",
+        "Basic Reporting"
+      ],
+      popular: false,
+      backgroundImage: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
+    }
+  };
 
   return (
-    <section id="pricing" className="relative min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 overflow-hidden">
-      
-      {/* Enhanced Background Elements */}
+    <section
+      className="min-h-screen py-12"
+      style={{
+        backgroundImage: `url("https://images.unsplash.com/photo-1521587760476-6c12a4b040da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80")`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center center'
+      }}
+    >
       <div className="absolute inset-0">
-        {/* Gradient Orbs */}
-        <div className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-r from-blue-400/20 to-purple-600/20 rounded-full mix-blend-multiply filter blur-xl animate-blob"></div>
-        <div className="absolute top-40 right-10 w-72 h-72 bg-gradient-to-r from-purple-400/20 to-pink-600/20 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-2000"></div>
-        <div className="absolute -bottom-32 left-20 w-72 h-72 bg-gradient-to-r from-pink-400/20 to-blue-600/20 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-4000"></div>
-        
-        {/* Grid Pattern */}
-        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-        
-        {/* Floating Elements */}
-        <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-blue-400 rounded-full animate-float"></div>
-        <div className="absolute top-1/3 right-1/4 w-3 h-3 bg-purple-400 rounded-full animate-float animation-delay-1000"></div>
-        <div className="absolute bottom-1/3 left-1/3 w-2 h-2 bg-pink-400 rounded-full animate-float animation-delay-2000"></div>
-        <div className="absolute bottom-1/4 right-1/3 w-3 h-3 bg-blue-500 rounded-full animate-float animation-delay-3000"></div>
+        <div className="absolute inset-0" style={{ backgroundColor: 'rgba(245, 245, 239, 0.85)' }}></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-white/10"></div>
       </div>
-      
-      <div className="relative z-10 pro-container pro-py-24">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
         <div className="text-center mb-16">
-          <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 pro-rounded-xl pro-flex-center mx-auto mb-6">
-            <Star className="w-8 h-8 text-white" />
-          </div>
-          <h2 className="pro-heading-section text-gray-900 mb-4">
-            Choose Your Perfect Plan
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            Choose Your Plan
           </h2>
-          <p className="pro-text-lead text-gray-600 max-w-3xl mx-auto mb-8">
-            Flexible subscription plans designed to scale with your legal practice. 
-            Start your journey today with our comprehensive legal platform.
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
+            Select the perfect plan tailored for your legal journey
           </p>
           
           {/* Billing Toggle */}
-          <div className="pro-flex items-center justify-center pro-gap-4 mb-8">
-            <span className={`pro-text-body font-medium transition-colors duration-200 ${
-              billingCycle === 'monthly' ? 'text-gray-900' : 'text-gray-500'
-            }`}>
+          <div className="flex items-center justify-center gap-4 bg-white rounded-full py-2 px-4 shadow-sm inline-flex">
+            <span className={`text-lg font-medium ${billingCycle === 'monthly' ? 'text-gray-900' : 'text-gray-500'}`}>
               Monthly
             </span>
             <button
               onClick={toggleBillingCycle}
-              className={`relative w-16 h-8 pro-rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                billingCycle === 'yearly' ? 'bg-blue-500' : 'bg-gray-300'
+              className={`relative w-14 h-7 rounded-full transition-colors ${
+                billingCycle === 'yearly' ? 'bg-[#b69d74]' : 'bg-gray-300'
               }`}
             >
-              <div className={`absolute top-1 w-6 h-6 bg-white pro-rounded-lg transition-transform duration-200 ${
-                billingCycle === 'yearly' ? 'transform translate-x-8' : 'transform translate-x-1'
-              }`}></div>
+              <div className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-transform ${
+                billingCycle === 'yearly' ? 'transform translate-x-7' : 'transform translate-x-1'
+              } shadow-md`}></div>
             </button>
-            <div className="pro-flex items-center pro-gap-2">
-              <span className={`pro-text-body font-medium transition-colors duration-200 ${
-                billingCycle === 'yearly' ? 'text-gray-900' : 'text-gray-500'
-              }`}>
-                Yearly
-              </span>
-              <span className="pro-text-xs bg-green-100 text-green-700 px-2 py-1 pro-rounded-lg font-semibold">
-                Save up to 17%
-              </span>
-            </div>
+            <span className={`text-lg font-medium ${billingCycle === 'yearly' ? 'text-gray-900' : 'text-gray-500'}`}>
+              Yearly <span className="text-sm text-green-600 ml-1">(Save 20%)</span>
+            </span>
           </div>
         </div>
 
-        {/* Pricing Cards */}
-        <div className="pro-grid lg:grid-cols-3 pro-gap-8 mb-16">
-          {Object.entries(pricingData).map(([key, plan]) => {
-            const IconComponent = plan.icon;
-            const isPopular = plan.popular;
-            
-            return (
+        {/* Pricing Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          {Object.entries(pricingData).map(([role, plan]) => (
+            <div 
+              key={role}
+              className={`relative bg-white rounded-2xl shadow-xl border-2 ${
+                plan.popular ? 'border-[#b69d74] transform scale-105' : 'border-gray-200'
+              } transition-all duration-300 hover:shadow-2xl`}
+            >
+              {/* Popular Badge */}
+              {plan.popular && (
+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                  <span className="bg-[#b69d74] text-white px-4 py-1 rounded-full text-sm font-semibold">
+                    Most Popular
+                  </span>
+                </div>
+              )}
+              
+              {/* Card Header with Background */}
               <div 
-                key={key}
-                className={`relative pro-card transition-all duration-300 hover:shadow-xl ${
-                  isPopular ? 'ring-2 ring-purple-500 transform scale-105' : 'hover:scale-105'
-                }`}
+                className="h-40 bg-cover bg-center rounded-t-2xl relative"
+                style={{ backgroundImage: `url(${plan.backgroundImage})` }}
               >
-                {isPopular && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <div className="bg-gradient-to-r from-purple-500 to-pink-600 text-white px-6 py-2 pro-rounded-lg pro-text-sm font-bold">
-                      <Sparkles className="w-4 h-4 inline mr-2" />
-                      {plan.badge}
-                    </div>
-                  </div>
-                )}
+                <div className="absolute inset-0 bg-black bg-opacity-30 rounded-t-2xl"></div>
+                <div className="relative z-10 h-full flex flex-col items-center justify-center p-4">
+                  <h3 className="text-2xl font-bold text-white mb-2">
+                    {plan.title}
+                  </h3>
+                  <p className="text-white text-opacity-90 text-center">
+                    {plan.description}
+                  </p>
+                </div>
+              </div>
+              
+              {/* Pricing */}
+              <div className="p-6 border-b border-gray-200">
+                <div className="text-center">
+                  <span className="text-4xl font-bold text-gray-900">
+                    {billingCycle === 'monthly' ? plan.monthlyPrice : plan.yearlyPrice}
+                  </span>
+                  <span className="text-gray-600 ml-2">
+                    /{billingCycle === 'monthly' ? 'month' : 'year'}
+                  </span>
+                  {billingCycle === 'yearly' && (
+                    <p className="text-green-600 text-sm font-medium mt-1">
+                      Equivalent to {plan.monthlyPrice}/month
+                    </p>
+                  )}
+                </div>
+              </div>
+              
+              {/* Features */}
+              <div className="p-6">
+                <ul className="space-y-3 mb-6">
+                  {plan.features.map((feature, index) => (
+                    <li key={index} className="flex items-start gap-3">
+                      <div className="w-5 h-5 bg-[#b69d74] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white text-xs font-bold">✓</span>
+                      </div>
+                      <span className="text-gray-700">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
                 
-                <div className="pro-p-8">
-                  {/* Plan Header */}
-                  <div className="text-center mb-6">
-                    <div className={`w-16 h-16 bg-gradient-to-r ${plan.gradient} pro-rounded-xl pro-flex-center mx-auto mb-4`}>
-                      <IconComponent className="w-8 h-8 text-white" />
+                {/* CTA Button */}
+                <button 
+                  onClick={() => handlePayment(role)}
+                  disabled={loadingPlan === role}
+                  className={`w-full py-3 px-4 rounded-lg font-semibold text-lg transition-all duration-300 ${
+                    plan.popular 
+                      ? 'bg-[#b69d74] hover:bg-[#a58c66] text-white' 
+                      : 'bg-gray-900 hover:bg-gray-800 text-white'
+                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                >
+                  {loadingPlan === role ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Processing...
                     </div>
-                    <h3 className="pro-heading-lg text-gray-900 mb-2">{plan.title}</h3>
-                    <p className="pro-text-sm text-gray-600 mb-4">{plan.subtitle}</p>
-                    
-                    {/* Pricing */}
-                    <div className="mb-4">
-                      <div className="pro-flex items-baseline justify-center pro-gap-2 mb-2">
-                        <span className="pro-heading-section text-gray-900">
-                          {billingCycle === 'monthly' ? plan.monthlyPrice : plan.yearlyPrice}
-                        </span>
-                        <span className="pro-text-body text-gray-600">
-                          /{billingCycle === 'monthly' ? 'month' : 'year'}
-                        </span>
-                      </div>
-                      
-                      {/* Original Price */}
-                      <div className="pro-flex items-center justify-center pro-gap-2">
-                        <span className="pro-text-sm text-gray-400 line-through">
-                          {billingCycle === 'monthly' ? plan.originalMonthlyPrice : plan.originalYearlyPrice}
-                        </span>
-                        {billingCycle === 'yearly' && (
-                          <span className="pro-text-xs bg-green-100 text-green-700 px-2 py-1 pro-rounded-lg font-semibold">
-                            {plan.savings}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    
-                    <p className="pro-text-sm text-gray-600">{plan.description}</p>
-                  </div>
-                  
-                  {/* Features */}
-                  <ul className="space-y-4 mb-8">
-                    {plan.features.map((feature, index) => {
-                      const FeatureIcon = feature.icon;
-                      return (
-                        <li key={index} className="pro-flex items-center pro-gap-3">
-                          <div className={`w-5 h-5 pro-rounded-lg pro-flex-center ${
-                            isPopular ? 'bg-purple-100' : 'bg-blue-100'
-                          }`}>
-                            <FeatureIcon className={`w-3 h-3 ${
-                              isPopular ? 'text-purple-600' : 'text-blue-600'
-                            }`} />
-                          </div>
-                          <span className="pro-text-sm text-gray-700">{feature.text}</span>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                  
-                  {/* CTA Button */}
-                  <button className={`w-full pro-btn pro-flex items-center justify-center pro-gap-2 ${
-                    isPopular 
-                      ? 'pro-btn-primary bg-gradient-to-r from-purple-500 to-pink-600 border-0 hover:from-purple-600 hover:to-pink-700' 
-                      : 'pro-btn-ghost hover:bg-gray-50'
-                  }`}>
-                    {isPopular ? <Crown className="w-5 h-5" /> : <ArrowRight className="w-5 h-5" />}
-                    Get Started
-                    <ArrowRight className="w-5 h-5" />
-                  </button>
-                </div>
+                  ) : (
+                    `Get Started as ${plan.title}`
+                  )}
+                </button>
+                
+                <p className="text-center text-gray-500 text-sm mt-3">
+                  14-day free trial • No credit card required
+                </p>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
 
-        {/* Trust Indicators */}
-        <div className="pro-grid md:grid-cols-4 pro-gap-6 mb-16">
-          {features.map((feature, index) => {
-            const IconComponent = feature.icon;
-            return (
-              <div key={index} className="text-center pro-p-6 bg-white pro-rounded-xl border border-gray-200">
-                <div className="w-12 h-12 bg-blue-100 pro-rounded-xl pro-flex-center mx-auto mb-4">
-                  <IconComponent className="w-6 h-6 text-blue-600" />
-                </div>
-                <h4 className="pro-heading-sm text-gray-900 mb-2">{feature.title}</h4>
-                <p className="pro-text-sm text-gray-600">{feature.description}</p>
-              </div>
-            );
-          })}
-        </div>
+        {/* Payment Status Notification */}
+        {paymentStatus && (
+          <div className={`fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg transform transition-transform duration-300 ${
+            paymentStatus ? 'translate-x-0' : 'translate-x-full'
+          } ${
+            paymentStatus === 'success' ? 'bg-green-500 text-white' : 
+            paymentStatus === 'error' ? 'bg-red-500 text-white' : 
+            'bg-yellow-500 text-white'
+          }`}>
+            <div className="flex items-center gap-3">
+              {paymentStatus === 'success' && (
+                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+              )}
+              {paymentStatus === 'error' && (
+                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              )}
+              {paymentStatus === 'cancelled' && (
+                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              )}
+              <span>
+                {paymentStatus === 'success' && 'Payment Successful!'}
+                {paymentStatus === 'error' && 'Payment Failed. Please try again.'}
+                {paymentStatus === 'cancelled' && 'Payment Cancelled'}
+              </span>
+            </div>
+          </div>
+        )}
 
-        {/* FAQ Section */}
-        <div className="text-center mb-12">
-          <h3 className="pro-heading-xl text-gray-900 mb-6">Frequently Asked Questions</h3>
-          <div className="pro-grid md:grid-cols-2 pro-gap-8 max-w-4xl mx-auto text-left">
-            <div>
-              <h4 className="pro-heading-sm text-gray-900 mb-2">Can I change plans anytime?</h4>
-              <p className="pro-text-sm text-gray-600">Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately.</p>
-            </div>
-            <div>
-              <h4 className="pro-heading-sm text-gray-900 mb-2">Is there a free trial?</h4>
-              <p className="pro-text-sm text-gray-600">We offer a 14-day free trial for all plans with full access to features.</p>
-            </div>
-            <div>
-              <h4 className="pro-heading-sm text-gray-900 mb-2">What payment methods do you accept?</h4>
-              <p className="pro-text-sm text-gray-600">We accept all major credit cards, UPI, net banking, and digital wallets.</p>
-            </div>
-            <div>
-              <h4 className="pro-heading-sm text-gray-900 mb-2">Do you offer enterprise plans?</h4>
-              <p className="pro-text-sm text-gray-600">Yes, we offer custom enterprise solutions with volume discounts and dedicated support.</p>
+        {/* Additional Info */}
+        <div className="text-center mt-16">
+          <div className="bg-white rounded-2xl shadow-lg p-8 max-w-2xl mx-auto">
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              Need help choosing the right plan?
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Our team is here to help you select the perfect plan for your needs.
+            </p>
+            <div className="flex justify-center">
+              <button
+                onClick={() => window.dispatchEvent(new CustomEvent('open-register-modal'))}
+                className="bg-[#b69d74] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#a58c66] transition-colors"
+              >
+                Contact Sales
+              </button>
             </div>
           </div>
-        </div>
-
-        {/* CTA Section */}
-        <div className="bg-gradient-to-r from-blue-100 to-purple-100 border border-blue-200 pro-rounded-xl pro-p-8 text-center">
-          <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 pro-rounded-xl pro-flex-center mx-auto mb-6">
-            <Gift className="w-8 h-8 text-white" />
-          </div>
-          <h3 className="pro-heading-xl text-gray-900 mb-4">Ready to Get Started?</h3>
-          <p className="pro-text-body text-gray-700 mb-6 max-w-2xl mx-auto">
-            Join thousands of legal professionals who trust our platform for their daily practice. 
-            Start your free trial today and experience the difference.
-          </p>
-          <div className="pro-flex flex-wrap justify-center items-center pro-gap-4">
-            <button className="pro-btn pro-btn-primary bg-gradient-to-r from-blue-500 to-purple-600 border-0 hover:from-blue-600 hover:to-purple-700">
-              Start Free Trial
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </button>
-            <button className="pro-btn pro-btn-ghost">
-              <Headphones className="w-5 h-5 mr-2" />
-              Talk to Sales
-            </button>
-          </div>
-          
-          <div className="mt-6 pro-flex flex-wrap justify-center items-center pro-gap-6 pro-text-sm text-gray-600">
-            <div className="pro-flex items-center pro-gap-2">
-              <CheckCircle className="w-4 h-4 text-green-600" />
-              14-day free trial
-            </div>
-            <div className="pro-flex items-center pro-gap-2">
-              <CheckCircle className="w-4 h-4 text-green-600" />
-              No credit card required
-            </div>
-            <div className="pro-flex items-center pro-gap-2">
-              <CheckCircle className="w-4 h-4 text-green-600" />
-              Cancel anytime
-            </div>
-          </div>
-        </div>
-
-        {/* Additional Options */}
-        <div className="mt-12 text-center">
-          <p className="pro-text-body text-gray-600 mb-4">
-            Looking for custom solutions or have specific requirements?
-          </p>
-          <button className="pro-text-sm text-blue-600 hover:text-blue-700 font-medium hover:underline pro-flex items-center pro-gap-1 mx-auto">
-            <TrendingUp className="w-4 h-4" />
-            View Enterprise & Custom Plans
-            <ArrowRight className="w-4 h-4" />
-          </button>
         </div>
       </div>
     </section>

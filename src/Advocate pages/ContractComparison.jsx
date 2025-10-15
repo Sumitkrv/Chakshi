@@ -3,7 +3,6 @@ import { useState, useRef } from "react";
 import { 
   Upload, 
   FileText, 
-  Shield, 
   CheckCircle, 
   AlertTriangle, 
   Download, 
@@ -14,12 +13,9 @@ import {
   Scale,
   BookOpen,
   Search,
-  Settings,
   Clock,
-  Zap,
-  Brain,
-  Target,
-  Globe
+  Shield,
+  GitCompare
 } from 'lucide-react';
 
 // N8N Webhook URLs
@@ -31,6 +27,41 @@ const WEBHOOK_URLS = {
   complianceGenerator: "https://n8n.srv983857.hstgr.cloud/webhook/compliance"
 };
 
+// Enhanced webhook connectivity test
+const testWebhookConnectivity = async (url, name) => {
+  try {
+    console.log(`🧪 Testing webhook connectivity for ${name}...`);
+    const response = await axios.post(url, { 
+      test: true,
+      timestamp: new Date().toISOString()
+    }, { 
+      timeout: 10000,
+      headers: { 'Content-Type': 'application/json' }
+    });
+    console.log(`✅ ${name} webhook is reachable:`, response.status);
+    return { status: true, message: `✅ ${name} operational` };
+  } catch (error) {
+    console.error(`❌ ${name} webhook connection failed:`, error.message);
+    
+    let errorMessage = `❌ ${name}: `;
+    if (error.response) {
+      if (error.response.status === 404) {
+        errorMessage += "Workflow not active or URL incorrect";
+      } else {
+        errorMessage += `Server error (${error.response.status})`;
+      }
+    } else if (error.code === 'ECONNABORTED') {
+      errorMessage += "Request timeout";
+    } else if (error.code === 'NETWORK_ERROR') {
+      errorMessage += "Network connection failed";
+    } else {
+      errorMessage += error.message;
+    }
+    
+    return { status: false, message: errorMessage };
+  }
+};
+
 function ContractComparison() {
   const [file1, setFile1] = useState(null);
   const [file2, setFile2] = useState(null);
@@ -38,6 +69,8 @@ function ContractComparison() {
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('comparison');
+  const [notifications, setNotifications] = useState([]);
+  const [webhookStatus, setWebhookStatus] = useState({});
   const [complianceData, setComplianceData] = useState({
     regulation: '',
     country: 'INDIA',
@@ -48,25 +81,75 @@ function ContractComparison() {
   const file2Ref = useRef();
   const singleFileRef = useRef();
 
+  // Professional notification system
+  const addNotification = (message, type = 'info') => {
+    const notification = {
+      id: Date.now(),
+      message,
+      type,
+      timestamp: new Date().toLocaleTimeString()
+    };
+    setNotifications(prev => [...prev, notification]);
+    
+    // Auto-remove notification after 5 seconds
+    setTimeout(() => {
+      setNotifications(prev => prev.filter(n => n.id !== notification.id));
+    }, 5000);
+  };
+
+  const removeNotification = (id) => {
+    setNotifications(prev => prev.filter(n => n.id !== id));
+  };
+
+  // Test all webhooks function
+  const testAllWebhooks = async () => {
+    addNotification('Testing webhook connectivity...', 'info');
+    const status = {};
+    
+    for (const [key, url] of Object.entries(WEBHOOK_URLS)) {
+      const result = await testWebhookConnectivity(url, key);
+      status[key] = result;
+    }
+    
+    setWebhookStatus(status);
+    
+    const workingWebhooks = Object.values(status).filter(s => s.status).length;
+    const totalWebhooks = Object.keys(status).length;
+    
+    if (workingWebhooks === totalWebhooks) {
+      addNotification('All webhooks are operational! ✅', 'success');
+    } else if (workingWebhooks > 0) {
+      addNotification(`${workingWebhooks}/${totalWebhooks} webhooks are working`, 'warning');
+    } else {
+      addNotification('❌ No webhooks are responding. Check network connectivity.', 'error');
+    }
+  };
+
+  // Enhanced file validation
   const validateFiles = (file1, file2) => {
     if (!file1 || !file2) {
-      alert("Please select both files!");
+      addNotification("Please select both legal documents for comparison analysis.", "warning");
       return false;
     }
 
-    // Check if files have same extension
     const ext1 = file1.name.split('.').pop().toLowerCase();
     const ext2 = file2.name.split('.').pop().toLowerCase();
     
     if (ext1 !== ext2) {
-      alert('Both contracts must have the same file extension');
+      addNotification('Both legal documents must be in the same file format for accurate comparison.', "warning");
       return false;
     }
 
     const allowedFormats = ['pdf', 'docx', 'png', 'jpeg', 'jpg'];
     if (!allowedFormats.includes(ext1)) {
-      alert('Supported formats: PDF, DOCX, PNG, JPEG, JPG');
+      addNotification('Supported professional document formats: PDF, DOCX, PNG, JPEG, JPG', "error");
       return false;
+    }
+
+    // Check file sizes (increased limit to 25MB)
+    const maxSize = 25 * 1024 * 1024;
+    if (file1.size > maxSize || file2.size > maxSize) {
+      addNotification('File size should be under 25MB for optimal processing.', "warning");
     }
 
     return true;
@@ -74,20 +157,26 @@ function ContractComparison() {
 
   const validateSingleFile = (file) => {
     if (!file) {
-      alert("Please select a file!");
+      addNotification("Please select a legal document for analysis.", "warning");
       return false;
     }
 
     const ext = file.name.split('.').pop().toLowerCase();
     const allowedFormats = ['pdf', 'docx', 'png', 'jpeg', 'jpg'];
     if (!allowedFormats.includes(ext)) {
-      alert('Supported formats: PDF, DOCX, PNG, JPEG, JPG');
+      addNotification('Supported professional document formats: PDF, DOCX, PNG, JPEG, JPG', "error");
       return false;
+    }
+
+    const maxSize = 25 * 1024 * 1024;
+    if (file.size > maxSize) {
+      addNotification('File size should be under 25MB for optimal processing.', "warning");
     }
 
     return true;
   };
 
+  // Enhanced contract comparison handler
   const handleContractComparison = async () => {
     if (!validateFiles(file1, file2)) return;
 
@@ -97,36 +186,96 @@ function ContractComparison() {
     formData.append("file2", file2);
 
     try {
+      addNotification('Initiating contract comparison analysis...', 'info');
+      
+      // Test webhook connectivity first
+      const connectivity = await testWebhookConnectivity(WEBHOOK_URLS.contractComparison, 'Contract Comparison');
+      if (!connectivity.status) {
+        throw new Error(connectivity.message);
+      }
+      
+      console.log('📤 Sending comparison request to:', WEBHOOK_URLS.contractComparison);
+      
       const response = await axios.post(WEBHOOK_URLS.contractComparison, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: { 
+          "Content-Type": "multipart/form-data"
+        },
+        timeout: 180000,
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          console.log(`📤 Upload progress: ${percentCompleted}%`);
+        }
       });
 
+      console.log('📥 Raw response:', response);
+      
       let data = response.data;
+      
+      // Enhanced response handling
       if (typeof data === "string") {
         try {
           data = JSON.parse(data);
-        } catch {
-          data = { message: data };
+        } catch (parseError) {
+          // Keep as string if not JSON
+          console.log('String response received:', data);
         }
       }
 
+      // Process and display results
+      const processedResults = processComparisonResults(data);
+      
       setResults({
-        type: 'Contract Comparison',
-        data: data,
+        type: 'Contract Comparison Analysis',
+        data: processedResults,
+        rawData: data,
         timestamp: new Date().toLocaleString()
       });
+      
+      addNotification('Contract comparison analysis completed successfully', 'success');
     } catch (err) {
-      console.error("Error comparing contracts:", err);
+      console.error("❌ Error comparing contracts:", err);
+      
+      let errorMessage = 'Contract comparison analysis failed. ';
+      errorMessage += err.message || 'Unknown error occurred';
+      
+      addNotification(errorMessage, 'error');
       setResults({ 
-        type: 'Contract Comparison',
-        error: err.message,
-        timestamp: new Date().toLocaleString()
+        type: 'Contract Comparison Analysis',
+        error: errorMessage,
+        timestamp: new Date().toLocaleString(),
+        debugInfo: {
+          errorCode: err.code,
+          errorMessage: err.message,
+          webhookUrl: WEBHOOK_URLS.contractComparison
+        }
       });
     } finally {
       setLoading(false);
     }
   };
 
+  // Process comparison results for better display
+  const processComparisonResults = (data) => {
+    if (!data) return { summary: "No data received from analysis" };
+    
+    if (typeof data === 'string') {
+      return { summary: data };
+    }
+    
+    if (typeof data === 'object') {
+      // Try to extract meaningful structure
+      if (data.message) return { summary: data.message };
+      if (data.analysis) return { summary: data.analysis };
+      if (data.result) return { summary: data.result };
+      
+      // Return the entire object for display
+      return data;
+    }
+    
+    return { summary: String(data) };
+  };
+
+  // Enhanced risk analysis handler
   const handleRiskAnalysis = async () => {
     if (!validateSingleFile(singleFile)) return;
 
@@ -135,28 +284,33 @@ function ContractComparison() {
     formData.append("file1", singleFile);
 
     try {
+      addNotification('Initiating risk assessment analysis...', 'info');
+      
       const response = await axios.post(WEBHOOK_URLS.riskAnalysis, formData, {
         headers: { "Content-Type": "multipart/form-data" },
+        timeout: 120000
       });
 
       let data = response.data;
       if (typeof data === "string") {
         try {
           data = JSON.parse(data);
-        } catch {
-          data = { message: data };
+        } catch (e) {
+          // Keep as string
         }
       }
 
       setResults({
-        type: 'Risk Analysis',
+        type: 'Risk Assessment & Compliance',
         data: data,
         timestamp: new Date().toLocaleString()
       });
+      addNotification('Risk analysis assessment completed successfully', 'success');
     } catch (err) {
       console.error("Error analyzing risk:", err);
+      addNotification('Risk assessment analysis failed. Please try again.', 'error');
       setResults({ 
-        type: 'Risk Analysis',
+        type: 'Risk Assessment & Compliance',
         error: err.message,
         timestamp: new Date().toLocaleString()
       });
@@ -165,6 +319,7 @@ function ContractComparison() {
     }
   };
 
+  // Enhanced document summarizer handler
   const handleDocumentSummarizer = async () => {
     if (!validateSingleFile(singleFile)) return;
 
@@ -173,28 +328,33 @@ function ContractComparison() {
     formData.append("file1", singleFile);
 
     try {
+      addNotification('Generating document intelligence report...', 'info');
+      
       const response = await axios.post(WEBHOOK_URLS.documentSummarizer, formData, {
         headers: { "Content-Type": "multipart/form-data" },
+        timeout: 120000
       });
 
       let data = response.data;
       if (typeof data === "string") {
         try {
           data = JSON.parse(data);
-        } catch {
-          data = { message: data };
+        } catch (e) {
+          // Keep as string
         }
       }
 
       setResults({
-        type: 'Document Summary',
+        type: 'Legal Document Intelligence',
         data: data,
         timestamp: new Date().toLocaleString()
       });
+      addNotification('Legal document intelligence report generated successfully', 'success');
     } catch (err) {
       console.error("Error summarizing document:", err);
+      addNotification('Document intelligence generation failed. Please try again.', 'error');
       setResults({ 
-        type: 'Document Summary',
+        type: 'Legal Document Intelligence',
         error: err.message,
         timestamp: new Date().toLocaleString()
       });
@@ -203,6 +363,7 @@ function ContractComparison() {
     }
   };
 
+  // Enhanced authenticity check handler
   const handleAuthenticityCheck = async () => {
     if (!validateSingleFile(singleFile)) return;
 
@@ -211,28 +372,33 @@ function ContractComparison() {
     formData.append("file1", singleFile);
 
     try {
+      addNotification('Performing document verification analysis...', 'info');
+      
       const response = await axios.post(WEBHOOK_URLS.authenticityChecker, formData, {
         headers: { "Content-Type": "multipart/form-data" },
+        timeout: 120000
       });
 
       let data = response.data;
       if (typeof data === "string") {
         try {
           data = JSON.parse(data);
-        } catch {
-          data = { message: data };
+        } catch (e) {
+          // Keep as string
         }
       }
 
       setResults({
-        type: 'Authenticity Check',
+        type: 'Document Verification Services',
         data: data,
         timestamp: new Date().toLocaleString()
       });
+      addNotification('Document verification analysis completed successfully', 'success');
     } catch (err) {
       console.error("Error checking authenticity:", err);
+      addNotification('Document verification analysis failed. Please try again.', 'error');
       setResults({ 
-        type: 'Authenticity Check',
+        type: 'Document Verification Services',
         error: err.message,
         timestamp: new Date().toLocaleString()
       });
@@ -241,41 +407,47 @@ function ContractComparison() {
     }
   };
 
+  // Enhanced compliance generation handler
   const handleComplianceGeneration = async () => {
     if (!complianceData.regulation || !complianceData.country || !complianceData.companyType) {
-      alert("Please fill all compliance fields!");
+      addNotification("Please complete all regulatory compliance parameters for comprehensive analysis.", "warning");
       return;
     }
 
     setLoading(true);
 
     try {
+      addNotification('Generating regulatory compliance framework...', 'info');
+      
       const response = await axios.post(WEBHOOK_URLS.complianceGenerator, {
         Regulation: complianceData.regulation,
         Country: complianceData.country,
         CompanyType: complianceData.companyType
       }, {
         headers: { "Content-Type": "application/json" },
+        timeout: 120000
       });
 
       let data = response.data;
       if (typeof data === "string") {
         try {
           data = JSON.parse(data);
-        } catch {
-          data = { message: data };
+        } catch (e) {
+          // Keep as string
         }
       }
 
       setResults({
-        type: 'Compliance Tasks',
+        type: 'Regulatory Compliance Framework',
         data: data,
         timestamp: new Date().toLocaleString()
       });
+      addNotification('Regulatory compliance framework generated successfully', 'success');
     } catch (err) {
       console.error("Error generating compliance tasks:", err);
+      addNotification('Regulatory compliance framework generation failed. Please try again.', 'error');
       setResults({ 
-        type: 'Compliance Tasks',
+        type: 'Regulatory Compliance Framework',
         error: err.message,
         timestamp: new Date().toLocaleString()
       });
@@ -293,47 +465,14 @@ function ContractComparison() {
     if (singleFileRef.current) singleFileRef.current.value = '';
   };
 
-  const tabs = [
-    { 
-      id: 'comparison', 
-      name: 'Contract Comparison', 
-      icon: Scale,
-      color: 'blue',
-      description: 'Compare two contracts side-by-side'
-    },
-    { 
-      id: 'risk', 
-      name: 'Risk Analysis', 
-      icon: AlertTriangle,
-      color: 'red',
-      description: 'Analyze contract risks and missing clauses'
-    },
-    { 
-      id: 'summary', 
-      name: 'Document Summarizer', 
-      icon: BookOpen,
-      color: 'green',
-      description: 'Convert contracts to plain language'
-    },
-    { 
-      id: 'authenticity', 
-      name: 'Authenticity Check', 
-      icon: Search,
-      color: 'purple',
-      description: 'Verify document authenticity'
-    },
-    { 
-      id: 'compliance', 
-      name: 'Compliance Generator', 
-      icon: CheckCircle,
-      color: 'indigo',
-      description: 'Generate regulatory checklists'
-    }
-  ];
+  const clearResults = () => {
+    setResults(null);
+  };
 
+  // Enhanced file upload area component
   const FileUploadArea = ({ label, file, onFileChange, fileRef, accept = ".pdf,.docx,.png,.jpeg,.jpg", multiple = false }) => (
     <div className="space-y-3">
-      <label className="block text-sm font-semibold text-gray-700">{label}</label>
+      <label className="block text-sm font-semibold" style={{ color: '#1f2839' }}>{label}</label>
       <div className="relative">
         <input
           ref={fileRef}
@@ -345,439 +484,649 @@ function ContractComparison() {
         />
         <div 
           onClick={() => fileRef?.current?.click()}
-          className="glass-morphism-card bg-white/70 backdrop-blur-sm border-2 border-dashed border-gray-300 hover:border-blue-400 rounded-xl p-8 text-center cursor-pointer transition-all duration-300 hover:bg-blue-50/50 group"
+          className="border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-all duration-200"
+          style={{
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            borderColor: 'rgba(182, 157, 116, 0.25)',
+            backdropFilter: 'blur(6px)'
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.borderColor = '#b69d74';
+            e.target.style.backgroundColor = 'rgba(182, 157, 116, 0.05)';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.borderColor = 'rgba(182, 157, 116, 0.25)';
+            e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+          }}
         >
           <div className="flex flex-col items-center space-y-3">
-            <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl group-hover:shadow-blue-500/30 transition-all duration-300">
-              <Upload className="w-8 h-8 text-white" />
+            <div className="p-2 rounded-lg" style={{ backgroundColor: 'rgba(182, 157, 116, 0.12)' }}>
+              <Upload className="w-6 h-6" style={{ color: '#b69d74' }} />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors duration-300">
-                {file ? 'Change file' : 'Click to upload or drag and drop'}
+              <p className="text-sm font-medium" style={{ color: '#1f2839' }}>
+                {file ? 'Replace document' : 'Upload legal document or drag and drop'}
               </p>
-              <p className="text-xs text-gray-500 mt-1">PDF, DOCX, PNG, JPEG, JPG (max 10MB)</p>
+              <p className="text-xs mt-1" style={{ color: '#6b7280' }}>Professional formats: PDF, DOCX, PNG, JPEG, JPG (Maximum 25MB)</p>
             </div>
           </div>
         </div>
         {file && (
-          <div className="mt-3 flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
+          <div className="mt-3 flex items-center justify-between p-3 rounded-lg" style={{
+            backgroundColor: 'rgba(16, 185, 129, 0.08)',
+            border: '1px solid rgba(16, 185, 129, 0.20)'
+          }}>
             <div className="flex items-center space-x-3">
-              <FileText className="w-5 h-5 text-green-600" />
+              <FileText className="w-4 h-4" style={{ color: '#10b981' }} />
               <div>
-                <p className="text-sm font-medium text-green-800">{file.name}</p>
-                <p className="text-xs text-green-600">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                <p className="text-sm font-medium" style={{ color: '#10b981' }}>{file.name}</p>
+                <p className="text-xs" style={{ color: '#10b981' }}>{(file.size / 1024 / 1024).toFixed(2)} MB</p>
               </div>
             </div>
-            <CheckCircle className="w-5 h-5 text-green-600" />
+            <CheckCircle className="w-4 h-4" style={{ color: '#10b981' }} />
           </div>
         )}
       </div>
     </div>
   );
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 relative overflow-hidden">
-      {/* Background Elements */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 via-purple-600/5 to-indigo-600/5"></div>
-      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-400/10 to-purple-600/10 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
+  // Enhanced results display component
+  const ResultsDisplay = ({ results, onClose }) => {
+    if (!results) return null;
+
+    const formatContent = (content) => {
+      if (typeof content === 'string') {
+        return content.split('\n').map((line, index) => (
+          <p key={index} className="mb-2">{line}</p>
+        ));
+      }
       
-      <div className="relative z-10">
-        {/* Enhanced Header */}
-        <div className="glass-morphism-card bg-white/80 backdrop-blur-xl border-b border-white/20 p-8 saas-shadow-glow">
-          <div className="max-w-7xl mx-auto">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="p-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl shadow-lg">
-                  <Brain className="w-10 h-10 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
-                    AI Contract Analysis Suite
-                  </h1>
-                  <p className="text-gray-600 text-lg mt-2 flex items-center">
-                    <Zap className="w-5 h-5 mr-2 text-yellow-500" />
-                    Powered by advanced AI automation - Professional legal document analysis
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-center space-x-3">
-                <div className="flex items-center space-x-2 px-4 py-2 bg-green-50 border border-green-200 rounded-lg">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-sm font-medium text-green-700">AI Services Online</span>
-                </div>
-                <button className="saas-button-secondary px-6 py-3 bg-white/80 backdrop-blur-sm border border-gray-200">
-                  <Settings className="w-5 h-5 mr-2" />
-                  Settings
-                </button>
+      if (typeof content === 'object') {
+        return Object.entries(content).map(([key, value]) => (
+          <div key={key} className="mb-4">
+            <h4 className="font-semibold text-gray-800 mb-2">{key}:</h4>
+            <div className="text-gray-700 pl-4">
+              {formatContent(value)}
+            </div>
+          </div>
+        ));
+      }
+      
+      return <p>{String(content)}</p>;
+    };
+
+    return (
+      <div className="rounded-lg p-6 mt-6" style={{
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        backdropFilter: 'blur(10px)',
+        border: '1px solid rgba(182, 157, 116, 0.20)',
+        boxShadow: '0 8px 32px rgba(31, 40, 57, 0.08)'
+      }}>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-4">
+          <div className="flex items-center space-x-3">
+            <div className="p-2 rounded-lg" style={{ backgroundColor: 'rgba(182, 157, 116, 0.12)' }}>
+              <Eye className="w-5 h-5" style={{ color: '#b69d74' }} />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold" style={{ color: '#1f2839' }}>{results.type} - Analysis Report</h3>
+              <p className="text-sm flex items-center" style={{ color: '#6b7280' }}>
+                <Clock className="w-3 h-3 mr-1" />
+                Generated: {results.timestamp}
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <button className="px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2" style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.95)',
+              border: '1px solid rgba(182, 157, 116, 0.15)',
+              color: '#6b7280',
+              backdropFilter: 'blur(6px)'
+            }}>
+              <Download className="w-4 h-4" />
+              <span>Export Report</span>
+            </button>
+            <button
+              onClick={onClose}
+              className="p-2 rounded-lg transition-all duration-200"
+              style={{ color: '#6b7280' }}
+              onMouseEnter={(e) => {
+                e.target.style.color = '#1f2839';
+                e.target.style.backgroundColor = 'rgba(182, 157, 116, 0.08)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.color = '#6b7280';
+                e.target.style.backgroundColor = 'transparent';
+              }}
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+        
+        {results.error ? (
+          <div className="rounded-lg p-6 mb-4" style={{
+            backgroundColor: '#fef2f2',
+            border: '2px solid #fecaca'
+          }}>
+            <div className="flex items-start space-x-4">
+              <AlertTriangle className="w-6 h-6 mt-1 text-red-500" />
+              <div className="flex-1">
+                <h4 className="text-xl font-bold text-red-800 mb-3">Analysis Processing Error</h4>
+                <p className="text-red-700 text-lg font-medium">{results.error}</p>
+                {results.debugInfo && (
+                  <div className="mt-4 p-3 bg-white rounded border border-red-200">
+                    <h6 className="font-semibold text-red-800 text-sm mb-2">Technical Details:</h6>
+                    <div className="text-xs text-red-600 font-mono">
+                      <div>Error Code: {results.debugInfo.errorCode || 'Unknown'}</div>
+                      <div>Webhook URL: {results.debugInfo.webhookUrl}</div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Enhanced Navigation Tabs */}
-        <div className="glass-morphism-card bg-white/70 backdrop-blur-xl border-b border-white/20">
-          <div className="max-w-7xl mx-auto px-8">
-            <nav className="flex space-x-1 overflow-x-auto py-4">
-              {tabs.map((tab, index) => {
-                const IconComponent = tab.icon;
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center space-x-3 py-4 px-6 rounded-xl font-medium text-sm whitespace-nowrap transition-all duration-300 animate-stagger-fade-in group ${
-                      activeTab === tab.id
-                        ? `bg-gradient-to-r from-${tab.color}-500 to-${tab.color}-600 text-white saas-shadow-glow`
-                        : 'text-gray-600 hover:text-gray-800 hover:bg-white/60 backdrop-blur-sm'
-                    }`}
-                    style={{ animationDelay: `${index * 100}ms` }}
-                  >
-                    <div className={`p-2 rounded-lg transition-all duration-300 ${
-                      activeTab === tab.id 
-                        ? 'bg-white/20' 
-                        : `bg-${tab.color}-50 group-hover:bg-${tab.color}-100`
-                    }`}>
-                      <IconComponent className={`w-5 h-5 ${
-                        activeTab === tab.id ? 'text-white' : `text-${tab.color}-600`
-                      }`} />
-                    </div>
-                    <div className="text-left">
-                      <div className="font-semibold">{tab.name}</div>
-                      <div className={`text-xs ${
-                        activeTab === tab.id ? 'text-white/80' : 'text-gray-500'
-                      }`}>
-                        {tab.description}
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </nav>
-          </div>
-        </div>
-
-        {/* Enhanced Loading Overlay */}
-        {loading && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="glass-morphism-card bg-white/90 backdrop-blur-xl border border-white/20 rounded-2xl p-8 saas-shadow-glow animate-scale-in">
-              <div className="flex flex-col items-center space-y-4">
-                <div className="relative">
-                  <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                    <Loader className="w-8 h-8 text-white animate-spin" />
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full animate-ping opacity-20"></div>
+        ) : (
+          <div className="space-y-6">
+            <div className="rounded-lg p-4 border-l-4 border-green-500" style={{
+              backgroundColor: '#f0fdf4'
+            }}>
+              <div className="flex items-center space-x-3">
+                <CheckCircle className="w-6 h-6 text-green-600" />
+                <div>
+                  <h4 className="text-lg font-bold text-green-800">Analysis Successfully Completed</h4>
+                  <p className="text-green-600">AI-powered legal analysis has been generated</p>
                 </div>
-                <div className="text-center">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-1">Processing Document</h3>
-                  <p className="text-gray-600">AI is analyzing your files...</p>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg border-2 border-gray-300">
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 rounded-t-lg">
+                <h4 className="text-xl font-bold flex items-center">
+                  <FileCheck className="w-6 h-6 mr-2" />
+                  Analysis Results
+                </h4>
+              </div>
+              
+              <div className="p-6">
+                <div className="bg-gray-50 rounded-lg p-6 border-2 border-gray-200 min-h-[200px]">
+                  {formatContent(results.data)}
                 </div>
               </div>
             </div>
           </div>
         )}
+      </div>
+    );
+  };
 
-        {/* Content Area */}
-        <div className="max-w-7xl mx-auto p-8">
-          {/* Contract Comparison Tab */}
-          {activeTab === 'comparison' && (
-            <div className="glass-morphism-card bg-white/80 backdrop-blur-xl border border-white/20 rounded-2xl p-8 saas-shadow-glow animate-slide-up">
-              <div className="flex items-center space-x-4 mb-6">
-                <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl">
-                  <Scale className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-gray-800">Contract Comparison Tool</h3>
-                  <p className="text-gray-600 mt-1">Compare two contracts side-by-side to identify changes, additions, and modifications with AI precision</p>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                <FileUploadArea
-                  label="First Contract Document"
-                  file={file1}
-                  onFileChange={(e) => setFile1(e.target.files[0])}
-                  fileRef={file1Ref}
-                />
-                
-                <FileUploadArea
-                  label="Second Contract Document"
-                  file={file2}
-                  onFileChange={(e) => setFile2(e.target.files[0])}
-                  fileRef={file2Ref}
-                />
-              </div>
+  const tabs = [
+    { 
+      id: 'comparison', 
+      name: 'Contract Comparison', 
+      icon: GitCompare,
+      description: 'Comprehensive side-by-side legal document comparison'
+    },
+    { 
+      id: 'risk', 
+      name: 'Risk Assessment', 
+      icon: AlertTriangle,
+      description: 'Advanced risk analysis and regulatory compliance evaluation'
+    },
+    { 
+      id: 'summary', 
+      name: 'Document Intelligence', 
+      icon: BookOpen,
+      description: 'AI-powered contract summarization and key insights extraction'
+    },
+    { 
+      id: 'authenticity', 
+      name: 'Document Verification', 
+      icon: Shield,
+      description: 'Professional authenticity validation and integrity assessment'
+    },
+    { 
+      id: 'compliance', 
+      name: 'Compliance Generator', 
+      icon: CheckCircle,
+      description: 'Automated regulatory framework and compliance checklist generation'
+    }
+  ];
 
-              <div className="flex items-center justify-between">
-                <div className="flex space-x-4">
-                  <button
-                    onClick={handleContractComparison}
-                    disabled={loading || !file1 || !file2}
-                    className="saas-button-primary px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-3"
-                  >
-                    <Scale className="w-5 h-5" />
-                    <span>{loading ? 'Comparing Contracts...' : 'Compare Contracts'}</span>
-                  </button>
-                  
-                  <button
-                    onClick={clearFiles}
-                    className="saas-button-secondary px-6 py-4 bg-white/80 border border-gray-200 text-gray-700 hover:bg-gray-50 flex items-center space-x-2"
-                  >
-                    <X className="w-5 h-5" />
-                    <span>Clear Files</span>
-                  </button>
-                </div>
-                
-                <div className="flex items-center space-x-4 text-sm text-gray-500">
-                  <div className="flex items-center space-x-2">
-                    <Clock className="w-4 h-4" />
-                    <span>Typical analysis: 30-60 seconds</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Target className="w-4 h-4" />
-                    <span>AI Accuracy: 99.2%</span>
-                  </div>
-                </div>
+  return (
+    <div className="min-h-screen" style={{ 
+      backgroundColor: '#f5f5ef',
+      backgroundImage: `
+        radial-gradient(circle at 20% 20%, rgba(182, 157, 116, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(31, 40, 57, 0.03) 0%, transparent 50%)
+      `
+    }}>
+      {/* Header */}
+      <div className="border-b p-6" style={{
+        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(245, 245, 239, 0.95) 100%)',
+        borderBottomColor: 'rgba(182, 157, 116, 0.20)',
+        backdropFilter: 'blur(15px)'
+      }}>
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center space-x-3 mb-4 sm:mb-0">
+              <div className="p-3 rounded-xl" style={{ 
+                background: 'linear-gradient(135deg, #1f2839 0%, #2a3441 100%)'
+              }}>
+                <Scale className="w-7 h-7 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold" style={{ color: '#1f2839' }}>Legal Intelligence Platform</h1>
+                <p className="text-sm" style={{ color: '#6b7280' }}>Advanced contract analysis and compliance management</p>
               </div>
             </div>
-          )}
+            
+            <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 px-3 py-1 rounded-md" style={{ 
+                backgroundColor: Object.keys(webhookStatus).length === 0 ? 'rgba(156, 163, 175, 0.1)' : 
+                               Object.values(webhookStatus).every(s => s.status) ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)',
+                border: '1px solid',
+                borderColor: Object.keys(webhookStatus).length === 0 ? 'rgba(156, 163, 175, 0.2)' : 
+                            Object.values(webhookStatus).every(s => s.status) ? 'rgba(16, 185, 129, 0.2)' : 'rgba(245, 158, 11, 0.2)'
+              }}>
+                <div className="w-2 h-2 rounded-full" style={{ 
+                  backgroundColor: Object.keys(webhookStatus).length === 0 ? '#9ca3af' : 
+                                 Object.values(webhookStatus).every(s => s.status) ? '#10b981' : '#f59e0b'
+                }}></div>
+                <span className="text-xs font-medium" style={{ 
+                  color: Object.keys(webhookStatus).length === 0 ? '#9ca3af' : 
+                        Object.values(webhookStatus).every(s => s.status) ? '#10b981' : '#f59e0b'
+                }}>
+                  {Object.keys(webhookStatus).length === 0 ? 'Systems Ready' : 
+                   Object.values(webhookStatus).every(s => s.status) ? 'All Systems Online' : 
+                   'Some Systems Offline'}
+                </span>
+              </div>
+              <button
+                onClick={testAllWebhooks}
+                className="px-3 py-1 rounded-md text-xs font-medium transition-all duration-200"
+                style={{
+                  backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                  border: '1px solid rgba(59, 130, 246, 0.2)',
+                  color: '#3b82f6'
+                }}
+              >
+                Test Connectivity
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
 
-          {/* Single Document Analysis Tabs */}
-          {(activeTab === 'risk' || activeTab === 'summary' || activeTab === 'authenticity') && (
-            <div className="glass-morphism-card bg-white/80 backdrop-blur-xl border border-white/20 rounded-2xl p-8 saas-shadow-glow animate-slide-up">
-              <div className="flex items-center space-x-4 mb-6">
-                <div className={`p-3 rounded-xl ${
-                  activeTab === 'risk' ? 'bg-gradient-to-r from-red-500 to-pink-600' :
-                  activeTab === 'summary' ? 'bg-gradient-to-r from-green-500 to-emerald-600' :
-                  'bg-gradient-to-r from-purple-500 to-indigo-600'
+      {/* Navigation Tabs */}
+      <div className="border-b" style={{
+        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.90) 0%, rgba(245, 245, 239, 0.85) 100%)',
+        borderBottomColor: 'rgba(182, 157, 116, 0.20)',
+        backdropFilter: 'blur(10px)'
+      }}>
+        <div className="max-w-7xl mx-auto px-6">
+          <nav className="flex space-x-1 py-4 overflow-x-auto">
+            {tabs.map((tab) => {
+              const IconComponent = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => {
+                    setActiveTab(tab.id);
+                    clearResults();
+                  }}
+                  className={`flex items-center space-x-2 py-3 px-4 rounded-lg font-medium text-sm whitespace-nowrap transition-all duration-200 ${
+                    activeTab === tab.id ? 'text-white' : 'hover:text-white'
+                  }`}
+                  style={{
+                    backgroundColor: activeTab === tab.id ? '#1f2839' : 'transparent',
+                    color: activeTab === tab.id ? '#ffffff' : '#6b7280'
+                  }}
+                >
+                  <IconComponent className="w-4 h-4" />
+                  <span>{tab.name}</span>
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+      </div>
+
+      {/* Loading Overlay */}
+      {loading && (
+        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: 'rgba(31, 40, 57, 0.50)' }}>
+          <div className="rounded-lg p-6 max-w-sm w-full mx-4" style={{ 
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(182, 157, 116, 0.20)'
+          }}>
+            <div className="flex flex-col items-center space-y-4">
+              <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: '#b69d74' }}>
+                <Loader className="w-6 h-6 text-white animate-spin" />
+              </div>
+              <div className="text-center">
+                <h3 className="text-lg font-semibold mb-1" style={{ color: '#1f2839' }}>AI Analysis in Progress</h3>
+                <p className="text-sm" style={{ color: '#6b7280' }}>Processing your documents...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Content Area */}
+      <div className="max-w-4xl mx-auto p-6">
+        {/* Contract Comparison Tab */}
+        {activeTab === 'comparison' && (
+          <div className="rounded-xl p-6 mb-6" style={{
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(182, 157, 116, 0.30)',
+            position: 'relative',
+            overflow: 'hidden'
+          }}>
+            <div style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: '3px',
+              background: 'linear-gradient(90deg, #b69d74 0%, #c7a97d 50%, #b69d74 100%)'
+            }}></div>
+            
+            <div className="flex items-center space-x-3 mb-6">
+              <div className="p-2 rounded-lg" style={{ backgroundColor: 'rgba(182, 157, 116, 0.12)' }}>
+                <GitCompare className="w-5 h-5" style={{ color: '#b69d74' }} />
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold" style={{ color: '#1f2839' }}>Contract Comparison Analysis</h3>
+                <p className="text-sm" style={{ color: '#6b7280' }}>Compare two legal documents and identify differences</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <FileUploadArea
+                label="Primary Document"
+                file={file1}
+                onFileChange={(e) => setFile1(e.target.files[0])}
+                fileRef={file1Ref}
+              />
+              
+              <FileUploadArea
+                label="Comparison Document"
+                file={file2}
+                onFileChange={(e) => setFile2(e.target.files[0])}
+                fileRef={file2Ref}
+              />
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+              <button
+                onClick={handleContractComparison}
+                disabled={loading || !file1 || !file2}
+                className="text-white px-6 py-3 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center space-x-2"
+                style={{
+                  background: 'linear-gradient(135deg, #b69d74 0%, #a68b63 100%)'
+                }}
+              >
+                <GitCompare className="w-4 h-4" />
+                <span>{loading ? 'Analyzing...' : 'Compare Documents'}</span>
+              </button>
+              
+              <button
+                onClick={clearFiles}
+                className="px-4 py-3 rounded-lg font-medium transition-all duration-200 flex items-center justify-center space-x-2"
+                style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                  border: '1px solid rgba(182, 157, 116, 0.15)',
+                  color: '#6b7280'
+                }}
+              >
+                <X className="w-4 h-4" />
+                <span>Clear Files</span>
+              </button>
+            </div>
+
+            {/* File Format Warning */}
+            <div className="mt-4 p-3 rounded-lg bg-amber-50 border border-amber-200">
+              <p className="text-sm text-amber-800 flex items-center">
+                <AlertTriangle className="w-4 h-4 mr-2" />
+                <strong>Important:</strong> Both documents must be in the same format (PDF, DOCX, PNG, JPEG, or JPG)
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Single Document Analysis Tabs */}
+        {(activeTab === 'risk' || activeTab === 'summary' || activeTab === 'authenticity') && (
+          <div className="rounded-lg p-6 mb-6" style={{
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(182, 157, 116, 0.20)'
+          }}>
+            <div className="flex items-center space-x-3 mb-6">
+              <div className="p-2 rounded-lg" style={{ backgroundColor: 'rgba(182, 157, 116, 0.12)' }}>
+                {activeTab === 'risk' && <AlertTriangle className="w-5 h-5" style={{ color: '#b69d74' }} />}
+                {activeTab === 'summary' && <BookOpen className="w-5 h-5" style={{ color: '#b69d74' }} />}
+                {activeTab === 'authenticity' && <Shield className="w-5 h-5" style={{ color: '#b69d74' }} />}
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold" style={{ color: '#1f2839' }}>
+                  {activeTab === 'risk' && 'Risk Assessment & Compliance'}
+                  {activeTab === 'summary' && 'Legal Document Intelligence'}
+                  {activeTab === 'authenticity' && 'Document Verification'}
+                </h3>
+                <p className="text-sm" style={{ color: '#6b7280' }}>
+                  {activeTab === 'risk' && 'Identify potential risks and compliance issues'}
+                  {activeTab === 'summary' && 'Extract key insights and summarize content'}
+                  {activeTab === 'authenticity' && 'Verify document authenticity and integrity'}
+                </p>
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <FileUploadArea
+                label="Document for Analysis"
+                file={singleFile}
+                onFileChange={(e) => setSingleFile(e.target.files[0])}
+                fileRef={singleFileRef}
+              />
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+              <button
+                onClick={
+                  activeTab === 'risk' ? handleRiskAnalysis :
+                  activeTab === 'summary' ? handleDocumentSummarizer :
+                  handleAuthenticityCheck
+                }
+                disabled={loading || !singleFile}
+                className="text-white px-6 py-3 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center space-x-2"
+                style={{
+                  background: 'linear-gradient(135deg, #b69d74 0%, #a68b63 100%)'
+                }}
+              >
+                {activeTab === 'risk' && <AlertTriangle className="w-4 h-4" />}
+                {activeTab === 'summary' && <BookOpen className="w-4 h-4" />}
+                {activeTab === 'authenticity' && <Shield className="w-4 h-4" />}
+                <span>
+                  {loading ? 'Processing...' : 
+                    activeTab === 'risk' ? 'Analyze Risks' :
+                    activeTab === 'summary' ? 'Generate Summary' :
+                    'Verify Document'
+                  }
+                </span>
+              </button>
+              
+              <button
+                onClick={clearFiles}
+                className="px-4 py-3 rounded-lg font-medium transition-all duration-200 flex items-center justify-center space-x-2"
+                style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                  border: '1px solid rgba(182, 157, 116, 0.15)',
+                  color: '#6b7280'
+                }}
+              >
+                <X className="w-4 h-4" />
+                <span>Clear File</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Compliance Generator Tab */}
+        {activeTab === 'compliance' && (
+          <div className="rounded-lg p-6 mb-6" style={{
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(182, 157, 116, 0.20)'
+          }}>
+            <div className="flex items-center space-x-3 mb-6">
+              <div className="p-2 rounded-lg" style={{ backgroundColor: 'rgba(182, 157, 116, 0.12)' }}>
+                <CheckCircle className="w-5 h-5" style={{ color: '#b69d74' }} />
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold" style={{ color: '#1f2839' }}>Compliance Framework Generator</h3>
+                <p className="text-sm" style={{ color: '#6b7280' }}>Generate regulatory compliance checklists and frameworks</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div className="space-y-2">
+                <label className="block text-sm font-medium" style={{ color: '#1f2839' }}>Regulation Type</label>
+                <input
+                  type="text"
+                  placeholder="e.g., labor law, data privacy"
+                  value={complianceData.regulation}
+                  onChange={(e) => setComplianceData({...complianceData, regulation: e.target.value})}
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-b69d74 focus:ring-1 focus:ring-b69d74"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label className="block text-sm font-medium" style={{ color: '#1f2839' }}>Jurisdiction</label>
+                <select
+                  value={complianceData.country}
+                  onChange={(e) => setComplianceData({...complianceData, country: e.target.value})}
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-b69d74 focus:ring-1 focus:ring-b69d74"
+                >
+                  <option value="INDIA">India</option>
+                  <option value="USA">United States</option>
+                  <option value="UK">United Kingdom</option>
+                  <option value="CANADA">Canada</option>
+                  <option value="AUSTRALIA">Australia</option>
+                </select>
+              </div>
+              
+              <div className="space-y-2">
+                <label className="block text-sm font-medium" style={{ color: '#1f2839' }}>Business Type</label>
+                <input
+                  type="text"
+                  placeholder="e.g., technology, healthcare"
+                  value={complianceData.companyType}
+                  onChange={(e) => setComplianceData({...complianceData, companyType: e.target.value})}
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-b69d74 focus:ring-1 focus:ring-b69d74"
+                />
+              </div>
+            </div>
+
+            <button
+              onClick={handleComplianceGeneration}
+              disabled={loading || !complianceData.regulation || !complianceData.country || !complianceData.companyType}
+              className="text-white px-6 py-3 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center space-x-2"
+              style={{
+                background: 'linear-gradient(135deg, #b69d74 0%, #a68b63 100%)'
+              }}
+            >
+              <CheckCircle className="w-4 h-4" />
+              <span>{loading ? 'Generating...' : 'Generate Framework'}</span>
+            </button>
+          </div>
+        )}
+
+        {/* Webhook Status Display */}
+        {Object.keys(webhookStatus).length > 0 && (
+          <div className="rounded-lg p-4 mb-6" style={{
+            backgroundColor: 'rgba(59, 130, 246, 0.05)',
+            border: '1px solid rgba(59, 130, 246, 0.20)'
+          }}>
+            <h3 className="text-lg font-semibold mb-3 flex items-center" style={{ color: '#1f2839' }}>
+              <FileCheck className="w-5 h-5 mr-3" style={{ color: '#3b82f6' }} />
+              System Status
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {Object.entries(webhookStatus).map(([key, status]) => (
+                <div key={key} className="p-3 rounded-lg border" style={{
+                  backgroundColor: status.status ? 'rgba(16, 185, 129, 0.05)' : 'rgba(239, 68, 68, 0.05)',
+                  borderColor: status.status ? 'rgba(16, 185, 129, 0.20)' : 'rgba(239, 68, 68, 0.20)'
+                }}>
+                  <div className="flex items-center space-x-2">
+                    <div className={`w-3 h-3 rounded-full ${status.status ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                    <span className="text-sm font-medium" style={{ 
+                      color: status.status ? '#059669' : '#dc2626' 
+                    }}>
+                      {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                    </span>
+                  </div>
+                  <p className="text-xs mt-1" style={{ 
+                    color: status.status ? '#059669' : '#dc2626' 
+                  }}>
+                    {status.message}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Results Display */}
+        <ResultsDisplay results={results} onClose={clearResults} />
+      </div>
+
+      {/* Notifications */}
+      <div className="fixed top-4 right-4 z-50 space-y-2">
+        {notifications.map((notification) => (
+          <div
+            key={notification.id}
+            className={`rounded-lg p-4 shadow-lg transition-all duration-300 max-w-sm ${
+              notification.type === 'error' ? 'bg-red-50 border border-red-200' :
+              notification.type === 'warning' ? 'bg-amber-50 border border-amber-200' :
+              notification.type === 'success' ? 'bg-green-50 border border-green-200' :
+              'bg-blue-50 border border-blue-200'
+            }`}
+          >
+            <div className="flex items-start justify-between">
+              <div className="flex items-start space-x-3">
+                <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                  notification.type === 'error' ? 'bg-red-100' :
+                  notification.type === 'warning' ? 'bg-amber-100' :
+                  notification.type === 'success' ? 'bg-green-100' :
+                  'bg-blue-100'
                 }`}>
-                  {activeTab === 'risk' && <AlertTriangle className="w-6 h-6 text-white" />}
-                  {activeTab === 'summary' && <BookOpen className="w-6 h-6 text-white" />}
-                  {activeTab === 'authenticity' && <Search className="w-6 h-6 text-white" />}
+                  {notification.type === 'error' && <AlertTriangle className="w-3 h-3 text-red-600" />}
+                  {notification.type === 'warning' && <AlertTriangle className="w-3 h-3 text-amber-600" />}
+                  {notification.type === 'success' && <CheckCircle className="w-3 h-3 text-green-600" />}
+                  {notification.type === 'info' && <FileText className="w-3 h-3 text-blue-600" />}
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold text-gray-800">
-                    {activeTab === 'risk' && 'Contract Risk Analysis'}
-                    {activeTab === 'summary' && 'Document Summarizer'}
-                    {activeTab === 'authenticity' && 'Document Authenticity Checker'}
-                  </h3>
-                  <p className="text-gray-600 mt-1">
-                    {activeTab === 'risk' && 'Analyze contract for missing clauses, potential risks, and compliance issues using advanced AI'}
-                    {activeTab === 'summary' && 'Convert complex legal contracts into clear, plain-language summaries with key points highlighted'}
-                    {activeTab === 'authenticity' && 'Advanced verification for signatures, watermarks, and detection of tampering or forgery attempts'}
+                  <p className={`text-sm font-medium ${
+                    notification.type === 'error' ? 'text-red-800' :
+                    notification.type === 'warning' ? 'text-amber-800' :
+                    notification.type === 'success' ? 'text-green-800' :
+                    'text-blue-800'
+                  }`}>
+                    {notification.message}
                   </p>
                 </div>
               </div>
-
-              <div className="mb-8">
-                <FileUploadArea
-                  label="Select Document for Analysis"
-                  file={singleFile}
-                  onFileChange={(e) => setSingleFile(e.target.files[0])}
-                  fileRef={singleFileRef}
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex space-x-4">
-                  <button
-                    onClick={
-                      activeTab === 'risk' ? handleRiskAnalysis :
-                      activeTab === 'summary' ? handleDocumentSummarizer :
-                      handleAuthenticityCheck
-                    }
-                    disabled={loading || !singleFile}
-                    className={`saas-button-primary px-8 py-4 text-white disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-3 ${
-                      activeTab === 'risk' ? 'bg-gradient-to-r from-red-600 to-pink-600' :
-                      activeTab === 'summary' ? 'bg-gradient-to-r from-green-600 to-emerald-600' :
-                      'bg-gradient-to-r from-purple-600 to-indigo-600'
-                    }`}
-                  >
-                    {activeTab === 'risk' && <AlertTriangle className="w-5 h-5" />}
-                    {activeTab === 'summary' && <BookOpen className="w-5 h-5" />}
-                    {activeTab === 'authenticity' && <Search className="w-5 h-5" />}
-                    <span>
-                      {loading ? 'Processing...' : 
-                        activeTab === 'risk' ? 'Analyze Risk' :
-                        activeTab === 'summary' ? 'Summarize Document' :
-                        'Check Authenticity'
-                      }
-                    </span>
-                  </button>
-                  
-                  <button
-                    onClick={clearFiles}
-                    className="saas-button-secondary px-6 py-4 bg-white/80 border border-gray-200 text-gray-700 hover:bg-gray-50 flex items-center space-x-2"
-                  >
-                    <X className="w-5 h-5" />
-                    <span>Clear File</span>
-                  </button>
-                </div>
-                
-                <div className="flex items-center space-x-4 text-sm text-gray-500">
-                  <div className="flex items-center space-x-2">
-                    <Brain className="w-4 h-4" />
-                    <span>AI-Powered Analysis</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Shield className="w-4 h-4" />
-                    <span>Enterprise Security</span>
-                  </div>
-                </div>
-              </div>
+              <button
+                onClick={() => removeNotification(notification.id)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
-          )}
-
-          {/* Enhanced Compliance Generator Tab */}
-          {activeTab === 'compliance' && (
-            <div className="glass-morphism-card bg-white/80 backdrop-blur-xl border border-white/20 rounded-2xl p-8 saas-shadow-glow animate-slide-up">
-              <div className="flex items-center space-x-4 mb-6">
-                <div className="p-3 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl">
-                  <CheckCircle className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-gray-800">Compliance Task Generator</h3>
-                  <p className="text-gray-600 mt-1">Generate automated regulatory checklists based on jurisdiction, company type, and applicable regulations</p>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div className="space-y-3">
-                  <label className="block text-sm font-semibold text-gray-700">Regulation Type</label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      placeholder="e.g., labor law, corporate law, tax law"
-                      value={complianceData.regulation}
-                      onChange={(e) => setComplianceData({...complianceData, regulation: e.target.value})}
-                      className="saas-input w-full pl-12 pr-4 py-4 bg-white/80 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all duration-300"
-                    />
-                    <Scale className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  </div>
-                </div>
-                
-                <div className="space-y-3">
-                  <label className="block text-sm font-semibold text-gray-700">Country/Jurisdiction</label>
-                  <div className="relative">
-                    <select
-                      value={complianceData.country}
-                      onChange={(e) => setComplianceData({...complianceData, country: e.target.value})}
-                      className="saas-input w-full pl-12 pr-4 py-4 bg-white/80 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all duration-300"
-                    >
-                      <option value="INDIA">🇮🇳 India</option>
-                      <option value="USA">🇺🇸 United States</option>
-                      <option value="UK">🇬🇧 United Kingdom</option>
-                      <option value="CANADA">🇨🇦 Canada</option>
-                      <option value="AUSTRALIA">🇦🇺 Australia</option>
-                    </select>
-                    <Globe className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  </div>
-                </div>
-                
-                <div className="space-y-3">
-                  <label className="block text-sm font-semibold text-gray-700">Company Type</label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      placeholder="e.g., justice, technology, healthcare"
-                      value={complianceData.companyType}
-                      onChange={(e) => setComplianceData({...complianceData, companyType: e.target.value})}
-                      className="saas-input w-full pl-12 pr-4 py-4 bg-white/80 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all duration-300"
-                    />
-                    <Target className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <button
-                  onClick={handleComplianceGeneration}
-                  disabled={loading || !complianceData.regulation || !complianceData.country || !complianceData.companyType}
-                  className="saas-button-primary px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-3"
-                >
-                  <CheckCircle className="w-5 h-5" />
-                  <span>{loading ? 'Generating Tasks...' : 'Generate Compliance Tasks'}</span>
-                </button>
-                
-                <div className="flex items-center space-x-4 text-sm text-gray-500">
-                  <div className="flex items-center space-x-2">
-                    <Brain className="w-4 h-4" />
-                    <span>AI Legal Database</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Globe className="w-4 h-4" />
-                    <span>Multi-Jurisdiction Support</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Enhanced Results Section */}
-          {results && (
-            <div className="glass-morphism-card bg-white/80 backdrop-blur-xl border border-white/20 rounded-2xl p-8 mt-8 saas-shadow-glow animate-slide-up">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center space-x-4">
-                  <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl">
-                    <Eye className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-gray-800">{results.type} Results</h3>
-                    <p className="text-gray-600 flex items-center mt-1">
-                      <Clock className="w-4 h-4 mr-2" />
-                      Generated on {results.timestamp}
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center space-x-3">
-                  <button className="saas-button-secondary px-4 py-2 bg-white/80 border border-gray-200 hover:bg-gray-50 flex items-center space-x-2">
-                    <Download className="w-4 h-4" />
-                    <span>Export</span>
-                  </button>
-                  <button
-                    onClick={() => setResults(null)}
-                    className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors duration-300"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
-              
-              {results.error ? (
-                <div className="bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-xl p-6">
-                  <div className="flex items-center space-x-3">
-                    <AlertTriangle className="w-6 h-6 text-red-600" />
-                    <div>
-                      <h4 className="font-semibold text-red-800">Analysis Error</h4>
-                      <p className="text-red-700 mt-1">{results.error}</p>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="bg-gradient-to-r from-gray-50/80 to-blue-50/80 border border-gray-200 rounded-xl p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h4 className="font-semibold text-gray-800 flex items-center">
-                      <FileCheck className="w-5 h-5 mr-2 text-green-600" />
-                      Analysis Complete
-                    </h4>
-                    <div className="flex items-center space-x-2 text-sm text-green-600">
-                      <CheckCircle className="w-4 h-4" />
-                      <span>Verified Results</span>
-                    </div>
-                  </div>
-                  <div className="bg-white/80 rounded-lg p-4 border border-gray-200">
-                    <pre className="whitespace-pre-wrap text-sm text-gray-800 max-h-96 overflow-y-auto font-mono leading-relaxed">
-                      {typeof results.data === 'string' 
-                        ? results.data 
-                        : JSON.stringify(results.data, null, 2)
-                      }
-                    </pre>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+          </div>
+        ))}
       </div>
     </div>
   );

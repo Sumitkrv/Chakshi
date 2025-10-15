@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Bar, Doughnut, Line, Pie } from 'react-chartjs-2';
+import { Bar, Doughnut, Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -13,23 +13,26 @@ import {
   Legend,
   Filler
 } from 'chart.js';
-import { 
-  TrendingUp, 
-  BarChart3, 
-  PieChart, 
-  Filter,
-  Calendar,
+import {
+  BarChart3,
+  TrendingUp,
   DollarSign,
-  Clock,
   Target,
   AlertTriangle,
-  CheckCircle,
-  Activity,
+  BookOpen,
+  Clock,
   Users,
   FileText,
-  ArrowUp,
-  ArrowDown,
-  Minus
+  CheckCircle,
+  Search,
+  Filter,
+  Calendar,
+  Activity,
+  Scale,
+  Briefcase,
+  PieChart,
+  LineChart,
+  Menu
 } from 'lucide-react';
 
 // Register ChartJS components
@@ -47,26 +50,31 @@ ChartJS.register(
 );
 
 const AnalyticsDashboard = () => {
+  // Professional color palette
+  const colors = {
+    cream: '#f5f5ef',
+    navy: '#1f2839',
+    golden: '#b69d74',
+    gray: '#6b7280',
+    green: '#10b981',
+    amber: '#f59e0b',
+    blue: '#3b82f6'
+  };
+
   // Sample data for demonstration
   const [caseData] = useState([
-    { id: 1, name: 'Smith v. Jones', progress: 65, risk: 'Medium', successProbability: 72, stages: 5, completedStages: 3, delays: 2, value: 125000, status: 'Active', category: 'Civil Litigation', openedDate: '2023-01-15', lastUpdate: '2023-10-20' },
-    { id: 2, name: 'Williams v. Anderson Corp', progress: 30, risk: 'High', successProbability: 35, stages: 7, completedStages: 2, delays: 4, value: 450000, status: 'Active', category: 'Corporate Law', openedDate: '2023-03-10', lastUpdate: '2023-10-18' },
-    { id: 3, name: 'State v. Peterson', progress: 85, risk: 'Low', successProbability: 88, stages: 4, completedStages: 3, delays: 0, value: 75000, status: 'Active', category: 'Criminal Defense', openedDate: '2023-05-22', lastUpdate: '2023-10-22' },
-    { id: 4, name: 'Johnson Estate Planning', progress: 45, risk: 'Medium', successProbability: 60, stages: 6, completedStages: 3, delays: 3, value: 95000, status: 'Pending', category: 'Estate Planning', openedDate: '2023-02-28', lastUpdate: '2023-10-15' },
-    { id: 5, name: 'Davis Contract Dispute', progress: 90, risk: 'Low', successProbability: 92, stages: 5, completedStages: 4, delays: 1, value: 150000, status: 'Active', category: 'Contract Law', openedDate: '2023-04-05', lastUpdate: '2023-10-21' },
-    { id: 6, name: 'Thompson IP Case', progress: 70, risk: 'Medium', successProbability: 78, stages: 8, completedStages: 5, delays: 2, value: 275000, status: 'Active', category: 'Intellectual Property', openedDate: '2023-06-12', lastUpdate: '2023-10-19' },
-    { id: 7, name: 'Miller Bankruptcy', progress: 95, risk: 'Low', successProbability: 85, stages: 4, completedStages: 4, delays: 0, value: 50000, status: 'Completed', category: 'Bankruptcy', openedDate: '2023-01-08', lastUpdate: '2023-09-30' }
+    { id: 1, name: 'Smith v. Jones', progress: 65, risk: 'Medium', successProbability: 72, value: 125000, status: 'Active', category: 'Civil Litigation' },
+    { id: 2, name: 'Williams v. Anderson Corp', progress: 30, risk: 'High', successProbability: 35, value: 450000, status: 'Active', category: 'Corporate Law' },
+    { id: 3, name: 'State v. Peterson', progress: 85, risk: 'Low', successProbability: 88, value: 75000, status: 'Active', category: 'Criminal Defense' },
+    { id: 4, name: 'Johnson Estate Planning', progress: 45, risk: 'Medium', successProbability: 60, value: 95000, status: 'Pending', category: 'Estate Planning' },
+    { id: 5, name: 'Davis Contract Dispute', progress: 90, risk: 'Low', successProbability: 92, value: 150000, status: 'Active', category: 'Contract Law' },
+    { id: 6, name: 'Thompson IP Case', progress: 70, risk: 'Medium', successProbability: 78, value: 275000, status: 'Active', category: 'Intellectual Property' },
+    { id: 7, name: 'Miller Bankruptcy', progress: 95, risk: 'Low', successProbability: 85, value: 50000, status: 'Completed', category: 'Bankruptcy' }
   ]);
 
-  // State for filters
-  const [filters, setFilters] = useState({
-    riskLevel: 'All',
-    status: 'All',
-    category: 'All',
-    timeframe: '30d'
-  });
-
-  const [activeMetric, setActiveMetric] = useState('overview');
+  const [filters, setFilters] = useState({ timeframe: '7d' });
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Calculate metrics
   const metrics = useMemo(() => {
@@ -75,23 +83,19 @@ const AnalyticsDashboard = () => {
     const totalValue = caseData.reduce((sum, c) => sum + c.value, 0);
     const avgSuccessRate = caseData.reduce((sum, c) => sum + c.successProbability, 0) / totalCases;
     const highRiskCases = caseData.filter(c => c.risk === 'High').length;
-    const completedCases = caseData.filter(c => c.status === 'Completed').length;
-    const avgProgress = caseData.reduce((sum, c) => sum + c.progress, 0) / totalCases;
-    const totalDelays = caseData.reduce((sum, c) => sum + c.delays, 0);
 
-    return {
-      totalCases,
-      activeCases,
-      completedCases,
-      totalValue,
-      avgSuccessRate,
-      highRiskCases,
-      avgProgress,
-      totalDelays
-    };
+    return { totalCases, activeCases, totalValue, avgSuccessRate, highRiskCases };
   }, [caseData]);
 
-  // Chart configurations
+  // Filtered case data based on search
+  const filteredCaseData = useMemo(() => {
+    return caseData.filter(caseItem =>
+      caseItem.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      caseItem.category.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [caseData, searchTerm]);
+
+  // Mobile-optimized chart configurations
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -99,21 +103,29 @@ const AnalyticsDashboard = () => {
       legend: {
         position: 'bottom',
         labels: {
-          padding: 20,
+          padding: 15,
           usePointStyle: true,
           font: {
-            size: 12
-          }
+            size: window.innerWidth < 768 ? 10 : 12
+          },
+          color: colors.navy
         }
       },
       tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        titleColor: 'white',
-        bodyColor: 'white',
-        borderColor: 'rgba(255, 255, 255, 0.1)',
+        backgroundColor: `rgba(${parseInt(colors.navy.slice(1, 3), 16)}, ${parseInt(colors.navy.slice(3, 5), 16)}, ${parseInt(colors.navy.slice(5, 7), 16)}, 0.95)`,
+        titleColor: colors.cream,
+        bodyColor: colors.cream,
+        borderColor: colors.golden,
         borderWidth: 1,
-        cornerRadius: 8,
-        padding: 12
+        cornerRadius: 6,
+        padding: 10,
+        displayColors: false,
+        titleFont: {
+          size: window.innerWidth < 768 ? 11 : 12
+        },
+        bodyFont: {
+          size: window.innerWidth < 768 ? 11 : 12
+        }
       }
     },
     scales: {
@@ -123,331 +135,645 @@ const AnalyticsDashboard = () => {
         },
         ticks: {
           font: {
-            size: 11
-          }
+            size: window.innerWidth < 768 ? 10 : 11
+          },
+          color: colors.gray,
+          maxRotation: window.innerWidth < 768 ? 45 : 0
         }
       },
       y: {
         grid: {
-          color: 'rgba(0, 0, 0, 0.05)'
+          color: `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`
         },
         ticks: {
           font: {
-            size: 11
-          }
+            size: window.innerWidth < 768 ? 10 : 11
+          },
+          color: colors.gray
         }
       }
     }
   };
 
-  // Case progress data
+  // Chart data configurations
   const progressData = {
-    labels: caseData.map(c => c.name.substring(0, 20) + '...'),
+    labels: filteredCaseData.map(c => {
+      if (window.innerWidth < 640) {
+        return c.name.substring(0, 12) + (c.name.length > 12 ? '...' : '');
+      }
+      return c.name.substring(0, 20) + (c.name.length > 20 ? '...' : '');
+    }),
     datasets: [{
       label: 'Progress %',
-      data: caseData.map(c => c.progress),
-      backgroundColor: 'rgba(212, 175, 55, 0.8)',
-      borderColor: 'rgba(212, 175, 55, 1)',
+      data: filteredCaseData.map(c => c.progress),
+      backgroundColor: `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.20)`,
+      borderColor: colors.golden,
       borderWidth: 2,
-      borderRadius: 4,
-      borderSkipped: false,
+      borderRadius: 6,
     }]
   };
 
-  // Risk distribution data
   const riskData = {
     labels: ['Low Risk', 'Medium Risk', 'High Risk'],
     datasets: [{
       data: [
-        caseData.filter(c => c.risk === 'Low').length,
-        caseData.filter(c => c.risk === 'Medium').length,
-        caseData.filter(c => c.risk === 'High').length
+        filteredCaseData.filter(c => c.risk === 'Low').length,
+        filteredCaseData.filter(c => c.risk === 'Medium').length,
+        filteredCaseData.filter(c => c.risk === 'High').length
       ],
       backgroundColor: [
-        'rgba(34, 197, 94, 0.8)',
-        'rgba(245, 158, 11, 0.8)',
-        'rgba(239, 68, 68, 0.8)'
+        `rgba(${parseInt(colors.green.slice(1, 3), 16)}, ${parseInt(colors.green.slice(3, 5), 16)}, ${parseInt(colors.green.slice(5, 7), 16)}, 0.20)`,
+        `rgba(${parseInt(colors.amber.slice(1, 3), 16)}, ${parseInt(colors.amber.slice(3, 5), 16)}, ${parseInt(colors.amber.slice(5, 7), 16)}, 0.20)`,
+        `rgba(239, 68, 68, 0.20)`
       ],
-      borderColor: [
-        'rgba(34, 197, 94, 1)',
-        'rgba(245, 158, 11, 1)',
-        'rgba(239, 68, 68, 1)'
-      ],
+      borderColor: [colors.green, colors.amber, '#ef4444'],
       borderWidth: 2
     }]
   };
 
-  // Case value data
   const valueData = {
-    labels: caseData.map(c => c.name.substring(0, 15) + '...'),
+    labels: filteredCaseData.map(c => {
+      if (window.innerWidth < 640) {
+        return c.name.substring(0, 10) + (c.name.length > 10 ? '...' : '');
+      }
+      return c.name.substring(0, 15) + (c.name.length > 15 ? '...' : '');
+    }),
     datasets: [{
       label: 'Case Value ($)',
-      data: caseData.map(c => c.value),
-      backgroundColor: 'rgba(10, 35, 66, 0.2)',
-      borderColor: 'rgba(10, 35, 66, 1)',
-      borderWidth: 3,
+      data: filteredCaseData.map(c => c.value),
+      backgroundColor: `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.10)`,
+      borderColor: colors.golden,
+      borderWidth: 2,
       fill: true,
-      tension: 0.4
+      tension: 0.4,
+      pointBackgroundColor: colors.cream,
+      pointBorderColor: colors.golden,
+      pointBorderWidth: 2,
+      pointRadius: window.innerWidth < 768 ? 3 : 4
     }]
   };
 
-  const getTrendIcon = (value, comparison = 0) => {
-    if (value > comparison) return <ArrowUp className="w-4 h-4 text-green-500" />;
-    if (value < comparison) return <ArrowDown className="w-4 h-4 text-red-500" />;
-    return <Minus className="w-4 h-4 text-gray-400" />;
-  };
-
   const statCards = [
-    {
-      title: 'Total Cases',
-      value: metrics.totalCases,
-      icon: FileText,
-      color: 'from-blue-500 to-cyan-400',
-      trend: '+2 this month',
-      change: 12
-    },
-    {
-      title: 'Active Cases',
-      value: metrics.activeCases,
-      icon: Activity,
-      color: 'from-green-500 to-emerald-400',
-      trend: '+1 this week',
-      change: 5
-    },
-    {
-      title: 'Total Value',
-      value: `$${(metrics.totalValue / 1000000).toFixed(1)}M`,
-      icon: DollarSign,
-      color: 'from-purple-500 to-indigo-400',
-      trend: '+$250K this month',
-      change: 8
-    },
-    {
-      title: 'Success Rate',
-      value: `${metrics.avgSuccessRate.toFixed(1)}%`,
-      icon: Target,
-      color: 'from-orange-500 to-amber-400',
-      trend: '+3.2% improvement',
-      change: 15
-    },
-    {
-      title: 'High Risk Cases',
-      value: metrics.highRiskCases,
-      icon: AlertTriangle,
-      color: 'from-red-500 to-pink-400',
-      trend: '-1 this week',
-      change: -2
-    },
-    {
-      title: 'Avg Progress',
-      value: `${metrics.avgProgress.toFixed(1)}%`,
-      icon: TrendingUp,
-      color: 'from-teal-500 to-cyan-400',
-      trend: '+5% this month',
-      change: 7
-    }
+    { title: 'Total Cases', value: metrics.totalCases, icon: FileText, change: 12 },
+    { title: 'Active Cases', value: metrics.activeCases, icon: Activity, change: 5 },
+    { title: 'Total Value', value: `$${(metrics.totalValue / 1000000).toFixed(1)}M`, icon: DollarSign, change: 8 },
+    { title: 'Success Rate', value: `${metrics.avgSuccessRate.toFixed(1)}%`, icon: Target, change: 3.2 }
+  ];
+
+  // Professional analytics sections
+  const performanceMetrics = [
+    { title: 'Win Rate', value: '78%', subtitle: 'Civil: 85%, Criminal: 72%', icon: Scale, trend: 'up' },
+    { title: 'Case Duration', value: '8.2 months', subtitle: 'Improved from 9.1 months', icon: Clock, trend: 'up' },
+    { title: 'Court Performance', value: '4.2/5', subtitle: 'High Court: 4.5, District: 3.9', icon: Briefcase, trend: 'stable' },
+    { title: 'Attendance Rate', value: '94%', subtitle: 'Excellent attendance record', icon: Calendar, trend: 'up' }
+  ];
+
+  const financialMetrics = [
+    { title: 'Monthly Revenue', value: '$45K', subtitle: '+15% vs last month', icon: TrendingUp, trend: 'up' },
+    { title: 'Outstanding Fees', value: '$18K', subtitle: 'Average age: 42 days', icon: Clock, trend: 'down' },
+    { title: 'Expense Ratio', value: '28%', subtitle: 'Court fees: 12%, Travel: 8%', icon: PieChart, trend: 'stable' },
+    { title: 'Client Value', value: '$125K', subtitle: 'Average client lifetime value', icon: Users, trend: 'up' }
+  ];
+
+  const productivityMetrics = [
+    { title: 'Billable Hours', value: '156h', subtitle: 'Current month tracking', icon: Clock, trend: 'up' },
+    { title: 'Document Processing', value: '2.3 days', subtitle: 'Average drafting time', icon: FileText, trend: 'up' },
+    { title: 'Research Efficiency', value: '65%', subtitle: 'Time saved with technology', icon: BookOpen, trend: 'up' },
+    { title: 'Task Completion', value: '91%', subtitle: 'Deadlines successfully met', icon: CheckCircle, trend: 'stable' }
+  ];
+
+  const predictiveMetrics = [
+    { title: 'Success Probability', value: '76%', subtitle: 'AI prediction confidence', icon: Target, trend: 'up' },
+    { title: 'Delay Risk', value: 'Medium', subtitle: '2-3 weeks expected', icon: AlertTriangle, trend: 'stable' },
+    { title: 'Settlement Likelihood', value: '42%', subtitle: 'Mediation recommended', icon: Scale, trend: 'up' },
+    { title: 'Case Complexity', value: '68%', subtitle: 'Above average complexity', icon: Activity, trend: 'up' }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-navy-50 via-white to-gold-50">
-      <div className="main-content lg:ml-64">
-        
-        {/* Professional Header */}
-        <header className="bg-white/80 backdrop-blur-sm border-b border-gold-200/30 px-6 py-8 sticky top-0 z-10">
-          <div className="flex justify-between items-start w-full">
-            <div className="flex flex-col">
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-navy-900 to-navy-700 bg-clip-text text-transparent">
-                Analytics Dashboard
-              </h1>
-              <p className="text-lg text-navy-600 mt-2 font-medium">
-                Comprehensive insights into your legal practice performance
-              </p>
-            </div>
-            
-            <div className="flex items-center gap-4">
-              <select 
-                className="bg-white/90 backdrop-blur-sm border-2 border-gold-200 hover:border-gold-400 focus:border-gold-500 rounded-xl px-4 py-3 text-navy-700 font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gold-400/30"
-                value={filters.timeframe}
-                onChange={(e) => setFilters({...filters, timeframe: e.target.value})}
-              >
-                <option value="7d">Last 7 days</option>
-                <option value="30d">Last 30 days</option>
-                <option value="90d">Last 90 days</option>
-                <option value="1y">Last year</option>
-              </select>
+    <div className="min-h-screen" style={{background: colors.cream}}>
+      {/* Mobile Menu Overlay */}
+      {isMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={() => setIsMenuOpen(false)}
+        />
+      )}
+
+      <div className="w-full">
+        {/* Header */}
+        <header className="sticky top-0 z-30 border-b" style={{
+          background: `linear-gradient(135deg, rgba(255, 255, 255, 0.20), rgba(255, 255, 255, 0.10))`,
+          backdropFilter: 'blur(6px)',
+          borderColor: `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`
+        }}>
+          <div className="px-4 py-3 sm:px-6">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center">
+                <button 
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  className="lg:hidden p-2 rounded-lg mr-2 transition-colors"
+                  style={{
+                    background: `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.08)`,
+                    color: colors.navy
+                  }}
+                >
+                  <Menu className="w-5 h-5" />
+                </button>
+                <div>
+                  <h1 className="text-lg sm:text-xl font-bold" style={{color: colors.navy}}>
+                    Legal Analytics Dashboard
+                  </h1>
+                  <p className="text-xs sm:text-sm hidden sm:block" style={{color: colors.gray}}>
+                    Comprehensive practice performance insights
+                  </p>
+                </div>
+              </div>
               
-              <button className="px-6 py-3 bg-gradient-to-r from-white/90 to-white/70 backdrop-blur-sm border-2 border-gold-200 hover:border-gold-400 rounded-xl text-navy-700 font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg flex items-center gap-2">
-                <Filter className="w-4 h-4" />
-                Filters
-              </button>
+              <div className="flex items-center gap-2">
+                <div className="relative">
+                  <Filter className="absolute left-2 top-1/2 transform -translate-y-1/2 w-3 h-3" style={{ color: colors.gray }} />
+                  <select 
+                    className="text-xs sm:text-sm pl-7 pr-3 py-1.5 rounded-lg focus:outline-none transition-all appearance-none"
+                    style={{
+                      background: `rgba(255, 255, 255, 0.06)`,
+                      border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`,
+                      color: colors.navy,
+                      backdropFilter: 'blur(6px)'
+                    }}
+                    value={filters.timeframe}
+                    onChange={(e) => setFilters({...filters, timeframe: e.target.value})}
+                    onFocus={(e) => e.target.style.borderColor = colors.golden}
+                    onBlur={(e) => e.target.style.borderColor = `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`}
+                  >
+                    <option value="7d">7 Days</option>
+                    <option value="90d">90 Days</option>
+                    <option value="1y">1 Year</option>
+                  </select>
+                </div>
+              </div>
             </div>
           </div>
         </header>
 
-        {/* Dashboard Content */}
-        <div className="p-6 lg:p-8">
-          
-          {/* Key Metrics Grid */}
-          <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-6 mb-8">
+        {/* Main Content */}
+        <div className="p-3 sm:p-4 md:p-6">
+          {/* Key Metrics Grid - Responsive */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
             {statCards.map((stat, index) => (
               <div 
                 key={index}
-                className="backdrop-blur-xl bg-gradient-to-br from-white/90 to-white/70 border-2 border-gold-200/50 hover:border-gold-400/60 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer hover:scale-105"
-                style={{animationDelay: `${0.1 * index}s`}}
-                onClick={() => setActiveMetric(stat.title.toLowerCase().replace(' ', '_'))}
+                className="p-3 sm:p-4 rounded-lg transition-all duration-200 hover:scale-105"
+                style={{
+                  background: `linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06))`,
+                  backdropFilter: 'blur(6px)',
+                  border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`,
+                  boxShadow: `0 0 15px rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.20)`
+                }}
               >
-                <div className="flex justify-between items-start mb-4">
-                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-r ${stat.color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                    <stat.icon className="w-7 h-7 text-white" />
+                <div className="flex justify-between items-start mb-2">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center" style={{
+                    background: `linear-gradient(135deg, ${colors.golden}20, ${colors.golden}10)`
+                  }}>
+                    <stat.icon className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: colors.golden }} />
                   </div>
                   <div className="flex items-center gap-1">
-                    {getTrendIcon(stat.change)}
-                    <span className={`text-xs font-bold ${stat.change > 0 ? 'text-green-600' : stat.change < 0 ? 'text-red-600' : 'text-navy-500'}`}>
-                      {Math.abs(stat.change)}%
+                    <span className={`text-xs font-semibold`} style={{
+                      color: stat.change > 0 ? colors.green : '#ef4444'
+                    }}>
+                      {stat.change > 0 ? '+' : ''}{stat.change}%
                     </span>
                   </div>
                 </div>
                 
-                <div className="flex flex-col">
-                  <h3 className="text-3xl font-bold bg-gradient-to-r from-navy-900 to-navy-700 bg-clip-text text-transparent mb-1">
+                <div>
+                  <h3 className="text-lg sm:text-xl font-bold mb-1" style={{color: colors.navy}}>
                     {stat.value}
                   </h3>
-                  <p className="text-sm font-semibold text-navy-600 mb-2">
+                  <p className="text-xs sm:text-sm truncate" style={{color: colors.gray}}>
                     {stat.title}
-                  </p>
-                  <p className="text-xs text-navy-500 font-medium">
-                    {stat.trend}
                   </p>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Charts Section */}
-          <div className="grid lg:grid-cols-2 gap-8 mb-8">
-            
+          {/* Charts Section - Stack on mobile */}
+          <div className="grid lg:grid-cols-2 gap-4 sm:gap-6 mb-6">
             {/* Case Progress Chart */}
-            <div className="backdrop-blur-xl bg-gradient-to-br from-white/90 to-white/70 border-2 border-gold-200/50 hover:border-gold-400/60 rounded-3xl p-8 shadow-lg hover:shadow-xl transition-all duration-300">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-2xl font-bold bg-gradient-to-r from-navy-900 to-navy-700 bg-clip-text text-transparent">
-                  Case Progress Overview
+            <div className="p-4 sm:p-6 rounded-lg" style={{
+              background: `linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06))`,
+              backdropFilter: 'blur(6px)',
+              border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`
+            }}>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-base sm:text-lg font-semibold" style={{color: colors.navy}}>
+                  Case Progress
                 </h3>
-                <div className="w-10 h-10 bg-gradient-to-br from-gold-400/20 to-gold-600/20 backdrop-blur-sm border border-gold-400/30 rounded-xl flex items-center justify-center">
-                  <BarChart3 className="w-5 h-5 text-gold-600" />
+                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center" style={{
+                  background: `linear-gradient(135deg, ${colors.golden}20, ${colors.golden}10)`
+                }}>
+                  <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: colors.golden }} />
                 </div>
               </div>
-              <div style={{ height: '300px' }}>
+              <div style={{ height: '250px', minHeight: '200px' }}>
                 <Bar data={progressData} options={chartOptions} />
               </div>
             </div>
 
             {/* Risk Distribution */}
-            <div className="backdrop-blur-xl bg-gradient-to-br from-white/90 to-white/70 border-2 border-gold-200/50 hover:border-gold-400/60 rounded-3xl p-8 shadow-lg hover:shadow-xl transition-all duration-300">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-2xl font-bold bg-gradient-to-r from-navy-900 to-navy-700 bg-clip-text text-transparent">
+            <div className="p-4 sm:p-6 rounded-lg" style={{
+              background: `linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06))`,
+              backdropFilter: 'blur(6px)',
+              border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`
+            }}>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-base sm:text-lg font-semibold" style={{color: colors.navy}}>
                   Risk Distribution
                 </h3>
-                <div className="w-10 h-10 bg-gradient-to-br from-gold-400/20 to-gold-600/20 backdrop-blur-sm border border-gold-400/30 rounded-xl flex items-center justify-center">
-                  <PieChart className="w-5 h-5 text-gold-600" />
+                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center" style={{
+                  background: `linear-gradient(135deg, ${colors.golden}20, ${colors.golden}10)`
+                }}>
+                  <AlertTriangle className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: colors.golden }} />
                 </div>
               </div>
-              <div style={{ height: '300px' }}>
-                <Doughnut data={riskData} options={{...chartOptions, cutout: '60%'}} />
+              <div style={{ height: '250px', minHeight: '200px' }}>
+                <Doughnut 
+                  data={riskData} 
+                  options={{
+                    ...chartOptions, 
+                    cutout: window.innerWidth < 768 ? '50%' : '60%'
+                  }} 
+                />
               </div>
             </div>
           </div>
 
-          {/* Case Value Trend */}
-          <div className="backdrop-blur-xl bg-gradient-to-br from-white/90 to-white/70 border-2 border-gold-200/50 hover:border-gold-400/60 rounded-3xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 mb-8">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-2xl font-bold bg-gradient-to-r from-navy-900 to-navy-700 bg-clip-text text-transparent">
+          {/* Case Value Trend - Full width */}
+          <div className="p-4 sm:p-6 rounded-lg mb-6" style={{
+            background: `linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06))`,
+            backdropFilter: 'blur(6px)',
+            border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`
+          }}>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-base sm:text-lg font-semibold" style={{color: colors.navy}}>
                 Case Value Trends
               </h3>
-              <div className="w-10 h-10 bg-gradient-to-br from-gold-400/20 to-gold-600/20 backdrop-blur-sm border border-gold-400/30 rounded-xl flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-gold-600" />
+              <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center" style={{
+                background: `linear-gradient(135deg, ${colors.golden}20, ${colors.golden}10)`
+              }}>
+                <LineChart className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: colors.golden }} />
               </div>
             </div>
-            <div style={{ height: '350px' }}>
+            <div style={{ height: '280px', minHeight: '250px' }}>
               <Line data={valueData} options={chartOptions} />
             </div>
           </div>
 
-          {/* Case Summary Table */}
-          <div className="backdrop-blur-xl bg-gradient-to-br from-white/90 to-white/70 border-2 border-gold-200/50 hover:border-gold-400/60 rounded-3xl p-8 shadow-lg hover:shadow-xl transition-all duration-300">
+          {/* Advanced Analytics Sections */}
+          
+          {/* Performance Metrics */}
+          <div className="p-4 sm:p-6 rounded-lg mb-6" style={{
+            background: `linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06))`,
+            backdropFilter: 'blur(6px)',
+            border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`
+          }}>
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-2xl font-bold bg-gradient-to-r from-navy-900 to-navy-700 bg-clip-text text-transparent">
-                Case Summary
-              </h3>
-              <div className="flex items-center gap-2">
+              <div>
+                <h3 className="text-lg font-semibold mb-1" style={{color: colors.navy}}>Performance Metrics</h3>
+                <p className="text-sm" style={{color: colors.gray}}>Win/Loss ratios, case durations, and court performance</p>
+              </div>
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{
+                background: `linear-gradient(135deg, ${colors.golden}20, ${colors.golden}10)`
+              }}>
+                <BarChart3 className="w-4 h-4" style={{ color: colors.golden }} />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {performanceMetrics.map((metric, index) => (
+                <div key={index} className="p-4 rounded-lg transition-all duration-200 hover:scale-105" style={{
+                  background: `rgba(255, 255, 255, 0.03)`,
+                  border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.10)`
+                }}>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{
+                      background: `linear-gradient(135deg, ${colors.golden}15, ${colors.golden}08)`
+                    }}>
+                      <metric.icon className="w-4 h-4" style={{ color: colors.golden }} />
+                    </div>
+                    <div className={`w-2 h-2 rounded-full`} style={{
+                      background: metric.trend === 'up' ? colors.green : metric.trend === 'down' ? '#ef4444' : colors.amber
+                    }}></div>
+                  </div>
+                  <h4 className="text-lg font-bold mb-1" style={{color: colors.navy}}>{metric.value}</h4>
+                  <p className="text-sm font-medium mb-1" style={{color: colors.gray}}>{metric.title}</p>
+                  <p className="text-xs" style={{color: colors.golden}}>{metric.subtitle}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Financial Analytics */}
+          <div className="p-4 sm:p-6 rounded-lg mb-6" style={{
+            background: `linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06))`,
+            backdropFilter: 'blur(6px)',
+            border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`
+          }}>
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <h3 className="text-lg font-semibold mb-1" style={{color: colors.navy}}>Financial Analytics</h3>
+                <p className="text-sm" style={{color: colors.gray}}>Revenue trends, outstanding fees, and profitability</p>
+              </div>
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{
+                background: `linear-gradient(135deg, ${colors.golden}20, ${colors.golden}10)`
+              }}>
+                <DollarSign className="w-4 h-4" style={{ color: colors.golden }} />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {financialMetrics.map((metric, index) => (
+                <div key={index} className="p-4 rounded-lg transition-all duration-200 hover:scale-105" style={{
+                  background: `rgba(255, 255, 255, 0.03)`,
+                  border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.10)`
+                }}>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{
+                      background: `linear-gradient(135deg, ${colors.golden}15, ${colors.golden}08)`
+                    }}>
+                      <metric.icon className="w-4 h-4" style={{ color: colors.golden }} />
+                    </div>
+                    <div className={`w-2 h-2 rounded-full`} style={{
+                      background: metric.trend === 'up' ? colors.green : metric.trend === 'down' ? '#ef4444' : colors.amber
+                    }}></div>
+                  </div>
+                  <h4 className="text-lg font-bold mb-1" style={{color: colors.navy}}>{metric.value}</h4>
+                  <p className="text-sm font-medium mb-1" style={{color: colors.gray}}>{metric.title}</p>
+                  <p className="text-xs" style={{color: colors.golden}}>{metric.subtitle}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Productivity Insights */}
+          <div className="p-4 sm:p-6 rounded-lg mb-6" style={{
+            background: `linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06))`,
+            backdropFilter: 'blur(6px)',
+            border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`
+          }}>
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <h3 className="text-lg font-semibold mb-1" style={{color: colors.navy}}>Productivity Insights</h3>
+                <p className="text-sm" style={{color: colors.gray}}>Time tracking, efficiency metrics, and task completion</p>
+              </div>
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{
+                background: `linear-gradient(135deg, ${colors.golden}20, ${colors.golden}10)`
+              }}>
+                <Activity className="w-4 h-4" style={{ color: colors.golden }} />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {productivityMetrics.map((metric, index) => (
+                <div key={index} className="p-4 rounded-lg transition-all duration-200 hover:scale-105" style={{
+                  background: `rgba(255, 255, 255, 0.03)`,
+                  border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.10)`
+                }}>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{
+                      background: `linear-gradient(135deg, ${colors.golden}15, ${colors.golden}08)`
+                    }}>
+                      <metric.icon className="w-4 h-4" style={{ color: colors.golden }} />
+                    </div>
+                    <div className={`w-2 h-2 rounded-full`} style={{
+                      background: metric.trend === 'up' ? colors.green : metric.trend === 'down' ? '#ef4444' : colors.amber
+                    }}></div>
+                  </div>
+                  <h4 className="text-lg font-bold mb-1" style={{color: colors.navy}}>{metric.value}</h4>
+                  <p className="text-sm font-medium mb-1" style={{color: colors.gray}}>{metric.title}</p>
+                  <p className="text-xs" style={{color: colors.golden}}>{metric.subtitle}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Predictive Analytics */}
+          <div className="p-4 sm:p-6 rounded-lg mb-6" style={{
+            background: `linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06))`,
+            backdropFilter: 'blur(6px)',
+            border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`
+          }}>
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <h3 className="text-lg font-semibold mb-1" style={{color: colors.navy}}>Predictive Analytics</h3>
+                <p className="text-sm" style={{color: colors.gray}}>AI-powered insights and predictions for case outcomes</p>
+              </div>
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{
+                background: `linear-gradient(135deg, ${colors.golden}20, ${colors.golden}10)`
+              }}>
+                <Target className="w-4 h-4" style={{ color: colors.golden }} />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {predictiveMetrics.map((metric, index) => (
+                <div key={index} className="p-4 rounded-lg transition-all duration-200 hover:scale-105" style={{
+                  background: `rgba(255, 255, 255, 0.03)`,
+                  border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.10)`
+                }}>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{
+                      background: `linear-gradient(135deg, ${colors.golden}15, ${colors.golden}08)`
+                    }}>
+                      <metric.icon className="w-4 h-4" style={{ color: colors.golden }} />
+                    </div>
+                    <div className={`w-2 h-2 rounded-full`} style={{
+                      background: metric.trend === 'up' ? colors.green : metric.trend === 'down' ? '#ef4444' : colors.amber
+                    }}></div>
+                  </div>
+                  <h4 className="text-lg font-bold mb-1" style={{color: colors.navy}}>{metric.value}</h4>
+                  <p className="text-sm font-medium mb-1" style={{color: colors.gray}}>{metric.title}</p>
+                  <p className="text-xs" style={{color: colors.golden}}>{metric.subtitle}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Case Summary Table with Mobile Optimization */}
+          <div className="p-4 sm:p-6 rounded-lg" style={{
+            background: `linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06))`,
+            backdropFilter: 'blur(6px)',
+            border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`
+          }}>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{
+                  background: `linear-gradient(135deg, ${colors.golden}20, ${colors.golden}10)`
+                }}>
+                  <FileText className="w-4 h-4" style={{ color: colors.golden }} />
+                </div>
+                <h3 className="text-base sm:text-lg font-semibold" style={{color: colors.navy}}>
+                  Case Summary
+                </h3>
+              </div>
+              <div className="w-full sm:w-auto relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" style={{ color: colors.gray }} />
                 <input
                   type="text"
                   placeholder="Search cases..."
-                  className="bg-white/90 backdrop-blur-sm border-2 border-gold-200 hover:border-gold-400 focus:border-gold-500 rounded-xl px-4 py-2 text-navy-700 font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gold-400/30"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full sm:w-48 pl-10 pr-3 py-2 text-sm rounded-lg focus:outline-none transition-all"
+                  style={{
+                    background: `rgba(255, 255, 255, 0.06)`,
+                    border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`,
+                    color: colors.navy,
+                    backdropFilter: 'blur(6px)'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = colors.golden}
+                  onBlur={(e) => e.target.style.borderColor = `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`}
                 />
               </div>
             </div>
             
-            <div className="overflow-x-auto">
-              <table className="w-full">
+            {/* Mobile Card View */}
+            <div className="block sm:hidden">
+              <div className="space-y-3">
+                {filteredCaseData.map((caseItem) => (
+                  <div key={caseItem.id} className="p-3 rounded-lg transition-all duration-200 hover:scale-[1.02]" style={{
+                    background: `rgba(255, 255, 255, 0.03)`,
+                    border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.10)`
+                  }}>
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <h4 className="font-medium text-sm truncate" style={{color: colors.navy}}>{caseItem.name}</h4>
+                        <p className="text-xs" style={{color: colors.gray}}>{caseItem.category}</p>
+                      </div>
+                      <span className={`px-2 py-1 rounded text-xs font-medium`} style={{
+                        background: caseItem.status === 'Active' ? `rgba(${parseInt(colors.green.slice(1, 3), 16)}, ${parseInt(colors.green.slice(3, 5), 16)}, ${parseInt(colors.green.slice(5, 7), 16)}, 0.20)` :
+                        caseItem.status === 'Pending' ? `rgba(${parseInt(colors.amber.slice(1, 3), 16)}, ${parseInt(colors.amber.slice(3, 5), 16)}, ${parseInt(colors.amber.slice(5, 7), 16)}, 0.20)` :
+                        `rgba(${parseInt(colors.blue.slice(1, 3), 16)}, ${parseInt(colors.blue.slice(3, 5), 16)}, ${parseInt(colors.blue.slice(5, 7), 16)}, 0.20)`,
+                        color: caseItem.status === 'Active' ? colors.green :
+                        caseItem.status === 'Pending' ? colors.amber : colors.blue,
+                        border: `1px solid ${caseItem.status === 'Active' ? colors.green :
+                        caseItem.status === 'Pending' ? colors.amber : colors.blue}40`
+                      }}>
+                        {caseItem.status}
+                      </span>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div>
+                        <span style={{color: colors.gray}}>Progress:</span>
+                        <div className="flex items-center gap-1">
+                          <div className="w-12 h-1.5 rounded-full" style={{background: `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`}}>
+                            <div 
+                              className="h-1.5 rounded-full"
+                              style={{ width: `${caseItem.progress}%`, background: colors.golden }}
+                            ></div>
+                          </div>
+                          <span className="font-medium" style={{color: colors.navy}}>{caseItem.progress}%</span>
+                        </div>
+                      </div>
+                      <div>
+                        <span style={{color: colors.gray}}>Risk:</span>
+                        <span className={`px-1.5 py-0.5 rounded text-xs font-medium`} style={{
+                          background: caseItem.risk === 'High' ? 'rgba(239, 68, 68, 0.20)' :
+                          caseItem.risk === 'Medium' ? `rgba(${parseInt(colors.amber.slice(1, 3), 16)}, ${parseInt(colors.amber.slice(3, 5), 16)}, ${parseInt(colors.amber.slice(5, 7), 16)}, 0.20)` :
+                          `rgba(${parseInt(colors.green.slice(1, 3), 16)}, ${parseInt(colors.green.slice(3, 5), 16)}, ${parseInt(colors.green.slice(5, 7), 16)}, 0.20)`,
+                          color: caseItem.risk === 'High' ? '#ef4444' :
+                          caseItem.risk === 'Medium' ? colors.amber : colors.green,
+                          border: `1px solid ${caseItem.risk === 'High' ? '#ef4444' :
+                          caseItem.risk === 'Medium' ? colors.amber : colors.green}40`
+                        }}>
+                          {caseItem.risk}
+                        </span>
+                      </div>
+                      <div>
+                        <span style={{color: colors.gray}}>Success:</span>
+                        <span className="font-medium" style={{color: colors.navy}}>{caseItem.successProbability}%</span>
+                      </div>
+                      <div>
+                        <span style={{color: colors.gray}}>Value:</span>
+                        <span className="font-medium" style={{color: colors.navy}}>${(caseItem.value/1000).toFixed(0)}K</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full min-w-[600px]">
                 <thead>
-                  <tr className="border-b-2 border-gold-200/50">
-                    <th className="text-left p-4 text-sm font-bold text-navy-700">Case Name</th>
-                    <th className="text-left p-4 text-sm font-bold text-navy-700">Progress</th>
-                    <th className="text-left p-4 text-sm font-bold text-navy-700">Risk Level</th>
-                    <th className="text-left p-4 text-sm font-bold text-navy-700">Success Rate</th>
-                    <th className="text-left p-4 text-sm font-bold text-navy-700">Value</th>
-                    <th className="text-left p-4 text-sm font-bold text-navy-700">Status</th>
+                  <tr style={{borderBottom: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`}}>
+                    <th className="text-left p-3 text-sm font-semibold" style={{color: colors.gray}}>Case Name</th>
+                    <th className="text-left p-3 text-sm font-semibold" style={{color: colors.gray}}>Progress</th>
+                    <th className="text-left p-3 text-sm font-semibold" style={{color: colors.gray}}>Risk</th>
+                    <th className="text-left p-3 text-sm font-semibold" style={{color: colors.gray}}>Success</th>
+                    <th className="text-left p-3 text-sm font-semibold" style={{color: colors.gray}}>Value</th>
+                    <th className="text-left p-3 text-sm font-semibold" style={{color: colors.gray}}>Status</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {caseData.map((caseItem) => (
-                    <tr key={caseItem.id} className="border-b border-gold-100/60 hover:bg-gradient-to-r hover:from-gold-50/50 hover:to-navy-50/30 transition-all duration-200">
-                      <td className="p-4">
-                        <div className="flex flex-col">
-                          <span className="text-sm font-semibold text-navy-900">
-                            {caseItem.name}
-                          </span>
-                          <span className="text-xs text-navy-600 font-medium">
-                            {caseItem.category}
-                          </span>
+                  {filteredCaseData.map((caseItem) => (
+                    <tr key={caseItem.id} className="transition-all duration-200" style={{
+                      borderBottom: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.10)`
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.background = `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.05)`}
+                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                    >
+                      <td className="p-3">
+                        <div>
+                          <span className="text-sm font-medium block" style={{color: colors.navy}}>{caseItem.name}</span>
+                          <span className="text-xs" style={{color: colors.gray}}>{caseItem.category}</span>
                         </div>
                       </td>
-                      <td className="p-4">
+                      <td className="p-3">
                         <div className="flex items-center gap-2">
-                          <div className="w-16 bg-navy-200/40 rounded-full h-2">
+                          <div className="w-16 h-2 rounded-full" style={{background: `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`}}>
                             <div 
-                              className="h-2 bg-gradient-to-r from-gold-400 to-gold-600 rounded-full transition-all duration-300"
-                              style={{width: `${caseItem.progress}%`}}
+                              className="h-2 rounded-full"
+                              style={{ width: `${caseItem.progress}%`, background: colors.golden }}
                             ></div>
                           </div>
-                          <span className="text-xs text-navy-600 font-medium">{caseItem.progress}%</span>
+                          <span className="text-xs font-medium" style={{color: colors.gray}}>{caseItem.progress}%</span>
                         </div>
                       </td>
-                      <td className="p-4">
-                        <span className={`inline-flex items-center px-3 py-1 rounded-xl text-xs font-bold border-2 ${
-                          caseItem.risk === 'High' ? 'bg-red-50 text-red-700 border-red-200' :
-                          caseItem.risk === 'Medium' ? 'bg-amber-50 text-amber-700 border-amber-200' :
-                          'bg-green-50 text-green-700 border-green-200'
-                        }`}>
+                      <td className="p-3">
+                        <span className={`px-2 py-1 rounded text-xs font-medium`} style={{
+                          background: caseItem.risk === 'High' ? 'rgba(239, 68, 68, 0.20)' :
+                          caseItem.risk === 'Medium' ? `rgba(${parseInt(colors.amber.slice(1, 3), 16)}, ${parseInt(colors.amber.slice(3, 5), 16)}, ${parseInt(colors.amber.slice(5, 7), 16)}, 0.20)` :
+                          `rgba(${parseInt(colors.green.slice(1, 3), 16)}, ${parseInt(colors.green.slice(3, 5), 16)}, ${parseInt(colors.green.slice(5, 7), 16)}, 0.20)`,
+                          color: caseItem.risk === 'High' ? '#ef4444' :
+                          caseItem.risk === 'Medium' ? colors.amber : colors.green,
+                          border: `1px solid ${caseItem.risk === 'High' ? '#ef4444' :
+                          caseItem.risk === 'Medium' ? colors.amber : colors.green}40`
+                        }}>
                           {caseItem.risk}
                         </span>
                       </td>
-                      <td className="p-4">
-                        <span className="text-sm font-semibold text-navy-900">
+                      <td className="p-3">
+                        <span className="text-sm font-medium" style={{color: colors.navy}}>
                           {caseItem.successProbability}%
                         </span>
                       </td>
-                      <td className="p-4">
-                        <span className="text-sm font-semibold text-navy-900">
+                      <td className="p-3">
+                        <span className="text-sm font-medium" style={{color: colors.navy}}>
                           ${caseItem.value.toLocaleString()}
                         </span>
                       </td>
-                      <td className="p-4">
-                        <span className={`inline-flex items-center px-3 py-1 rounded-xl text-xs font-bold border-2 ${
-                          caseItem.status === 'Active' ? 'bg-green-50 text-green-700 border-green-200' :
-                          caseItem.status === 'Pending' ? 'bg-amber-50 text-amber-700 border-amber-200' :
-                          'bg-blue-50 text-blue-700 border-blue-200'
-                        }`}>
+                      <td className="p-3">
+                        <span className={`px-2 py-1 rounded text-xs font-medium`} style={{
+                          background: caseItem.status === 'Active' ? `rgba(${parseInt(colors.green.slice(1, 3), 16)}, ${parseInt(colors.green.slice(3, 5), 16)}, ${parseInt(colors.green.slice(5, 7), 16)}, 0.20)` :
+                          caseItem.status === 'Pending' ? `rgba(${parseInt(colors.amber.slice(1, 3), 16)}, ${parseInt(colors.amber.slice(3, 5), 16)}, ${parseInt(colors.amber.slice(5, 7), 16)}, 0.20)` :
+                          `rgba(${parseInt(colors.blue.slice(1, 3), 16)}, ${parseInt(colors.blue.slice(3, 5), 16)}, ${parseInt(colors.blue.slice(5, 7), 16)}, 0.20)`,
+                          color: caseItem.status === 'Active' ? colors.green :
+                          caseItem.status === 'Pending' ? colors.amber : colors.blue,
+                          border: `1px solid ${caseItem.status === 'Active' ? colors.green :
+                          caseItem.status === 'Pending' ? colors.amber : colors.blue}40`
+                        }}>
                           {caseItem.status}
                         </span>
                       </td>

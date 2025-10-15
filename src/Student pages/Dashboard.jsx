@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { 
   BookOpen, 
@@ -7,367 +7,409 @@ import {
   TrendingUp,
   Calendar,
   Award,
-  Target,
-  Users,
   CheckCircle,
-  AlertCircle,
-  Star,
-  Plus,
-  ArrowRight,
+  Users,
   BarChart3,
-  Brain,
-  Trophy
+  Target,
+  ArrowRight,
+  Plus,
+  Bell,
+  Search,
+  User,
+  Menu,
+  X
 } from 'lucide-react';
 
 const StudentDashboard = () => {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('overview');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Debug logging
+  useEffect(() => {
+    console.log('✅ Student Dashboard component rendered!', { user: user?.email, timestamp: new Date().toISOString() });
+  }, [user]);
+
+  // Hero.js Color Palette
+  const colors = {
+    cream: '#f5f5ef',
+    navy: '#1f2839',
+    golden: '#b69d74',
+    gray: '#6b7280',
+    green: '#10b981',
+    amber: '#f59e0b',
+    blue: '#3b82f6'
+  };
 
   const stats = [
     { 
-      title: 'Courses Enrolled', 
+      title: 'Active Courses', 
       value: '8', 
-      icon: BookOpen, 
-      color: 'from-navy-600 to-navy-800',
+      icon: FileText,
       change: '+2 this semester',
-      trend: 'up'
+      trend: 'up',
+      breakdown: '6 ongoing, 2 new'
     },
     { 
       title: 'Assignments Due', 
-      value: '3', 
-      icon: FileText, 
-      color: 'from-gold-500 to-gold-600',
-      change: '2 due this week',
-      trend: 'neutral'
+      value: '5', 
+      icon: Calendar,
+      change: '2 this week',
+      trend: 'neutral',
+      breakdown: 'Next 7 days'
     },
     { 
       title: 'Study Hours', 
-      value: '42', 
-      icon: Clock, 
-      color: 'from-navy-500 to-navy-700',
+      value: '32', 
+      icon: Users,
       change: '+8 this week',
-      trend: 'up'
+      trend: 'up',
+      breakdown: 'Weekly average'
     },
     { 
-      title: 'Overall Progress', 
-      value: '75%', 
-      icon: TrendingUp, 
-      color: 'from-gold-400 to-gold-600',
-      change: '+5% this month',
-      trend: 'up'
+      title: 'Grade Average', 
+      value: '85%', 
+      icon: TrendingUp,
+      change: '+3% this month',
+      trend: 'up',
+      breakdown: 'Current GPA: 3.4'
     }
   ];
 
   const recentActivities = [
     { 
-      activity: 'Submitted Constitutional Law Assignment', 
+      activity: 'Court Order received in Civil Suit No. 245/2024', 
       time: '2 hours ago',
-      type: 'assignment',
-      status: 'completed',
-      icon: CheckCircle
+      type: 'court_order',
+      status: 'new',
+      priority: 'high'
     },
     { 
-      activity: 'Completed Contract Law Quiz', 
+      activity: 'Client consultation completed - Property Dispute', 
+      time: '4 hours ago',
+      type: 'meeting',
+      status: 'completed',
+      priority: 'medium'
+    },
+    { 
+      activity: 'Counter-affidavit filed in High Court', 
       time: '1 day ago',
-      type: 'quiz',
-      status: 'completed',
-      icon: CheckCircle
+      type: 'filing',
+      status: 'filed',
+      priority: 'high'
     },
     { 
-      activity: 'Attended Moot Court Session', 
+      activity: 'New client message - Contract Review', 
+      time: '1 day ago',
+      type: 'message',
+      status: 'unread',
+      priority: 'medium'
+    },
+    { 
+      activity: 'Cause list updated - 3 cases scheduled', 
       time: '2 days ago',
-      type: 'session',
-      status: 'attended',
-      icon: Users
-    },
-    { 
-      activity: 'Downloaded Civil Procedure Notes', 
-      time: '3 days ago',
-      type: 'resource',
-      status: 'downloaded',
-      icon: FileText
+      type: 'notification',
+      status: 'info',
+      priority: 'low'
     }
   ];
 
   const upcomingTasks = [
     { 
-      task: 'Criminal Law Assignment', 
-      dueDate: 'Tomorrow',
+      task: 'High Court Hearing - Writ Petition', 
+      dueDate: 'Today 2:30 PM',
       priority: 'high',
-      course: 'Criminal Law',
-      status: 'pending'
+      details: 'Court No. 15, Justice Sharma',
+      type: 'hearing'
     },
     { 
-      task: 'Legal Research Project', 
-      dueDate: 'Friday',
+      task: 'Client Meeting - M/s ABC Industries', 
+      dueDate: 'Tomorrow 11:00 AM',
       priority: 'medium',
-      course: 'Legal Research',
-      status: 'in-progress'
+      details: 'Contract negotiation discussion',
+      type: 'meeting'
     },
     { 
-      task: 'Jurisprudence Quiz', 
+      task: 'File Reply in Sessions Court', 
+      dueDate: 'Friday',
+      priority: 'high',
+      details: 'Criminal Case No. 156/2024',
+      type: 'filing'
+    },
+    { 
+      task: 'Evidence Collection - Property Case', 
       dueDate: 'Next Week',
-      priority: 'low',
-      course: 'Jurisprudence',
-      status: 'not-started'
+      priority: 'medium',
+      details: 'Site inspection and documentation',
+      type: 'task'
     }
   ];
 
   const achievements = [
-    { name: 'Consistent Learner', icon: Award, earned: true },
-    { name: 'Legal Research Pro', icon: Brain, earned: true },
-    { name: 'Moot Court Star', icon: Trophy, earned: true },
-    { name: 'Top Performer', icon: Star, earned: false }
+    { name: 'Case Win Streak', earned: true, count: '5 consecutive wins' },
+    { name: 'Client Satisfaction', earned: true, count: '4.8/5 rating' },
+    { name: 'Revenue Milestone', earned: true, count: '₹10L+ this year' },
+    { name: 'Court Excellence', earned: false, count: 'Supreme Court case' }
   ];
 
   const getPriorityColor = (priority) => {
     switch (priority) {
-      case 'high': return 'pro-status-error';
-      case 'medium': return 'pro-status-warning';
-      case 'low': return 'pro-status-success';
-      default: return 'pro-status-info';
+      case 'high': return `bg-red-50 text-red-700 border border-red-200`;
+      case 'medium': return `bg-yellow-50 text-yellow-700 border border-yellow-200`;
+      case 'low': return `bg-green-50 text-green-700 border border-green-200`;
+      default: return `bg-blue-50 text-blue-700 border border-blue-200`;
     }
   };
 
-  const getActivityColor = (type) => {
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'completed': 
+      case 'filed': return `bg-green-50 text-green-700 border border-green-200`;
+      case 'new': 
+      case 'unread': return `background: linear-gradient(135deg, ${colors.golden}20, ${colors.golden}10); color: ${colors.navy}; border: 1px solid ${colors.golden}40`;
+      case 'info': return `bg-blue-50 text-blue-700 border border-blue-200`;
+      default: return `background: rgba(107, 114, 128, 0.1); color: ${colors.gray}; border: 1px solid rgba(107, 114, 128, 0.2)`;
+    }
+  };
+
+  const getTypeIcon = (type) => {
     switch (type) {
-      case 'assignment': return 'text-blue-500';
-      case 'quiz': return 'text-green-500';
-      case 'session': return 'text-purple-500';
-      case 'resource': return 'text-indigo-500';
-      default: return 'text-gray-500';
+      case 'court_order': return <FileText className="w-4 h-4" style={{color: colors.amber}} />;
+      case 'meeting': return <Users className="w-4 h-4" style={{color: colors.blue}} />;
+      case 'filing': return <CheckCircle className="w-4 h-4" style={{color: colors.green}} />;
+      case 'message': return <Bell className="w-4 h-4" style={{color: colors.golden}} />;
+      case 'notification': return <Clock className="w-4 h-4" style={{color: colors.gray}} />;
+      case 'hearing': return <Calendar className="w-4 h-4" style={{color: colors.amber}} />;
+      case 'task': return <Target className="w-4 h-4" style={{color: colors.navy}} />;
+      default: return <FileText className="w-4 h-4" style={{color: colors.gray}} />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-navy-50 via-white to-gold-50">
-      <div className="main-content lg:ml-64">
-        
-        {/* Professional Header */}
-        <header className="bg-white/80 backdrop-blur-sm border-b border-gold-200/30 px-6 py-8 sticky top-0 z-10">
-          <div className="flex justify-between items-start w-full">
-            <div className="flex flex-col">
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-navy-900 to-navy-700 bg-clip-text text-transparent">
-                Welcome back, {user ? user.name || user.email.split('@')[0] : 'Student'}! 👋
-              </h1>
-              <p className="text-lg text-navy-600 mt-2 font-medium">
-                Ready to continue your legal education journey?
-              </p>
+    <div className="min-h-screen" style={{background: colors.cream}}>
+      {/* Header */}
+      <header className="border-b sticky top-0 z-30 h-16" style={{
+        background: `linear-gradient(135deg, rgba(255, 255, 255, 0.20), rgba(255, 255, 255, 0.10))`,
+        backdropFilter: 'blur(6px)',
+        borderColor: `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`
+      }}>
+        <div className="h-full px-4 flex items-center justify-between">
+          {/* Left Section */}
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="p-2 rounded-md transition-colors"
+              style={{
+                background: `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.08)`,
+                color: colors.navy
+              }}
+              aria-label="Toggle menu"
+            >
+              {isMobileMenuOpen ? (
+                <X className="w-5 h-5" />
+              ) : (
+                <Menu className="w-5 h-5" />
+              )}
+            </button>
+            
+            {/* Logo/Brand */}
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{
+                background: `linear-gradient(135deg, ${colors.golden}, ${colors.golden}DD)`
+              }}>
+                <Award className="w-5 h-5" style={{color: 'white'}} />
+              </div>
+              <span className="font-bold text-lg hidden sm:block" style={{
+                background: `linear-gradient(135deg, ${colors.navy}, ${colors.golden})`,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent'
+              }}>
+                LegalPro
+              </span>
             </div>
             
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 text-sm text-navy-600 bg-white/90 backdrop-blur-sm border-2 border-gold-200 rounded-xl px-4 py-2 font-medium">
-                <Calendar className="w-4 h-4 text-gold-600" />
-                <span>{new Date().toLocaleDateString('en-US', { 
-                  weekday: 'long', 
-                  month: 'long', 
-                  day: 'numeric' 
-                })}</span>
+            {/* Search Bar */}
+            <div className="relative hidden md:block">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2" style={{color: colors.golden}} />
+              <input
+                type="text"
+                placeholder="Search cases, clients..."
+                className="pl-10 pr-4 py-2 w-64 rounded-lg focus:outline-none transition-all"
+                style={{
+                  background: `rgba(255, 255, 255, 0.06)`,
+                  border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`,
+                  color: colors.navy,
+                  backdropFilter: 'blur(6px)'
+                }}
+                onFocus={(e) => e.target.style.borderColor = colors.golden}
+                onBlur={(e) => e.target.style.borderColor = `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`}
+              />
+            </div>
+          </div>
+
+          {/* Right Section */}
+          <div className="flex items-center space-x-4">
+            {/* Notifications */}
+            <button className="relative p-2 rounded-md transition-colors" style={{
+              background: `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.08)`,
+              color: colors.navy
+            }}>
+              <Bell className="w-5 h-5" />
+              <span className="absolute top-1 right-1 w-2 h-2 rounded-full" style={{background: colors.amber}}></span>
+            </button>
+
+            {/* User Profile */}
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{
+                background: `linear-gradient(135deg, ${colors.golden}20, ${colors.golden}10)`
+              }}>
+                <User className="w-4 h-4" style={{color: colors.golden}} />
+              </div>
+              <div className="hidden sm:block text-right">
+                <p className="text-sm font-medium" style={{color: colors.navy}}>
+                  Adv. {user?.name || 'Legal Professional'}
+                </p>
+                <p className="text-xs" style={{color: colors.gray}}>Senior Advocate</p>
               </div>
             </div>
           </div>
-        </header>
+        </div>
+      </header>
 
-        {/* Dashboard Content */}
-        <div className="p-6 lg:p-8">
-          
-          {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {stats.map((stat, index) => (
-              <div 
-                key={index} 
-                className="backdrop-blur-xl bg-gradient-to-br from-white/90 to-white/70 border-2 border-gold-200/50 hover:border-gold-400/60 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 group hover:scale-105"
-                style={{animationDelay: `${0.1 * index}s`}}
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden p-4" style={{
+          background: `linear-gradient(135deg, rgba(255, 255, 255, 0.20), rgba(255, 255, 255, 0.10))`,
+          backdropFilter: 'blur(6px)',
+          borderBottom: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`
+        }}>
+          <nav className="space-y-2">
+            {['Dashboard', 'Cases', 'Clients', 'Calendar', 'Documents', 'Reports', 'Settings'].map((item) => (
+              <button
+                key={item}
+                className="w-full text-left px-3 py-2 rounded-lg transition-colors font-medium"
+                style={{
+                  color: colors.navy,
+                  background: `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.05)`
+                }}
+                onMouseEnter={(e) => e.target.style.background = `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.12)`}
+                onMouseLeave={(e) => e.target.style.background = `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.05)`}
               >
-                <div className="flex justify-between items-start mb-4">
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${stat.color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                    <stat.icon className="w-6 h-6 text-white" />
-                  </div>
-                  <div className={`flex items-center gap-1 text-xs ${stat.trend === 'up' ? 'text-green-600' : 'text-navy-500'} font-medium`}>
-                    <TrendingUp className="w-3 h-3" />
-                    <span>{stat.change}</span>
-                  </div>
-                </div>
-                
-                <div className="flex flex-col">
-                  <h3 className="text-2xl font-bold bg-gradient-to-r from-navy-900 to-navy-700 bg-clip-text text-transparent mb-1">
-                    {stat.value}
-                  </h3>
-                  <p className="text-sm font-semibold text-navy-600">
-                    {stat.title}
-                  </p>
-                </div>
-              </div>
+                {item}
+              </button>
             ))}
+          </nav>
+        </div>
+      )}
+
+      {/* Main Content */}
+      <main className="p-4 sm:p-6 lg:p-8">
+        {/* Welcome Section */}
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold mb-2" style={{color: colors.navy}}>
+            Welcome back, {user ? user.name || user.email.split('@')[0] : 'Student'}
+          </h1>
+          <p style={{color: colors.gray}}>
+            Your student dashboard - track courses, assignments, and academic progress
+          </p>
+          <div className="flex items-center gap-2 text-sm mt-2" style={{color: colors.gray}}>
+            <Calendar className="w-4 h-4" />
+            <span>{new Date().toLocaleDateString('en-US', { 
+              weekday: 'long', 
+              month: 'long', 
+              day: 'numeric' 
+            })}</span>
           </div>
+        </div>
 
-          {/* Main Dashboard Grid */}
-          <div className="pro-grid lg:grid-cols-3 pro-gap-8">
-            
-            {/* Recent Activities */}
-            <div className="lg:col-span-2">
-              <div className="pro-dashboard-card">
-                <div className="pro-flex-between items-center mb-6">
-                  <h2 className="pro-heading-lg text-gray-900">Recent Activities</h2>
-                  <button className="pro-btn pro-btn-ghost pro-text-sm">
-                    See All
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </button>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          {stats.map((stat, index) => (
+            <div 
+              key={index} 
+              className="rounded-lg p-4 transition-all duration-200 hover:scale-105"
+              style={{
+                background: `linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06))`,
+                backdropFilter: 'blur(6px)',
+                border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`,
+                boxShadow: `0 0 15px rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.20)`
+              }}
+            >
+              <div className="flex justify-between items-start mb-3">
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{
+                  background: `linear-gradient(135deg, ${colors.golden}20, ${colors.golden}10)`
+                }}>
+                  <stat.icon className="w-5 h-5" style={{color: colors.golden}} />
                 </div>
-                
-                <div className="space-y-4">
-                  {recentActivities.map((item, index) => (
-                    <div 
-                      key={index} 
-                      className="pro-flex items-start pro-gap-4 pro-p-4 pro-rounded-lg hover:bg-gray-50 transition-colors duration-200 border border-transparent hover:border-gray-200"
-                    >
-                      <div className={`w-10 h-10 pro-rounded-lg bg-gray-100 pro-flex-center ${getActivityColor(item.type)}`}>
-                        <item.icon className="w-5 h-5" />
-                      </div>
-                      
-                      <div className="flex-1 min-w-0">
-                        <p className="pro-text-body font-medium text-gray-900 mb-1">
-                          {item.activity}
-                        </p>
-                        <p className="pro-text-sm text-gray-500">
-                          {item.time}
-                        </p>
-                      </div>
-                      
-                      <div className={`pro-status-badge pro-status-success`}>
-                        {item.status}
-                      </div>
-                    </div>
-                  ))}
+                <div className="flex items-center gap-1 text-xs" style={{color: colors.gray}}>
+                  <span>{stat.change}</span>
                 </div>
-              </div>
-            </div>
-
-            {/* Upcoming Tasks */}
-            <div>
-              <div className="pro-dashboard-card">
-                <div className="pro-flex-between items-center mb-6">
-                  <h2 className="pro-heading-lg text-gray-900">Upcoming Tasks</h2>
-                  <button className="pro-btn pro-btn-primary pro-btn-sm">
-                    <Plus className="w-4 h-4" />
-                  </button>
-                </div>
-                
-                <div className="space-y-3">
-                  {upcomingTasks.map((item, index) => (
-                    <div 
-                      key={index} 
-                      className="pro-p-4 pro-rounded-lg border border-gray-200 hover:border-blue-300 transition-colors duration-200 hover:bg-blue-50/50"
-                    >
-                      <div className="pro-flex-between items-start mb-2">
-                        <h4 className="pro-text-body font-semibold text-gray-900">
-                          {item.task}
-                        </h4>
-                        <div className={`pro-status-badge ${getPriorityColor(item.priority)}`}>
-                          {item.priority}
-                        </div>
-                      </div>
-                      
-                      <p className="pro-text-sm text-gray-600 mb-2">
-                        {item.course}
-                      </p>
-                      
-                      <div className="pro-flex-between items-center">
-                        <span className="pro-text-xs text-gray-500">
-                          Due: {item.dueDate}
-                        </span>
-                        <button className="pro-btn pro-btn-ghost pro-btn-xs">
-                          View
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Progress and Achievements */}
-          <div className="pro-grid lg:grid-cols-2 pro-gap-8 mt-8">
-            
-            {/* Academic Progress */}
-            <div className="pro-dashboard-card">
-              <div className="pro-flex-between items-center mb-6">
-                <h2 className="pro-heading-lg text-gray-900">Academic Progress</h2>
-                <BarChart3 className="w-5 h-5 text-gray-400" />
               </div>
               
-              <div className="space-y-6">
-                {/* Overall Progress */}
-                <div>
-                  <div className="pro-flex-between items-center mb-2">
-                    <span className="pro-text-body font-medium text-gray-700">Overall Progress</span>
-                    <span className="pro-text-body font-bold text-gray-900">75%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 pro-rounded-full h-3 overflow-hidden">
-                    <div 
-                      className="h-full bg-gradient-to-r from-blue-500 to-purple-600 pro-rounded-full transition-all duration-1000 ease-out"
-                      style={{width: '75%'}}
-                    ></div>
-                  </div>
-                </div>
-
-                {/* Subject Progress */}
-                {[
-                  { subject: 'Constitutional Law', progress: 85 },
-                  { subject: 'Contract Law', progress: 70 },
-                  { subject: 'Criminal Law', progress: 90 },
-                  { subject: 'Civil Procedure', progress: 65 }
-                ].map((item, index) => (
-                  <div key={index}>
-                    <div className="pro-flex-between items-center mb-1">
-                      <span className="pro-text-sm font-medium text-gray-600">{item.subject}</span>
-                      <span className="pro-text-sm font-semibold text-gray-700">{item.progress}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 pro-rounded-full h-2 overflow-hidden">
-                      <div 
-                        className="h-full bg-gradient-to-r from-green-400 to-green-600 pro-rounded-full transition-all duration-1000 ease-out"
-                        style={{width: `${item.progress}%`, animationDelay: `${0.2 * index}s`}}
-                      ></div>
-                    </div>
-                  </div>
-                ))}
+              <div>
+                <h3 className="text-2xl font-bold mb-1" style={{color: colors.navy}}>
+                  {stat.value}
+                </h3>
+                <p className="text-sm font-medium mb-1" style={{color: colors.gray}}>
+                  {stat.title}
+                </p>
+                <p className="text-xs" style={{color: colors.golden}}>
+                  {stat.breakdown}
+                </p>
               </div>
             </div>
+          ))}
+        </div>
 
-            {/* Achievement Badges */}
-            <div className="pro-dashboard-card">
-              <div className="pro-flex-between items-center mb-6">
-                <h2 className="pro-heading-lg text-gray-900">Achievements</h2>
-                <Target className="w-5 h-5 text-gray-400" />
+        {/* Main Content Grid */}
+        <div className="grid lg:grid-cols-3 gap-6 mb-8">
+          
+          {/* Today's Priorities */}
+          <div className="lg:col-span-2">
+            <div className="rounded-lg p-6" style={{
+              background: `linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06))`,
+              backdropFilter: 'blur(6px)',
+              border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`
+            }}>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-lg font-semibold" style={{color: colors.navy}}>Today's Priorities</h2>
+                <button className="flex items-center gap-1 text-sm transition-colors" style={{color: colors.golden}}>
+                  View Calendar
+                  <ArrowRight className="w-4 h-4" />
+                </button>
               </div>
               
-              <div className="pro-grid pro-grid-2 pro-gap-4">
-                {achievements.map((achievement, index) => (
+              <div className="space-y-3">
+                {upcomingTasks.map((item, index) => (
                   <div 
                     key={index} 
-                    className={`pro-p-4 pro-rounded-lg border-2 transition-all duration-300 ${
-                      achievement.earned 
-                        ? 'border-green-200 bg-green-50 hover:border-green-300' 
-                        : 'border-gray-200 bg-gray-50 hover:border-gray-300'
-                    }`}
+                    className="flex items-center gap-3 p-3 rounded-lg transition-all duration-200 hover:scale-[1.02]"
+                    style={{
+                      background: `rgba(255, 255, 255, 0.03)`,
+                      border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.10)`
+                    }}
                   >
-                    <div className="pro-flex-col items-center pro-text-center">
-                      <div className={`w-12 h-12 pro-rounded-xl pro-flex-center mb-3 ${
-                        achievement.earned 
-                          ? 'bg-green-100 text-green-600' 
-                          : 'bg-gray-100 text-gray-400'
-                      }`}>
-                        <achievement.icon className="w-6 h-6" />
-                      </div>
-                      <span className={`pro-text-sm font-medium ${
-                        achievement.earned ? 'text-green-700' : 'text-gray-600'
-                      }`}>
-                        {achievement.name}
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{
+                      background: `linear-gradient(135deg, ${colors.golden}15, ${colors.golden}08)`
+                    }}>
+                      {getTypeIcon(item.type)}
+                    </div>
+                    
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate" style={{color: colors.navy}}>
+                        {item.task}
+                      </p>
+                      <p className="text-xs" style={{color: colors.gray}}>
+                        {item.details}
+                      </p>
+                    </div>
+                    
+                    <div className="text-right">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(item.priority)}`}>
+                        {item.priority}
                       </span>
-                      {achievement.earned && (
-                        <CheckCircle className="w-4 h-4 text-green-500 mt-2" />
-                      )}
+                      <p className="text-xs mt-1" style={{color: colors.gray}}>
+                        {item.dueDate}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -376,34 +418,233 @@ const StudentDashboard = () => {
           </div>
 
           {/* Quick Actions */}
-          <div className="pro-dashboard-card mt-8">
-            <h2 className="pro-heading-lg text-gray-900 mb-6">Quick Actions</h2>
-            
-            <div className="pro-grid pro-grid-4 pro-gap-4">
-              {[
-                { title: 'Browse Courses', icon: BookOpen, color: 'from-blue-500 to-blue-600' },
-                { title: 'View Calendar', icon: Calendar, color: 'from-purple-500 to-purple-600' },
-                { title: 'Study Materials', icon: FileText, color: 'from-green-500 to-green-600' },
-                { title: 'Moot Court', icon: Users, color: 'from-orange-500 to-orange-600' }
-              ].map((action, index) => (
-                <button 
-                  key={index}
-                  className="pro-p-4 pro-rounded-lg border border-gray-200 hover:border-blue-300 bg-white hover:bg-blue-50 transition-all duration-300 pro-hover-lift group"
-                >
-                  <div className="pro-flex-col items-center pro-text-center">
-                    <div className={`w-12 h-12 pro-rounded-xl bg-gradient-to-r ${action.color} pro-flex-center mb-3 group-hover:scale-110 transition-transform duration-300 pro-shadow-glow`}>
-                      <action.icon className="w-6 h-6 text-white" />
+          <div>
+            <div className="rounded-lg p-6" style={{
+              background: `linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06))`,
+              backdropFilter: 'blur(6px)',
+              border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`
+            }}>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-lg font-semibold" style={{color: colors.navy}}>Quick Actions</h2>
+                <Plus className="w-5 h-5" style={{color: colors.golden}} />
+              </div>
+              
+              <div className="space-y-3">
+                {[
+                  { title: 'Add New Case', icon: FileText, description: 'Register new case' },
+                  { title: 'Upload Document', icon: Award, description: 'OCR scan & file' },
+                  { title: 'Schedule Meeting', icon: Calendar, description: 'Client consultation' },
+                  { title: 'Generate Draft', icon: BookOpen, description: 'Legal document' }
+                ].map((action, index) => (
+                  <button 
+                    key={index}
+                    className="w-full p-3 rounded-lg transition-all duration-200 hover:scale-[1.02] text-left"
+                    style={{
+                      background: `linear-gradient(135deg, ${colors.golden}08, ${colors.golden}05)`,
+                      border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.10)`
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = `linear-gradient(135deg, ${colors.golden}15, ${colors.golden}10)`;
+                      e.currentTarget.style.transform = 'scale(1.02)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = `linear-gradient(135deg, ${colors.golden}08, ${colors.golden}05)`;
+                      e.currentTarget.style.transform = 'scale(1)';
+                    }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{
+                        background: `linear-gradient(135deg, ${colors.golden}20, ${colors.golden}15)`
+                      }}>
+                        <action.icon className="w-4 h-4" style={{color: colors.golden}} />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium" style={{color: colors.navy}}>
+                          {action.title}
+                        </p>
+                        <p className="text-xs" style={{color: colors.gray}}>
+                          {action.description}
+                        </p>
+                      </div>
                     </div>
-                    <span className="pro-text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors duration-300">
-                      {action.title}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Progress and Recent Activity */}
+        <div className="grid lg:grid-cols-2 gap-6 mb-8">
+          
+          {/* Recent Activity Feed */}
+          <div className="rounded-lg p-6" style={{
+            background: `linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06))`,
+            backdropFilter: 'blur(6px)',
+            border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`
+          }}>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-lg font-semibold" style={{color: colors.navy}}>Recent Activity Feed</h2>
+              <BarChart3 className="w-5 h-5" style={{color: colors.golden}} />
+            </div>
+            
+            <div className="space-y-4">
+              {recentActivities.map((item, index) => (
+                <div 
+                  key={index}
+                  className="flex items-center gap-3 p-3 rounded-lg transition-all duration-200 hover:scale-[1.01]"
+                  style={{
+                    background: `rgba(255, 255, 255, 0.03)`,
+                    border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.10)`
+                  }}
+                >
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{
+                    background: `linear-gradient(135deg, ${colors.golden}15, ${colors.golden}08)`
+                  }}>
+                    {getTypeIcon(item.type)}
+                  </div>
+                  
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate" style={{color: colors.navy}}>
+                      {item.activity}
+                    </p>
+                    <p className="text-xs" style={{color: colors.gray}}>
+                      {item.time}
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <span 
+                      className="px-2 py-1 rounded-full text-xs font-medium"
+                      style={{
+                        ...(item.status === 'new' || item.status === 'unread' 
+                          ? {
+                              background: `linear-gradient(135deg, ${colors.golden}20, ${colors.golden}10)`,
+                              color: colors.navy,
+                              border: `1px solid ${colors.golden}40`
+                            }
+                          : {
+                              background: `rgba(16, 185, 129, 0.1)`,
+                              color: colors.green,
+                              border: `1px solid rgba(16, 185, 129, 0.2)`
+                            }
+                        )
+                      }}
+                    >
+                      {item.status}
                     </span>
                   </div>
-                </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Case Progress Tracker */}
+          <div className="rounded-lg p-6" style={{
+            background: `linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06))`,
+            backdropFilter: 'blur(6px)',
+            border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`
+          }}>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-lg font-semibold" style={{color: colors.navy}}>Case Progress</h2>
+              <Target className="w-5 h-5" style={{color: colors.golden}} />
+            </div>
+            
+            <div className="space-y-4">
+              {/* Overall Progress */}
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm font-medium" style={{color: colors.navy}}>Monthly Target</span>
+                  <span className="text-sm font-semibold" style={{color: colors.navy}}>85%</span>
+                </div>
+                <div className="w-full rounded-full h-2 overflow-hidden" style={{background: `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`}}>
+                  <div 
+                    className="h-full rounded-full transition-all duration-300"
+                    style={{
+                      width: '85%',
+                      background: `linear-gradient(90deg, ${colors.golden}, ${colors.golden}CC)`
+                    }}
+                  ></div>
+                </div>
+              </div>
+
+              {/* Case Type Progress */}
+              {[
+                { type: 'Civil Cases', progress: 90, color: colors.golden },
+                { type: 'Criminal Cases', progress: 75, color: colors.amber },
+                { type: 'Corporate Law', progress: 85, color: colors.blue },
+                { type: 'Family Law', progress: 65, color: colors.green }
+              ].map((item, index) => (
+                <div key={index}>
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-xs font-medium" style={{color: colors.gray}}>{item.type}</span>
+                    <span className="text-xs font-semibold" style={{color: colors.navy}}>{item.progress}%</span>
+                  </div>
+                  <div className="w-full rounded-full h-1.5 overflow-hidden" style={{background: `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.10)`}}>
+                    <div 
+                      className="h-full rounded-full transition-all duration-300"
+                      style={{
+                        width: `${item.progress}%`,
+                        background: item.color
+                      }}
+                    ></div>
+                  </div>
+                </div>
               ))}
             </div>
           </div>
         </div>
-      </div>
+
+        {/* Performance Achievements */}
+        <div className="rounded-lg p-6 mb-8" style={{
+          background: `linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06))`,
+          backdropFilter: 'blur(6px)',
+          border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`
+        }}>
+          <h2 className="text-lg font-semibold mb-4" style={{color: colors.navy}}>Professional Achievements</h2>
+          
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {achievements.map((achievement, index) => (
+              <div 
+                key={index} 
+                className="p-3 rounded-lg transition-all duration-200 hover:scale-105"
+                style={{
+                  background: achievement.earned 
+                    ? `linear-gradient(135deg, ${colors.golden}15, ${colors.golden}08)`
+                    : `rgba(107, 114, 128, 0.05)`,
+                  border: achievement.earned 
+                    ? `1px solid ${colors.golden}40`
+                    : `1px solid rgba(107, 114, 128, 0.15)`
+                }}
+              >
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center mb-2" style={{
+                    background: achievement.earned 
+                      ? `linear-gradient(135deg, ${colors.golden}, ${colors.golden}DD)`
+                      : `rgba(107, 114, 128, 0.10)`,
+                    color: achievement.earned ? 'white' : colors.gray
+                  }}>
+                    <Award className="w-4 h-4" />
+                  </div>
+                  <span className="text-xs font-medium mb-1" style={{
+                    color: achievement.earned ? colors.navy : colors.gray
+                  }}>
+                    {achievement.name}
+                  </span>
+                  <span className="text-xs" style={{
+                    color: achievement.earned ? colors.golden : colors.gray
+                  }}>
+                    {achievement.count}
+                  </span>
+                  {achievement.earned && (
+                    <CheckCircle className="w-3 h-3 mt-1" style={{color: colors.green}} />
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </main>
     </div>
   );
 };

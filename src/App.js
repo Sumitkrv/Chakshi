@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate, Outlet, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Navbar from "./components/Navbar";
 import AdvocateNavbar from "./Advocate components/Navbar";
@@ -15,11 +15,14 @@ import FreeTools from "./components/FreeTools";
 import RoleGateway from "./components/RoleGateway";
 import Pricing from "./components/Pricing";
 import Testimonials from "./components/Testimonials";
-// import Footer from "./components/Footer";
+import Footer from "./components/Footer";
 import Login from "./components/Login";
-import Register from "./components/Register";
+import RegisterRedirect from "./components/RegisterRedirect";
+import SearchResults from "./components/SearchResults";
 import Dashboard from "./components/Dashboard";
-import Analytics from "./Advocate pages/Analytics";
+import TemplateBrowser from "./components/TemplateBrowser";
+import AnalyticsDashboard from "./Advocate pages/Analytics";
+import Cases from "./Advocate pages/Cases";
 import Clients from "./Advocate pages/Clients";
 import ContractComparison from "./Advocate pages/ContractComparison";
 import Documents from "./Advocate pages/Documents";
@@ -32,6 +35,17 @@ import Courses from "./Student pages/Courses";
 import Assignments from "./Student pages/Assignments";
 import Library from "./Student pages/Library";
 import MootCourt from "./Student pages/MootCourt";
+import Calendar from "./Student pages/Calendar";
+import Career from "./Student pages/Career-simple";
+import ContentFeed from "./Student pages/ContentFeed-simple";
+import ExamPrep from "./Student pages/ExamPrep";
+import StudentResearch from "./Student pages/Research";
+import StudentSimulation from "./Student pages/Simulation";
+import StudentNotifications from "./Student pages/Notifications";
+import StudentAllFeatures from "./Student pages/AllFeatures";
+import StudentProfile from "./Student pages/Profile";
+import StudentSettings from "./Student pages/Settings";
+import StudentHelp from "./Student pages/Help";
 import ClerkDashboard from "./Clerk components/Dashboard";
 import CaseList from "./Clerk components/CaseList";
 import CaseDetails from "./Clerk components/CaseDetails";
@@ -43,6 +57,10 @@ import ClerkIntegrations from "./Clerk components/Integrations";
 import ClerkSettings from "./Clerk components/Settings";
 import ProtectedRoute from "./components/ProtectedRoute";
 import "./App.css";
+import AdminLayout from './Admin/AdminLayout';
+import AdminDashboard from './Admin/Dashboard';
+import AdminUsers from './Admin/Users';
+import AdminSettings from './Admin/Settings';
 
 // Loading component with professional SaaS styling
 const SaaSLoader = () => (
@@ -82,7 +100,7 @@ const SaaSLoader = () => (
 // Home component with enhanced animations
 const Home = () => {
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       {/* Animated background pattern */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-purple-500/5 to-transparent rounded-full blur-3xl"></div>
@@ -113,6 +131,7 @@ const Home = () => {
         <div className="stagger-fade-in">
           <Testimonials />
         </div>
+        <TemplateBrowser /> {/* Integrate the new TemplateBrowser component */}
       </div>
     </div>
   );
@@ -177,30 +196,52 @@ function AppContent() {
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={
-          <div className="min-h-screen">
+          <div className="flex flex-col min-h-screen">
             <Navbar />
-            <Home />
-            {/* <Footer /> */}
+            <div className="flex-grow">
+              <Home />
+            </div>
+            <Footer />
+          </div>
+        } />
+        
+        {/* Search Results Route */}
+        <Route path="/search" element={
+          <div className="flex flex-col min-h-screen">
+            <Navbar />
+            <div className="flex-grow">
+              <SearchResults />
+            </div>
+            <Footer />
           </div>
         } />
         
         {/* Auth Routes */}
         <Route path="/login" element={
-          <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 zoom-in">
-            <Login />
+          <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 zoom-in">
+            <div className="flex-grow">
+              <Login />
+            </div>
+            <Footer />
           </div>
         } />
         <Route path="/register" element={
-          <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 zoom-in">
-            <Register />
+          <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 zoom-in">
+            <div className="flex-grow">
+              <RegisterRedirect />
+            </div>
+            <Footer />
           </div>
         } />
         
         {/* Protected Routes */}
         <Route path="/dashboard" element={
           <ProtectedRoute>
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 slide-in-up">
-              <Dashboard />
+            <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 slide-in-up">
+              <div className="flex-grow">
+                <Dashboard />
+              </div>
+              <Footer />
             </div>
           </ProtectedRoute>
         } />
@@ -211,7 +252,10 @@ function AppContent() {
             <AdvocateLayout />
           </ProtectedRoute>
         }>
-          <Route path="dashboard" element={<Analytics />} />
+          <Route path="dashboard" element={<AnalyticsDashboard />} />
+          {/* explicit analytics path (also allow /advocate/analytics) */}
+          <Route path="analytics" element={<AnalyticsDashboard />} />
+          <Route path="cases" element={<Cases />} />
           <Route path="clients" element={<Clients />} />
           <Route path="contractcomparison" element={<ContractComparison />} />
           <Route path="documents" element={<Documents />} />
@@ -234,10 +278,18 @@ function AppContent() {
           <Route path="courses" element={<Courses />} />
           <Route path="assignments" element={<Assignments />} />
           <Route path="library" element={<Library />} />
-          <Route path="moot-court" element={<MootCourt />} />
-          <Route path="study-groups" element={<StudentDashboard />} />
-          <Route path="progress" element={<StudentDashboard />} />
-          <Route path="settings" element={<StudentDashboard />} />
+          <Route path="mootcourt" element={<MootCourt />} />
+          <Route path="calendar" element={<Calendar />} />
+          <Route path="career" element={<Career />} />
+          <Route path="content-feed" element={<ContentFeed />} />
+          <Route path="examprep" element={<ExamPrep />} />
+          <Route path="research" element={<StudentResearch />} />
+          <Route path="simulation" element={<StudentSimulation />} />
+          <Route path="notifications" element={<StudentNotifications />} />
+          <Route path="all-features" element={<StudentAllFeatures />} />
+          <Route path="profile" element={<StudentProfile />} />
+          <Route path="settings" element={<StudentSettings />} />
+          <Route path="help" element={<StudentHelp />} />
           <Route index element={<Navigate to="dashboard" replace />} />
         </Route>
 
@@ -258,6 +310,17 @@ function AppContent() {
           <Route path="offline-mode" element={<OfflineModeToggle />} />
           <Route path="integrations" element={<ClerkIntegrations />} />
           <Route path="settings" element={<ClerkSettings />} />
+          <Route index element={<Navigate to="dashboard" replace />} />
+        </Route>
+        {/* Admin Routes */}
+        <Route path="/admin/*" element={
+          <ProtectedRoute>
+            <AdminLayout />
+          </ProtectedRoute>
+        }>
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="users" element={<AdminUsers />} />
+          <Route path="settings" element={<AdminSettings />} />
           <Route index element={<Navigate to="dashboard" replace />} />
         </Route>
         

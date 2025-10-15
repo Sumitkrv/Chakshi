@@ -1,154 +1,106 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import LoadingOverlay from '../components/LoadingOverlay';
-import { Search, Menu, Bell, Grid3X3, Settings, User, LogOut, ChevronDown, X, Zap, Filter, Clock, ArrowRight, Check, Trash2, Mail, Phone, Shield, Moon, Sun, Globe, HelpCircle } from 'lucide-react';
 
 const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [searchFilters, setSearchFilters] = useState({ category: 'all', dateRange: 'all' });
-  const [searchHistory, setSearchHistory] = useState([]);
-  const [selectedSearchIndex, setSelectedSearchIndex] = useState(-1);
-  const [notifications, setNotifications] = useState([
-    { id: 1, text: 'Hearing reminder for Case #C-2023-4582', time: '10 mins ago', read: false, type: 'reminder', priority: 'high' },
-    { id: 2, text: 'New document uploaded by client', time: '45 mins ago', read: false, type: 'document', priority: 'medium' },
-    { id: 3, text: 'Court date changed for Smith v. Jones', time: '2 hours ago', read: true, type: 'schedule', priority: 'high' },
-    { id: 4, text: 'Client Johnson signed the agreement', time: '5 hours ago', read: true, type: 'document', priority: 'low' },
-    { id: 5, text: 'Payment received from client ABC Corp', time: '1 day ago', read: false, type: 'payment', priority: 'medium' }
-  ]);
-  const [notificationFilter, setNotificationFilter] = useState('all');
-  const [darkMode, setDarkMode] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  
+  const notifications = [
+    { id: 1, text: 'Hearing reminder for Case #C-2023-4582', time: '10 mins ago', read: false },
+    { id: 2, text: 'New document uploaded by client', time: '45 mins ago', read: false },
+    { id: 3, text: 'Court date changed for Smith v. Jones', time: '2 hours ago', read: true }
+  ];
   
   const searchRef = useRef(null);
   const notificationsRef = useRef(null);
   const profileRef = useRef(null);
+  const mobileMenuRef = useRef(null);
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, logout } = useAuth();
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
-  // Enhanced search categories
-  const searchCategories = [
-    { value: 'all', label: 'All' },
-    { value: 'cases', label: 'Cases' },
-    { value: 'clients', label: 'Clients' },
-    { value: 'documents', label: 'Documents' },
-    { value: 'appointments', label: 'Appointments' },
-    { value: 'contacts', label: 'Contacts' }
-  ];
+  // Updated color palette to match Hero.js
+  const colors = {
+    // Primary Brand Colors
+    background: '#f5f5ef', // Light cream background
+    textPrimary: '#1f2839', // Dark navy text
+    textSecondary: '#6b7280', // Medium gray
+    accent: '#b69d74', // Golden brown accent
+    border: 'rgba(31, 40, 57, 0.15)', // Light navy border
+    hover: 'rgba(182, 157, 116, 0.08)', // Light golden brown hover
+    active: 'rgba(182, 157, 116, 0.12)', // Medium golden brown active
+    shadow: '0 1px 3px 0 rgba(31, 40, 57, 0.1), 0 1px 2px 0 rgba(31, 40, 57, 0.06)',
+    
+    // Status Colors
+    success: '#10b981', // Green
+    warning: '#f59e0b', // Amber
+    info: '#3b82f6', // Blue
+    
+    // Additional functional colors
+    cardBackground: 'rgba(255, 255, 255, 0.03)',
+    overlay: 'rgba(255, 255, 255, 0.08)',
+  };
+
+  // Navigation items organized by category
+  const navItems = {
+    core: [
+      { name: 'Dashboard', path: '/advocate/dashboard' },
+      { name: 'Cases', path: '/advocate/cases' },
+      { name: 'Clients', path: '/advocate/clients' },
+      { name: 'Documents', path: '/advocate/documents' },
+    ],
+    tools: [
+      { name: 'Contract Analysis', path: '/advocate/contractcomparison' },
+      { name: 'Research', path: '/advocate/research' },
+      { name: 'Simulation', path: '/advocate/simulation' },
+    ],
+    insights: []
+  };
 
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (searchRef.current && !searchRef.current.contains(event.target)) {
-        setSearchOpen(false);
-        setSelectedSearchIndex(-1);
-      }
-      if (notificationsRef.current && !notificationsRef.current.contains(event.target)) {
-        setNotificationsOpen(false);
-      }
-      if (profileRef.current && !profileRef.current.contains(event.target)) {
-        setProfileOpen(false);
-      }
+      [searchRef, notificationsRef, profileRef, mobileMenuRef].forEach(ref => {
+        if (ref.current && !ref.current.contains(event.target)) {
+          if (ref === searchRef) setSearchOpen(false);
+          if (ref === notificationsRef) setNotificationsOpen(false);
+          if (ref === profileRef) setProfileOpen(false);
+          if (ref === mobileMenuRef) setMobileMenuOpen(false);
+        }
+      });
     };
 
     document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Keyboard navigation for search
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (searchOpen && searchResults.length > 0) {
-        switch (event.key) {
-          case 'ArrowDown':
-            event.preventDefault();
-            setSelectedSearchIndex(prev => 
-              prev < searchResults.length - 1 ? prev + 1 : prev
-            );
-            break;
-          case 'ArrowUp':
-            event.preventDefault();
-            setSelectedSearchIndex(prev => prev > 0 ? prev - 1 : -1);
-            break;
-          case 'Enter':
-            event.preventDefault();
-            if (selectedSearchIndex >= 0) {
-              handleResultClick(searchResults[selectedSearchIndex]);
-            } else if (searchResults.length > 0) {
-              handleResultClick(searchResults[0]);
-            }
-            break;
-          case 'Escape':
-            setSearchOpen(false);
-            setSelectedSearchIndex(-1);
-            break;
-        }
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [searchOpen, searchResults, selectedSearchIndex]);
-
-  // Enhanced search function with filters
+  // Mock search function
   const searchAllContent = useCallback((query) => {
     if (!query.trim()) return [];
     
-    const results = [];
-    const searchTerm = query.toLowerCase();
-    
-    // Mock data for different categories
-    const mockData = {
-      cases: [
-        { title: 'Smith v. Jones Corporation', category: 'Commercial Law', id: 'C-2023-001' },
-        { title: 'Estate of Williams', category: 'Probate Law', id: 'C-2023-002' },
-        { title: 'ABC Corp vs XYZ Ltd', category: 'Corporate Law', id: 'C-2023-003' }
-      ],
-      clients: [
-        { name: 'John Smith', company: 'Smith Enterprises', phone: '+1-555-0123' },
-        { name: 'Sarah Johnson', company: 'Johnson & Associates', phone: '+1-555-0124' },
-        { name: 'Michael Brown', company: 'Brown Industries', phone: '+1-555-0125' }
-      ],
-      documents: [
-        { name: 'Contract Agreement - Smith.pdf', type: 'Contract', date: '2023-12-01' },
-        { name: 'Court Filing - Jones Case.doc', type: 'Court Filing', date: '2023-11-28' },
-        { name: 'Legal Brief - Williams Estate.pdf', type: 'Legal Brief', date: '2023-11-25' }
-      ]
-    };
+    const mockData = [
+      { title: 'Smith v. Jones Corporation', category: 'Case', id: 'C-2023-001' },
+      { title: 'John Smith', category: 'Client', id: 'CL-001' },
+      { title: 'Contract Agreement.pdf', category: 'Document', id: 'DOC-001' }
+    ];
 
-    // Search through different data types based on filter
-    Object.keys(mockData).forEach(category => {
-      if (searchFilters.category === 'all' || searchFilters.category === category) {
-        mockData[category].forEach(item => {
-          const searchableText = Object.values(item).join(' ').toLowerCase();
-          if (searchableText.includes(searchTerm)) {
-            results.push({
-              text: category === 'cases' ? `${item.title} - ${item.category}` :
-                    category === 'clients' ? `${item.name} - ${item.company}` :
-                    `${item.name} - ${item.type}`,
-              category: category.charAt(0).toUpperCase() + category.slice(1),
-              id: item.id || item.name || item.title,
-              data: item
-            });
-          }
-        });
-      }
-    });
-    
-    return results.slice(0, 8);
-  }, [searchFilters]);
+    return mockData.filter(item => 
+      item.title.toLowerCase().includes(query.toLowerCase())
+    ).slice(0, 5);
+  }, []);
 
   const handleSearchChange = (e) => {
     const query = e.target.value;
     setSearchQuery(query);
-    setSelectedSearchIndex(-1);
     
     if (query.length > 2) {
       const results = searchAllContent(query);
@@ -164,499 +116,549 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
     setSearchQuery('');
     setSearchResults([]);
     setSearchOpen(false);
-    setSelectedSearchIndex(-1);
   };
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      // Add to search history
-      setSearchHistory(prev => {
-        const newHistory = [searchQuery, ...prev.filter(item => item !== searchQuery)].slice(0, 5);
-        return newHistory;
-      });
-      
-      if (searchResults.length > 0) {
-        const targetResult = selectedSearchIndex >= 0 ? searchResults[selectedSearchIndex] : searchResults[0];
-        handleResultClick(targetResult);
-      }
+    if (searchQuery.trim() && searchResults.length > 0) {
+      navigate('/advocate/search', { state: { query: searchQuery } });
+      setSearchOpen(false);
     }
   };
-
-  const handleResultClick = (result) => {
-    // Navigate based on category
-    switch (result.category.toLowerCase()) {
-      case 'cases':
-        navigate(`/advocate/cases/${result.id}`);
-        break;
-      case 'clients':
-        navigate(`/advocate/clients/${result.id}`);
-        break;
-      case 'documents':
-        navigate(`/advocate/documents/${result.id}`);
-        break;
-      default:
-        // Scroll to element if it exists
-        if (result.element) {
-          result.element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          // Highlight the element temporarily with a more sophisticated approach
-          const originalBg = result.element.style.backgroundColor;
-          const originalTransition = result.element.style.transition;
-          
-          result.element.style.transition = 'background-color 0.5s ease';
-          result.element.style.backgroundColor = '#fffdba';
-          
-          setTimeout(() => {
-            result.element.style.backgroundColor = originalBg;
-            setTimeout(() => {
-              result.element.style.transition = originalTransition;
-            }, 500);
-          }, 2000);
-        }
-    }
-    setSearchOpen(false);
-    setSelectedSearchIndex(-1);
-  };
-
-  // Enhanced notification functions
-  const markNotificationAsRead = (id) => {
-    setNotifications(prev => 
-      prev.map(notif => 
-        notif.id === id ? { ...notif, read: true } : notif
-      )
-    );
-  };
-
-  const deleteNotification = (id) => {
-    setNotifications(prev => prev.filter(notif => notif.id !== id));
-  };
-
-  const markAllAsRead = () => {
-    setNotifications(prev => prev.map(notif => ({ ...notif, read: true })));
-  };
-
-  const filteredNotifications = notifications.filter(notif => {
-    if (notificationFilter === 'all') return true;
-    if (notificationFilter === 'unread') return !notif.read;
-    return notif.type === notificationFilter;
-  });
-
-  // Handle navigation to different pages
-  const handleNavigation = (path) => {
-    setProfileOpen(false);
-    navigate(path);
-  };
-
-  // Handle sign out
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleSignOut = async () => {
     setProfileOpen(false);
     setIsLoggingOut(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    logout();
-    navigate('/');
+    
+    try {
+      // Short delay for UX
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Clear authentication - this will trigger cleanup in other components
+      logout();
+      
+      // Navigate to home page after a short delay to ensure cleanup
+      setTimeout(() => {
+        navigate('/', { replace: true });
+      }, 100);
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Still navigate even if there's an error
+      navigate('/', { replace: true });
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-    // Apply dark mode to document
-    document.documentElement.classList.toggle('dark');
-  };
+  const NavButton = ({ item, mobile = false }) => (
+    <button
+      onClick={() => mobile ? (navigate(item.path), setMobileMenuOpen(false)) : navigate(item.path)}
+      className={`transition-all duration-200 ${
+        mobile 
+          ? 'w-full px-4 py-3 rounded-lg text-left border backdrop-blur-sm' 
+          : 'px-3 py-2 rounded-md text-sm font-medium'
+      }`}
+      style={{
+        color: location.pathname === item.path ? colors.accent : colors.textPrimary,
+        backgroundColor: location.pathname === item.path ? colors.active : 'transparent',
+        borderColor: mobile ? colors.border : 'transparent',
+        fontWeight: location.pathname === item.path ? '600' : '500',
+        border: location.pathname === item.path ? `1px solid ${colors.accent}40` : '1px solid transparent'
+      }}
+      onMouseEnter={(e) => {
+        if (!mobile && location.pathname !== item.path) {
+          e.target.style.backgroundColor = colors.hover;
+          e.target.style.borderColor = `${colors.accent}30`;
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (!mobile && location.pathname !== item.path) {
+          e.target.style.backgroundColor = 'transparent';
+          e.target.style.borderColor = 'transparent';
+        }
+      }}
+    >
+      <span>{item.name}</span>
+    </button>
+  );
 
   return (
     <>
-      {isLoggingOut && <LoadingOverlay message="Logging out..." />}
-      <nav className="glass-morphism-card border-b border-white/20 backdrop-blur-xl bg-gradient-to-r from-purple-900/80 via-blue-900/80 to-indigo-900/80 px-6 py-4 saas-shadow-glow sticky top-0 z-50">
-        <div className="flex items-center justify-between h-16">
-          {/* Left side - Menu toggle and Logo */}
-          <div className="flex items-center space-x-4">
-            <button 
-              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className="saas-button-secondary p-2.5 rounded-lg group transition-all duration-300 hover:bg-white/10"
-              aria-label="Toggle sidebar"
+      {isLoggingOut && <LoadingOverlay message="Signing out..." />}
+      
+      <nav 
+        className="border-b sticky top-0 z-50 backdrop-blur-sm"
+        style={{ 
+          backgroundColor: colors.background,
+          borderColor: colors.border,
+          boxShadow: colors.shadow
+        }}
+      >
+        <div className="flex items-center justify-between h-16 px-6">
+          {/* Logo */}
+          <div className="flex items-center space-x-8">
+            <div 
+              className="flex items-center cursor-pointer"
+              onClick={() => navigate('/advocate/dashboard')}
             >
-              <Menu className="w-5 h-5 text-white/80 group-hover:text-white transition-colors duration-300" />
-            </button>
-            
-            {/* Enhanced Logo/Brand */}
-            <div className="hidden md:flex items-center cursor-pointer group" onClick={() => navigate('/advocate/dashboard')}>
-              <div className="flex items-center space-x-3">
-                <div className="p-2 rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 shadow-lg group-hover:shadow-yellow-500/30 transition-all duration-300">
-                  <Zap className="w-6 h-6 text-white animate-pulse-glow" />
+              <div 
+                className="w-8 h-8 rounded-lg flex items-center justify-center mr-3"
+                style={{
+                  background: `linear-gradient(135deg, ${colors.accent}, ${colors.accent}DD, ${colors.accent}BB)`
+                }}
+              >
+                <span className="text-white font-bold text-sm">CL</span>
+              </div>
+              <div>
+                <h1 
+                  className="text-lg font-bold"
+                  style={{ color: colors.textPrimary }}
+                >
+                  Chakshi Legal
+                </h1>
+                <p 
+                  className="text-xs"
+                  style={{ color: colors.textSecondary }}
+                >
+                  Professional Suite
+                </p>
+              </div>
+            </div>
+
+            {/* Desktop Navigation */}
+            <div className="hidden xl:flex items-center space-x-1">
+              {navItems.core.map(item => (
+                <NavButton key={item.path} item={item} />
+              ))}
+              
+              {/* Tools Dropdown */}
+              <div className="relative group">
+                <button 
+                  className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors border border-transparent"
+                  style={{
+                    color: colors.textPrimary,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = colors.hover;
+                    e.target.style.borderColor = `${colors.accent}30`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = 'transparent';
+                    e.target.style.borderColor = 'transparent';
+                  }}
+                >
+                  <span>Tools</span>
+                  <span className="text-xs" style={{ color: colors.accent }}>▼</span>
+                </button>
+                <div 
+                  className="absolute top-full left-0 mt-1 w-48 border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-30 backdrop-blur-sm"
+                  style={{
+                    backgroundColor: colors.background,
+                    borderColor: colors.border,
+                    boxShadow: `0 10px 25px ${colors.textPrimary}15`
+                  }}
+                >
+                  {navItems.tools.map(item => (
+                    <NavButton key={item.path} item={item} />
+                  ))}
                 </div>
-                <div className="flex flex-col">
-                  <span className="text-xl font-bold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
-                    LegalSuite
-                  </span>
-                  <span className="text-xs text-white/60 font-medium">
-                    Advocate Dashboard
-                  </span>
+              </div>
+
+              {/* Settings Dropdown */}
+              <div className="relative group">
+                <button 
+                  className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors border border-transparent"
+                  style={{
+                    color: colors.textPrimary,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = colors.hover;
+                    e.target.style.borderColor = `${colors.accent}30`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = 'transparent';
+                    e.target.style.borderColor = 'transparent';
+                  }}
+                >
+                  <span>Settings</span>
+                  <span className="text-xs" style={{ color: colors.accent }}>▼</span>
+                </button>
+                <div 
+                  className="absolute top-full left-0 mt-1 w-48 border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-30 backdrop-blur-sm"
+                  style={{
+                    backgroundColor: colors.background,
+                    borderColor: colors.border,
+                    boxShadow: `0 10px 25px ${colors.textPrimary}15`
+                  }}
+                >
+                  <NavButton item={{ name: 'Settings', path: '/advocate/settings' }} />
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Enhanced Search Bar with Filters */}
-          <div className="flex-1 max-w-2xl mx-6 relative animate-float" ref={searchRef}>
-            <form onSubmit={handleSearchSubmit} className="w-full">
+          {/* Search Bar */}
+          <div className="flex-1 max-w-md mx-8 relative" ref={searchRef}>
+            <form onSubmit={handleSearchSubmit}>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Search className="h-5 w-5 text-white/60" />
-                </div>
                 <input
                   type="text"
-                  placeholder="Search cases, documents, clients..."
-                  className="saas-input w-full pl-12 pr-20 py-3.5 bg-white/10 border border-white/20 text-white placeholder-white/60 backdrop-blur-md focus:bg-white/15 focus:border-blue-400/50 focus:ring-2 focus:ring-blue-400/30 rounded-xl transition-all duration-300"
+                  placeholder="Search cases, clients, documents..."
+                  className="w-full px-4 py-2 text-sm border rounded-lg focus:ring-2 transition-all duration-200 backdrop-blur-sm"
+                  style={{
+                    backgroundColor: colors.cardBackground,
+                    borderColor: colors.border,
+                    color: colors.textPrimary,
+                    focusBorderColor: colors.accent,
+                    focusRingColor: `${colors.accent}40`
+                  }}
                   value={searchQuery}
                   onChange={handleSearchChange}
-                  onFocus={() => searchQuery.length > 2 && setSearchOpen(true)}
                 />
-                <div className="absolute inset-y-0 right-0 flex items-center space-x-2 pr-4">
-                  <button
-                    type="button"
-                    onClick={() => setSearchOpen(!searchOpen)}
-                    className="text-white/60 hover:text-white transition-colors duration-300"
-                    aria-label="Search filters"
-                  >
-                    <Filter className="h-4 w-4" />
-                  </button>
-                  {searchQuery && (
+                {searchQuery && (
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3">
                     <button
                       type="button"
                       onClick={clearSearch}
-                      className="text-white/60 hover:text-white transition-colors duration-300"
+                      className="text-sm transition-colors"
+                      style={{ color: colors.textSecondary }}
                     >
-                      <X className="h-4 w-4" />
+                      Clear
                     </button>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             </form>
 
-            {/* Enhanced Search Results with Filters */}
-            {searchOpen && (
-              <div className="absolute z-50 mt-2 w-full glass-morphism-card border border-white/20 backdrop-blur-xl rounded-xl overflow-hidden animate-stagger-fade-in shadow-2xl">
-                {/* Search Filters */}
-                <div className="p-4 border-b border-white/10 bg-gradient-to-r from-blue-600/20 to-purple-600/20">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-sm font-semibold text-white">Search Filters</h3>
-                    <button 
-                      onClick={clearSearch}
-                      className="text-xs text-white/60 hover:text-white transition-colors duration-300"
+            {/* Search Results */}
+            {searchOpen && searchResults.length > 0 && (
+              <div 
+                className="absolute mt-1 w-full border rounded-lg shadow-lg z-50 backdrop-blur-sm"
+                style={{
+                  backgroundColor: colors.background,
+                  borderColor: colors.border,
+                  boxShadow: `0 10px 25px ${colors.textPrimary}15`
+                }}
+              >
+                <div className="py-2">
+                  {searchResults.map((result, index) => (
+                    <div
+                      key={index}
+                      className="px-4 py-3 cursor-pointer transition-colors border-b last:border-b-0"
+                      style={{
+                        borderColor: colors.border,
+                        hoverBackground: colors.hover
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = colors.hover;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = 'transparent';
+                      }}
+                      onClick={() => {
+                        navigate(`/advocate/${result.category.toLowerCase()}s/${result.id}`);
+                        setSearchOpen(false);
+                      }}
                     >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
-                  <div className="flex space-x-3">
-                    <select 
-                      value={searchFilters.category}
-                      onChange={(e) => setSearchFilters(prev => ({ ...prev, category: e.target.value }))}
-                      className="text-xs bg-white/10 border border-white/20 text-white rounded-lg px-3 py-1"
-                    >
-                      {searchCategories.map(cat => (
-                        <option key={cat.value} value={cat.value} className="bg-gray-800">
-                          {cat.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                {/* Search History */}
-                {searchHistory.length > 0 && searchQuery.length <= 2 && (
-                  <div className="p-4 border-b border-white/10">
-                    <h4 className="text-xs font-semibold text-white/80 mb-2 flex items-center">
-                      <Clock className="h-3 w-3 mr-1" />
-                      Recent Searches
-                    </h4>
-                    {searchHistory.map((term, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setSearchQuery(term)}
-                        className="block w-full text-left text-sm text-white/70 hover:text-white py-1 hover:bg-white/5 rounded px-2"
-                      >
-                        {term}
-                      </button>
-                    ))}
-                  </div>
-                )}
-
-                {/* Search Results */}
-                {searchResults.length > 0 && (
-                  <>
-                    <div className="p-4 border-b border-white/10 bg-gradient-to-r from-green-600/20 to-blue-600/20">
-                      <h3 className="text-sm font-semibold text-white">
-                        {searchResults.length} result{searchResults.length !== 1 ? 's' : ''} found
-                      </h3>
-                    </div>
-                    <div className="max-h-80 overflow-y-auto">
-                      {searchResults.map((result, index) => (
-                        <div 
-                          key={index} 
-                          className={`p-4 border-b border-white/10 hover:bg-white/10 cursor-pointer transition-all duration-300 group ${
-                            selectedSearchIndex === index ? 'bg-white/15' : ''
-                          }`}
-                          onClick={() => handleResultClick(result)}
+                      <div className="flex justify-between items-center">
+                        <span 
+                          className="text-sm font-medium"
+                          style={{ color: colors.textPrimary }}
                         >
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm text-white/90 group-hover:text-white transition-colors duration-300 line-clamp-2">
-                                {result.text}
-                              </p>
-                              <span className="inline-flex items-center mt-2 px-3 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-200 border border-blue-400/30">
-                                {result.category}
-                              </span>
-                            </div>
-                            <ArrowRight className="h-4 w-4 text-white/60 flex-shrink-0 ml-3 mt-1 group-hover:text-white transition-colors duration-300" />
-                          </div>
-                        </div>
-                      ))}
+                          {result.title}
+                        </span>
+                        <span 
+                          className="text-xs px-2 py-1 rounded"
+                          style={{
+                            backgroundColor: `${colors.accent}15`,
+                            color: colors.accent,
+                            border: `1px solid ${colors.accent}30`
+                          }}
+                        >
+                          {result.category}
+                        </span>
+                      </div>
                     </div>
-                  </>
-                )}
-
-                {searchQuery.length > 2 && searchResults.length === 0 && (
-                  <div className="p-6 text-center">
-                    <Search className="w-12 h-12 mx-auto text-white/30 mb-3" />
-                    <p className="text-sm text-white/80 mb-1">No results found for "{searchQuery}"</p>
-                    <p className="text-xs text-white/50">Try different keywords or check your spelling</p>
-                  </div>
-                )}
+                  ))}
+                </div>
               </div>
             )}
           </div>
 
           {/* Right side items */}
-          <div className="flex items-center space-x-3">
-            {/* Dark Mode Toggle */}
+          <div className="flex items-center space-x-4">
+            {/* Mobile Menu Button */}
             <button 
-              onClick={toggleDarkMode}
-              className="saas-button-secondary p-2.5 group relative rounded-lg transition-all duration-300 hover:bg-white/10"
-              aria-label="Toggle dark mode"
+              className="xl:hidden p-2 rounded-md transition-colors text-sm font-medium border border-transparent"
+              style={{ color: colors.textPrimary }}
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = colors.hover;
+                e.target.style.borderColor = `${colors.accent}30`;
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = 'transparent';
+                e.target.style.borderColor = 'transparent';
+              }}
             >
-              {darkMode ? 
-                <Sun className="h-5 w-5 text-white/80 group-hover:text-white transition-colors duration-300" /> :
-                <Moon className="h-5 w-5 text-white/80 group-hover:text-white transition-colors duration-300" />
-              }
-              <div className="saas-tooltip">
-                {darkMode ? 'Light Mode' : 'Dark Mode'}
-              </div>
+              Menu
             </button>
 
-            {/* Apps button */}
-            <button 
-              className="saas-button-secondary p-2.5 group relative rounded-lg transition-all duration-300 hover:bg-white/10"
-              onClick={() => navigate('/apps')}
-              aria-label="Apps"
-            >
-              <Grid3X3 className="h-5 w-5 text-white/80 group-hover:text-white transition-colors duration-300" />
-              <div className="saas-tooltip">
-                Apps
-              </div>
-            </button>
-
-            {/* Enhanced Notifications */}
+            {/* Notifications */}
             <div className="relative" ref={notificationsRef}>
               <button 
-                className="saas-button-secondary p-2.5 group relative rounded-lg transition-all duration-300 hover:bg-white/10"
+                className="relative p-2 rounded-md transition-colors text-sm font-medium border border-transparent"
+                style={{ color: colors.textPrimary }}
                 onClick={() => setNotificationsOpen(!notificationsOpen)}
-                aria-label="Notifications"
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = colors.hover;
+                  e.target.style.borderColor = `${colors.accent}30`;
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = 'transparent';
+                  e.target.style.borderColor = 'transparent';
+                }}
               >
-                <Bell className="h-5 w-5 text-white/80 group-hover:text-white transition-colors duration-300" />
+                Notifications
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 inline-flex items-center justify-center h-5 w-5 text-xs font-bold text-white bg-gradient-to-r from-red-500 to-pink-500 rounded-full animate-pulse-glow shadow-lg">
+                  <span 
+                    className="absolute -top-1 -right-1 h-4 w-4 rounded-full text-xs flex items-center justify-center text-white font-semibold"
+                    style={{ backgroundColor: colors.warning }}
+                  >
                     {unreadCount}
                   </span>
                 )}
-                <div className="saas-tooltip">
-                  Notifications
-                </div>
               </button>
 
               {notificationsOpen && (
-                <div className="absolute right-0 mt-3 w-96 glass-morphism-card border border-white/20 backdrop-blur-xl rounded-xl overflow-hidden z-10 animate-slide-down shadow-2xl">
-                  <div className="p-4 border-b border-white/10 bg-gradient-to-r from-blue-600/20 to-purple-600/20">
-                    <div className="flex justify-between items-center mb-3">
-                      <h3 className="text-sm font-semibold text-white">Notifications</h3>
-                      <div className="flex space-x-2">
-                        {unreadCount > 0 && (
-                          <button 
-                            onClick={markAllAsRead}
-                            className="text-xs text-blue-300 hover:text-blue-200 font-medium transition-colors duration-300"
-                          >
-                            Mark all read
-                          </button>
-                        )}
-                        <button 
-                          onClick={() => navigate('/notifications')}
-                          className="text-xs text-blue-300 hover:text-blue-200 font-medium transition-colors duration-300"
-                        >
-                          View all
-                        </button>
-                      </div>
-                    </div>
-                    {/* Notification Filters */}
-                    <div className="flex space-x-2">
-                      {['all', 'unread', 'reminder', 'document', 'payment'].map(filter => (
-                        <button
-                          key={filter}
-                          onClick={() => setNotificationFilter(filter)}
-                          className={`text-xs px-3 py-1 rounded-full transition-colors duration-300 ${
-                            notificationFilter === filter 
-                              ? 'bg-blue-500/30 text-blue-200' 
-                              : 'bg-white/10 text-white/60 hover:text-white'
-                          }`}
-                        >
-                          {filter.charAt(0).toUpperCase() + filter.slice(1)}
-                        </button>
-                      ))}
+                <div 
+                  className="absolute right-0 mt-2 w-80 border rounded-lg shadow-lg z-40 backdrop-blur-sm"
+                  style={{
+                    backgroundColor: colors.background,
+                    borderColor: colors.border,
+                    boxShadow: `0 10px 25px ${colors.textPrimary}15`
+                  }}
+                >
+                  <div className="p-4 border-b" style={{ borderColor: colors.border }}>
+                    <div className="flex justify-between items-center">
+                      <h3 
+                        className="text-sm font-semibold"
+                        style={{ color: colors.textPrimary }}
+                      >
+                        Notifications
+                      </h3>
+                      <span 
+                        className="text-xs"
+                        style={{ color: colors.textSecondary }}
+                      >
+                        {unreadCount} unread
+                      </span>
                     </div>
                   </div>
+                  
                   <div className="max-h-96 overflow-y-auto">
-                    {filteredNotifications.length > 0 ? (
-                      filteredNotifications.map(notification => (
-                        <div key={notification.id} className={`p-4 border-b border-white/10 hover:bg-white/10 transition-all duration-300 group ${!notification.read ? 'bg-blue-500/10' : ''}`}>
-                          <div className="flex items-start justify-between">
-                            <div className="flex items-start flex-1">
-                              {!notification.read && (
-                                <span className="h-2 w-2 mt-2 rounded-full bg-gradient-to-r from-blue-400 to-blue-500 mr-3 flex-shrink-0 animate-pulse-glow"></span>
-                              )}
-                              <div className={notification.read ? "ml-5" : ""}>
-                                <p className="text-sm text-white/90">{notification.text}</p>
-                                <div className="flex items-center justify-between mt-2">
-                                  <p className="text-xs text-white/50">{notification.time}</p>
-                                  <span className={`text-xs px-2 py-1 rounded-full ${
-                                    notification.priority === 'high' ? 'bg-red-500/20 text-red-300' :
-                                    notification.priority === 'medium' ? 'bg-yellow-500/20 text-yellow-300' :
-                                    'bg-green-500/20 text-green-300'
-                                  }`}>
-                                    {notification.priority}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="flex space-x-1 ml-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                              {!notification.read && (
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    markNotificationAsRead(notification.id);
-                                  }}
-                                  className="p-1 text-white/60 hover:text-green-400 transition-colors duration-300"
-                                  title="Mark as read"
-                                >
-                                  <Check className="h-3 w-3" />
-                                </button>
-                              )}
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  deleteNotification(notification.id);
-                                }}
-                                className="p-1 text-white/60 hover:text-red-400 transition-colors duration-300"
-                                title="Delete"
-                              >
-                                <Trash2 className="h-3 w-3" />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="p-6 text-sm text-white/60 text-center">No notifications found</p>
-                    )}
+                    {notifications.map(notification => (
+                      <div 
+                        key={notification.id}
+                        className="p-4 border-b cursor-pointer transition-colors"
+                        style={{
+                          borderColor: colors.border,
+                          backgroundColor: notification.read ? 'transparent' : `${colors.accent}08`
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.backgroundColor = colors.hover;
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.backgroundColor = notification.read ? 'transparent' : `${colors.accent}08`;
+                        }}
+                      >
+                        <p 
+                          className="text-sm mb-1 font-medium"
+                          style={{ color: colors.textPrimary }}
+                        >
+                          {notification.text}
+                        </p>
+                        <span 
+                          className="text-xs"
+                          style={{ color: colors.textSecondary }}
+                        >
+                          {notification.time}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Enhanced User profile */}
+            {/* User Profile */}
             <div className="relative" ref={profileRef}>
               <button 
-                className="flex items-center space-x-3 focus:outline-none group saas-button-secondary px-4 py-2.5 rounded-xl transition-all duration-300 hover:bg-white/10"
+                className="flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors border backdrop-blur-sm"
+                style={{
+                  borderColor: colors.border,
+                  color: colors.textPrimary
+                }}
                 onClick={() => setProfileOpen(!profileOpen)}
-                aria-label="User profile"
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = colors.hover;
+                  e.target.style.borderColor = colors.accent;
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = 'transparent';
+                  e.target.style.borderColor = colors.border;
+                }}
               >
-                <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center text-white font-bold shadow-lg group-hover:shadow-purple-500/30 transition-all duration-300">
-                  {user ? user.name?.charAt(0) || user.email?.charAt(0) || 'U' : 'U'}
+                <div 
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-semibold"
+                  style={{
+                    background: `linear-gradient(135deg, ${colors.accent}, ${colors.accent}DD)`
+                  }}
+                >
+                  {user ? user.name?.charAt(0) || user.email?.charAt(0) : 'U'}
                 </div>
-                <div className="hidden md:block text-left">
-                  <p className="text-sm font-semibold text-white/90 group-hover:text-white transition-colors duration-300 truncate max-w-[120px]">
-                    {user ? user.name || user.email.split('@')[0] : 'User'}
+                <div className="hidden lg:block text-left">
+                  <p className="text-sm font-semibold" style={{ color: colors.textPrimary }}>
+                    {user ? user.name?.split(' ')[0] : 'User'}
                   </p>
-                  <p className="text-xs text-white/60 group-hover:text-white/70 transition-colors duration-300">
-                    {user ? user.role || 'Advocate' : 'Advocate'}
+                  <p className="text-xs" style={{ color: colors.textSecondary }}>
+                    {user?.role || 'Legal Professional'}
                   </p>
                 </div>
-                <ChevronDown className={`h-4 w-4 text-white/60 group-hover:text-white transition-all duration-300 ${profileOpen ? 'rotate-180' : ''}`} />
+                <span 
+                  className={`text-xs transition-transform ${profileOpen ? 'rotate-180' : ''}`}
+                  style={{ color: colors.accent }}
+                >
+                  ▼
+                </span>
               </button>
 
               {profileOpen && (
-                <div className="absolute right-0 mt-3 w-64 glass-morphism-card border border-white/20 backdrop-blur-xl rounded-xl py-2 z-10 animate-slide-down shadow-2xl">
-                  <div className="px-4 py-3 border-b border-white/10">
-                    <div className="flex items-center space-x-3">
-                      <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center text-white font-bold">
-                        {user ? user.name?.charAt(0) || user.email?.charAt(0) || 'U' : 'U'}
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-white/90 truncate">{user ? user.name || user.email.split('@')[0] : 'User'}</p>
-                        <p className="text-xs text-white/60 truncate">{user ? user.email : 'user@example.com'}</p>
-                        <div className="flex items-center mt-1">
-                          <Shield className="h-3 w-3 text-green-400 mr-1" />
-                          <span className="text-xs text-green-400">Verified</span>
-                        </div>
-                      </div>
-                    </div>
+                <div 
+                  className="absolute right-0 mt-2 w-56 border rounded-lg shadow-lg z-40 backdrop-blur-sm"
+                  style={{
+                    backgroundColor: colors.background,
+                    borderColor: colors.border,
+                    boxShadow: `0 10px 25px ${colors.textPrimary}15`
+                  }}
+                >
+                  <div className="p-4 border-b" style={{ borderColor: colors.border }}>
+                    <p className="text-sm font-medium" style={{ color: colors.textPrimary }}>
+                      {user?.name || 'User'}
+                    </p>
+                    <p className="text-xs truncate" style={{ color: colors.textSecondary }}>
+                      {user?.email || 'user@example.com'}
+                    </p>
                   </div>
                   
-                  <button 
-                    onClick={() => handleNavigation('/advocate/profile')}
-                    className="flex items-center space-x-3 w-full text-left px-4 py-3 text-sm text-white/80 hover:bg-white/10 hover:text-white transition-all duration-300 group"
-                  >
-                    <User className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
-                    <span>My Profile</span>
-                  </button>
-                  
-                  <button 
-                    onClick={() => handleNavigation('/advocate/settings')}
-                    className="flex items-center space-x-3 w-full text-left px-4 py-3 text-sm text-white/80 hover:bg-white/10 hover:text-white transition-all duration-300 group"
-                  >
-                    <Settings className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
-                    <span>Settings</span>
-                  </button>
+                  <div className="py-2">
+                    <button 
+                      onClick={() => navigate('/advocate/profile')}
+                      className="flex items-center w-full px-4 py-2 text-sm transition-colors text-left"
+                      style={{ color: colors.textPrimary }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = colors.hover;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = 'transparent';
+                      }}
+                    >
+                      Profile Settings
+                    </button>
+                    <button 
+                      onClick={() => navigate('/advocate/settings')}
+                      className="flex items-center w-full px-4 py-2 text-sm transition-colors text-left"
+                      style={{ color: colors.textPrimary }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = colors.hover;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = 'transparent';
+                      }}
+                    >
+                      Account Settings
+                    </button>
+                  </div>
 
-                  <button 
-                    onClick={() => handleNavigation('/advocate/billing')}
-                    className="flex items-center space-x-3 w-full text-left px-4 py-3 text-sm text-white/80 hover:bg-white/10 hover:text-white transition-all duration-300 group"
-                  >
-                    <Globe className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
-                    <span>Billing & Plans</span>
-                  </button>
-
-                  <button 
-                    onClick={() => handleNavigation('/help')}
-                    className="flex items-center space-x-3 w-full text-left px-4 py-3 text-sm text-white/80 hover:bg-white/10 hover:text-white transition-all duration-300 group"
-                  >
-                    <HelpCircle className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
-                    <span>Help & Support</span>
-                  </button>
-
-                  <div className="border-t border-white/10 my-1"></div>
-                  
-                  <button 
-                    onClick={handleSignOut}
-                    className="flex items-center space-x-3 w-full text-left px-4 py-3 text-sm text-red-300 hover:bg-red-500/10 hover:text-red-200 transition-all duration-300 group"
-                  >
-                    <LogOut className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
-                    <span>Sign out</span>
-                  </button>
+                  <div className="border-t py-2" style={{ borderColor: colors.border }}>
+                    <button 
+                      onClick={handleSignOut}
+                      className="flex items-center w-full px-4 py-2 text-sm transition-colors text-left"
+                      style={{ color: colors.warning }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = `${colors.warning}15`;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = 'transparent';
+                      }}
+                    >
+                      Sign Out
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
           </div>
         </div>
       </nav>
+
+      {/* Mobile Navigation Menu */}
+      {mobileMenuOpen && (
+        <div 
+          ref={mobileMenuRef}
+          className="xl:hidden absolute top-16 left-0 right-0 z-40 border-b shadow-lg backdrop-blur-sm"
+          style={{
+            backgroundColor: colors.background,
+            borderColor: colors.border,
+            boxShadow: `0 10px 25px ${colors.textPrimary}15`
+          }}
+        >
+          <div className="px-6 py-4 space-y-1">
+            {/* Core Navigation */}
+            <div className="mb-4">
+              <h3 
+                className="text-xs font-semibold uppercase tracking-wider mb-2"
+                style={{ color: colors.textSecondary }}
+              >
+                Core
+              </h3>
+              <div className="space-y-1">
+                {navItems.core.map(item => (
+                  <NavButton key={item.path} item={item} mobile />
+                ))}
+              </div>
+            </div>
+
+            {/* Tools */}
+            <div className="mb-4">
+              <h3 
+                className="text-xs font-semibold uppercase tracking-wider mb-2"
+                style={{ color: colors.textSecondary }}
+              >
+                Tools
+              </h3>
+              <div className="space-y-1">
+                {navItems.tools.map(item => (
+                  <NavButton key={item.path} item={item} mobile />
+                ))}
+              </div>
+            </div>
+
+            {/* Settings */}
+            <div className="mb-4">
+              <h3 
+                className="text-xs font-semibold uppercase tracking-wider mb-2"
+                style={{ color: colors.textSecondary }}
+              >
+                Settings
+              </h3>
+              <div className="space-y-1">
+                <NavButton item={{ name: 'Settings', path: '/advocate/settings' }} mobile />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };

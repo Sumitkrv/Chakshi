@@ -1,24 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Star, 
-  Quote, 
-  ArrowRight, 
-  RotateCcw, 
-  Users, 
-  Briefcase, 
-  GraduationCap, 
-  Award,
-  CheckCircle,
-  TrendingUp,
-  MessageSquare,
-  Heart,
-  Shield,
-  Zap,
-  ChevronLeft,
-  ChevronRight,
-  Play,
-  Pause
-} from 'lucide-react';
 
 const Testimonials = () => {
   const [flippedCard, setFlippedCard] = useState(null);
@@ -37,10 +17,12 @@ const Testimonials = () => {
       rating: 5,
       category: "Legal Professionals",
       avatar: "RK",
+      gender: "male",
       company: "Kumar & Associates",
       verified: true,
       experience: "15+ years",
-      highlight: "70% time savings"
+      highlight: "70% time savings",
+      gradient: "from-[#b69d74] to-[#b69d74DD]"
     },
     {
       id: 2,
@@ -52,10 +34,12 @@ const Testimonials = () => {
       rating: 5,
       category: "Students & Education",
       avatar: "PS",
+      gender: "female",
       company: "National Law University",
       verified: true,
       experience: "3rd Year Student",
-      highlight: "Moot court success"
+      highlight: "Moot court success",
+      gradient: "from-[#b69d74] to-[#b69d74CC]"
     },
     {
       id: 3,
@@ -67,10 +51,12 @@ const Testimonials = () => {
       rating: 5,
       category: "Business Owners",
       avatar: "VM",
+      gender: "male",
       company: "Mehta Enterprises",
       verified: true,
       experience: "10+ years in business",
-      highlight: "Thousands saved"
+      highlight: "Thousands saved",
+      gradient: "from-[#b69d74] to-[#b69d74BB]"
     },
     {
       id: 4,
@@ -82,10 +68,12 @@ const Testimonials = () => {
       rating: 5,
       category: "Legal Professionals",
       avatar: "AS",
+      gender: "female",
       company: "Singh Legal Associates",
       verified: true,
       experience: "12+ years",
-      highlight: "Multi-jurisdiction compliance"
+      highlight: "Multi-jurisdiction compliance",
+      gradient: "from-[#b69d74] to-[#b69d74AA]"
     },
     {
       id: 5,
@@ -97,10 +85,12 @@ const Testimonials = () => {
       rating: 4,
       category: "Business Owners",
       avatar: "RK",
+      gender: "male",
       company: "TechStart Solutions",
       verified: true,
       experience: "Entrepreneur",
-      highlight: "Startup-friendly"
+      highlight: "Startup-friendly",
+      gradient: "from-[#b69d74] to-[#b69d7499]"
     },
     {
       id: 6,
@@ -112,18 +102,20 @@ const Testimonials = () => {
       rating: 5,
       category: "Students & Education",
       avatar: "MI",
+      gender: "female",
       company: "West Bengal National University",
       verified: true,
       experience: "20+ years teaching",
-      highlight: "Curriculum integration"
+      highlight: "Curriculum integration",
+      gradient: "from-[#b69d74] to-[#b69d7488]"
     }
   ];
 
   const categories = [
-    { id: 'All', name: 'All Reviews', icon: MessageSquare, count: testimonials.length },
-    { id: 'Legal Professionals', name: 'Legal Professionals', icon: Briefcase, count: testimonials.filter(t => t.category === 'Legal Professionals').length },
-    { id: 'Business Owners', name: 'Business Owners', icon: TrendingUp, count: testimonials.filter(t => t.category === 'Business Owners').length },
-    { id: 'Students & Education', name: 'Students & Education', icon: GraduationCap, count: testimonials.filter(t => t.category === 'Students & Education').length }
+    { id: 'All', name: 'All Reviews', count: testimonials.length },
+    { id: 'Legal Professionals', name: 'Legal Professionals', count: testimonials.filter(t => t.category === 'Legal Professionals').length },
+    { id: 'Business Owners', name: 'Business Owners', count: testimonials.filter(t => t.category === 'Business Owners').length },
+    { id: 'Students & Education', name: 'Students & Education', count: testimonials.filter(t => t.category === 'Students & Education').length }
   ];
 
   // Filter testimonials based on active category
@@ -168,142 +160,330 @@ const Testimonials = () => {
     setIsAutoPlaying(!isAutoPlaying);
   };
 
-  const renderStars = (rating) => {
-    return Array.from({ length: 5 }, (_, index) => (
-      <Star 
-        key={index} 
-        className={`w-4 h-4 ${index < rating ? 'text-yellow-500 fill-current' : 'text-gray-300'}`}
-      />
-    ));
-  };
-
   const averageRating = (filteredTestimonials.reduce((sum, t) => sum + t.rating, 0) / filteredTestimonials.length).toFixed(1);
   
   const featuredTestimonial = filteredTestimonials[currentSlide];
 
+  // Gender icon component
+  const GenderIcon = ({ gender, className = "w-4 h-4" }) => {
+    if (gender === 'male') {
+      return (
+        <svg className={className} fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+        </svg>
+      );
+    } else if (gender === 'female') {
+      return (
+        <svg className={className} fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+        </svg>
+      );
+    }
+    return null;
+  };
+
+  // Star rating component
+  const StarRating = ({ rating, size = "text-sm" }) => {
+    return (
+      <div className={`flex gap-0.5 ${size} text-[#b69d74]`}>
+        {[...Array(5)].map((_, i) => (
+          <span key={i}>{i < rating ? '★' : '☆'}</span>
+        ))}
+      </div>
+    );
+  };
+
   return (
-    <section className="relative min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 overflow-hidden">
+    <section 
+      id="testimonials" 
+      className="relative min-h-screen text-[#1f2839] overflow-hidden"
+      style={{ 
+        backgroundColor: '#f5f5ef',
+        backgroundImage: 'url("https://images.unsplash.com/photo-1521587760476-6c12a4b040da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80")',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
+    >
       
-      {/* Enhanced Background Elements */}
+      {/* Background Elements */}
       <div className="absolute inset-0">
-        {/* Gradient Orbs */}
-        <div className="absolute top-20 right-10 w-72 h-72 bg-gradient-to-r from-purple-400/20 to-pink-600/20 rounded-full mix-blend-multiply filter blur-xl animate-blob"></div>
-        <div className="absolute bottom-20 left-10 w-72 h-72 bg-gradient-to-r from-blue-400/20 to-indigo-600/20 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-2000"></div>
-        <div className="absolute top-1/2 left-1/2 w-72 h-72 bg-gradient-to-r from-indigo-400/20 to-purple-600/20 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-4000"></div>
+        {/* Background overlay for readability */}
+        <div className="absolute inset-0" style={{ backgroundColor: 'rgba(245, 245, 239, 0.85)' }}></div>
+        
+        {/* Light Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-white/10"></div>
+        
+        {/* Animated Background Elements */}
+        <div 
+          className="absolute top-20 -left-20 w-80 h-80 rounded-full blur-3xl opacity-30"
+          style={{
+            background: `linear-gradient(135deg, rgba(182, 157, 116, 0.2), rgba(182, 157, 116, 0.1))`
+          }}
+        ></div>
+        <div 
+          className="absolute bottom-20 -right-20 w-96 h-96 rounded-full blur-3xl opacity-20"
+          style={{
+            background: `linear-gradient(135deg, rgba(182, 157, 116, 0.15), rgba(182, 157, 116, 0.08))`
+          }}
+        ></div>
         
         {/* Grid Pattern */}
-        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+        <div 
+          className="absolute inset-0 opacity-5"
+          style={{
+            backgroundImage: `
+              linear-gradient(to right, #1f2839 1px, transparent 1px),
+              linear-gradient(to bottom, #1f2839 1px, transparent 1px)
+            `,
+            backgroundSize: '60px 60px',
+          }}
+        ></div>
       </div>
       
-      <div className="relative z-10 pro-container pro-py-24">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-24">
         
         {/* Header */}
-        <div className="text-center mb-16">
-          <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-600 pro-rounded-xl pro-flex-center mx-auto mb-6">
-            <Heart className="w-8 h-8 text-white" />
+        <div className="text-center mb-12 md:mb-16">
+          <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-[#b69d74] to-[#b69d74DD] border border-[#b69d7460] rounded-xl flex items-center justify-center mx-auto mb-4 md:mb-6 shadow-lg">
+            <span className="text-white font-bold text-sm md:text-xl">★</span>
           </div>
-          <h2 className="pro-heading-section text-gray-900 mb-4">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#1f2839] mb-4">
             Trusted by Legal Professionals
           </h2>
-          <p className="pro-text-lead text-gray-600 max-w-3xl mx-auto mb-8">
+          <p className="text-lg md:text-xl text-[#6b7280] max-w-3xl mx-auto mb-6 md:mb-8 px-4">
             See what our users are saying about their experience with Chakshi Legal AI Suite. 
             Real stories from real professionals who've transformed their practice.
           </p>
           
           {/* Stats */}
-          <div className="pro-grid md:grid-cols-4 pro-gap-6 max-w-4xl mx-auto mb-12">
-            <div className="text-center pro-p-6 bg-white/50 backdrop-blur-sm pro-rounded-xl border border-white/20 transition-all hover:scale-105 hover:shadow-lg">
-              <div className="pro-heading-xl font-bold text-purple-600 mb-1">{averageRating}</div>
-              <div className="pro-flex justify-center pro-gap-1 mb-2">
-                {renderStars(Math.floor(averageRating))}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 max-w-4xl mx-auto mb-8 md:mb-12 px-4">
+            <div 
+              className="text-center p-4 md:p-6 rounded-xl border transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+              style={{
+                background: 'rgba(255, 255, 255, 0.80)',
+                backdropFilter: 'blur(15px)',
+                border: '1px solid rgba(182, 157, 116, 0.3)',
+                boxShadow: '0 8px 25px rgba(31, 40, 57, 0.12)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.90)';
+                e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.6)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.80)';
+                e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.3)';
+              }}
+            >
+              <div className="text-xl md:text-2xl lg:text-3xl font-bold text-[#1f2839] mb-1">{averageRating}</div>
+              <div className="flex justify-center gap-1 mb-2">
+                <StarRating rating={5} />
               </div>
-              <div className="pro-text-sm text-gray-600">Average Rating</div>
+              <div className="text-xs md:text-sm text-[#6b7280]">Average Rating</div>
             </div>
-            <div className="text-center pro-p-6 bg-white/50 backdrop-blur-sm pro-rounded-xl border border-white/20 transition-all hover:scale-105 hover:shadow-lg">
-              <div className="pro-heading-xl font-bold text-blue-600 mb-1">500+</div>
-              <div className="pro-text-sm text-gray-600">Happy Users</div>
+            <div 
+              className="text-center p-4 md:p-6 rounded-xl border transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+              style={{
+                background: 'rgba(255, 255, 255, 0.80)',
+                backdropFilter: 'blur(15px)',
+                border: '1px solid rgba(182, 157, 116, 0.3)',
+                boxShadow: '0 8px 25px rgba(31, 40, 57, 0.12)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.90)';
+                e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.6)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.80)';
+                e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.3)';
+              }}
+            >
+              <div className="text-xl md:text-2xl lg:text-3xl font-bold text-[#1f2839] mb-1">500+</div>
+              <div className="text-xs md:text-sm text-[#6b7280]">Happy Users</div>
             </div>
-            <div className="text-center pro-p-6 bg-white/50 backdrop-blur-sm pro-rounded-xl border border-white/20 transition-all hover:scale-105 hover:shadow-lg">
-              <div className="pro-heading-xl font-bold text-green-600 mb-1">98%</div>
-              <div className="pro-text-sm text-gray-600">Satisfaction Rate</div>
+            <div 
+              className="text-center p-4 md:p-6 rounded-xl border transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+              style={{
+                background: 'rgba(255, 255, 255, 0.80)',
+                backdropFilter: 'blur(15px)',
+                border: '1px solid rgba(182, 157, 116, 0.3)',
+                boxShadow: '0 8px 25px rgba(31, 40, 57, 0.12)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.90)';
+                e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.6)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.80)';
+                e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.3)';
+              }}
+            >
+              <div className="text-xl md:text-2xl lg:text-3xl font-bold text-[#1f2839] mb-1">98%</div>
+              <div className="text-xs md:text-sm text-[#6b7280]">Satisfaction Rate</div>
             </div>
-            <div className="text-center pro-p-6 bg-white/50 backdrop-blur-sm pro-rounded-xl border border-white/20 transition-all hover:scale-105 hover:shadow-lg">
-              <div className="pro-heading-xl font-bold text-indigo-600 mb-1">24/7</div>
-              <div className="pro-text-sm text-gray-600">Support Available</div>
+            <div 
+              className="text-center p-4 md:p-6 rounded-xl border transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+              style={{
+                background: 'rgba(255, 255, 255, 0.80)',
+                backdropFilter: 'blur(15px)',
+                border: '1px solid rgba(182, 157, 116, 0.3)',
+                boxShadow: '0 8px 25px rgba(31, 40, 57, 0.12)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.90)';
+                e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.6)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.80)';
+                e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.3)';
+              }}
+            >
+              <div className="text-xl md:text-2xl lg:text-3xl font-bold text-[#1f2839] mb-1">24/7</div>
+              <div className="text-xs md:text-sm text-[#6b7280]">Support Available</div>
             </div>
           </div>
         </div>
 
-        {/* Featured Testimonial Carousel */}
-        <div className="mb-16 relative max-w-4xl mx-auto">
-          <div className="pro-card pro-p-8 bg-white/70 backdrop-blur-sm border-white/30 rounded-2xl shadow-lg">
-            <div className="pro-flex flex-col md:flex-row items-start pro-gap-6">
-              <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-blue-600 pro-rounded-xl pro-flex-center text-white font-bold text-2xl flex-shrink-0">
-                {featuredTestimonial.avatar}
-              </div>
-              
-              <div className="flex-1">
-                <div className="pro-flex items-start justify-between mb-4">
-                  <div>
-                    <h3 className="pro-heading-md text-gray-900">{featuredTestimonial.name}</h3>
-                    <p className="pro-text-sm text-gray-600">{featuredTestimonial.role} • {featuredTestimonial.company}</p>
-                  </div>
-                  <div className="pro-flex pro-gap-1">
-                    {renderStars(featuredTestimonial.rating)}
-                  </div>
-                </div>
-                
-                <p className="pro-text-body text-gray-700 mb-4 italic">"{featuredTestimonial.content}"</p>
-                
-                <div className="pro-flex items-center pro-gap-2 mb-4">
-                  <span className="pro-text-xs px-2 py-1 bg-purple-100 text-purple-700 pro-rounded-lg font-medium">
-                    {featuredTestimonial.highlight}
-                  </span>
-                  {featuredTestimonial.verified && (
-                    <div className="pro-flex items-center pro-gap-1 pro-text-xs text-green-600">
-                      <CheckCircle className="w-3 h-3" />
-                      Verified User
+        {/* Featured Testimonial */}
+        <div className="mb-12 md:mb-16 relative max-w-4xl mx-auto px-4">
+          {featuredTestimonial && (
+            <div 
+              className="p-6 md:p-8 rounded-2xl border shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-2"
+              style={{
+                background: 'rgba(255, 255, 255, 0.80)',
+                backdropFilter: 'blur(15px)',
+                border: '1px solid rgba(182, 157, 116, 0.3)',
+                boxShadow: '0 8px 25px rgba(31, 40, 57, 0.12)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.90)';
+                e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.6)';
+                e.currentTarget.style.boxShadow = '0 15px 40px rgba(182, 157, 116, 0.25)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.80)';
+                e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.3)';
+                e.currentTarget.style.boxShadow = '0 8px 25px rgba(31, 40, 57, 0.12)';
+              }}
+            >
+              <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6">
+                <div className="flex flex-col items-center gap-2">
+                  <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-[#b69d74] to-[#b69d74DD] rounded-xl flex items-center justify-center text-white font-bold text-lg md:text-2xl flex-shrink-0 shadow-lg relative">
+                    {featuredTestimonial.avatar}
+                    <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 border border-[#b69d7440]">
+                      <GenderIcon gender={featuredTestimonial.gender} className="w-3 h-3 text-[#b69d74]" />
                     </div>
-                  )}
+                  </div>
                 </div>
                 
-                <p className="pro-text-sm text-gray-600">{featuredTestimonial.detailed.substring(0, 120)}...</p>
+                <div className="flex-1">
+                  <div className="flex flex-col sm:flex-row items-start justify-between mb-4 gap-2">
+                    <div>
+                      <h3 className="text-lg md:text-xl font-semibold text-[#1f2839]">{featuredTestimonial.name}</h3>
+                      <p className="text-sm text-[#6b7280]">{featuredTestimonial.role} • {featuredTestimonial.company}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <StarRating rating={featuredTestimonial.rating} />
+                      <span className="text-sm text-[#6b7280]">({featuredTestimonial.rating}/5)</span>
+                    </div>
+                  </div>
+                  
+                  <p className="text-base text-[#6b7280] mb-4 italic">"{featuredTestimonial.content}"</p>
+                  
+                  <div className="flex flex-wrap items-center gap-2 mb-4">
+                    <span className="text-xs px-2 py-1 bg-gradient-to-r from-[#b69d74] to-[#b69d74DD] text-white rounded-lg font-medium">
+                      {featuredTestimonial.highlight}
+                    </span>
+                    {featuredTestimonial.verified && (
+                      <div className="flex items-center gap-1 text-xs text-[#b69d74] font-medium">
+                        ✓ VERIFIED USER
+                      </div>
+                    )}
+                  </div>
+                  
+                  <p className="text-sm text-[#6b7280]">{featuredTestimonial.detailed.substring(0, 120)}...</p>
+                </div>
               </div>
             </div>
-          </div>
+          )}
           
           {/* Carousel Controls */}
-          <div className="pro-flex items-center justify-center mt-6 pro-gap-4">
+          <div className="flex items-center justify-center mt-6 gap-2 md:gap-4 flex-wrap">
             <button 
               onClick={prevSlide}
-              className="w-10 h-10 pro-flex-center bg-white/70 backdrop-blur-sm pro-rounded-full border border-white/30 hover:bg-white transition-all"
+              className="px-3 py-2 md:px-4 md:py-2 flex items-center justify-center rounded-lg border text-[#1f2839] transition-all duration-300 text-sm hover:-translate-y-1"
+              style={{
+                background: 'rgba(255, 255, 255, 0.80)',
+                backdropFilter: 'blur(15px)',
+                border: '1px solid rgba(182, 157, 116, 0.3)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.95)';
+                e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.6)';
+                e.currentTarget.style.color = '#b69d74';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.80)';
+                e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.3)';
+                e.currentTarget.style.color = '#1f2839';
+              }}
             >
-              <ChevronLeft className="w-5 h-5 text-gray-700" />
+              ← Previous
             </button>
             
             <button 
               onClick={toggleAutoPlay}
-              className="w-10 h-10 pro-flex-center bg-white/70 backdrop-blur-sm pro-rounded-full border border-white/30 hover:bg-white transition-all"
+              className="px-3 py-2 md:px-4 md:py-2 flex items-center justify-center rounded-lg border text-[#1f2839] transition-all duration-300 text-sm hover:-translate-y-1"
+              style={{
+                background: 'rgba(255, 255, 255, 0.80)',
+                backdropFilter: 'blur(15px)',
+                border: '1px solid rgba(182, 157, 116, 0.3)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.95)';
+                e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.6)';
+                e.currentTarget.style.color = '#b69d74';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.80)';
+                e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.3)';
+                e.currentTarget.style.color = '#1f2839';
+              }}
             >
-              {isAutoPlaying ? <Pause className="w-5 h-5 text-gray-700" /> : <Play className="w-5 h-5 text-gray-700" />}
+              {isAutoPlaying ? "⏸ Pause" : "▶ Play"}
             </button>
             
             <button 
               onClick={nextSlide}
-              className="w-10 h-10 pro-flex-center bg-white/70 backdrop-blur-sm pro-rounded-full border border-white/30 hover:bg-white transition-all"
+              className="px-3 py-2 md:px-4 md:py-2 flex items-center justify-center rounded-lg border text-[#1f2839] transition-all duration-300 text-sm hover:-translate-y-1"
+              style={{
+                background: 'rgba(255, 255, 255, 0.80)',
+                backdropFilter: 'blur(15px)',
+                border: '1px solid rgba(182, 157, 116, 0.3)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.95)';
+                e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.6)';
+                e.currentTarget.style.color = '#b69d74';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.80)';
+                e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.3)';
+                e.currentTarget.style.color = '#1f2839';
+              }}
             >
-              <ChevronRight className="w-5 h-5 text-gray-700" />
+              Next →
             </button>
           </div>
           
           {/* Dots Indicator */}
-          <div className="pro-flex justify-center mt-4 pro-gap-2">
+          <div className="flex justify-center mt-4 gap-2">
             {filteredTestimonials.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentSlide(index)}
-                className={`w-2 h-2 pro-rounded-full transition-all ${
-                  index === currentSlide ? 'bg-purple-500 w-6' : 'bg-gray-300'
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  index === currentSlide ? 'bg-[#b69d74] w-6' : 'bg-[#b69d7440]'
                 }`}
               />
             ))}
@@ -311,26 +491,31 @@ const Testimonials = () => {
         </div>
 
         {/* Category Filters */}
-        <div className="pro-flex justify-center mb-12">
-          <div className="pro-flex flex-wrap items-center pro-gap-3 pro-p-2 bg-white/50 backdrop-blur-sm pro-rounded-xl border border-white/20">
+        <div className="flex justify-center mb-8 md:mb-12 px-4">
+          <div 
+            className="flex flex-wrap items-center gap-2 md:gap-3 p-2 rounded-xl border max-w-full overflow-x-auto"
+            style={{
+              background: 'rgba(255, 255, 255, 0.80)',
+              backdropFilter: 'blur(15px)',
+              border: '1px solid rgba(182, 157, 116, 0.3)'
+            }}
+          >
             {categories.map((category) => {
-              const IconComponent = category.icon;
               return (
                 <button
                   key={category.id}
-                  className={`pro-flex items-center pro-gap-2 px-4 py-2 pro-rounded-lg transition-all duration-300 ${
+                  className={`flex items-center gap-1 md:gap-2 px-2 py-1 md:px-4 md:py-2 rounded-lg transition-all duration-300 text-xs md:text-sm whitespace-nowrap ${
                     activeCategory === category.id 
-                      ? 'bg-purple-500 text-white shadow-lg transform scale-105' 
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
+                      ? 'bg-gradient-to-r from-[#b69d74] to-[#b69d74DD] text-white' 
+                      : 'text-[#6b7280] hover:text-[#b69d74] hover:bg-white/60'
                   }`}
                   onClick={() => handleCategoryClick(category.id)}
                 >
-                  <IconComponent className="w-4 h-4" />
                   <span className="font-medium">{category.name}</span>
-                  <span className={`pro-text-xs px-2 py-0.5 pro-rounded-lg font-semibold ${
+                  <span className={`text-xs px-1.5 py-0.5 md:px-2 md:py-0.5 rounded-lg font-semibold ${
                     activeCategory === category.id 
-                      ? 'bg-purple-400 text-white' 
-                      : 'bg-gray-100 text-gray-600'
+                      ? 'bg-white/20 text-white' 
+                      : 'bg-[#b69d7410] text-[#6b7280] border border-[#b69d7440]'
                   }`}>
                     {category.count}
                   </span>
@@ -341,11 +526,11 @@ const Testimonials = () => {
         </div>
 
         {/* Testimonials Grid */}
-        <div className="pro-grid lg:grid-cols-3 md:grid-cols-2 pro-gap-8 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8 mb-12 md:mb-16 px-4">
           {filteredTestimonials.map((testimonial) => (
             <div 
               key={testimonial.id} 
-              className={`relative group cursor-pointer transition-all duration-500 h-96 ${
+              className={`relative group cursor-pointer transition-all duration-500 h-80 md:h-96 ${
                 flippedCard === testimonial.id ? '[transform:rotateY(180deg)]' : ''
               }`}
               style={{ transformStyle: 'preserve-3d', perspective: '1000px' }}
@@ -353,93 +538,124 @@ const Testimonials = () => {
             >
               {/* Card Front */}
               <div className="absolute inset-0 w-full h-full [backface-visibility:hidden]">
-                <div className="h-full pro-card pro-p-6 bg-white/70 backdrop-blur-sm border-white/30 hover:shadow-xl transition-all duration-300 flex flex-col">
-                  <div className="pro-flex items-start justify-between mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-600 pro-rounded-xl pro-flex-center text-white font-bold">
-                      {testimonial.avatar}
+                <div 
+                  className="h-full p-4 md:p-6 rounded-xl border transition-all duration-300 flex flex-col hover:shadow-xl hover:-translate-y-2"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.80)',
+                    backdropFilter: 'blur(15px)',
+                    border: '1px solid rgba(182, 157, 116, 0.3)',
+                    boxShadow: '0 8px 25px rgba(31, 40, 57, 0.12)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.90)';
+                    e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.6)';
+                    e.currentTarget.style.boxShadow = '0 15px 40px rgba(182, 157, 116, 0.25)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.80)';
+                    e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.3)';
+                    e.currentTarget.style.boxShadow = '0 8px 25px rgba(31, 40, 57, 0.12)';
+                  }}
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="relative">
+                      <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-[#b69d74] to-[#b69d74DD] rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                        {testimonial.avatar}
+                      </div>
+                      <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 border border-[#b69d7440]">
+                        <GenderIcon gender={testimonial.gender} className="w-2.5 h-2.5 text-[#b69d74]" />
+                      </div>
                     </div>
-                    <Quote className="w-8 h-8 text-purple-300" />
+                    <StarRating rating={testimonial.rating} />
                   </div>
                   
-                  <p className="pro-text-body text-gray-700 mb-6 leading-relaxed flex-grow">
+                  <p className="text-sm md:text-base text-[#6b7280] mb-4 md:mb-6 leading-relaxed flex-grow line-clamp-4">
                     "{testimonial.content}"
                   </p>
                   
-                  <div className="pro-flex items-center justify-between mb-4">
-                    <div className="pro-flex pro-gap-1">
-                      {renderStars(testimonial.rating)}
+                  <div className="flex items-center justify-between mb-3 md:mb-4">
+                    <div className="text-xs md:text-sm font-medium text-[#1f2839]">
+                      {testimonial.rating}/5 Rating
                     </div>
                     {testimonial.verified && (
-                      <div className="pro-flex items-center pro-gap-1 pro-text-xs text-green-600">
-                        <CheckCircle className="w-3 h-3" />
-                        Verified
+                      <div className="flex items-center gap-1 text-xs text-[#b69d74] font-medium">
+                        ✓ VERIFIED
                       </div>
                     )}
                   </div>
                   
-                  <div className="border-t border-gray-200 pt-4">
-                    <div className="pro-flex items-center justify-between">
+                  <div className="border-t border-[#b69d7440] pt-3 md:pt-4">
+                    <div className="flex items-center justify-between">
                       <div>
-                        <h4 className="pro-heading-sm text-gray-900">{testimonial.name}</h4>
-                        <p className="pro-text-xs text-gray-600">{testimonial.role}</p>
-                        <p className="pro-text-xs text-gray-500">{testimonial.location}</p>
+                        <h4 className="text-sm md:text-base font-semibold text-[#1f2839]">{testimonial.name}</h4>
+                        <p className="text-xs text-[#6b7280]">{testimonial.role}</p>
+                        <p className="text-xs text-[#9CA3AF]">{testimonial.location}</p>
                       </div>
                       <div className="text-right">
-                        <p className="pro-text-xs text-gray-600 font-medium">{testimonial.company}</p>
-                        <p className="pro-text-xs text-gray-500">{testimonial.experience}</p>
+                        <p className="text-xs text-[#6b7280] font-medium">{testimonial.company}</p>
+                        <p className="text-xs text-[#9CA3AF]">{testimonial.experience}</p>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="mt-4 pro-flex items-center justify-center pro-text-xs text-purple-600 opacity-70 transition-opacity group-hover:opacity-100">
-                    <ArrowRight className="w-3 h-3 mr-1" />
-                    Click for detailed review
+                  <div className="mt-3 md:mt-4 flex items-center justify-center text-xs text-[#6b7280] hover:text-[#b69d74] transition-colors duration-300">
+                    Click for detailed review →
                   </div>
                 </div>
               </div>
               
               {/* Card Back */}
               <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] overflow-y-auto">
-                <div className="h-full pro-card pro-p-6 bg-gradient-to-br from-purple-50 to-blue-50 border-purple-200 hover:shadow-xl transition-all duration-300">
-                  <div className="pro-flex items-start justify-between mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-600 pro-rounded-xl pro-flex-center text-white font-bold">
-                      {testimonial.avatar}
+                <div 
+                  className="h-full p-4 md:p-6 rounded-xl border transition-all duration-300"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.80)',
+                    backdropFilter: 'blur(15px)',
+                    border: '1px solid rgba(182, 157, 116, 0.3)',
+                    boxShadow: '0 8px 25px rgba(31, 40, 57, 0.12)'
+                  }}
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="relative">
+                      <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-[#b69d74] to-[#b69d74DD] rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                        {testimonial.avatar}
+                      </div>
+                      <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 border border-[#b69d7440]">
+                        <GenderIcon gender={testimonial.gender} className="w-2.5 h-2.5 text-[#b69d74]" />
+                      </div>
                     </div>
                     <button 
-                      className="w-8 h-8 pro-flex-center bg-purple-100 hover:bg-purple-200 pro-rounded-lg transition-colors"
+                      className="px-2 py-1 md:px-3 md:py-1 flex items-center justify-center bg-gradient-to-r from-[#b69d74] to-[#b69d74DD] text-white rounded-lg text-xs hover:shadow-lg transition-all duration-300"
                       onClick={(e) => {
                         e.stopPropagation();
                         setFlippedCard(null);
                       }}
                     >
-                      <RotateCcw className="w-4 h-4 text-purple-600" />
+                      ← Back
                     </button>
                   </div>
                   
-                  <h3 className="pro-heading-md text-gray-900 mb-3">Detailed Experience</h3>
-                  <p className="pro-text-sm text-gray-700 mb-6 leading-relaxed">
+                  <h3 className="text-lg md:text-xl font-semibold text-[#1f2839] mb-3">Detailed Experience</h3>
+                  <p className="text-xs md:text-sm text-[#6b7280] mb-4 md:mb-6 leading-relaxed">
                     {testimonial.detailed}
                   </p>
                   
-                  <div className="pro-flex items-center justify-between mb-4">
-                    <div className="pro-flex pro-gap-1">
-                      {renderStars(testimonial.rating)}
-                    </div>
-                    <span className="pro-text-xs px-2 py-1 bg-purple-100 text-purple-700 pro-rounded-lg font-medium">
+                  <div className="flex items-center justify-between mb-3 md:mb-4">
+                    <StarRating rating={testimonial.rating} />
+                    <span className="text-xs px-2 py-1 bg-gradient-to-r from-[#b69d74] to-[#b69d74DD] text-white rounded-lg font-medium">
                       {testimonial.category}
                     </span>
                   </div>
                   
-                  <div className="border-t border-purple-200 pt-4">
-                    <div className="pro-flex items-center justify-between">
+                  <div className="border-t border-[#b69d7440] pt-3 md:pt-4">
+                    <div className="flex items-center justify-between">
                       <div>
-                        <h4 className="pro-heading-sm text-gray-900">{testimonial.name}</h4>
-                        <p className="pro-text-xs text-gray-600">{testimonial.role}</p>
+                        <h4 className="text-sm font-semibold text-[#1f2839]">{testimonial.name}</h4>
+                        <p className="text-xs text-[#6b7280]">{testimonial.role}</p>
                       </div>
                       {testimonial.verified && (
-                        <div className="pro-flex items-center pro-gap-1 pro-text-xs text-green-600 bg-green-50 px-2 py-1 pro-rounded-lg">
-                          <Shield className="w-3 h-3" />
-                          Verified Review
+                        <div className="text-xs text-[#b69d74] bg-[#b69d7410] border border-[#b69d7440] px-2 py-1 rounded-lg font-medium">
+                          ✓ VERIFIED
                         </div>
                       )}
                     </div>
@@ -450,77 +666,8 @@ const Testimonials = () => {
           ))}
         </div>
 
-        {/* CTA Section */}
-        <div className="bg-gradient-to-r from-purple-100 to-blue-100 border border-purple-200 pro-rounded-xl pro-p-8 text-center relative overflow-hidden">
-          <div className="absolute -top-10 -right-10 w-32 h-32 bg-purple-200/30 pro-rounded-full"></div>
-          <div className="absolute -bottom-8 -left-8 w-24 h-24 bg-blue-200/30 pro-rounded-full"></div>
-          
-          <div className="relative z-10">
-            <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-600 pro-rounded-xl pro-flex-center mx-auto mb-6">
-              <Users className="w-8 h-8 text-white" />
-            </div>
-            <h3 className="pro-heading-xl text-gray-900 mb-4">Join Our Community</h3>
-            <p className="pro-text-body text-gray-700 mb-6 max-w-2xl mx-auto">
-              Be part of the growing community of legal professionals who are transforming their practice with AI. 
-              Your success story could be next!
-            </p>
-            <div className="pro-flex flex-wrap justify-center items-center pro-gap-4">
-              <button className="pro-btn pro-btn-primary bg-gradient-to-r from-purple-500 to-blue-600 border-0 hover:from-purple-600 hover:to-blue-700 transform hover:scale-105 transition-all">
-                Start Your Free Trial
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </button>
-              <button className="pro-btn pro-btn-ghost border border-gray-300 hover:border-purple-300">
-                <MessageSquare className="w-5 h-5 mr-2" />
-                Read More Reviews
-              </button>
-            </div>
-            
-            <div className="mt-6 pro-flex flex-wrap justify-center items-center pro-gap-6 pro-text-sm text-gray-600">
-              <div className="pro-flex items-center pro-gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600" />
-                No credit card required
-              </div>
-              <div className="pro-flex items-center pro-gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600" />
-                14-day free trial
-              </div>
-              <div className="pro-flex items-center pro-gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600" />
-                Full feature access
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* CTA Section and Brand Footer removed as requested */}
       </div>
-
-      <style jsx>{`
-        @keyframes blob {
-          0% {
-            transform: translate(0px, 0px) scale(1);
-          }
-          33% {
-            transform: translate(30px, -50px) scale(1.1);
-          }
-          66% {
-            transform: translate(-20px, 20px) scale(0.9);
-          }
-          100% {
-            transform: translate(0px, 0px) scale(1);
-          }
-        }
-        .animate-blob {
-          animation: blob 7s infinite;
-        }
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
-        .bg-grid-pattern {
-          background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(148 163 184 / 0.05)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e");
-        }
-      `}</style>
     </section>
   );
 };

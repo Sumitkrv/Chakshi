@@ -1,20 +1,35 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { FiChevronLeft, FiChevronRight, FiDownload, FiRefreshCw, FiCheck, FiCalendar } from 'react-icons/fi';
 
-export default function Calendar() {
+const Calendar = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [events, setEvents] = useState([
-    { id: 1, title: 'Moot Court Practice', date: new Date(2023, 9, 15), type: 'academic' },
-    { id: 2, title: 'Internship Application Deadline', date: new Date(2023, 9, 20), type: 'career' },
-    { id: 3, title: 'Contract Law Exam', date: new Date(2023, 9, 25), type: 'exam' },
-    { id: 4, title: 'Legal Research Workshop', date: new Date(2023, 9, 18), type: 'academic' },
-  ]);
-
   const [syncStatus, setSyncStatus] = useState('idle');
+  const [isMobile, setIsMobile] = useState(false);
+
+  const events = [
+    { id: 1, title: 'Moot Court Practice', date: new Date(2024, 0, 15), type: 'academic', priority: 'high' },
+    { id: 2, title: 'Internship Application Deadline', date: new Date(2024, 0, 20), type: 'career', priority: 'medium' },
+    { id: 3, title: 'Contract Law Exam', date: new Date(2024, 0, 25), type: 'exam', priority: 'high' },
+    { id: 4, title: 'Legal Research Workshop', date: new Date(2024, 0, 18), type: 'academic', priority: 'low' },
+    { id: 5, title: 'Legal Writing Submission', date: new Date(2024, 0, 22), type: 'academic', priority: 'medium' },
+    { id: 6, title: 'Career Fair', date: new Date(2024, 0, 28), type: 'career', priority: 'medium' },
+    { id: 7, title: 'Supreme Court Hearing Observation', date: new Date(2024, 0, 16), type: 'court', priority: 'high' },
+    { id: 8, title: 'Bar Council Meeting', date: new Date(2024, 0, 19), type: 'professional', priority: 'low' },
+  ];
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
 
   const handleSync = () => {
     setSyncStatus('syncing');
-    // Simulate API call
     setTimeout(() => {
       setSyncStatus('synced');
       setTimeout(() => setSyncStatus('idle'), 2000);
@@ -22,35 +37,62 @@ export default function Calendar() {
   };
 
   const handleExport = () => {
-    // In a real app, this would generate and download a file
-    alert('Exporting calendar events. Please wait...');
+    const calendarData = {
+      events: events.map(event => ({
+        ...event,
+        date: event.date.toISOString()
+      }))
+    };
+    const blob = new Blob([JSON.stringify(calendarData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `legal-calendar-export-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   const getDaysInMonth = (date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    return new Date(year, month + 1, 0).getDate();
+    return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
   };
 
   const getFirstDayOfMonth = (date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    return new Date(year, month, 1).getDay();
+    return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
   };
 
   const navigateMonth = (direction) => {
-    const newDate = new Date(currentDate);
-    newDate.setMonth(currentDate.getMonth() + direction);
-    setCurrentDate(newDate);
+    setCurrentDate(prev => {
+      const newDate = new Date(prev);
+      newDate.setMonth(prev.getMonth() + direction);
+      return newDate;
+    });
   };
 
   const formatDate = (date) => {
     return date.toLocaleDateString('en-US', { 
-      weekday: 'short', 
+      weekday: 'long', 
       year: 'numeric', 
-      month: 'short', 
+      month: 'long', 
       day: 'numeric' 
     });
+  };
+
+  const formatTime = (date) => {
+    return date.toLocaleTimeString('en-US', { 
+      hour: '2-digit', 
+      minute: '2-digit',
+      hour12: true 
+    });
+  };
+
+  const getDaysUntilEvent = (eventDate) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const eventDay = new Date(eventDate);
+    eventDay.setHours(0, 0, 0, 0);
+    const diffTime = eventDay - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
   };
 
   const renderCalendarDays = () => {
@@ -60,7 +102,9 @@ export default function Calendar() {
 
     // Add empty cells for days before the first day of the month
     for (let i = 0; i < firstDay; i++) {
-      days.push(<div key={`empty-${i}`} className="h-12" style={{ border: '1px solid #E5E7EB' }}></div>);
+      days.push(
+        <div key={`empty-${i}`} className="h-24 border border-transparent rounded-lg" />
+      );
     }
 
     // Add cells for each day of the month
@@ -72,42 +116,66 @@ export default function Calendar() {
         event.date.getFullYear() === currentDate.getFullYear()
       );
       
-      const isSelected = selectedDate && 
-        selectedDate.getDate() === day && 
+      const isSelected = selectedDate.getDate() === day && 
         selectedDate.getMonth() === currentDate.getMonth() &&
         selectedDate.getFullYear() === currentDate.getFullYear();
       
-      const dayStyle = {
-        border: `1px solid ${isSelected ? '#1E3A8A' : '#E5E7EB'}`,
-        backgroundColor: isSelected ? '#E8EDF5' : '#fff',
-        transition: 'background-color 0.2s'
-      };
+      const isToday = new Date().getDate() === day && 
+        new Date().getMonth() === currentDate.getMonth() &&
+        new Date().getFullYear() === currentDate.getFullYear();
+
+      const hasHighPriority = dayEvents.some(event => event.priority === 'high');
+
+      const dayClassNames = `
+        h-24 p-2 border rounded-lg transition-all duration-200 cursor-pointer
+        ${isSelected 
+          ? 'border-[#b69d74] bg-[rgba(182,157,116,0.08)] shadow-[0_0_15px_#b69d7440]' 
+          : 'border-[rgba(31,40,57,0.15)] hover:border-[#b69d7450] hover:bg-[rgba(182,157,116,0.05)]'
+        }
+        ${isToday && !isSelected ? 'bg-[rgba(182,157,116,0.05)] border-[#b69d7440]' : ''}
+        ${hasHighPriority ? 'ring-1 ring-[#f59e0b30]' : ''}
+        flex flex-col relative
+      `;
 
       days.push(
         <div 
           key={day} 
-          className="h-12 flex flex-col items-center justify-start p-1 cursor-pointer"
-          style={dayStyle}
+          className={dayClassNames}
           onClick={() => setSelectedDate(date)}
         >
-          <span className={`text-sm ${isSelected ? 'font-bold' : ''}`} style={{ color: isSelected ? '#1E3A8A' : '#333333' }}>
-            {day}
-          </span>
-          <div className="flex justify-center mt-1">
-            {dayEvents.slice(0, 2).map(event => (
+          <div className="flex justify-between items-start">
+            <span className={`
+              text-sm font-medium
+              ${isSelected ? 'text-[#b69d74]' : isToday ? 'text-[#1f2839]' : 'text-[#1f2839]'}
+              ${hasHighPriority ? 'font-bold' : ''}
+            `}>
+              {day}
+            </span>
+            {isToday && (
+              <span className="w-2 h-2 bg-[#b69d74] rounded-full" />
+            )}
+          </div>
+          
+          <div className="mt-1 flex flex-wrap gap-1 justify-center">
+            {dayEvents.slice(0, isMobile ? 2 : 3).map(event => (
               <span 
                 key={event.id} 
-                className="w-2 h-2 rounded-full mx-0.5"
-                style={{
-                  backgroundColor:
-                    event.type === 'exam' ? '#1E3A8A' :
-                    event.type === 'career' ? '#333333' : '#0A2342'
-                }}
-                title={event.title}
-              ></span>
+                className={`
+                  w-2 h-2 rounded-full
+                  ${event.type === 'exam' ? 'bg-[#f59e0b]' :
+                    event.type === 'career' ? 'bg-[#10b981]' : 
+                    event.type === 'court' ? 'bg-[#3b82f6]' :
+                    event.type === 'professional' ? 'bg-[#8b5cf6]' : 'bg-[#b69d74]'
+                  }
+                  ${event.priority === 'high' ? 'ring-1 ring-white ring-offset-1 ring-offset-[#b69d74]' : ''}
+                `}
+                title={`${event.title} (${event.priority} priority)`}
+              />
             ))}
-            {dayEvents.length > 2 && (
-              <span className="text-xs" style={{ color: '#444444' }}>+{dayEvents.length - 2}</span>
+            {dayEvents.length > (isMobile ? 2 : 3) && (
+              <span className="text-xs text-[#6b7280] font-medium">
+                +{dayEvents.length - (isMobile ? 2 : 3)}
+              </span>
             )}
           </div>
         </div>
@@ -118,7 +186,6 @@ export default function Calendar() {
   };
 
   const getEventsForSelectedDate = () => {
-    if (!selectedDate) return [];
     return events.filter(event => 
       event.date.getDate() === selectedDate.getDate() && 
       event.date.getMonth() === selectedDate.getMonth() &&
@@ -126,182 +193,315 @@ export default function Calendar() {
     );
   };
 
+  const getUpcomingEvents = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    return events
+      .filter(event => event.date >= today)
+      .sort((a, b) => a.date - b.date)
+      .slice(0, 5);
+  };
+
+  const getEventTypeColor = (type) => {
+    switch (type) {
+      case 'exam': 
+        return 'bg-[rgba(245,158,11,0.1)] text-[#f59e0b] border-[rgba(245,158,11,0.3)]';
+      case 'career': 
+        return 'bg-[rgba(16,185,129,0.1)] text-[#10b981] border-[rgba(16,185,129,0.3)]';
+      case 'court': 
+        return 'bg-[rgba(59,130,246,0.1)] text-[#3b82f6] border-[rgba(59,130,246,0.3)]';
+      case 'professional': 
+        return 'bg-[rgba(139,92,246,0.1)] text-[#8b5cf6] border-[rgba(139,92,246,0.3)]';
+      case 'academic': 
+        return 'bg-[rgba(182,157,116,0.1)] text-[#b69d74] border-[rgba(182,157,116,0.3)]';
+      default: 
+        return 'bg-[rgba(107,114,128,0.1)] text-[#6b7280] border-[rgba(107,114,128,0.3)]';
+    }
+  };
+
+  const getEventTypeLabel = (type) => {
+    switch (type) {
+      case 'exam': return 'Exam';
+      case 'career': return 'Career';
+      case 'court': return 'Court';
+      case 'professional': return 'Professional';
+      case 'academic': return 'Academic';
+      default: return 'Event';
+    }
+  };
+
+  const getPriorityBadge = (priority) => {
+    switch (priority) {
+      case 'high':
+        return <span className="w-2 h-2 bg-[#f59e0b] rounded-full ml-1" title="High Priority" />;
+      case 'medium':
+        return <span className="w-2 h-2 bg-[#b69d74] rounded-full ml-1" title="Medium Priority" />;
+      case 'low':
+        return <span className="w-2 h-2 bg-[#6b7280] rounded-full ml-1" title="Low Priority" />;
+      default:
+        return null;
+    }
+  };
+
   return (
-    <div className="p-6 max-w-6xl mx-auto bg-white">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold" style={{ color: '#0A2342' }}>Academic Calendar</h2>
-        <div className="flex space-x-2">
-          <button
-            className="px-4 py-2 rounded-lg flex items-center transition-colors"
-            style={{
-              backgroundColor: syncStatus === 'idle' ? '#1E3A8A' : '#0A2342',
-              color: '#fff',
-              fontWeight: 500,
-              border: 'none',
-              boxShadow: 'none'
-            }}
-            onClick={handleSync}
-            disabled={syncStatus === 'syncing'}
-          >
-            {syncStatus === 'syncing' ? (
-              <>
-                {/* Professional minimal spinner */}
-                <svg className="animate-spin mr-2 h-4 w-4" style={{ color: '#fff' }} viewBox="0 0 24 24" fill="none">
-                  <circle cx="12" cy="12" r="10" stroke="#fff" strokeWidth="3" opacity="0.2" />
-                  <path d="M22 12a10 10 0 0 1-10 10" stroke="#fff" strokeWidth="3" />
-                </svg>
-                Synchronizing...
-              </>
-            ) : syncStatus === 'synced' ? (
-              <>
-                {/* Professional check icon */}
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="#fff" strokeWidth="2" viewBox="0 0 24 24">
-                  <polyline points="20 6 10 18 4 12" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-                Synchronized
-              </>
-            ) : (
-              <>
-                {/* Professional sync icon */}
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="#fff" strokeWidth="2" viewBox="0 0 24 24">
-                  <path d="M4 4v5h5M20 20v-5h-5" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M5 9a9 9 0 0 1 14 7" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M19 15a9 9 0 0 1-14-7" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-                Synchronize with Google Calendar
-              </>
-            )}
-          </button>
-          <button
-            className="px-4 py-2 rounded-lg flex items-center transition-colors"
-            style={{
-              backgroundColor: '#fff',
-              color: '#1E3A8A',
-              border: '1px solid #1E3A8A',
-              fontWeight: 500
-            }}
-            onClick={handleExport}
-          >
-            {/* Professional export icon */}
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="#1E3A8A" strokeWidth="2" viewBox="0 0 24 24">
-              <path d="M12 4v12m0 0l-4-4m4 4l4-4" strokeLinecap="round" strokeLinejoin="round" />
-              <rect x="4" y="18" width="16" height="2" rx="1" fill="#1E3A8A" />
-            </svg>
-            Export Events
-          </button>
+    <div className="min-h-screen bg-[#f5f5ef]">
+      {/* Header Section */}
+      <div className="bg-white border-b border-[rgba(31,40,57,0.15)] px-6 lg:px-8 py-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+            <div className="mb-4 lg:mb-0">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-[rgba(182,157,116,0.1)] rounded-lg flex items-center justify-center">
+                  <FiCalendar className="w-5 h-5 text-[#b69d74]" />
+                </div>
+                <div>
+                  <h1 className="text-2xl lg:text-3xl font-bold text-[#1f2839]">Legal Academic Calendar</h1>
+                  <p className="text-[#6b7280] mt-1">Sync your personal, institutional & legal ecosystem timelines</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex flex-wrap gap-3">
+              <button
+                onClick={handleSync}
+                disabled={syncStatus === 'syncing'}
+                className={`
+                  flex items-center px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200
+                  bg-gradient-to-r from-[#b69d74] to-[#b69d74DD] hover:from-[#b69d74DD] hover:to-[#b69d74BB]
+                  text-white shadow-sm hover:shadow-md
+                  ${syncStatus === 'syncing' ? 'cursor-not-allowed opacity-90' : ''}
+                  ${syncStatus === 'synced' ? 'bg-[#10b981] hover:bg-[#10b981DD]' : ''}
+                `}
+              >
+                {syncStatus === 'syncing' ? (
+                  <>
+                    <FiRefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                    Syncing...
+                  </>
+                ) : syncStatus === 'synced' ? (
+                  <>
+                    <FiCheck className="w-4 h-4 mr-2" />
+                    Synced
+                  </>
+                ) : (
+                  <>
+                    <FiRefreshCw className="w-4 h-4 mr-2" />
+                    Sync Calendar
+                  </>
+                )}
+              </button>
+              
+              <button
+                onClick={handleExport}
+                className="flex items-center px-4 py-2 rounded-lg font-medium text-sm 
+                         bg-white text-[#1f2839] border border-[rgba(31,40,57,0.15)] 
+                         hover:bg-[rgba(255,255,255,0.8)] shadow-sm transition-all duration-200
+                         hover:border-[#b69d7450]"
+              >
+                <FiDownload className="w-4 h-4 mr-2" />
+                Export
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Calendar View */}
-        <div className="lg:col-span-2 rounded-2xl shadow p-6" style={{ background: '#fff', border: '1px solid #E5E7EB' }}>
-          <div className="flex justify-between items-center mb-4">
-            <button
-              onClick={() => navigateMonth(-1)}
-              className="p-2 rounded-full"
-              style={{ background: '#F3F4F6', color: '#1E3A8A' }}
-            >
-              {/* Professional left arrow */}
-              <svg className="w-5 h-5" fill="none" stroke="#1E3A8A" strokeWidth="2" viewBox="0 0 24 24">
-                <polyline points="15 19 8 12 15 5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-            <h3 className="text-xl font-semibold" style={{ color: '#0A2342' }}>
-              {currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-            </h3>
-            <button
-              onClick={() => navigateMonth(1)}
-              className="p-2 rounded-full"
-              style={{ background: '#F3F4F6', color: '#1E3A8A' }}
-            >
-              {/* Professional right arrow */}
-              <svg className="w-5 h-5" fill="none" stroke="#1E3A8A" strokeWidth="2" viewBox="0 0 24 24">
-                <polyline points="9 5 16 12 9 19" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-          </div>
+      {/* Main Content */}
+      <div className="px-6 lg:px-8 py-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            {/* Calendar Section - 2/3 width on large screens */}
+            <div className="lg:col-span-2">
+              <div className="bg-white rounded-xl border border-[rgba(31,40,57,0.15)] shadow-sm p-6">
+                {/* Calendar Header */}
+                <div className="flex items-center justify-between mb-6">
+                  <button
+                    onClick={() => navigateMonth(-1)}
+                    className="p-2 rounded-lg bg-[rgba(182,157,116,0.08)] hover:bg-[rgba(182,157,116,0.15)] transition-colors group"
+                  >
+                    <FiChevronLeft className="w-5 h-5 text-[#1f2839] group-hover:text-[#b69d74]" />
+                  </button>
+                  
+                  <h2 className="text-xl font-semibold text-[#1f2839]">
+                    {currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                  </h2>
+                  
+                  <button
+                    onClick={() => navigateMonth(1)}
+                    className="p-2 rounded-lg bg-[rgba(182,157,116,0.08)] hover:bg-[rgba(182,157,116,0.15)] transition-colors group"
+                  >
+                    <FiChevronRight className="w-5 h-5 text-[#1f2839] group-hover:text-[#b69d74]" />
+                  </button>
+                </div>
 
-          <div className="grid grid-cols-7 gap-1 mb-2">
-            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-              <div key={day} className="text-center text-sm font-medium py-2" style={{ color: '#444444' }}>
-                {day}
+                {/* Week Days Header */}
+                <div className="grid grid-cols-7 gap-2 mb-3">
+                  {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                    <div key={day} className="text-center text-sm font-medium text-[#6b7280] py-2">
+                      {day}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Calendar Grid */}
+                <div className="grid grid-cols-7 gap-2">
+                  {renderCalendarDays()}
+                </div>
+
+                {/* Legend */}
+                <div className="mt-6 pt-4 border-t border-[rgba(31,40,57,0.15)]">
+                  <div className="flex flex-wrap gap-4 text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="w-3 h-3 bg-[#b69d74] rounded-full"></span>
+                      <span className="text-[#6b7280]">Academic</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="w-3 h-3 bg-[#f59e0b] rounded-full"></span>
+                      <span className="text-[#6b7280]">Exam</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="w-3 h-3 bg-[#10b981] rounded-full"></span>
+                      <span className="text-[#6b7280]">Career</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="w-3 h-3 bg-[#3b82f6] rounded-full"></span>
+                      <span className="text-[#6b7280]">Court</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="w-3 h-3 bg-[#8b5cf6] rounded-full"></span>
+                      <span className="text-[#6b7280]">Professional</span>
+                    </div>
+                  </div>
+                </div>
               </div>
-            ))}
-          </div>
+            </div>
 
-          <div className="grid grid-cols-7">
-            {renderCalendarDays()}
-          </div>
-        </div>
+            {/* Events Sidebar - 1/3 width on large screens */}
+            <div className="space-y-6">
+              
+              {/* Selected Date Events */}
+              <div className="bg-white rounded-xl border border-[rgba(31,40,57,0.15)] shadow-sm p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-semibold text-lg text-[#1f2839]">
+                    {formatDate(selectedDate)}
+                  </h3>
+                  {getEventsForSelectedDate().some(event => event.priority === 'high') && (
+                    <span className="text-xs bg-[rgba(245,158,11,0.1)] text-[#f59e0b] px-2 py-1 rounded-full border border-[rgba(245,158,11,0.3)]">
+                      High Priority
+                    </span>
+                  )}
+                </div>
 
-        {/* Events Panel */}
-        <div className="space-y-6">
-          {/* Selected Date Events */}
-          <div className="rounded-2xl shadow p-6" style={{ background: '#fff', border: '1px solid #E5E7EB' }}>
-            <h3 className="font-semibold mb-4 text-lg" style={{ color: '#0A2342' }}>
-              {selectedDate ? formatDate(selectedDate) : 'Please select a date'}
-            </h3>
-
-            {getEventsForSelectedDate().length > 0 ? (
-              <ul className="space-y-3">
-                {getEventsForSelectedDate().map(event => (
-                  <li key={event.id} className="flex items-start">
-                    <span className="w-2 h-2 rounded-full mt-2 mr-3 flex-shrink-0"
-                      style={{
-                        background:
-                          event.type === 'exam'
-                            ? '#1E3A8A'
-                            : event.type === 'career'
-                            ? '#333333'
-                            : '#0A2342'
-                      }}
-                    ></span>
-                    <div>
-                      <p className="font-medium" style={{ color: '#333333' }}>{event.title}</p>
-                      <p className="text-sm" style={{ color: '#444444' }}>
-                        {event.date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </p>
+                <div className="space-y-3">
+                  {getEventsForSelectedDate().length > 0 ? (
+                    getEventsForSelectedDate().map(event => (
+                      <div 
+                        key={event.id} 
+                        className="p-3 rounded-lg border border-[rgba(31,40,57,0.15)] bg-[rgba(255,255,255,0.03)] hover:bg-[rgba(182,157,116,0.05)] transition-colors group"
+                      >
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="flex items-center gap-2">
+                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${getEventTypeColor(event.type)}`}>
+                              {getEventTypeLabel(event.type)}
+                            </span>
+                            {getPriorityBadge(event.priority)}
+                          </div>
+                          <span className="text-sm text-[#6b7280] font-medium">
+                            {formatTime(event.date)}
+                          </span>
+                        </div>
+                        <p className="font-medium text-[#1f2839] text-sm mb-1">{event.title}</p>
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-[#6b7280]">
+                            {event.date.toLocaleDateString('en-US', { weekday: 'long' })}
+                          </span>
+                          {event.priority === 'high' && (
+                            <span className="text-xs text-[#f59e0b] font-medium">Urgent</span>
+                          )}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-6">
+                      <div className="w-12 h-12 bg-[rgba(182,157,116,0.08)] rounded-full flex items-center justify-center mx-auto mb-3">
+                        <FiCalendar className="w-6 h-6 text-[#b69d74]" />
+                      </div>
+                      <p className="text-[#6b7280] text-sm">No events scheduled for this date</p>
+                      <p className="text-[#6b7280] text-xs mt-1">Perfect time for focused study</p>
                     </div>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-sm" style={{ color: '#444444' }}>There are no scheduled events for this date.</p>
-            )}
-          </div>
+                  )}
+                </div>
+              </div>
 
-          {/* Upcoming Events */}
-          <div className="rounded-2xl shadow p-6" style={{ background: '#fff', border: '1px solid #E5E7EB' }}>
-            <h3 className="font-semibold mb-4 text-lg" style={{ color: '#0A2342' }}>Upcoming Events</h3>
-            <ul className="space-y-4">
-              {events
-                .filter(event => event.date > new Date())
-                .sort((a, b) => a.date - b.date)
-                .slice(0, 3)
-                .map(event => (
-                  <li key={event.id} className="flex items-start">
-                    <div className="w-2 h-2 rounded-full mt-2 mr-3 flex-shrink-0"
-                      style={{
-                        background:
-                          event.type === 'exam'
-                            ? '#1E3A8A'
-                            : event.type === 'career'
-                            ? '#333333'
-                            : '#0A2342'
-                      }}
-                    ></div>
-                    <div>
-                      <p className="font-medium" style={{ color: '#333333' }}>{event.title}</p>
-                      <p className="text-sm" style={{ color: '#444444' }}>
-                        {event.date.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })}
-                      </p>
+              {/* Upcoming Events */}
+              <div className="bg-white rounded-xl border border-[rgba(31,40,57,0.15)] shadow-sm p-6">
+                <h3 className="font-semibold text-lg text-[#1f2839] mb-4">Upcoming Events</h3>
+                
+                <div className="space-y-3">
+                  {getUpcomingEvents().length > 0 ? (
+                    getUpcomingEvents().map(event => {
+                      const daysUntil = getDaysUntilEvent(event.date);
+                      return (
+                        <div 
+                          key={event.id} 
+                          className="p-3 rounded-lg border border-[rgba(31,40,57,0.15)] hover:bg-[rgba(182,157,116,0.05)] transition-colors group"
+                        >
+                          <div className="flex justify-between items-start mb-1">
+                            <div className="flex items-center gap-2">
+                              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${getEventTypeColor(event.type)}`}>
+                                {getEventTypeLabel(event.type)}
+                              </span>
+                              {getPriorityBadge(event.priority)}
+                            </div>
+                            <span className="text-xs text-[#6b7280]">
+                              {event.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            </span>
+                          </div>
+                          <p className="font-medium text-[#1f2839] text-sm mb-1">{event.title}</p>
+                          <div className="flex justify-between items-center">
+                            <p className="text-xs text-[#6b7280]">
+                              {event.date.toLocaleDateString('en-US', { weekday: 'short' })} • {formatTime(event.date)}
+                            </p>
+                            <span className={`text-xs font-medium ${
+                              daysUntil === 0 ? 'text-[#f59e0b]' : 
+                              daysUntil <= 3 ? 'text-[#b69d74]' : 'text-[#6b7280]'
+                            }`}>
+                              {daysUntil === 0 ? 'Today' : daysUntil === 1 ? 'Tomorrow' : `in ${daysUntil}d`}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <div className="text-center py-4">
+                      <p className="text-[#6b7280] text-sm">No upcoming events scheduled</p>
                     </div>
-                  </li>
-                ))}
-            </ul>
+                  )}
+                </div>
+              </div>
+
+              {/* Quick Stats */}
+              <div className="bg-white rounded-xl border border-[rgba(31,40,57,0.15)] shadow-sm p-6">
+                <h3 className="font-semibold text-lg text-[#1f2839] mb-4">This Week</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center p-3 bg-[rgba(182,157,116,0.05)] rounded-lg">
+                    <div className="text-2xl font-bold text-[#b69d74]">3</div>
+                    <div className="text-xs text-[#6b7280]">Academic Events</div>
+                  </div>
+                  <div className="text-center p-3 bg-[rgba(245,158,11,0.05)] rounded-lg">
+                    <div className="text-2xl font-bold text-[#f59e0b]">1</div>
+                    <div className="text-xs text-[#6b7280]">High Priority</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default Calendar;
