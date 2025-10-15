@@ -161,24 +161,19 @@ const Login = () => {
       }
 
       const userProfile = backendResponse.data.user;
+      const backendToken = userProfile.token; // Extract backend JWT from user profile
+
+      if (!backendToken) {
+        throw new Error('Backend token not received after successful login.');
+      }
 
       // Ensure the role from the backend matches the selected role in the form
       if (userProfile.role.toLowerCase() !== formData.role) {
-        // This scenario might require specific handling, e.g., redirecting to a role selection page
-        // or showing an error that the selected role doesn't match the registered role.
-        // For now, we'll throw an error.
         throw new Error(`Role mismatch: You are registered as ${userProfile.role}, but tried to log in as ${formData.role}.`);
       }
       
-      if (!backendResponse.success) {
-        throw new Error(backendResponse.message || 'Backend login failed.');
-      }
-
-      const userData = backendResponse.data.user;
-      const backendToken = supabaseAccessToken; // Use Supabase token for frontend session
-
-      // Store user data in context and localStorage
-      login({ ...userProfile, token: supabaseToken });
+      // Store user data and backend token in context and localStorage
+      login(userProfile, backendToken);
       
       // Get the selected role's route
       const selectedRole = roles.find(role => role.id === formData.role);

@@ -139,14 +139,16 @@ const Register = () => {
     setRoleError('');
     setLoading(true);
     
+    console.log('Register handleSubmit triggered');
     if (!validateForm()) {
+      console.log('Form validation failed.');
       setLoading(false);
       return;
     }
+    console.log('Form validation passed. Attempting Supabase signUp...');
 
     try {
       // 1. Register user with Supabase
-      // 1. Sign up with Supabase
       const { data, error: supabaseError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -159,54 +161,56 @@ const Register = () => {
       });
 
       if (supabaseError) {
+        console.error('Supabase signUp error:', supabaseError);
         throw new Error(supabaseError.message);
       }
+      console.log('Supabase signUp response data:', data);
 
-      // Supabase signUp might not immediately return a session if email confirmation is required.
-      // For simplicity, we'll assume a session is immediately available or handle the confirmation flow.
-      // If email confirmation is enabled, the user will need to verify their email before logging in.
-      // For this task, we'll proceed as if the session is available.
       if (!data || !data.session || !data.session.access_token) {
         // If no session, it might mean email confirmation is pending.
-        // We can still proceed to call our backend if the user object is returned,
-        // but the token might not be valid for authenticated calls yet.
-        // For now, we'll assume a session is needed for immediate login.
-        throw new Error('Supabase registration successful, but no active session. Please check your email for verification.');
+        // The user will need to verify their email before logging in.
+        // For this task, we'll assume a session is needed for immediate login.
+        console.warn('Supabase registration successful, but no active session. Email confirmation might be pending.');
+        setError('Registration successful! Please check your email to verify your account and then log in.');
+        setLoading(false);
+        return; // Exit early, do not proceed to backend login if no session
       }
 
       const supabaseToken = data.session.access_token;
+      console.log('Supabase access token obtained:', supabaseToken);
 
       // 2. Send Supabase JWT to our backend for local user creation/update
-      // The backend /auth/login endpoint handles both login and initial registration in our local DB
+      console.log('Calling backendLoginUser with Supabase token...');
       const backendResponse = await backendLoginUser(supabaseToken);
+      console.log('Backend login response:', backendResponse);
 
       if (!backendResponse.success) {
         throw new Error(backendResponse.message || 'Backend registration/login failed.');
       }
 
       const userProfile = backendResponse.data.user;
+      const backendToken = userProfile.token; // Extract backend JWT from user profile
+
+      if (!backendToken) {
+        throw new Error('Backend token not received after successful registration.');
+      }
+      console.log('Backend token received:', backendToken);
 
       // Ensure the role from the backend matches the selected role in the form
       if (userProfile.role.toLowerCase() !== formData.role) {
         throw new Error(`Role mismatch: You are registered as ${userProfile.role}, but tried to register as ${formData.role}.`);
       }
       
-      if (!backendResponse.success) {
-        throw new Error(backendResponse.message || 'Backend registration/login failed.');
-      }
-
-      const userData = backendResponse.data.user;
-      const backendToken = supabaseAccessToken; // Use Supabase token for frontend session
-
-      // Store user data in context and localStorage
-      login({ ...userProfile, token: supabaseToken });
+      // Store user data and backend token in context and localStorage
+      login(userProfile, backendToken);
+      console.log('User logged in to AuthContext and redirected.');
       
       // Get the selected role's route
       const selectedRole = roles.find(role => role.id === formData.role);
       navigate(selectedRole.route);
       
     } catch (err) {
-      console.error('Registration failed:', err);
+      console.error('Registration failed in catch block:', err);
       setError(err.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
