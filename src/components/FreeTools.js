@@ -1,291 +1,81 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import { getTemplateCategories, getTemplates } from '../lib/api';
 
 const FreeTools = () => {
-  const freeTools = [
-    {
-      id: 1,
-      title: "RTI Application Generator",
-      label: "Information Rights",
-      description: "Create comprehensive Right to Information applications with automated legal formatting and government compliance checks.",
-      category: "Government",
-      isNew: false,
-      isFeatured: true,
-      popularity: 95,
-      timeEstimate: "8-12 min",
-      uses: 15680,
-      difficulty: "Beginner",
-      successRate: 98,
-      rating: 4.9,
-      lastUpdated: "2024-09-15",
-      premium: false,
-      tags: ["Information", "Government", "Transparency", "RTI"],
-      features: [
-        "Auto-fill government details",
-        "Legal compliance verification",
-        "Multiple format exports",
-        "Application tracking support"
-      ]
-    },
-    {
-      id: 2,
-      title: "Police Complaint Builder",
-      label: "Crime Reporting",
-      description: "Generate legally sound police complaints with proper formatting, evidence attachment guidelines, and follow-up procedures.",
-      category: "Criminal",
-      isNew: true,
-      isFeatured: false,
-      popularity: 89,
-      timeEstimate: "12-18 min",
-      uses: 12340,
-      difficulty: "Intermediate",
-      successRate: 94,
-      rating: 4.7,
-      lastUpdated: "2024-09-20",
-      premium: false,
-      tags: ["Crime", "Police", "Complaint", "Evidence"],
-      features: [
-        "Evidence checklist included",
-        "Station locator integration",
-        "Legal procedure guidance",
-        "Progress tracking system"
-      ]
-    },
-    {
-      id: 3,
-      title: "Consumer Court Assistant",
-      label: "Consumer Rights",
-      description: "Draft comprehensive consumer complaints with automated damage calculations, legal precedent references, and court filing guidance.",
-      category: "Consumer",
-      isNew: false,
-      isFeatured: true,
-      popularity: 93,
-      timeEstimate: "15-25 min",
-      uses: 18920,
-      difficulty: "Intermediate",
-      successRate: 96,
-      rating: 4.8,
-      lastUpdated: "2024-09-10",
-      premium: false,
-      tags: ["Consumer Rights", "Products", "Services", "Redressal"],
-      features: [
-        "Damage calculator built-in",
-        "Legal precedent database",
-        "Court fee calculator",
-        "Filing procedure guide"
-      ]
-    },
-    {
-      id: 4,
-      title: "Smart Rental Agreement",
-      label: "Property Law",
-      description: "Create legally compliant rental agreements with city-specific clauses, automatic rent calculations, and tenant protection features.",
-      category: "Property",
-      isNew: false,
-      isFeatured: true,
-      popularity: 97,
-      timeEstimate: "20-30 min",
-      uses: 28760,
-      difficulty: "Advanced",
-      successRate: 99,
-      rating: 4.9,
-      lastUpdated: "2024-09-18",
-      premium: false,
-      tags: ["Property", "Rental", "Agreement", "Tenancy"],
-      features: [
-        "City-specific legal clauses",
-        "Rent escalation calculator",
-        "Security deposit tracker",
-        "Digital signature support"
-      ]
-    },
-    {
-      id: 5,
-      title: "Will & Testament Creator",
-      label: "Estate Planning",
-      description: "Design comprehensive wills with asset distribution planning, executor guidelines, and legal validity verification across states.",
-      category: "Personal",
-      isNew: true,
-      isFeatured: false,
-      popularity: 86,
-      timeEstimate: "25-40 min",
-      uses: 9840,
-      difficulty: "Advanced",
-      successRate: 97,
-      rating: 4.6,
-      lastUpdated: "2024-09-22",
-      premium: true,
-      tags: ["Will", "Assets", "Testament", "Inheritance"],
-      features: [
-        "Asset valuation guide",
-        "State law compliance",
-        "Executor responsibilities",
-        "Legal witness requirements"
-      ]
-    },
-    {
-      id: 6,
-      title: "Legal Notice Generator",
-      label: "Legal Notices",
-      description: "Draft formal legal notices with appropriate legal language, response timelines, and escalation procedures for various situations.",
-      category: "Civil",
-      isNew: false,
-      isFeatured: false,
-      popularity: 91,
-      timeEstimate: "10-20 min",
-      uses: 16420,
-      difficulty: "Intermediate",
-      successRate: 95,
-      rating: 4.7,
-      lastUpdated: "2024-09-12",
-      premium: false,
-      tags: ["Notice", "Legal", "Court", "Civil"],
-      features: [
-        "Multiple notice types",
-        "Timeline calculators",
-        "Legal language database",
-        "Delivery proof guidance"
-      ]
-    },
-    {
-      id: 7,
-      title: "FIR Copy Application",
-      label: "Police Records",
-      description: "Generate applications for certified FIR copies with proper documentation requirements and police station procedures.",
-      category: "Criminal",
-      isNew: false,
-      isFeatured: false,
-      popularity: 84,
-      timeEstimate: "5-10 min",
-      uses: 11250,
-      difficulty: "Beginner",
-      successRate: 99,
-      rating: 4.8,
-      lastUpdated: "2024-09-08",
-      premium: false,
-      tags: ["FIR", "Police", "Copy", "Documentation"],
-      features: [
-        "Station contact details",
-        "Required documents list",
-        "Fee calculation guide",
-        "Processing timeline"
-      ]
-    },
-    {
-      id: 8,
-      title: "Property Due Diligence Kit",
-      label: "Property Verification",
-      description: "Comprehensive property verification toolkit with document checklists, legal compliance checks, and investment risk assessment.",
-      category: "Property",
-      isNew: true,
-      isFeatured: true,
-      popularity: 90,
-      timeEstimate: "30-45 min",
-      uses: 14870,
-      difficulty: "Advanced",
-      successRate: 93,
-      rating: 4.8,
-      lastUpdated: "2024-09-21",
-      premium: true,
-      tags: ["Property", "Verification", "Documents", "Investment"],
-      features: [
-        "Document verification matrix",
-        "Legal compliance scanner",
-        "Risk assessment calculator",
-        "Investment analysis tools"
-      ]
-    },
-    {
-      id: 9,
-      title: "Employment Contract Builder",
-      label: "Employment Law",
-      description: "Create comprehensive employment contracts with role-specific clauses, compliance checks, and industry standard terms.",
-      category: "Corporate",
-      isNew: true,
-      isFeatured: false,
-      popularity: 88,
-      timeEstimate: "15-25 min",
-      uses: 7340,
-      difficulty: "Intermediate",
-      successRate: 96,
-      rating: 4.7,
-      lastUpdated: "2024-09-19",
-      premium: false,
-      tags: ["Employment", "Contract", "HR", "Compliance"],
-      features: [
-        "Role-based templates",
-        "Salary structure guide",
-        "Compliance verification",
-        "Digital signature ready"
-      ]
-    },
-    {
-      id: 10,
-      title: "Startup Legal Essentials",
-      label: "Business Formation",
-      description: "Complete legal documentation package for startups including incorporation papers, founder agreements, and compliance guides.",
-      category: "Corporate",
-      isNew: false,
-      isFeatured: true,
-      popularity: 92,
-      timeEstimate: "45-60 min",
-      uses: 5670,
-      difficulty: "Advanced",
-      successRate: 94,
-      rating: 4.9,
-      lastUpdated: "2024-09-17",
-      premium: true,
-      tags: ["Startup", "Incorporation", "Founders", "Compliance"],
-      features: [
-        "Complete incorporation kit",
-        "Founder equity calculator",
-        "Compliance calendar",
-        "Investor agreement templates"
-      ]
-    }
-  ];
-
-  const categories = [
-    "All", 
-    "Government", 
-    "Criminal", 
-    "Consumer", 
-    "Property", 
-    "Personal", 
-    "Civil", 
-    "Corporate"
-  ];
+  const { user, loading: authLoading } = useAuth();
+  const [templates, setTemplates] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("default");
-  const [viewMode, setViewMode] = useState("grid");
+  const [viewMode, setViewMode] = useState("grid"); // This state is not used in the current JSX, but kept for potential future use.
   const [selectedTool, setSelectedTool] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showOnlyFree, setShowOnlyFree] = useState(false);
-  const [bookmarkedTools, setBookmarkedTools] = useState([]);
+  const [bookmarkedTools, setBookmarkedTools] = useState([]); // This state is not used in the current JSX, but kept for potential future use.
   const [showGeneratorForm, setShowGeneratorForm] = useState(false);
   const [formData, setFormData] = useState({});
   const [generatedDocument, setGeneratedDocument] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      if (authLoading) return; // Wait for auth to load
+
+      if (!user || !user.token) {
+        setError("Authentication required to fetch templates.");
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
+      try {
+        const [categoriesResponse, templatesResponse] = await Promise.all([
+          getTemplateCategories(user.token),
+          getTemplates(user.token, {
+            categoryId: selectedCategory === "All" ? undefined : selectedCategory,
+            isFree: showOnlyFree ? true : undefined,
+            // Add other filters here if needed
+          }),
+        ]);
+
+        setCategories([{ id: "All", name: "All", slug: "all" }, ...categoriesResponse.data.categories]);
+        setTemplates(templatesResponse.data.templates);
+      } catch (err) {
+        console.error("Failed to fetch initial data:", err);
+        setError("Failed to load templates and categories. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInitialData();
+  }, [user, authLoading, selectedCategory, showOnlyFree]); // Re-fetch when user, authLoading, selectedCategory, or showOnlyFree changes
+
   // Filter tools based on category, search query, and additional filters
-  const filteredTools = freeTools
+  const filteredTools = templates
     .filter(tool => {
-      const categoryMatch = selectedCategory === "All" || tool.category === selectedCategory;
+      const categoryMatch = selectedCategory === "All" || tool.categoryId === selectedCategory;
       const searchMatch = tool.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        tool.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        tool.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-      const freeMatch = !showOnlyFree || !tool.premium;
+        (tool.description && tool.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (tool.tags && tool.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())));
+      const freeMatch = !showOnlyFree || tool.isFree;
       
       return categoryMatch && searchMatch && freeMatch;
     })
     .sort((a, b) => {
-      if (sortBy === "popularity") return b.popularity - a.popularity;
+      // The API response doesn't directly provide 'popularity' or 'uses' as in the hardcoded data.
+      // We'll use 'rating' and 'createdAt' for sorting.
+      if (sortBy === "rating") return (b.rating || 0) - (a.rating || 0);
       if (sortBy === "name") return a.title.localeCompare(b.title);
-      if (sortBy === "uses") return b.uses - a.uses;
-      if (sortBy === "rating") return b.rating - a.rating;
-      if (sortBy === "newest") return new Date(b.lastUpdated) - new Date(a.lastUpdated);
-      return 0;
+      if (sortBy === "newest") return new Date(b.createdAt) - new Date(a.createdAt);
+      // Default sort could be by title or creation date if no specific sort is chosen
+      return a.title.localeCompare(b.title);
     });
 
   const clearAllFilters = () => {
@@ -299,42 +89,48 @@ const FreeTools = () => {
   const generateDocument = async (toolId, userData) => {
     setIsGenerating(true);
     try {
-      const tool = freeTools.find(t => t.id === toolId);
+      const tool = templates.find(t => t.id === toolId);
+      if (!tool) {
+        throw new Error("Template not found for generation.");
+      }
       let generatedContent = '';
       
-      switch (toolId) {
-        case 1: // RTI Application
+      // The switch cases here are based on the hardcoded tool IDs.
+      // In a real-world scenario, you might have a more dynamic way to determine
+      // which generator function to call based on the template's properties or a backend service.
+      switch (tool.title) { // Using title as a proxy for the hardcoded tool types
+        case "RTI Application Generator":
           generatedContent = generateRTIApplication(userData);
           break;
-        case 2: // Police Complaint
+        case "Police Complaint Builder":
           generatedContent = generatePoliceComplaint(userData);
           break;
-        case 3: // Consumer Court Assistant
+        case "Consumer Court Assistant":
           generatedContent = generateConsumerComplaint(userData);
           break;
-        case 4: // Rental Agreement
+        case "Smart Rental Agreement":
           generatedContent = generateRentalAgreement(userData);
           break;
-        case 5: // Will & Testament
+        case "Will & Testament Creator":
           generatedContent = generateWillTestament(userData);
           break;
-        case 6: // Legal Notice
+        case "Legal Notice Generator":
           generatedContent = generateLegalNotice(userData);
           break;
-        case 7: // FIR Copy Application
+        case "FIR Copy Application":
           generatedContent = generateFIRCopyApplication(userData);
           break;
-        case 8: // Property Due Diligence
+        case "Property Due Diligence Kit":
           generatedContent = generatePropertyDueDiligence(userData);
           break;
-        case 9: // Employment Contract
+        case "Employment Contract Builder":
           generatedContent = generateEmploymentContract(userData);
           break;
-        case 10: // Startup Legal Essentials
+        case "Startup Legal Essentials":
           generatedContent = generateStartupDocuments(userData);
           break;
         default:
-          generatedContent = 'Template not available for this tool.';
+          generatedContent = tool.content || 'Template not available for this tool.'; // Use API content if no specific generator
       }
       
       setGeneratedDocument({
@@ -1158,7 +954,7 @@ Generated on: ${new Date().toLocaleString()}
     setIsModalOpen(false);
   };
 
-  const renderFormFields = (toolId) => {
+  const renderFormFields = (toolTitle) => {
     const commonStyles = {
       input: "w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
       textarea: "w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[100px]",
@@ -1166,8 +962,8 @@ Generated on: ${new Date().toLocaleString()}
       section: "mb-6 p-4 bg-gray-50 rounded-lg"
     };
 
-    switch (toolId) {
-      case 1: // RTI Application
+    switch (toolTitle) {
+      case "RTI Application Generator":
         return (
           <div className="space-y-6">
             <div className={commonStyles.section}>
@@ -1305,7 +1101,7 @@ Generated on: ${new Date().toLocaleString()}
           </div>
         );
 
-      case 2: // Police Complaint
+      case "Police Complaint Builder":
         return (
           <div className="space-y-6">
             <div className={commonStyles.section}>
@@ -1408,7 +1204,7 @@ Generated on: ${new Date().toLocaleString()}
           </div>
         );
 
-      case 3: // Consumer Court Assistant
+      case "Consumer Court Assistant":
         return (
           <div className="space-y-6">
             <div className={commonStyles.section}>
@@ -1570,7 +1366,7 @@ Generated on: ${new Date().toLocaleString()}
           </div>
         );
 
-      case 4: // Rental Agreement
+      case "Smart Rental Agreement":
         return (
           <div className="space-y-6">
             <div className={commonStyles.section}>
@@ -1710,7 +1506,7 @@ Generated on: ${new Date().toLocaleString()}
           </div>
         );
 
-      case 5: // Will & Testament
+      case "Will & Testament Creator":
         return (
           <div className="space-y-6">
             <div className={commonStyles.section}>
@@ -1961,7 +1757,7 @@ Generated on: ${new Date().toLocaleString()}
           </div>
         );
 
-      case 6: // Legal Notice
+      case "Legal Notice Generator":
         return (
           <div className="space-y-6">
             <div className={commonStyles.section}>
@@ -2114,7 +1910,7 @@ Generated on: ${new Date().toLocaleString()}
           </div>
         );
 
-      case 7: // FIR Copy Application
+      case "FIR Copy Application":
         return (
           <div className="space-y-6">
             <div className={commonStyles.section}>
@@ -2287,7 +2083,7 @@ Generated on: ${new Date().toLocaleString()}
           </div>
         );
 
-      case 8: // Property Due Diligence
+      case "Property Due Diligence Kit":
         return (
           <div className="space-y-6">
             <div className={commonStyles.section}>
@@ -2472,7 +2268,7 @@ Generated on: ${new Date().toLocaleString()}
           </div>
         );
 
-      case 9: // Employment Contract
+      case "Employment Contract Builder":
         return (
           <div className="space-y-6">
             <div className={commonStyles.section}>
@@ -2688,7 +2484,7 @@ Generated on: ${new Date().toLocaleString()}
           </div>
         );
 
-      case 10: // Startup Legal Essentials
+      case "Startup Legal Essentials":
         return (
           <div className="space-y-6">
             <div className={commonStyles.section}>
@@ -2769,96 +2565,34 @@ Generated on: ${new Date().toLocaleString()}
 
             <div className={commonStyles.section}>
               <h4 className="text-lg font-semibold mb-4" style={{ color: '#1f2839' }}>Founder Information</h4>
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className={commonStyles.label}>Founder 1 Name *</label>
-                    <input 
-                      className={commonStyles.input}
-                      value={formData.founder1Name || ''} 
-                      onChange={(e) => setFormData({...formData, founder1Name: e.target.value})}
-                      placeholder="Enter founder 1 name"
-                    />
-                  </div>
-                  <div>
-                    <label className={commonStyles.label}>Equity %</label>
-                    <input 
-                      className={commonStyles.input}
-                      type="number"
-                      value={formData.founder1Equity || ''} 
-                      onChange={(e) => setFormData({...formData, founder1Equity: e.target.value})}
-                      placeholder="Enter equity percentage"
-                    />
-                  </div>
-                  <div>
-                    <label className={commonStyles.label}>Role</label>
-                    <input 
-                      className={commonStyles.input}
-                      value={formData.founder1Role || ''} 
-                      onChange={(e) => setFormData({...formData, founder1Role: e.target.value})}
-                      placeholder="Enter role/designation"
-                    />
-                  </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className={commonStyles.label}>Founder 1 Name *</label>
+                  <input 
+                    className={commonStyles.input}
+                    value={formData.founder1Name || ''} 
+                    onChange={(e) => setFormData({...formData, founder1Name: e.target.value})}
+                    placeholder="Enter founder 1 name"
+                  />
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className={commonStyles.label}>Founder 2 Name</label>
-                    <input 
-                      className={commonStyles.input}
-                      value={formData.founder2Name || ''} 
-                      onChange={(e) => setFormData({...formData, founder2Name: e.target.value})}
-                      placeholder="Enter founder 2 name"
-                    />
-                  </div>
-                  <div>
-                    <label className={commonStyles.label}>Equity %</label>
-                    <input 
-                      className={commonStyles.input}
-                      type="number"
-                      value={formData.founder2Equity || ''} 
-                      onChange={(e) => setFormData({...formData, founder2Equity: e.target.value})}
-                      placeholder="Enter equity percentage"
-                    />
-                  </div>
-                  <div>
-                    <label className={commonStyles.label}>Role</label>
-                    <input 
-                      className={commonStyles.input}
-                      value={formData.founder2Role || ''} 
-                      onChange={(e) => setFormData({...formData, founder2Role: e.target.value})}
-                      placeholder="Enter role/designation"
-                    />
-                  </div>
+                <div>
+                  <label className={commonStyles.label}>Equity %</label>
+                  <input 
+                    className={commonStyles.input}
+                    type="number"
+                    value={formData.founder1Equity || ''} 
+                    onChange={(e) => setFormData({...formData, founder1Equity: e.target.value})}
+                    placeholder="Enter equity percentage"
+                  />
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className={commonStyles.label}>Founder 3 Name</label>
-                    <input 
-                      className={commonStyles.input}
-                      value={formData.founder3Name || ''} 
-                      onChange={(e) => setFormData({...formData, founder3Name: e.target.value})}
-                      placeholder="Enter founder 3 name"
-                    />
-                  </div>
-                  <div>
-                    <label className={commonStyles.label}>Equity %</label>
-                    <input 
-                      className={commonStyles.input}
-                      type="number"
-                      value={formData.founder3Equity || ''} 
-                      onChange={(e) => setFormData({...formData, founder3Equity: e.target.value})}
-                      placeholder="Enter equity percentage"
-                    />
-                  </div>
-                  <div>
-                    <label className={commonStyles.label}>Role</label>
-                    <input 
-                      className={commonStyles.input}
-                      value={formData.founder3Role || ''} 
-                      onChange={(e) => setFormData({...formData, founder3Role: e.target.value})}
-                      placeholder="Enter role/designation"
-                    />
-                  </div>
+                <div>
+                  <label className={commonStyles.label}>Role</label>
+                  <input 
+                    className={commonStyles.input}
+                    value={formData.founder1Role || ''} 
+                    onChange={(e) => setFormData({...formData, founder1Role: e.target.value})}
+                    placeholder="Enter role/designation"
+                  />
                 </div>
               </div>
             </div>
@@ -3217,48 +2951,48 @@ Generated on: ${new Date().toLocaleString()}
           <div className="flex flex-wrap gap-3">
             {categories.map((category) => (
               <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
+                key={category.id}
+                onClick={() => setSelectedCategory(category.id)}
                 className={`px-6 py-3 rounded-xl border transition-all duration-300 hover:scale-105 ${
-                  selectedCategory === category
+                  selectedCategory === category.id
                     ? 'text-white border-transparent shadow-lg'
                     : 'hover:shadow-sm'
                 }`}
                 style={{
-                  background: selectedCategory === category
+                  background: selectedCategory === category.id
                     ? 'linear-gradient(135deg, #b69d74 0%, #b69d74 100%)'
                     : 'rgba(255, 255, 255, 0.80)',
-                  color: selectedCategory === category ? '#ffffff' : '#1f2839',
-                  borderColor: selectedCategory === category ? 'transparent' : 'rgba(182, 157, 116, 0.3)',
+                  color: selectedCategory === category.id ? '#ffffff' : '#1f2839',
+                  borderColor: selectedCategory === category.id ? 'transparent' : 'rgba(182, 157, 116, 0.3)',
                   backdropFilter: 'blur(10px)'
                 }}
                 onMouseEnter={(e) => {
-                  if (selectedCategory !== category) {
+                  if (selectedCategory !== category.id) {
                     e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.90)';
                     e.target.style.borderColor = 'rgba(182, 157, 116, 0.6)';
                   }
                 }}
                 onMouseLeave={(e) => {
-                  if (selectedCategory !== category) {
+                  if (selectedCategory !== category.id) {
                     e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.80)';
                     e.target.style.borderColor = 'rgba(182, 157, 116, 0.3)';
                   }
                 }}
               >
-                {category}
-                {category !== "All" && (
+                {category.name}
+                {category.id !== "All" && (
                   <span className={`ml-2 text-xs rounded-full px-2 py-1 ${
-                    selectedCategory === category
+                    selectedCategory === category.id
                       ? 'bg-white/20 text-white'
                       : 'text-gray-600'
                   }`}
                   style={{
-                    backgroundColor: selectedCategory === category 
+                    backgroundColor: selectedCategory === category.id 
                       ? 'rgba(255, 255, 255, 0.2)' 
                       : 'rgba(182, 157, 116, 0.15)'
                   }}
                   >
-                    {freeTools.filter(tool => tool.category === category).length}
+                    {templates.filter(tool => tool.categoryId === category.id).length}
                   </span>
                 )}
               </button>
@@ -3269,8 +3003,16 @@ Generated on: ${new Date().toLocaleString()}
         {/* Results Info */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
           <div style={{ color: '#6b7280' }}>
-            Showing <span className="font-semibold" style={{ color: '#1f2839' }}>{filteredTools.length}</span> of{' '}
-            <span className="font-semibold" style={{ color: '#1f2839' }}>{freeTools.length}</span> templates
+            {loading ? (
+              <span>Loading templates...</span>
+            ) : error ? (
+              <span className="text-red-500">{error}</span>
+            ) : (
+              <span>
+                Showing <span className="font-semibold" style={{ color: '#1f2839' }}>{filteredTools.length}</span> of{' '}
+                <span className="font-semibold" style={{ color: '#1f2839' }}>{templates.length}</span> templates
+              </span>
+            )}
           </div>
           
           <div className="flex items-center gap-2">
@@ -3291,129 +3033,170 @@ Generated on: ${new Date().toLocaleString()}
         </div>
 
         {/* Tools Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8 mb-12">
-          {filteredTools.map((tool) => (
-            <div
-              key={tool.id}
-              className="rounded-2xl p-4 md:p-6 border hover:shadow-md transition-all duration-300 cursor-pointer group shadow-sm"
-              onClick={() => openToolDetails(tool)}
+        {loading ? (
+          <div className="text-center py-16">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center animate-spin" style={{ backgroundColor: 'rgba(182, 157, 116, 0.2)', color: '#b69d74' }}>
+              <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2a10 10 0 0110 10c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2zm0 2a8 8 0 100 16 8 8 0 000-16zm0 3a1 1 0 011 1v4a1 1 0 11-2 0V8a1 1 0 011-1zm0 8a1 1 0 110 2 1 1 0 010-2z" />
+              </svg>
+            </div>
+            <h3 className="text-2xl font-bold" style={{ color: '#1f2839' }}>Loading Templates...</h3>
+          </div>
+        ) : error ? (
+          <div className="text-center py-16 rounded-2xl border" style={{ background: 'rgba(255, 255, 255, 0.80)', backdropFilter: 'blur(10px)', borderColor: 'rgba(239, 68, 68, 0.3)' }}>
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(239, 68, 68, 0.2)', color: '#ef4444' }}>
+              <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 10 110-16 8 8 0 010 16zm-1-9a1 1 0 00-2 0v2a1 1 0 102 0V9zm0 4a1 1 0 100 2h.01a1 1 0 100-2H9z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <h3 className="text-2xl font-bold mb-4" style={{ color: '#1f2839' }}>Error Loading Templates</h3>
+            <p className="mb-8 text-red-600">{error}</p>
+            <button
+              onClick={() => window.location.reload()} // Simple reload to retry
+              className="px-8 py-3 rounded-xl transition-all duration-300 border"
               style={{
-                background: 'rgba(255, 255, 255, 0.80)',
-                backdropFilter: 'blur(10px)',
-                borderColor: 'rgba(182, 157, 116, 0.3)',
-                boxShadow: '0 6px 25px rgba(31, 40, 57, 0.12)'
+                background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.25) 100%)',
+                color: '#ef4444',
+                borderColor: 'rgba(239, 68, 68, 0.4)'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.90)';
-                e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.6)';
-                e.currentTarget.style.boxShadow = '0 12px 35px rgba(31, 40, 57, 0.18)';
+                e.target.style.background = 'linear-gradient(135deg, #ef4444 0%, #ef4444 100%)';
+                e.target.style.color = '#ffffff';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.80)';
-                e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.3)';
-                e.currentTarget.style.boxShadow = '0 6px 25px rgba(31, 40, 57, 0.12)';
+                e.target.style.background = 'linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.25) 100%)';
+                e.target.style.color = '#ef4444';
               }}
             >
-              {/* Tool Header */}
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div 
-                      className="w-8 h-8 rounded-lg flex items-center justify-center"
-                      style={{
-                        backgroundColor: 'rgba(182, 157, 116, 0.2)',
-                        color: '#b69d74'
-                      }}
-                    >
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm2 6a2 2 0 104 0 2 2 0 00-4 0zm6 0a2 2 0 104 0 2 2 0 00-4 0z" clipRule="evenodd" />
-                      </svg>
+              Retry
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8 mb-12">
+            {filteredTools.map((tool) => (
+              <div
+                key={tool.id}
+                className="rounded-2xl p-4 md:p-6 border hover:shadow-md transition-all duration-300 cursor-pointer group shadow-sm"
+                onClick={() => openToolDetails(tool)}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.80)',
+                  backdropFilter: 'blur(10px)',
+                  borderColor: 'rgba(182, 157, 116, 0.3)',
+                  boxShadow: '0 6px 25px rgba(31, 40, 57, 0.12)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.90)';
+                  e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.6)';
+                  e.currentTarget.style.boxShadow = '0 12px 35px rgba(31, 40, 57, 0.18)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.80)';
+                  e.currentTarget.style.borderColor = 'rgba(182, 157, 116, 0.3)';
+                  e.currentTarget.style.boxShadow = '0 6px 25px rgba(31, 40, 57, 0.12)';
+                }}
+              >
+                {/* Tool Header */}
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div 
+                        className="w-8 h-8 rounded-lg flex items-center justify-center"
+                        style={{
+                          backgroundColor: 'rgba(182, 157, 116, 0.2)',
+                          color: '#b69d74'
+                        }}
+                      >
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm2 6a2 2 0 104 0 2 2 0 00-4 0zm6 0a2 2 0 104 0 2 2 0 00-4 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      {/* Assuming 'isNew' and 'premium' are properties from the API response */}
+                      {tool.isNew && (
+                        <span 
+                          className="text-xs px-2 py-1 rounded-full border font-medium"
+                          style={{
+                            backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                            color: '#10b981',
+                            borderColor: 'rgba(16, 185, 129, 0.3)'
+                          }}
+                        >
+                          New
+                        </span>
+                      )}
+                      {!tool.isFree && ( // Assuming 'premium' means not free
+                        <span 
+                          className="text-xs px-2 py-1 rounded-full border font-medium"
+                          style={{
+                            backgroundColor: 'rgba(245, 158, 11, 0.15)',
+                            color: '#f59e0b',
+                            borderColor: 'rgba(245, 158, 11, 0.3)'
+                          }}
+                        >
+                          Premium
+                        </span>
+                      )}
                     </div>
-                    {tool.isNew && (
-                      <span 
-                        className="text-xs px-2 py-1 rounded-full border font-medium"
-                        style={{
-                          backgroundColor: 'rgba(16, 185, 129, 0.15)',
-                          color: '#10b981',
-                          borderColor: 'rgba(16, 185, 129, 0.3)'
-                        }}
-                      >
-                        New
-                      </span>
-                    )}
-                    {tool.premium && (
-                      <span 
-                        className="text-xs px-2 py-1 rounded-full border font-medium"
-                        style={{
-                          backgroundColor: 'rgba(245, 158, 11, 0.15)',
-                          color: '#f59e0b',
-                          borderColor: 'rgba(245, 158, 11, 0.3)'
-                        }}
-                      >
-                        Premium
-                      </span>
-                    )}
+                    <h3 className="text-lg md:text-xl font-bold mb-2 group-hover:transition-colors" style={{ color: '#1f2839' }}>
+                      {tool.title}
+                    </h3>
+                    <p className="text-xs md:text-sm mb-1" style={{ color: '#b69d74' }}>{tool.category ? tool.category.name : 'N/A'}</p>
                   </div>
-                  <h3 className="text-lg md:text-xl font-bold mb-2 group-hover:transition-colors" style={{ color: '#1f2839' }}>
-                    {tool.title}
-                  </h3>
-                  <p className="text-xs md:text-sm mb-1" style={{ color: '#b69d74' }}>{tool.label}</p>
                 </div>
-              </div>
 
-              {/* Description */}
-              <p className="text-xs md:text-sm mb-4 line-clamp-3" style={{ color: '#6b7280' }}>
-                {tool.description}
-              </p>
+                {/* Description */}
+                <p className="text-xs md:text-sm mb-4 line-clamp-3" style={{ color: '#6b7280' }}>
+                  {tool.description}
+                </p>
 
-              {/* Metadata */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span 
-                    className={`text-xs px-2 py-1 rounded-full ${getDifficultyColor(tool.difficulty)}`}
-                    style={getDifficultyStyle(tool.difficulty)}
+                {/* Metadata */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span 
+                      className={`text-xs px-2 py-1 rounded-full ${getDifficultyColor(tool.difficulty)}`}
+                      style={getDifficultyStyle(tool.difficulty)}
+                    >
+                      {tool.difficulty}
+                    </span>
+                    {renderStarRating(tool.rating)}
+                  </div>
+
+                  <div className="flex items-center justify-between text-xs" style={{ color: '#6b7280' }}>
+                    <span>{tool.completionTimeMin ? `${tool.completionTimeMin} min` : 'N/A'}</span>
+                    <span>{tool.successRatePct ? `${tool.successRatePct}% success` : 'N/A'}</span>
+                  </div>
+                </div>
+
+                {/* CTA */}
+                <div className="mt-6 pt-4" style={{ borderTop: '1px solid rgba(182, 157, 116, 0.3)' }}>
+                  <button 
+                    onClick={() => startDocumentGeneration(tool)}
+                    className="w-full py-3 rounded-xl transition-all duration-300 font-semibold border"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(182, 157, 116, 0.15) 0%, rgba(182, 157, 116, 0.25) 100%)',
+                      color: '#1f2839',
+                      borderColor: 'rgba(182, 157, 116, 0.4)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.background = 'linear-gradient(135deg, #b69d74 0%, #b69d74 100%)';
+                      e.target.style.color = '#ffffff';
+                      e.target.style.boxShadow = '0 6px 20px rgba(182, 157, 116, 0.4)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.background = 'linear-gradient(135deg, rgba(182, 157, 116, 0.15) 0%, rgba(182, 157, 116, 0.25) 100%)';
+                      e.target.style.color = '#1f2839';
+                      e.target.style.boxShadow = 'none';
+                    }}
                   >
-                    {tool.difficulty}
-                  </span>
-                  {renderStarRating(tool.rating)}
-                </div>
-
-                <div className="flex items-center justify-between text-xs" style={{ color: '#6b7280' }}>
-                  <span>{tool.timeEstimate}</span>
-                  <span>{tool.successRate}% success</span>
+                    Generate Document
+                  </button>
                 </div>
               </div>
-
-              {/* CTA */}
-              <div className="mt-6 pt-4" style={{ borderTop: '1px solid rgba(182, 157, 116, 0.3)' }}>
-                <button 
-                  onClick={() => startDocumentGeneration(tool)}
-                  className="w-full py-3 rounded-xl transition-all duration-300 font-semibold border"
-                  style={{
-                    background: 'linear-gradient(135deg, rgba(182, 157, 116, 0.15) 0%, rgba(182, 157, 116, 0.25) 100%)',
-                    color: '#1f2839',
-                    borderColor: 'rgba(182, 157, 116, 0.4)'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.background = 'linear-gradient(135deg, #b69d74 0%, #b69d74 100%)';
-                    e.target.style.color = '#ffffff';
-                    e.target.style.boxShadow = '0 6px 20px rgba(182, 157, 116, 0.4)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.background = 'linear-gradient(135deg, rgba(182, 157, 116, 0.15) 0%, rgba(182, 157, 116, 0.25) 100%)';
-                    e.target.style.color = '#1f2839';
-                    e.target.style.boxShadow = 'none';
-                  }}
-                >
-                  Generate Document
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         {/* No Results */}
-        {filteredTools.length === 0 && (
+        {filteredTools.length === 0 && !loading && !error && (
           <div 
             className="text-center py-16 rounded-2xl border"
             style={{
@@ -3631,7 +3414,7 @@ Generated on: ${new Date().toLocaleString()}
 
               {/* Dynamic Form */}
               <div className="mb-8">
-                {renderFormFields(selectedTool.id)}
+                {renderFormFields(selectedTool.title)}
               </div>
 
               {/* Form Actions */}
