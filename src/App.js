@@ -15,9 +15,9 @@ import FreeTools from "./components/FreeTools";
 import RoleGateway from "./components/RoleGateway";
 import Pricing from "./components/Pricing";
 import Testimonials from "./components/Testimonials";
-import Footer from "./components/Footer";
+// Footer removed per request
 import Login from "./components/Login";
-import RegisterRedirect from "./components/RegisterRedirect";
+import Register from "./components/Register";
 import SearchResults from "./components/SearchResults";
 import Dashboard from "./components/Dashboard";
 import AnalyticsDashboard from "./Advocate pages/Analytics";
@@ -54,12 +54,16 @@ import QuickActions from "./Clerk components/QuickActions";
 import OfflineModeToggle from "./Clerk components/OfflineModeToggle";
 import ClerkIntegrations from "./Clerk components/Integrations";
 import ClerkSettings from "./Clerk components/Settings";
+// Admin components/pages imports: some projects keep admin pages in different locations.
+// Import only if they exist under src; otherwise comment out to avoid build errors.
+import AdminLayout from "./Admin/AdminLayout";
+import AdminDashboard from "./Admin/Dashboard";
+import AdminUsers from "./Admin/Users";
+import AdminSettings from "./Admin/Settings";
+// Note: other admin pages (Analytics, Payments, Content, Reports, Courses, Notifications)
+// are not present under src/Admin. If you have them elsewhere, I can wire them up.
 import ProtectedRoute from "./components/ProtectedRoute";
 import "./App.css";
-import AdminLayout from './Admin/AdminLayout';
-import AdminDashboard from './Admin/Dashboard';
-import AdminUsers from './Admin/Users';
-import AdminSettings from './Admin/Settings';
 
 // Loading component with professional SaaS styling
 const SaaSLoader = () => (
@@ -109,20 +113,19 @@ const Home = () => {
       <div className="relative z-10">
         <Hero />
         <div className="stagger-fade-in">
-          <Stats />
+          <RoleGateway />
         </div>
         <div className="stagger-fade-in">
-          <FreeQueryWidget />
+          <Features />
         </div>
         <div className="stagger-fade-in">
           <FreeTools />
         </div>
         <div className="stagger-fade-in">
-          <Features />
+          <FreeQueryWidget />
         </div>
-       
         <div className="stagger-fade-in">
-          <RoleGateway />
+          <Stats />
         </div>
         <div className="stagger-fade-in">
           <Pricing />
@@ -199,7 +202,6 @@ function AppContent() {
             <div className="flex-grow">
               <Home />
             </div>
-            <Footer />
           </div>
         } />
         
@@ -210,7 +212,6 @@ function AppContent() {
             <div className="flex-grow">
               <SearchResults />
             </div>
-            <Footer />
           </div>
         } />
         
@@ -220,15 +221,13 @@ function AppContent() {
             <div className="flex-grow">
               <Login />
             </div>
-            <Footer />
           </div>
         } />
         <Route path="/register" element={
           <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 zoom-in">
             <div className="flex-grow">
-              <RegisterRedirect />
+              <Register />
             </div>
-            <Footer />
           </div>
         } />
         
@@ -239,7 +238,6 @@ function AppContent() {
               <div className="flex-grow">
                 <Dashboard />
               </div>
-              <Footer />
             </div>
           </ProtectedRoute>
         } />
@@ -310,15 +308,25 @@ function AppContent() {
           <Route path="settings" element={<ClerkSettings />} />
           <Route index element={<Navigate to="dashboard" replace />} />
         </Route>
+
         {/* Admin Routes */}
         <Route path="/admin/*" element={
           <ProtectedRoute>
-            <AdminLayout />
+            <div className="fade-in">
+              <AdminLayout />
+            </div>
           </ProtectedRoute>
         }>
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="users" element={<AdminUsers />} />
+          {/* The following admin pages are not present in src/Admin; render dashboard as placeholder */}
+          <Route path="analytics" element={<AdminDashboard />} />
+          <Route path="payments" element={<AdminDashboard />} />
+          <Route path="content" element={<AdminDashboard />} />
+          <Route path="courses" element={<AdminDashboard />} />
+          <Route path="notifications" element={<AdminDashboard />} />
           <Route path="settings" element={<AdminSettings />} />
+          <Route path="reports" element={<AdminDashboard />} />
           <Route index element={<Navigate to="dashboard" replace />} />
         </Route>
         

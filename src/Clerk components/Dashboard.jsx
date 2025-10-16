@@ -388,39 +388,7 @@ const Dashboard = () => {
               )}
             </div>
             
-            {dashboardData.weather && (
-              <div 
-                className="mt-6 md:mt-0 rounded-2xl p-6 border-2 transition-all duration-500 hover:scale-105 hover:shadow-xl"
-                style={{
-                  background: colors.gradients.card,
-                  border: `2px solid ${colors.primary.gold}30`,
-                  backdropFilter: 'blur(20px)',
-                  boxShadow: '0 15px 50px rgba(31, 40, 57, 0.15)'
-                }}
-              >
-                <div className="flex items-center space-x-4">
-                  <div style={{ color: colors.primary.gold }}>
-                    <LegalIcons.Weather />
-                  </div>
-                  <div>
-                    <div style={{ 
-                      color: colors.primary.navy, 
-                      fontSize: '28px', 
-                      fontWeight: '700' 
-                    }}>
-                      {dashboardData.weather.temperature}°C
-                    </div>
-                    <div style={{ 
-                      color: colors.primary.gray, 
-                      fontWeight: '600',
-                      fontSize: '16px'
-                    }}>
-                      {dashboardData.weather.condition}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
+            {/* Removed demo weather widget to keep the dashboard focused and professional */}
           </div>
         </div>
 
@@ -431,7 +399,7 @@ const Dashboard = () => {
             { key: 'activeCases', label: 'Active Cases', icon: LegalIcons.ActiveCases, color: colors.status.success },
             { key: 'pendingCases', label: 'Pending Cases', icon: LegalIcons.PendingCases, color: colors.status.warning },
             { key: 'todayHearings', label: "Today's Hearings", icon: LegalIcons.Hearings, color: colors.primary.gold },
-            { key: 'unreadSMS', label: 'Unread SMS', icon: LegalIcons.SMS, color: '#6366f1' },
+            { key: 'unreadSMS', label: 'Messages', icon: LegalIcons.SMS, color: '#6366f1' },
             { key: 'pendingDocuments', label: 'Pending Docs', icon: LegalIcons.Documents, color: '#ef4444' }
           ].map((stat, index) => (
             <div
@@ -921,12 +889,12 @@ const Dashboard = () => {
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
             {[
-              { label: 'New Case', icon: LegalIcons.NewCase, ta: 'नया मामला' },
-              { label: 'Upload Doc', icon: LegalIcons.Upload, ta: 'दस्तावेज़ अपलोड' },
-              { label: 'Send SMS', icon: LegalIcons.SMS, ta: 'SMS भेजें' },
-              { label: 'Schedule', icon: LegalIcons.Schedule, ta: 'सुनवाई शेड्यूल' },
-              { label: 'Report', icon: LegalIcons.Report, ta: 'रिपोर्ट' },
-              { label: 'Search', icon: LegalIcons.Search, ta: 'खोजें' }
+                { label: 'New Case', icon: LegalIcons.NewCase, ta: 'नया मामला' },
+                { label: 'Upload Doc', icon: LegalIcons.Upload, ta: 'दस्तावेज़ अपलोड' },
+                { label: 'Notify Clients', icon: LegalIcons.SMS, ta: 'ग्राहकों को सूचित करें' },
+                { label: 'Schedule', icon: LegalIcons.Schedule, ta: 'सुनवाई शेड्यूल' },
+                { label: 'Generate Report', icon: LegalIcons.Report, ta: 'रिपोर्ट जेनरेट करें' },
+                { label: 'Find Records', icon: LegalIcons.Search, ta: 'रिकॉर्ड खोजें' }
             ].map((action, index) => (
               <button
                 key={action.label}
