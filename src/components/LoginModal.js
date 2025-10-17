@@ -3,18 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { X, Eye, EyeOff } from 'lucide-react';
 import RegisterModal from './RegisterModal';
+import { supabase } from '../lib/supabaseClient'; // Import supabase client
+import { exchangeSupabaseTokenForBackendToken } from '../lib/api'; // Import the new API function
 
 const LoginModal = ({ isOpen, onClose, onOpenRegister }) => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    role: ''
   });
   const [error, setError] = useState('');
-  const [roleError, setRoleError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [hoveredRole, setHoveredRole] = useState(null);
+  // Removed hoveredRole and roleError as role selection is removed
   const [isAnimating, setIsAnimating] = useState(false);
   const navigate = useNavigate();
   const { login, logoutEvent } = useAuth();
@@ -35,22 +35,28 @@ const LoginModal = ({ isOpen, onClose, onOpenRegister }) => {
 
   const roles = [
     {
-      id: 'advocate',
+      id: 'ADVOCATE',
       title: 'Advocate',
       route: '/advocate/dashboard',
       description: 'Legal professional practice management'
     },
     {
-      id: 'student',
+      id: 'STUDENT',
       title: 'Law Student',
       route: '/student/dashboard',
       description: 'Pursuing legal education and training'
     },
     {
-      id: 'clerk',
+      id: 'CLERK',
       title: 'Court Clerk',
       route: '/clerk/dashboard',
       description: 'Court administration and case management'
+    },
+    {
+      id: 'ADMIN',
+      title: 'Admin',
+      route: '/admin/dashboard',
+      description: 'Administrator with full system access'
     }
   ];
 
@@ -58,11 +64,11 @@ const LoginModal = ({ isOpen, onClose, onOpenRegister }) => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
       setIsAnimating(true);
-      setFormData({ email: '', password: '', role: '' });
+      setFormData({ email: '', password: '' });
       setError('');
-      setRoleError('');
+      // Removed setRoleError as role selection is removed
       setShowPassword(false);
-      setHoveredRole(null);
+      // Removed setHoveredRole as role selection is removed
 
       const handleEscape = (e) => {
         if (e.key === 'Escape') {
@@ -93,41 +99,14 @@ const LoginModal = ({ isOpen, onClose, onOpenRegister }) => {
       ...formData,
       [e.target.name]: e.target.value
     });
-    if (e.target.name === 'role') {
-      setRoleError('');
-    }
     setError('');
-  };
-
-  const authenticateUser = async (credentials) => {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    if (credentials.email && credentials.password && credentials.role) {
-      return {
-        id: Date.now(),
-        email: credentials.email,
-        role: credentials.role,
-        name: credentials.email.split('@')[0],
-        token: `demo-token-${Date.now()}`,
-        isAuthenticated: true
-      };
-    } else {
-      throw new Error('Invalid credentials');
-    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    setRoleError('');
     setLoading(true);
     
-    if (!formData.role) {
-      setRoleError('Please select your role');
-      setLoading(false);
-      return;
-    }
-
     if (!formData.email || !formData.password) {
       setError('Please fill in all fields');
       setLoading(false);
@@ -135,11 +114,49 @@ const LoginModal = ({ isOpen, onClose, onOpenRegister }) => {
     }
 
     try {
-      const userData = await authenticateUser(formData);
-      login(userData);
+      // 1. Authenticate with Supabase
+      const { data, error: supabaseError } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (supabaseError) {
+        throw new Error(supabaseError.message);
+      }
+
+      if (!data.session || !data.session.access_token) {
+        throw new Error('Supabase authentication failed: No session or access token.');
+      }
+
+      const supabaseAccessToken = data.session.access_token;
+
+      // 2. Exchange Supabase JWT for Backend JWT
+      const backendResponse = await exchangeSupabaseTokenForBackendToken(supabaseAccessToken);
+
+      if (!backendResponse.success) {
+        throw new Error(backendResponse.message || 'Backend login failed.');
+      }
+
+      const backendToken = backendResponse.data.user.token;
+      // The role is now expected to come directly from the backend response
+      const userProfile = backendResponse.data.user; 
+      
+      if (!userProfile.role) {
+        throw new Error('User role not provided by backend. Cannot determine dashboard route.');
+      }
+
+      // 3. Log in to AuthContext
+      login(userProfile, backendToken);
       onClose();
-      const selectedRole = roles.find(role => role.id === formData.role);
-      navigate(selectedRole.route);
+      // Navigate based on the role provided by the backend
+      const selectedRole = roles.find(role => role.id === userProfile.role);
+      if (selectedRole) {
+        navigate(selectedRole.route);
+      } else {
+        console.warn(`No route defined for role: ${userProfile.role}. Navigating to default dashboard.`);
+        navigate('/dashboard'); // Fallback to a generic dashboard if role route is not found
+      }
+
     } catch (err) {
       console.error('Login failed:', err);
       setError(err.message || 'Login failed. Please check your credentials.');
@@ -278,75 +295,7 @@ const LoginModal = ({ isOpen, onClose, onOpenRegister }) => {
               </div>
             </div>
 
-            <div>
-              <label 
-                className="block text-sm font-medium mb-3"
-                style={{ color: colors.darkNavy }}
-              >
-                Professional Role
-              </label>
-              <div className="space-y-2 sm:space-y-3">
-                {roles.map((role) => {
-                  const isSelected = formData.role === role.id;
-                  const isHovered = hoveredRole === role.id;
-                  return (
-                    <div
-                      key={role.id}
-                      className={`p-3 sm:p-4 border-2 rounded-lg cursor-pointer transition-all duration-300 ${
-                        loading ? 'opacity-50 cursor-not-allowed' : ''
-                      }`}
-                      style={{
-                        borderColor: isSelected ? colors.golden : colors.goldenAlpha40,
-                        backgroundColor: isSelected ? colors.goldenAlpha10 : 'transparent',
-                        ...(isHovered && !isSelected && {
-                          borderColor: colors.goldenAlpha50,
-                          backgroundColor: colors.goldenAlpha05
-                        })
-                      }}
-                      onClick={() => !loading && handleChange({ target: { name: 'role', value: role.id } })}
-                      onMouseEnter={() => setHoveredRole(role.id)}
-                      onMouseLeave={() => setHoveredRole(null)}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <h4 
-                              className="text-sm sm:text-base font-semibold"
-                              style={{ color: colors.darkNavy }}
-                            >
-                              {role.title}
-                            </h4>
-                            {isSelected && (
-                              <span 
-                                className="text-base sm:text-lg"
-                                style={{ color: colors.golden }}
-                              >
-                                {/* checkmark icon removed for professionalism */}
-                              </span>
-                            )}
-                          </div>
-                          <p 
-                            className="text-xs sm:text-sm"
-                            style={{ color: colors.mediumGray }}
-                          >
-                            {role.description}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-              {roleError && (
-                <div 
-                  className="mt-2 flex items-center gap-2 text-sm"
-                  style={{ color: colors.golden }}
-                >
-                  <span>⚠️</span>
-                  {roleError}
-                </div>
-              )}
-            </div>
+            {/* Role selection UI removed as per user's request */}
 
             <button 
               type="submit"

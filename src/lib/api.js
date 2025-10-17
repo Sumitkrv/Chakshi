@@ -23,9 +23,9 @@ export const loginUser = async (token) => {
   }
 };
 
-export const verifySupabaseToken = async (token) => {
+export const exchangeSupabaseTokenForBackendToken = async (token) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/auth/verify-token`, { token });
+    const response = await axios.post(`${API_BASE_URL}/auth/login`, { token });
     return response.data;
   } catch (error) {
     throw error.response.data;
@@ -67,6 +67,15 @@ export const getTemplateById = async (token, id) => {
   try {
     const authAxios = createAuthInstance(token);
     const response = await authAxios.get(`/templates/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const registerUserWithBackend = async (token, role, name) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/auth/register`, { token, role, name });
     return response.data;
   } catch (error) {
     throw error.response.data;

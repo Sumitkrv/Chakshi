@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { X, Eye, EyeOff } from 'lucide-react';
+import { supabase } from '../lib/supabaseClient'; // Import supabase client
+import { registerUserWithBackend } from '../lib/api'; // Import the new API function
 
 const RegisterModal = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
@@ -18,6 +20,7 @@ const RegisterModal = ({ isOpen, onClose }) => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [hoveredRole, setHoveredRole] = useState(null);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [registrationSuccess, setRegistrationSuccess] = useState(false); // New state for success message
   const navigate = useNavigate();
   const { login, logoutEvent } = useAuth();
 
@@ -36,22 +39,28 @@ const RegisterModal = ({ isOpen, onClose }) => {
 
   const roles = [
     {
-      id: 'advocate',
+      id: 'ADVOCATE', // Changed to match backend enum
       title: 'Advocate',
       description: 'Legal professional managing cases and clients',
       route: '/advocate/dashboard'
     },
     {
-      id: 'student',
+      id: 'STUDENT', // Changed to match backend enum
       title: 'Law Student',
       description: 'Student pursuing legal education',
       route: '/student/dashboard'
     },
     {
-      id: 'clerk',
+      id: 'CLERK', // Changed to match backend enum
       title: 'Court Clerk',
       description: 'Court administrative professional',
       route: '/clerk/dashboard'
+    },
+    {
+      id: 'ADMIN', // Added ADMIN role as per backend enum
+      title: 'Admin',
+      description: 'Administrator with full system access',
+      route: '/admin/dashboard'
     }
   ];
 
@@ -65,6 +74,7 @@ const RegisterModal = ({ isOpen, onClose }) => {
       setShowPassword(false);
       setShowConfirmPassword(false);
       setHoveredRole(null);
+      setRegistrationSuccess(false); // Reset success state when modal opens
 
       const handleEscape = (e) => {
         if (e.key === 'Escape') {
@@ -154,24 +164,6 @@ const RegisterModal = ({ isOpen, onClose }) => {
     return true;
   };
 
-  const registerUser = async (userData) => {
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    if (userData.name && userData.email && userData.password && userData.role) {
-      return {
-        id: Date.now(),
-        name: userData.name,
-        email: userData.email,
-        role: userData.role,
-        token: `demo-token-${Date.now()}`,
-        isAuthenticated: true,
-        registeredAt: new Date().toISOString()
-      };
-    } else {
-      throw new Error('Registration failed');
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -184,11 +176,54 @@ const RegisterModal = ({ isOpen, onClose }) => {
     }
 
     try {
-      const userData = await registerUser(formData);
-      login(userData);
+      // 1. Register with Supabase
+      const { data, error: supabaseError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (supabaseError) {
+        throw new Error(supabaseError.message);
+      }
+
+      if (!data.session || !data.session.access_token) {
+        // Supabase signup successful, but email confirmation is pending
+        setRegistrationSuccess(true);
+        // onClose(); // Do not close the modal immediately, let the user see the success message
+        return; // Stop further processing
+      }
+
+      const supabaseAccessToken = data.session.access_token;
+
+      // 2. Register user with our Backend
+      const backendResponse = await registerUserWithBackend(
+        supabaseAccessToken,
+        formData.role,
+        formData.name
+      );
+
+      if (!backendResponse.success) {
+        throw new Error(backendResponse.message || 'Backend registration failed.');
+      }
+
+      const backendToken = backendResponse.data.backendToken; // Corrected to backendToken
+      const userProfile = backendResponse.data.user; 
+      
+      if (!userProfile.role) {
+        throw new Error('User role not provided by backend after registration. Cannot determine dashboard route.');
+      }
+
+      // 3. Log in to AuthContext
+      login(userProfile, backendToken);
       onClose();
-      const selectedRole = roles.find(role => role.id === formData.role);
-      navigate(selectedRole.route);
+      // Navigate based on the role provided by the backend
+      const selectedRole = roles.find(role => role.id === userProfile.role);
+      if (selectedRole) {
+        navigate(selectedRole.route);
+      } else {
+        console.warn(`No route defined for role: ${userProfile.role}. Navigating to default dashboard.`);
+        navigate('/dashboard'); // Fallback to a generic dashboard if role route is not found
+      }
     } catch (err) {
       console.error('Registration failed:', err);
       setError(err.message || 'Registration failed. Please try again.');
@@ -247,333 +282,357 @@ const RegisterModal = ({ isOpen, onClose }) => {
 
           <div className="p-4 sm:p-6 md:p-8">
             <div className="text-center mb-6 sm:mb-8">
-              <h1 
-                id="register-modal-title"
-                className="text-xl sm:text-2xl font-bold mb-2"
-                style={{ color: colors.darkNavy }}
-              >
-                Create Professional Account
-              </h1>
-              <p 
-                className="text-sm sm:text-base"
-                style={{ color: colors.mediumGray }}
-              >
-                Join our legal platform and access professional tools
-              </p>
+              {registrationSuccess ? (
+                <>
+                  <h1 
+                    id="register-modal-title"
+                    className="text-xl sm:text-2xl font-bold mb-2"
+                    style={{ color: colors.darkNavy }}
+                  >
+                    Registration Successful!
+                  </h1>
+                  <p 
+                    className="text-sm sm:text-base"
+                    style={{ color: colors.mediumGray }}
+                  >
+                    Please check your email to verify your account, then you can log in.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <h1 
+                    id="register-modal-title"
+                    className="text-xl sm:text-2xl font-bold mb-2"
+                    style={{ color: colors.darkNavy }}
+                  >
+                    Create Professional Account
+                  </h1>
+                  <p 
+                    className="text-sm sm:text-base"
+                    style={{ color: colors.mediumGray }}
+                  >
+                    Join our legal platform and access professional tools
+                  </p>
+                </>
+              )}
             </div>
-
-            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-              
-              <div>
-                <label 
-                  htmlFor="name" 
-                  className="block text-sm font-medium mb-2"
-                  style={{ color: colors.darkNavy }}
-                >
-                  Full Name
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                  placeholder="Enter your full professional name"
-                  className="w-full p-3 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent"
-                  style={{
-                    backgroundColor: '#fafafa',
-                    borderColor: colors.goldenAlpha40,
-                    color: colors.darkNavy
-                  }}
-                  disabled={loading}
-                />
-              </div>
-
-              {/* Email Field */}
-              <div>
-                <label 
-                  htmlFor="email"
-                  className="block text-sm font-medium mb-2"
-                  style={{ color: colors.darkNavy }}
-                >
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  placeholder="Enter your professional email address"
-                  className="w-full p-3 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent"
-                  style={{
-                    backgroundColor: '#fafafa',
-                    borderColor: colors.goldenAlpha40,
-                    color: colors.darkNavy
-                  }}
-                  disabled={loading}
-                />
-              </div>
-
-              {/* Password Field */}
-              <div>
-                <label 
-                  htmlFor="password"
-                  className="block text-sm font-medium mb-2"
-                  style={{ color: colors.darkNavy }}
-                >
-                  Password
-                </label>
-                <div className="relative">
+            {/* Conditionally render form or success message */}
+            {!registrationSuccess && (
+              <> {/* Use a fragment to wrap multiple elements */}
+                <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+                
+                <div>
+                  <label 
+                    htmlFor="name" 
+                    className="block text-sm font-medium mb-2"
+                    style={{ color: colors.darkNavy }}
+                  >
+                    Full Name
+                  </label>
                   <input
-                    type={showPassword ? "text" : "password"}
-                    id="password"
-                    name="password"
-                    value={formData.password}
+                    type="text"
+                    id="name"
+                    name="name"
+                    value={formData.name}
                     onChange={handleChange}
                     required
-                    placeholder="Create a secure password (minimum 6 characters)"
-                    className="w-full p-3 pr-12 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent"
+                    placeholder="Enter your full professional name"
+                    className="w-full p-3 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent"
                     style={{
                       backgroundColor: '#fafafa',
                       borderColor: colors.goldenAlpha40,
                       color: colors.darkNavy
                     }}
                     disabled={loading}
-                    minLength="6"
                   />
-                  <button
-                    type="button"
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded transition-colors duration-200 hover:bg-gray-100"
-                    onClick={() => setShowPassword(!showPassword)}
-                    disabled={loading}
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4 text-gray-500" /> : <Eye className="w-4 h-4 text-gray-500" />}
-                  </button>
                 </div>
-                
-                {/* Password Strength Indicator */}
-                {formData.password && (
-                  <div className="mt-2">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs" style={{ color: colors.mediumGray }}>Password Strength</span>
-                      <span className="text-xs font-medium" style={{ color: colors.golden }}>
-                        {passwordStrength.text}
-                      </span>
-                    </div>
-                    <div 
-                      className="w-full border rounded-lg h-2"
-                      style={{ 
-                        backgroundColor: colors.goldenAlpha10,
-                        borderColor: colors.goldenAlpha40
+
+                {/* Email Field */}
+                <div>
+                  <label 
+                    htmlFor="email"
+                    className="block text-sm font-medium mb-2"
+                    style={{ color: colors.darkNavy }}
+                  >
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    placeholder="Enter your professional email address"
+                    className="w-full p-3 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent"
+                    style={{
+                      backgroundColor: '#fafafa',
+                      borderColor: colors.goldenAlpha40,
+                      color: colors.darkNavy
+                    }}
+                    disabled={loading}
+                  />
+                </div>
+
+                {/* Password Field */}
+                <div>
+                  <label 
+                    htmlFor="password"
+                    className="block text-sm font-medium mb-2"
+                    style={{ color: colors.darkNavy }}
+                  >
+                    Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      id="password"
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      required
+                      placeholder="Create a secure password (minimum 6 characters)"
+                      className="w-full p-3 pr-12 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent"
+                      style={{
+                        backgroundColor: '#fafafa',
+                        borderColor: colors.goldenAlpha40,
+                        color: colors.darkNavy
                       }}
+                      disabled={loading}
+                      minLength="6"
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded transition-colors duration-200 hover:bg-gray-100"
+                      onClick={() => setShowPassword(!showPassword)}
+                      disabled={loading}
                     >
+                      {showPassword ? <EyeOff className="w-4 h-4 text-gray-500" /> : <Eye className="w-4 h-4 text-gray-500" />}
+                    </button>
+                  </div>
+                  
+                  {/* Password Strength Indicator */}
+                  {formData.password && (
+                    <div className="mt-2">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs" style={{ color: colors.mediumGray }}>Password Strength</span>
+                        <span className="text-xs font-medium" style={{ color: colors.golden }}>
+                          {passwordStrength.text}
+                        </span>
+                      </div>
                       <div 
-                        className="h-2 rounded-lg transition-all duration-300"
+                        className="w-full border rounded-lg h-2"
                         style={{ 
-                          width: `${(passwordStrength.strength / 5) * 100}%`,
-                          background: `linear-gradient(135deg, ${colors.golden}, ${colors.golden}DD)`
+                          backgroundColor: colors.goldenAlpha10,
+                          borderColor: colors.goldenAlpha40
                         }}
-                      ></div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div>
-                <label 
-                  htmlFor="confirmPassword"
-                  className="block text-sm font-medium mb-2"
-                  style={{ color: colors.darkNavy }}
-                >
-                  Confirm Password
-                </label>
-                <div className="relative">
-                  <input
-                    type={showConfirmPassword ? "text" : "password"}
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    required
-                    placeholder="Confirm your secure password"
-                    className="w-full p-3 pr-12 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent"
-                    style={{
-                      backgroundColor: '#fafafa',
-                      borderColor: colors.goldenAlpha40,
-                      color: colors.darkNavy
-                    }}
-                    disabled={loading}
-                  />
-                  <button
-                    type="button"
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded transition-colors duration-200 hover:bg-gray-100"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    disabled={loading}
-                  >
-                    {showConfirmPassword ? <EyeOff className="w-4 h-4 text-gray-500" /> : <Eye className="w-4 h-4 text-gray-500" />}
-                  </button>
-                </div>
-                
-                {/* Password Match Indicator */}
-                {formData.confirmPassword && (
-                  <div className="mt-2 flex items-center gap-2">
-                    {formData.password === formData.confirmPassword ? (
-                      <>
-                        <div 
-                          className="w-4 h-4 rounded-full flex items-center justify-center"
-                          style={{ backgroundColor: colors.golden }}
-                        >
-                          <span className="text-white text-xs">✓</span>
-                        </div>
-                        <span className="text-xs font-medium" style={{ color: colors.golden }}>Passwords match</span>
-                      </>
-                    ) : (
-                      <>
-                        <div 
-                          className="w-4 h-4 rounded-full flex items-center justify-center"
-                          style={{ backgroundColor: colors.golden }}
-                        >
-                          <span className="text-white text-xs">✗</span>
-                        </div>
-                        <span className="text-xs font-medium" style={{ color: colors.golden }}>Passwords don't match</span>
-                      </>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              <div>
-                <label 
-                  className="block text-sm font-medium mb-3"
-                  style={{ color: colors.darkNavy }}
-                >
-                  Professional Role
-                </label>
-                <div className="space-y-3">
-                  {roles.map((role) => {
-                    const isSelected = formData.role === role.id;
-                    const isHovered = hoveredRole === role.id;
-                    
-                    return (
-                      <div
-                        key={role.id}
-                        className={`p-4 border-2 rounded-lg cursor-pointer transition-all duration-300 ${
-                          loading ? 'opacity-50 cursor-not-allowed' : ''
-                        }`}
-                        style={{
-                          borderColor: isSelected ? colors.golden : colors.goldenAlpha40,
-                          backgroundColor: isSelected ? colors.goldenAlpha10 : 'transparent',
-                          ...(isHovered && !isSelected && {
-                            borderColor: colors.goldenAlpha50,
-                            backgroundColor: colors.goldenAlpha05
-                          })
-                        }}
-                        onClick={() => !loading && handleChange({ target: { name: 'role', value: role.id } })}
-                        onMouseEnter={() => setHoveredRole(role.id)}
-                        onMouseLeave={() => setHoveredRole(null)}
                       >
-                        <div className="flex items-center gap-3">
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between">
-                              <h4 
-                                className="text-base font-semibold"
-                                style={{ color: colors.darkNavy }}
+                        <div 
+                          className="h-2 rounded-lg transition-all duration-300"
+                          style={{ 
+                            width: `${(passwordStrength.strength / 5) * 100}%`,
+                            background: `linear-gradient(135deg, ${colors.golden}, ${colors.golden}DD)`
+                          }}
+                        ></div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <label 
+                    htmlFor="confirmPassword"
+                    className="block text-sm font-medium mb-2"
+                    style={{ color: colors.darkNavy }}
+                  >
+                    Confirm Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      required
+                      placeholder="Confirm your secure password"
+                      className="w-full p-3 pr-12 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-transparent"
+                      style={{
+                        backgroundColor: '#fafafa',
+                        borderColor: colors.goldenAlpha40,
+                        color: colors.darkNavy
+                      }}
+                      disabled={loading}
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded transition-colors duration-200 hover:bg-gray-100"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      disabled={loading}
+                    >
+                      {showConfirmPassword ? <EyeOff className="w-4 h-4 text-gray-500" /> : <Eye className="w-4 h-4 text-gray-500" />}
+                    </button>
+                  </div>
+                  
+                  {/* Password Match Indicator */}
+                  {formData.confirmPassword && (
+                    <div className="mt-2 flex items-center gap-2">
+                      {formData.password === formData.confirmPassword ? (
+                        <>
+                          <div 
+                            className="w-4 h-4 rounded-full flex items-center justify-center"
+                            style={{ backgroundColor: colors.golden }}
+                          >
+                            <span className="text-white text-xs">✓</span>
+                          </div>
+                          <span className="text-xs font-medium" style={{ color: colors.golden }}>Passwords match</span>
+                        </>
+                      ) : (
+                        <>
+                          <div 
+                            className="w-4 h-4 rounded-full flex items-center justify-center"
+                            style={{ backgroundColor: colors.golden }}
+                          >
+                            <span className="text-white text-xs">✗</span>
+                          </div>
+                          <span className="text-xs font-medium" style={{ color: colors.golden }}>Passwords don't match</span>
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <label 
+                    className="block text-sm font-medium mb-3"
+                    style={{ color: colors.darkNavy }}
+                  >
+                    Professional Role
+                  </label>
+                  <div className="space-y-3">
+                    {roles.map((role) => {
+                      const isSelected = formData.role === role.id;
+                      const isHovered = hoveredRole === role.id;
+                      
+                      return (
+                        <div
+                          key={role.id}
+                          className={`p-4 border-2 rounded-lg cursor-pointer transition-all duration-300 ${
+                            loading ? 'opacity-50 cursor-not-allowed' : ''
+                          }`}
+                          style={{
+                            borderColor: isSelected ? colors.golden : colors.goldenAlpha40,
+                            backgroundColor: isSelected ? colors.goldenAlpha10 : 'transparent',
+                            ...(isHovered && !isSelected && {
+                              borderColor: colors.goldenAlpha50,
+                              backgroundColor: colors.goldenAlpha05
+                            })
+                          }}
+                          onClick={() => !loading && handleChange({ target: { name: 'role', value: role.id } })}
+                          onMouseEnter={() => setHoveredRole(role.id)}
+                          onMouseLeave={() => setHoveredRole(null)}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between">
+                                <h4 
+                                  className="text-base font-semibold"
+                                  style={{ color: colors.darkNavy }}
+                                >
+                                  {role.title}
+                                </h4>
+                                {/* checkmark icon removed for professionalism */}
+                              </div>
+                              <p 
+                                className="text-sm"
+                                style={{ color: colors.mediumGray }}
                               >
-                                {role.title}
-                              </h4>
-                              {/* checkmark icon removed for professionalism */}
+                                {role.description}
+                              </p>
                             </div>
-                            <p 
-                              className="text-sm"
-                              style={{ color: colors.mediumGray }}
-                            >
-                              {role.description}
-                            </p>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
-                {roleError && (
-                  <div 
-                    className="mt-2 flex items-center gap-2 text-sm"
-                    style={{ color: colors.golden }}
-                  >
-                    <span>⚠️</span>
-                    {roleError}
+                      );
+                    })}
                   </div>
-                )}
-              </div>
+                  {roleError && (
+                    <div 
+                      className="mt-2 flex items-center gap-2 text-sm"
+                      style={{ color: colors.golden }}
+                    >
+                      <span>⚠️</span>
+                      {roleError}
+                    </div>
+                  )}
+                </div>
 
-              <button 
-                type="submit"
-                className={`w-full text-white py-3 sm:py-4 px-4 sm:px-6 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 hover:opacity-90 shadow-lg ${
-                  loading ? 'opacity-75 cursor-not-allowed' : ''
-                }`}
-                style={{
-                  background: `linear-gradient(135deg, ${colors.golden}, ${colors.golden}DD)`,
-                  boxShadow: `0 4px 15px ${colors.goldenAlpha40}`
-                }}
-                disabled={loading}
-              >
-                {loading ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    Creating Account...
-                  </>
-                ) : (
-                  <>
-                    Create Account Securely
-                    <span>→</span>
-                  </>
-                )}
-              </button>
-            </form>
+                <button 
+                  type="submit"
+                  className={`w-full text-white py-3 sm:py-4 px-4 sm:px-6 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 hover:opacity-90 shadow-lg ${
+                    loading ? 'opacity-75 cursor-not-allowed' : ''
+                  }`}
+                  style={{
+                    background: `linear-gradient(135deg, ${colors.golden}, ${colors.golden}DD)`,
+                    boxShadow: `0 4px 15px ${colors.goldenAlpha40}`
+                  }}
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Creating Account...
+                    </>
+                  ) : (
+                    <>
+                      Create Account Securely
+                      <span>→</span>
+                    </>
+                  )}
+                </button>
+              </form>
 
-            {error && (
+              {error && (
+                <div 
+                  className="mt-4 p-3 border rounded-lg flex items-center gap-2"
+                  style={{
+                    backgroundColor: colors.goldenAlpha10,
+                    borderColor: colors.goldenAlpha40
+                  }}
+                >
+                  <span style={{ color: colors.golden }}>⚠️</span>
+                  <p 
+                    className="text-sm"
+                    style={{ color: colors.darkNavy }}
+                  >
+                    {error}
+                  </p>
+                </div>
+              )}
+
               <div 
-                className="mt-4 p-3 border rounded-lg flex items-center gap-2"
+                className="mt-4 p-3 rounded-lg"
                 style={{
                   backgroundColor: colors.goldenAlpha10,
                   borderColor: colors.goldenAlpha40
                 }}
               >
-                <span style={{ color: colors.golden }}>⚠️</span>
-                <p 
-                  className="text-sm"
-                  style={{ color: colors.darkNavy }}
-                >
-                  {error}
-                </p>
+                <div>
+                  <h4 
+                    className="text-sm font-semibold mb-1"
+                    style={{ color: colors.darkNavy }}
+                  >
+                    Demo Environment
+                  </h4>
+                  <p 
+                    className="text-xs leading-relaxed"
+                    style={{ color: colors.mediumGray }}
+                  >
+                    Complete all fields and select your professional role to create a demonstration account and explore the platform capabilities.
+                  </p>
+                </div>
               </div>
+            </>
             )}
-
-            <div 
-              className="mt-4 p-3 rounded-lg"
-              style={{
-                backgroundColor: colors.goldenAlpha10,
-                borderColor: colors.goldenAlpha40
-              }}
-            >
-              <div>
-                <h4 
-                  className="text-sm font-semibold mb-1"
-                  style={{ color: colors.darkNavy }}
-                >
-                  Demo Environment
-                </h4>
-                <p 
-                  className="text-xs leading-relaxed"
-                  style={{ color: colors.mediumGray }}
-                >
-                  Complete all fields and select your professional role to create a demonstration account and explore the platform capabilities.
-                </p>
-              </div>
-            </div>
           </div>
         </div>
       </div>

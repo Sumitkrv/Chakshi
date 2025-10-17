@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { verifySupabaseToken, getCurrentUserProfile } from '../lib/api'; // Import API functions
+import { exchangeSupabaseTokenForBackendToken, getCurrentUserProfile } from '../lib/api'; // Import API functions
 import { supabase } from '../lib/supabaseClient'; // Import supabase client
 
 const AuthContext = createContext(null);
@@ -26,12 +26,12 @@ export const AuthProvider = ({ children }) => {
           } else {
             console.error('Failed to fetch user profile:', userProfileResponse.message);
             await logout(); // Clear session if profile fetch fails
-            navigate('/login'); // Redirect to login
+            // Removed navigate('/login'); to allow public pages to load
           }
         } catch (error) {
           console.error('Auth check failed:', error);
           await logout(); // Clear session on any error during verification/fetch
-          navigate('/login'); // Redirect to login
+          // Removed navigate('/login'); to allow public pages to load
         } finally {
           setLoading(false); // Ensure loading is set to false after API call
         }
@@ -55,7 +55,7 @@ export const AuthProvider = ({ children }) => {
         if (session && session.access_token) {
           try {
             // Call backend login with Supabase JWT to get backend JWT and user profile
-            const backendResponse = await verifySupabaseToken(session.access_token); // Using verifySupabaseToken as it maps to /auth/login
+            const backendResponse = await exchangeSupabaseTokenForBackendToken(session.access_token); // Using exchangeSupabaseTokenForBackendToken as it maps to /auth/login
             if (backendResponse.success) {
               const backendToken = backendResponse.data.user.token; // Assuming backend returns token in user object
               const userProfile = backendResponse.data.user;
