@@ -72,7 +72,7 @@ const Navbar = ({
     { id: 4, title: 'Quick Actions Panel', type: 'actions', url: '/clerk/quick-actions', category: 'Tools' },
     { id: 5, title: 'Court Calendar', type: 'scheduling', url: '/clerk/calendar', category: 'Cases' },
     { id: 6, title: 'Document Management', type: 'documents', url: '/clerk/documents', category: 'Cases' },
-    { id: 7, title: 'Fraud Detection', type: 'security', url: '/clerk/fraud-detection', category: 'Analytics' },
+  // Fraud Detection removed
     { id: 8, title: 'Legal Reports', type: 'reports', url: '/clerk/reports', category: 'Analytics' },
   ];
 
@@ -208,13 +208,7 @@ const Navbar = ({
   ];
 
   const analyticsItems = [
-    { 
-      name: 'Fraud Detection', 
-      path: '/clerk/fraud-detection', 
-      description: 'AI-powered security analysis',
-      status: 'AI Active',
-      color: '#10b981'
-    },
+    // Fraud Detection removed
     { 
       name: 'Legal Reports', 
       path: '/clerk/reports', 
@@ -519,15 +513,15 @@ const Navbar = ({
                 <button
                   onClick={() => setShowAnalyticsMenu(!showAnalyticsMenu)}
                   className={`flex items-center px-6 py-3 rounded-2xl font-semibold text-sm transition-all duration-300 hover:scale-105 relative overflow-hidden group ${
-                    isActivePath('/clerk/fraud-detection') || isActivePath('/clerk/reports') || isActivePath('/clerk/dashboard')
+                    isActivePath('/clerk/reports') || isActivePath('/clerk/dashboard')
                       ? 'text-white'
                       : 'text-[#1f2839]'
                   }`}
                   style={{
-                    background: isActivePath('/clerk/fraud-detection') || isActivePath('/clerk/reports') || isActivePath('/clerk/dashboard')
+                    background: isActivePath('/clerk/reports') || isActivePath('/clerk/dashboard')
                       ? colors.goldGradient
                       : colors.gold05,
-                    boxShadow: isActivePath('/clerk/fraud-detection') || isActivePath('/clerk/reports') || isActivePath('/clerk/dashboard')
+                    boxShadow: isActivePath('/clerk/reports') || isActivePath('/clerk/dashboard')
                       ? `0 4px 15px ${colors.gold20}`
                       : `0 2px 8px ${colors.navy05}`
                   }}

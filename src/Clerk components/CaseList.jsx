@@ -382,21 +382,21 @@ const CaseList = () => {
   // Get priority color
   const getPriorityColor = (priority) => {
     switch (priority?.toLowerCase()) {
-      case 'critical': return 'text-[#f59e0b] bg-[#f59e0b20] border-[#f59e0b40]';
-      case 'high': return 'text-[#b69d74] bg-[#b69d7415] border-[#b69d7440]';
-      case 'medium': return 'text-[#6b7280] bg-[#6b728020] border-[#6b728040]';
-      case 'low': return 'text-[#10b981] bg-[#10b98120] border-[#10b98140]';
-      default: return 'text-[#6b7280] bg-[#6b728015] border-[#6b728025]';
+      case 'critical': return 'text-[#dc2626] bg-[#dc262615] border-2 border-[#dc262640]';
+      case 'high': return 'text-[#f59e0b] bg-[#f59e0b15] border-2 border-[#f59e0b40]';
+      case 'medium': return 'text-[#3b82f6] bg-[#3b82f615] border-2 border-[#3b82f640]';
+      case 'low': return 'text-[#10b981] bg-[#10b98115] border-2 border-[#10b98140]';
+      default: return 'text-[#6b7280] bg-[#6b728015] border-2 border-[#6b728040]';
     }
   };
 
   // Get status color
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
-      case 'active': return 'text-[#10b981] bg-[#10b98115]';
-      case 'pending': return 'text-[#f59e0b] bg-[#f59e0b15]';
-      case 'closed': return 'text-[#6b7280] bg-[#6b728015]';
-      default: return 'text-[#6b7280] bg-[#6b728015]';
+      case 'active': return 'text-[#10b981] bg-[#10b98115] border-2 border-[#10b98140]';
+      case 'pending': return 'text-[#f59e0b] bg-[#f59e0b15] border-2 border-[#f59e0b40]';
+      case 'closed': return 'text-[#6b7280] bg-[#6b728015] border-2 border-[#6b728040]';
+      default: return 'text-[#6b7280] bg-[#6b728015] border-2 border-[#6b728040]';
     }
   };
 
@@ -672,12 +672,12 @@ const CaseList = () => {
         {/* Cases List */}
         {viewMode === 'table' ? (
           // Table View
-          <div className="bg-white rounded-lg border border-[#1f283915] overflow-hidden shadow-sm">
+          <div className="bg-white rounded-xl border-2 border-[#1f283915] overflow-hidden shadow-md">
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-[#1f283915]">
-                <thead className="bg-[#f5f5ef]">
+              <table className="min-w-full divide-y-2 divide-[#1f283920]">
+                <thead className="bg-gradient-to-r from-[#f5f5ef] to-[#fafaf8]">
                   <tr>
-                    <th className="px-6 py-3 text-left">
+                    <th className="px-6 py-4 text-left">
                       <input
                         type="checkbox"
                         checked={selectedCases.length === filteredAndSortedCases.length && filteredAndSortedCases.length > 0}
@@ -685,26 +685,26 @@ const CaseList = () => {
                         className="h-4 w-4 text-[#b69d74] focus:ring-[#b69d74] border-[#1f283925] rounded"
                       />
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-bold text-[#1f2839] uppercase tracking-wider">
                       {language === 'ta' ? 'मामला' : 'Case'}
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-bold text-[#1f2839] uppercase tracking-wider">
                       {language === 'ta' ? 'स्थिति' : 'Status'}
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-bold text-[#1f2839] uppercase tracking-wider">
                       {language === 'ta' ? 'प्राथमिकता' : 'Priority'}
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-bold text-[#1f2839] uppercase tracking-wider">
                       {language === 'ta' ? 'अगली सुनवाई' : 'Next Hearing'}
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-bold text-[#1f2839] uppercase tracking-wider">
                       {language === 'ta' ? 'कार्य' : 'Actions'}
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-[#1f283915]">
+                <tbody className="bg-white divide-y-2 divide-[#1f283910]">
                   {filteredAndSortedCases.map((case_) => (
-                    <tr key={case_.id} className="hover:bg-[#f5f5ef] transition-colors">
+                    <tr key={case_.id} className="hover:bg-gradient-to-r hover:from-[#f5f5ef] hover:to-[#fafaf8] transition-all duration-200 border-b border-[#1f283908]">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <input
                           type="checkbox"
@@ -719,42 +719,42 @@ const CaseList = () => {
                             <div className="flex items-center space-x-2">
                               <Link
                                 to={`/clerk/case/${case_.id}`}
-                                className="text-sm font-medium text-[#b69d74] hover:text-[#1f2839] transition-colors"
+                                className="text-sm font-semibold text-[#b69d74] hover:text-[#1f2839] transition-colors"
                               >
                                 {case_.number}
                               </Link>
                               <button
                                 onClick={(e) => toggleFavorite(case_.id, e)}
-                                className={`p-1 rounded transition-colors ${favorites.has(case_.id) ? 'text-[#f59e0b]' : 'text-[#6b7280] hover:text-[#f59e0b]'}`}
+                                className={`p-1 rounded-lg transition-all duration-200 ${favorites.has(case_.id) ? 'text-[#f59e0b] bg-[#f59e0b15]' : 'text-[#6b7280] hover:text-[#f59e0b] hover:bg-[#f59e0b10]'}`}
                               >
                                 <svg className="h-4 w-4" fill={favorites.has(case_.id) ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                                 </svg>
                               </button>
                             </div>
-                            <div className="text-sm text-[#6b7280] mt-1">
+                            <div className="text-sm font-medium text-[#1f2839] mt-1">
                               {case_.title}
                             </div>
-                            <div className="text-xs text-[#6b7280]">
+                            <div className="text-xs text-[#6b7280] mt-0.5">
                               {case_.court} • {case_.judge}
                             </div>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 py-1 text-xs rounded-full font-medium ${getStatusColor(case_.status)}`}>
+                        <span className={`px-3 py-1.5 text-xs rounded-lg font-semibold ${getStatusColor(case_.status)}`}>
                           {case_.status}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 py-1 text-xs rounded-full font-medium border ${getPriorityColor(case_.priority)}`}>
+                        <span className={`px-3 py-1.5 text-xs rounded-lg font-semibold ${getPriorityColor(case_.priority)}`}>
                           {case_.priority}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-[#1f2839]">
                         {case_.nextHearing ? (
                           <div>
-                            <div>{new Date(case_.nextHearing).toLocaleDateString()}</div>
+                            <div className="font-medium">{new Date(case_.nextHearing).toLocaleDateString()}</div>
                             <div className="text-xs text-[#6b7280]">{case_.hearingTime}</div>
                           </div>
                         ) : (
@@ -764,7 +764,7 @@ const CaseList = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <button
                           onClick={() => navigate(`/clerk/case/${case_.id}`)}
-                          className="text-[#b69d74] hover:text-[#1f2839] transition-colors"
+                          className="px-4 py-1.5 text-[#b69d74] hover:text-white hover:bg-[#b69d74] border-2 border-[#b69d74] rounded-lg transition-all duration-200 font-semibold"
                         >
                           {language === 'ta' ? 'देखें' : 'View'}
                         </button>
@@ -781,8 +781,11 @@ const CaseList = () => {
             {filteredAndSortedCases.map((case_) => (
               <div
                 key={case_.id}
-                className="bg-white rounded-lg border border-[#1f283915] p-6 hover:shadow-lg transition-all cursor-pointer shadow-sm"
+                className="bg-white rounded-xl border-2 border-[#1f283915] p-6 hover:shadow-2xl hover:border-[#b69d7440] transition-all duration-300 cursor-pointer shadow-md hover:scale-[1.02] transform"
                 onClick={() => navigate(`/clerk/case/${case_.id}`)}
+                style={{
+                  boxShadow: '0 2px 8px rgba(31, 40, 57, 0.08)'
+                }}
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center space-x-3">
@@ -796,7 +799,7 @@ const CaseList = () => {
                       className="h-4 w-4 text-[#b69d74] focus:ring-[#b69d74] border-[#1f283925] rounded"
                     />
                     <div 
-                      className="text-lg font-semibold text-[#b69d74] hover:text-[#1f2839] transition-colors"
+                      className="text-lg font-bold text-[#b69d74] hover:text-[#1f2839] transition-colors"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <Link to={`/clerk/case/${case_.id}`}>
@@ -806,7 +809,7 @@ const CaseList = () => {
                   </div>
                   <button
                     onClick={(e) => toggleFavorite(case_.id, e)}
-                    className={`p-1 rounded transition-colors ${favorites.has(case_.id) ? 'text-[#f59e0b]' : 'text-[#6b7280] hover:text-[#f59e0b]'}`}
+                    className={`p-1.5 rounded-lg transition-all duration-200 ${favorites.has(case_.id) ? 'text-[#f59e0b] bg-[#f59e0b15]' : 'text-[#6b7280] hover:text-[#f59e0b] hover:bg-[#f59e0b10]'}`}
                   >
                     <svg className="h-5 w-5" fill={favorites.has(case_.id) ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
@@ -814,7 +817,7 @@ const CaseList = () => {
                   </button>
                 </div>
 
-                <h3 className="text-sm font-medium text-[#1f2839] mb-2">
+                <h3 className="text-base font-semibold text-[#1f2839] mb-3 line-clamp-2">
                   {case_.title}
                 </h3>
 

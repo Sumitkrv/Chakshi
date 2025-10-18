@@ -201,7 +201,6 @@ const Courses = () => {
     'Fifth Year': [
       'Drafting, Pleading & Conveyancing',
       'Professional Ethics & Bar Bench Relations',
-      'Moot Court & Advocacy Training',
       'Internship Practicum'
     ]
   };
@@ -473,7 +472,7 @@ const Courses = () => {
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
           <div className="mb-4 lg:mb-0">
-            <h1 className="text-3xl font-bold text-[#1f2839]">Legal Education Platform</h1>
+            <h1 className="text-3xl font-bold text-[#1f2839]">Chakshi</h1>
             <p className="text-[#6b7280] mt-1">Constructivist Learning Theory & Competency-Based Education</p>
           </div>
           
@@ -606,13 +605,8 @@ const Courses = () => {
         {activeTab === 'analytics' && (
           <div className="text-center py-12">
             <BarChart3 className="w-16 h-16 text-[#b69d74] mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-[#1f2839] mb-2">Learning Analytics Dashboard</h3>
-            <p className="text-[#6b7280] mb-6">Advanced analytics and progress tracking coming soon</p>
-            <div className="bg-[#b69d7405] border border-[#b69d7420] rounded-lg p-6 max-w-md mx-auto">
-              <p className="text-sm text-[#1f2839]">
-                Track your progress, identify knowledge gaps, and compare your performance with peers anonymously.
-              </p>
-            </div>
+            <h3 className="text-xl font-bold text-[#1f2839] mb-2">Coming Soon</h3>
+            <p className="text-[#6b7280] mb-6">Analytics features will be available soon</p>
           </div>
         )}
       </div>

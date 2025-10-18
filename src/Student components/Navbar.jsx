@@ -16,7 +16,6 @@ import {
   FiFileText,
   FiCalendar,
   FiBriefcase,
-  FiRss,
   FiBookOpen,
   FiAward,
   FiBarChart2,
@@ -90,12 +89,9 @@ const Navbar = () => {
     { id: 'assignments', label: 'Assignments', icon: FiFileText, path: '/student/assignments', premium: false },
     { id: 'calendar', label: 'Calendar', icon: FiCalendar, path: '/student/calendar', premium: false },
     { id: 'career', label: 'Career', icon: FiBriefcase, path: '/student/career', premium: true },
-    { id: 'content-feed', label: 'Content Feed', icon: FiRss, path: '/student/content-feed', premium: false },
     { id: 'examprep', label: 'Exam Prep', icon: FiBookOpen, path: '/student/examprep', premium: true },
     { id: 'library', label: 'Library', icon: FiAward, path: '/student/library', premium: false },
-    { id: 'mootcourt', label: 'Moot Court', icon: FiBarChart2, path: '/student/mootcourt', premium: true },
-    { id: 'research', label: 'Research', icon: FiSearch, path: '/student/research', premium: false },
-    { id: 'simulation', label: 'Simulation', icon: FiPlay, path: '/student/simulation', premium: true }
+    { id: 'research', label: 'Research', icon: FiSearch, path: '/student/research', premium: false }
   ];
 
   // Items to show in main navbar (first 6 items)
@@ -167,15 +163,10 @@ const Navbar = () => {
 
   const handleLogout = useCallback(async () => {
     try {
-      // Clear authentication - this will trigger cleanup in other components
       await logout();
-      
-      // Navigate to home page with replace to clear history
-      navigate('/', { replace: true });
+      navigate('/');
     } catch (error) {
       console.error('Logout failed:', error);
-      // Still navigate even if there's an error
-      navigate('/', { replace: true });
     }
   }, [logout, navigate]);
 
@@ -237,7 +228,7 @@ const Navbar = () => {
       <div className="px-4 sm:px-6 lg:px-8 h-full w-full max-w-full">
         <div className="flex items-center justify-between h-full w-full">
           
-          {/* Left Section - Navigation & Search */}
+          {/* Left Section - Navigation */}
           <div className="flex items-center space-x-4 flex-1 min-w-0">
             
             {/* Navigation Items */}
@@ -361,143 +352,6 @@ const Navbar = () => {
                       );
                     })}
                   </div>
-                  <div className="p-3 border-t border-[rgba(31,40,57,0.1)]">
-                    <button
-                      onClick={() => {
-                        navigate('/student/all-features');
-                        setShowMoreMenu(false);
-                      }}
-                      className="w-full text-center bg-gradient-to-r from-[rgba(182,157,116,0.1)] to-[rgba(200,176,144,0.1)] text-[#b69d74] hover:text-[#1f2839] font-semibold text-sm py-2.5 rounded-xl transition-all duration-300 hover:transform hover:scale-[1.02]"
-                    >
-                      View All Features
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Enhanced Search Bar */}
-            <div className="relative max-w-md w-full min-w-0" ref={searchRef}>
-              <form onSubmit={handleSearchSubmit} className="w-full">
-                <div className="relative w-full group">
-                  {/* Animated background */}
-                  <div className={`absolute inset-0 rounded-xl transition-all duration-300 ${
-                    isSearchFocused 
-                      ? 'bg-gradient-to-r from-white to-white shadow-2xl shadow-[#b69d74]/20' 
-                      : 'bg-white/80 group-hover:bg-white'
-                  }`}></div>
-                  
-                  <FiSearch className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 flex-shrink-0 transition-all duration-300 ${
-                    isSearchFocused ? 'text-[#b69d74] scale-110' : 'text-[#6b7280]'
-                  }`} />
-                  
-                  <input
-                    type="search"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onFocus={() => {
-                      setIsSearchFocused(true);
-                      setShowSearchSuggestions(true);
-                    }}
-                    onBlur={() => setIsSearchFocused(false)}
-                    className="relative w-full pl-10 pr-10 py-2.5 border-0 rounded-xl focus:ring-0 bg-transparent text-[#1f2839] placeholder-[#6b7280] transition-all duration-300 z-10"
-                    placeholder="Search courses, assignments..."
-                  />
-                  
-                  {searchQuery && (
-                    <button
-                      type="button"
-                      onClick={() => setSearchQuery('')}
-                      className="relative z-20 absolute right-10 top-1/2 transform -translate-y-1/2 p-1 hover:bg-[rgba(182,157,116,0.1)] rounded-lg transition-all duration-200 flex-shrink-0 hover:scale-110"
-                    >
-                      <FiX className="w-3.5 h-3.5 text-[#6b7280]" />
-                    </button>
-                  )}
-                  
-                  <div className={`absolute right-3 top-1/2 transform -translate-y-1/2 hidden sm:flex items-center space-x-1 text-xs px-2 py-1 rounded-lg border transition-all duration-300 flex-shrink-0 ${
-                    isSearchFocused
-                      ? 'bg-gradient-to-r from-[#b69d74] to-[#c8b090] text-white border-transparent'
-                      : 'text-[#6b7280] bg-[rgba(182,157,116,0.05)] border-[rgba(31,40,57,0.1)] group-hover:bg-[rgba(182,157,116,0.1)]'
-                  }`}>
-                    <FiCommand className="w-3 h-3" />
-                    <span>K</span>
-                  </div>
-
-                  {/* Animated focus border */}
-                  <div className={`absolute inset-0 rounded-xl bg-gradient-to-r from-[#b69d74] to-[#c8b090] opacity-0 transition-all duration-300 ${
-                    isSearchFocused ? 'opacity-20 blur-sm' : 'group-hover:opacity-10'
-                  }`}></div>
-                </div>
-              </form>
-
-              {/* Enhanced Search Suggestions */}
-              {showSearchSuggestions && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-[rgba(182,157,116,0.2)] py-3 z-[90] max-h-80 overflow-y-auto transform origin-top">
-                  <div className="p-2">
-                    {searchQuery ? (
-                      <div className="space-y-2">
-                        <p className="text-xs text-[#6b7280] px-3 py-1 font-medium">Search results for "{searchQuery}"</p>
-                        {searchSuggestions
-                          .filter(item => item.text.toLowerCase().includes(searchQuery.toLowerCase()))
-                          .map((item, index) => (
-                            <button
-                              key={index}
-                              className="w-full flex items-center space-x-3 p-3 text-left hover:bg-gradient-to-r hover:from-[rgba(182,157,116,0.05)] hover:to-[rgba(200,176,144,0.08)] rounded-xl transition-all duration-300 group hover:transform hover:scale-[1.02]"
-                              onClick={() => {
-                                setSearchQuery(item.text);
-                                setShowSearchSuggestions(false);
-                                handleSearchSubmit({ preventDefault: () => {} });
-                              }}
-                            >
-                              <span className="text-lg flex-shrink-0 group-hover:scale-110 transition-transform duration-300">{item.icon}</span>
-                              <div className="min-w-0 flex-1">
-                                <div className="flex items-center space-x-2">
-                                  <p className="text-sm font-semibold text-[#1f2839] truncate">{item.text}</p>
-                                  {item.trending && (
-                                    <span className="flex items-center space-x-1 px-1.5 py-0.5 bg-gradient-to-r from-green-100 to-emerald-100 rounded-full">
-                                      <FiZap className="w-3 h-3 text-green-600" />
-                                      <span className="text-xs text-green-600 font-medium">Trending</span>
-                                    </span>
-                                  )}
-                                </div>
-                                <p className="text-xs text-[#6b7280] capitalize truncate">{item.type}</p>
-                              </div>
-                              <FiChevronRight className="w-4 h-4 text-[#6b7280] opacity-0 group-hover:opacity-100 transition-all duration-300 transform -translate-x-1 group-hover:translate-x-0" />
-                            </button>
-                          ))}
-                      </div>
-                    ) : (
-                      <div className="space-y-2">
-                        <p className="text-xs text-[#6b7280] px-3 py-1 font-medium">Quick searches</p>
-                        {searchSuggestions.map((item, index) => (
-                          <button
-                            key={index}
-                            className="w-full flex items-center space-x-3 p-3 text-left hover:bg-gradient-to-r hover:from-[rgba(182,157,116,0.05)] hover:to-[rgba(200,176,144,0.08)] rounded-xl transition-all duration-300 group hover:transform hover:scale-[1.02]"
-                            onClick={() => {
-                              setSearchQuery(item.text);
-                              setShowSearchSuggestions(false);
-                              handleSearchSubmit({ preventDefault: () => {} });
-                            }}
-                          >
-                            <span className="text-lg flex-shrink-0 group-hover:scale-110 transition-transform duration-300">{item.icon}</span>
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center space-x-2">
-                                <p className="text-sm font-semibold text-[#1f2839] truncate">{item.text}</p>
-                                {item.trending && (
-                                  <span className="flex items-center space-x-1 px-1.5 py-0.5 bg-gradient-to-r from-green-100 to-emerald-100 rounded-full">
-                                    <FiZap className="w-3 h-3 text-green-600" />
-                                    <span className="text-xs text-green-600 font-medium">Trending</span>
-                                  </span>
-                                )}
-                              </div>
-                              <p className="text-xs text-[#6b7280] capitalize truncate">{item.type}</p>
-                            </div>
-                            <FiChevronRight className="w-4 h-4 text-[#6b7280] opacity-0 group-hover:opacity-100 transition-all duration-300 transform -translate-x-1 group-hover:translate-x-0" />
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
                 </div>
               )}
             </div>
@@ -505,30 +359,6 @@ const Navbar = () => {
 
           {/* Right Section - Enhanced Actions */}
           <div className="flex items-center space-x-2 flex-shrink-0 ml-4">
-            
-            {/* Enhanced Dark Mode Toggle */}
-            <button
-              onClick={() => setIsDarkMode(!isDarkMode)}
-              className="relative p-2.5 rounded-xl hover:bg-[rgba(182,157,116,0.1)] transition-all duration-300 flex-shrink-0 group hover:transform hover:scale-110"
-              aria-label="Toggle dark mode"
-            >
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-transparent to-transparent group-hover:from-[rgba(182,157,116,0.1)] group-hover:to-[rgba(200,176,144,0.1)] transition-all duration-300"></div>
-              {isDarkMode ? (
-                <FiSun className="w-5 h-5 text-[#1f2839] relative z-10 transition-transform duration-300 group-hover:rotate-180" />
-              ) : (
-                <FiMoon className="w-5 h-5 text-[#1f2839] relative z-10 transition-transform duration-300 group-hover:rotate-180" />
-              )}
-            </button>
-
-            {/* Enhanced Help Button */}
-            <button
-              onClick={() => navigate('/student/help')}
-              className="relative p-2.5 rounded-xl hover:bg-[rgba(182,157,116,0.1)] transition-all duration-300 hidden sm:flex flex-shrink-0 group hover:transform hover:scale-110"
-              aria-label="Help"
-            >
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-transparent to-transparent group-hover:from-[rgba(182,157,116,0.1)] group-hover:to-[rgba(200,176,144,0.1)] transition-all duration-300"></div>
-              <FiHelpCircle className="w-5 h-5 text-[#1f2839] relative z-10" />
-            </button>
 
             {/* Enhanced Notifications */}
             <div className="relative flex-shrink-0" ref={notificationRef}>

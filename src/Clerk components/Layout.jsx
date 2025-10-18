@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import Navbar from './Navbar';
 import Footer from './Footer';
@@ -7,25 +7,46 @@ import Modal from './Modal';
 import ToastNotifications from './ToastNotifications';
 
 const Layout = () => {
-  const [theme, setTheme] = useState(localStorage.getItem('clerk-theme') || 'light');
-  const [language, setLanguage] = useState(localStorage.getItem('clerk-language') || 'en');
+  const [theme, setTheme] = useState(() => 
+    localStorage.getItem('clerk-theme') || 'light'
+  );
+  const [language, setLanguage] = useState(() => 
+    localStorage.getItem('clerk-language') || 'en'
+  );
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState(null);
   const [notifications, setNotifications] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
+  const location = useLocation();
 
   // Handle online/offline status
   useEffect(() => {
-    const handleOnlineStatus = () => setIsOnline(navigator.onLine);
-    const handleOfflineStatus = () => setIsOnline(false);
+    const handleOnline = () => {
+      setIsOnline(true);
+      addNotification({
+        type: 'success',
+        title: 'Back Online',
+        message: 'Your connection has been restored.'
+      });
+    };
 
-    window.addEventListener('online', handleOnlineStatus);
-    window.addEventListener('offline', handleOfflineStatus);
+    const handleOffline = () => {
+      setIsOnline(false);
+      addNotification({
+        type: 'warning',
+        title: 'Offline Mode',
+        message: 'You are currently offline. Some features may be limited.'
+      });
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
 
     return () => {
-      window.removeEventListener('online', handleOnlineStatus);
-      window.removeEventListener('offline', handleOfflineStatus);
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
     };
   }, []);
 
@@ -33,6 +54,12 @@ const Layout = () => {
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('clerk-theme', theme);
+    
+    // Update meta theme-color for mobile browsers
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (metaThemeColor) {
+      metaThemeColor.setAttribute('content', '#f5f5ef');
+    }
   }, [theme]);
 
   // Handle language changes
@@ -41,19 +68,43 @@ const Layout = () => {
     localStorage.setItem('clerk-language', language);
   }, [language]);
 
+  // Handle route changes
+  useEffect(() => {
+    // Scroll to top on route change
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // Simulate loading state for route transitions
+    setIsLoading(true);
+    const timer = setTimeout(() => setIsLoading(false), 300);
+    return () => clearTimeout(timer);
+  }, [location.pathname]);
+
   // Handle keyboard shortcuts
   useEffect(() => {
     const handleKeyboardShortcuts = (e) => {
       // Ctrl/Cmd + K for search
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault();
-        // Trigger global search
-        document.getElementById('global-search')?.focus();
+        const searchInput = document.getElementById('global-search');
+        if (searchInput) {
+          searchInput.focus();
+          searchInput.select();
+        }
       }
 
       // Escape to close modal
       if (e.key === 'Escape' && showModal) {
-        setShowModal(false);
+        closeModal();
+      }
+
+      // Ctrl/Cmd + / for help
+      if ((e.ctrlKey || e.metaKey) && e.key === '/') {
+        e.preventDefault();
+        addNotification({
+          type: 'info',
+          title: 'Keyboard Shortcuts',
+          message: 'Ctrl+K: Search • Ctrl+/: Help • Escape: Close modal'
+        });
       }
     };
 
@@ -62,35 +113,54 @@ const Layout = () => {
   }, [showModal]);
 
   // Add notification function
-  const addNotification = (notification) => {
-    const id = Date.now();
-    const newNotification = { ...notification, id };
-    setNotifications(prev => [...prev, newNotification]);
+  const addNotification = useCallback((notification) => {
+    const id = Date.now() + Math.random();
+    const newNotification = { 
+      ...notification, 
+      id,
+      timestamp: new Date().toISOString()
+    };
     
-    // Auto remove after 5 seconds
+    setNotifications(prev => [newNotification, ...prev.slice(0, 4)]); // Keep max 5 notifications
+    
+    // Auto remove after duration based on type
+    const duration = notification.type === 'error' ? 8000 : 5000;
     setTimeout(() => {
       removeNotification(id);
-    }, 5000);
-  };
+    }, duration);
+  }, []);
 
   // Remove notification function
-  const removeNotification = (id) => {
+  const removeNotification = useCallback((id) => {
     setNotifications(prev => prev.filter(n => n.id !== id));
-  };
+  }, []);
 
   // Modal functions
-  const openModal = (content) => {
+  const openModal = useCallback((content) => {
     setModalContent(content);
     setShowModal(true);
-  };
+    // Prevent body scroll when modal is open
+    document.body.style.overflow = 'hidden';
+  }, []);
 
-  const closeModal = () => {
+  const closeModal = useCallback(() => {
     setShowModal(false);
     setModalContent(null);
-  };
+    // Restore body scroll
+    document.body.style.overflow = 'unset';
+  }, []);
+
+  // Global loading handler
+  const setGlobalLoading = useCallback((loading) => {
+    setIsLoading(loading);
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) {
+      overlay.classList.toggle('hidden', !loading);
+    }
+  }, []);
 
   return (
-    <div className={`clerk-layout min-h-screen bg-gray-50 dark:bg-gray-900 ${theme} ${language}`}>
+    <div className="clerk-layout min-h-screen bg-[#f5f5ef] transition-colors duration-300">
       {/* Main Layout Container */}
       <div className="flex flex-col min-h-screen">
         {/* Header/Navbar */}
@@ -103,54 +173,75 @@ const Layout = () => {
           user={user}
           notifications={notifications}
           addNotification={addNotification}
+          openModal={openModal}
         />
 
-        {/* Scrollable Main Content Area */}
-        <div className="flex-1 flex flex-col overflow-auto">
-          {/* Breadcrumb Trail - Hidden on mobile, shown on tablet and up */}
-          <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 lg:px-8 py-3 hidden sm:block">
+        {/* Main Content Area - No internal scrolling */}
+        <div className="flex-1 flex flex-col">
+          {/* Breadcrumb Trail */}
+          <div className="bg-white/80 backdrop-blur-sm border-b border-[rgba(31,40,57,0.15)] px-4 sm:px-6 lg:px-8 py-3 hidden sm:block">
             <nav className="flex" aria-label="Breadcrumb">
-              <ol className="inline-flex items-center space-x-1 md:space-x-3">
-                <li className="inline-flex items-center">
-                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                    {user?.name || 'Clerk Dashboard'}
+              <ol className="flex items-center space-x-2 text-sm">
+                <li className="flex items-center">
+                  <span className="text-[#6b7280] hover:text-[#1f2839] transition-colors cursor-default">
+                    Clerk Dashboard
+                  </span>
+                </li>
+                <li className="flex items-center">
+                  <svg className="h-4 w-4 text-[#6b7280]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                  <span className="ml-2 text-[#1f2839] font-medium">
+                    {location.pathname.split('/').pop() || 'Home'}
                   </span>
                 </li>
               </ol>
             </nav>
           </div>
 
-          {/* Main Content */}
-          <main className="flex-1 w-full overflow-auto">
-            <div className="w-full max-w-full px-4 sm:px-6 lg:px-8 py-6 mx-auto">
+          {/* Main Content - Full height, no overflow */}
+          <main className="flex-1">
+            <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-6 mx-auto min-h-full">
               {/* Connection Status Banner */}
               {!isOnline && (
-                <div className="mb-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0">
-                      <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                      </svg>
+                <div className="mb-6 bg-amber-50 border border-amber-200 rounded-xl p-4 backdrop-blur-sm animate-pulse">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <svg className="h-5 w-5 text-amber-500" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div className="ml-3">
+                        <h3 className="text-sm font-medium text-amber-800">
+                          Offline Mode
+                        </h3>
+                        <p className="text-sm text-amber-700 mt-1">
+                          You're currently offline. Some features may be limited.
+                        </p>
+                      </div>
                     </div>
-                    <div className="ml-3">
-                      <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                        You're currently offline. Some features may be limited.
-                      </p>
+                    <div className="flex items-center">
+                      <div className="h-2 w-2 bg-amber-500 rounded-full animate-ping mr-2"></div>
+                      <span className="text-xs text-amber-600 font-medium">OFFLINE</span>
                     </div>
                   </div>
                 </div>
               )}
 
               {/* Page Content */}
-              <div className="animate-fade-in w-full min-h-[400px]">
-                <Outlet context={{ 
-                  addNotification, 
-                  openModal, 
-                  closeModal, 
-                  theme, 
-                  language, 
-                  isOnline 
-                }} />
+              <div className={`transition-opacity duration-300 ${isLoading ? 'opacity-50' : 'opacity-100'}`}>
+                <div className="animate-fade-in-up">
+                  <Outlet context={{ 
+                    addNotification, 
+                    openModal, 
+                    closeModal, 
+                    setGlobalLoading,
+                    theme, 
+                    language, 
+                    isOnline 
+                  }} />
+                </div>
               </div>
             </div>
           </main>
@@ -161,14 +252,12 @@ const Layout = () => {
       </div>
 
       {/* Modal Container */}
-      {showModal && (
-        <Modal
-          isOpen={showModal}
-          onClose={closeModal}
-          content={modalContent}
-          theme={theme}
-        />
-      )}
+      <Modal
+        isOpen={showModal}
+        onClose={closeModal}
+        content={modalContent}
+        theme={theme}
+      />
 
       {/* Toast Notifications */}
       <ToastNotifications
@@ -177,12 +266,18 @@ const Layout = () => {
         theme={theme}
       />
 
-      {/* Loading Overlay for Global Actions */}
-      <div id="loading-overlay" className="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-xl">
-          <div className="flex items-center space-x-3">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-            <span className="text-gray-900 dark:text-gray-100">Processing...</span>
+      {/* Loading Overlay */}
+      <div 
+        id="loading-overlay" 
+        className="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center transition-opacity duration-300"
+      >
+        <div className="bg-white rounded-2xl p-8 shadow-2xl border border-[rgba(31,40,57,0.15)] transform transition-transform duration-300 scale-95 hover:scale-100">
+          <div className="flex items-center space-x-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#b69d74]"></div>
+            <div>
+              <p className="text-[#1f2839] font-semibold">Processing...</p>
+              <p className="text-[#6b7280] text-sm mt-1">Please wait a moment</p>
+            </div>
           </div>
         </div>
       </div>
@@ -191,16 +286,19 @@ const Layout = () => {
       <style jsx>{`
         .clerk-layout {
           font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          background: #f5f5ef;
+          height: 100vh;
+          overflow-y: auto;
         }
         
-        .animate-fade-in {
-          animation: fadeIn 0.3s ease-in-out;
+        .animate-fade-in-up {
+          animation: fadeInUp 0.5s ease-out;
         }
         
-        @keyframes fadeIn {
+        @keyframes fadeInUp {
           from {
             opacity: 0;
-            transform: translateY(10px);
+            transform: translateY(20px);
           }
           to {
             opacity: 1;
@@ -208,41 +306,131 @@ const Layout = () => {
           }
         }
 
-        /* Custom scrollbar */
-        .clerk-layout ::-webkit-scrollbar {
-          width: 8px;
-          height: 8px;
+        /* Remove all internal scrollbars, only use browser scroll */
+        .clerk-layout * {
+          overflow: visible !important;
         }
-        
-        .clerk-layout ::-webkit-scrollbar-track {
-          background: rgba(156, 163, 175, 0.1);
-          border-radius: 4px;
-        }
-        
-        .clerk-layout ::-webkit-scrollbar-thumb {
-          background: rgba(156, 163, 175, 0.5);
-          border-radius: 4px;
-        }
-        
-        .clerk-layout ::-webkit-scrollbar-thumb:hover {
-          background: rgba(156, 163, 175, 0.8);
+
+        .clerk-layout main,
+        .clerk-layout .flex-1,
+        .clerk-layout .overflow-auto,
+        .clerk-layout .overflow-hidden {
+          overflow: visible !important;
         }
 
         /* Focus styles for accessibility */
-        .clerk-layout *:focus {
-          outline: 2px solid #3b82f6;
+        .clerk-layout *:focus-visible {
+          outline: 2px solid #b69d74;
           outline-offset: 2px;
+          border-radius: 4px;
         }
 
-        /* Dark mode transitions */
+        /* Smooth transitions for all interactive elements */
         .clerk-layout * {
-          transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+          transition: all 0.2s ease-in-out;
         }
 
-        /* Ensure proper scrolling behavior */
-        html, body {
+        /* Golden glow effects */
+        .golden-glow {
+          box-shadow: 0 0 15px rgba(182, 157, 116, 0.4);
+        }
+
+        .golden-glow-strong {
+          box-shadow: 0 0 25px rgba(182, 157, 116, 0.5);
+        }
+
+        /* Backdrop blur support fallback */
+        @supports not (backdrop-filter: blur(10px)) {
+          .backdrop-blur-sm {
+            background-color: rgba(245, 245, 239, 0.95);
+          }
+        }
+
+        /* Selection colors */
+        .clerk-layout ::selection {
+          background: rgba(182, 157, 116, 0.3);
+          color: #1f2839;
+        }
+
+        .clerk-layout ::-moz-selection {
+          background: rgba(182, 157, 116, 0.3);
+          color: #1f2839;
+        }
+
+        /* Ensure proper full-screen scrolling */
+        html, body, #root {
           height: 100%;
+          margin: 0;
+          padding: 0;
           overflow: auto;
+        }
+
+        body {
+          overflow-y: scroll;
+        }
+      `}</style>
+
+      {/* Inline styles for dynamic color properties */}
+      <style jsx global>{`
+        :root {
+          --primary-bg: #f5f5ef;
+          --primary-text: #1f2839;
+          --accent-color: #b69d74;
+          --secondary-text: #6b7280;
+          --success-color: #10b981;
+          --warning-color: #f59e0b;
+          --info-color: #3b82f6;
+        }
+
+        /* Custom utility classes for the color palette */
+        .bg-primary { background-color: #f5f5ef; }
+        .bg-accent { background-color: #b69d74; }
+        .text-primary { color: #1f2839; }
+        .text-accent { color: #b69d74; }
+        .text-secondary { color: #6b7280; }
+        .border-accent { border-color: #b69d74; }
+        .border-primary { border-color: #1f2839; }
+
+        /* Gradient backgrounds */
+        .bg-gradient-golden {
+          background: linear-gradient(135deg, #b69d74, rgba(182, 157, 116, 0.87), rgba(182, 157, 116, 0.73));
+        }
+
+        .bg-gradient-cream {
+          background: linear-gradient(135deg, rgba(182, 157, 116, 0.12), rgba(182, 157, 116, 0.08));
+        }
+
+        /* Status colors */
+        .text-success { color: #10b981; }
+        .text-warning { color: #f59e0b; }
+        .text-info { color: #3b82f6; }
+        .bg-success { background-color: #10b981; }
+        .bg-warning { background-color: #f59e0b; }
+        .bg-info { background-color: #3b82f6; }
+
+        /* Global scrollbar styling for the entire page */
+        ::-webkit-scrollbar {
+          width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+          background: rgba(182, 157, 116, 0.1);
+          border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+          background: rgba(182, 157, 116, 0.4);
+          border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+          background: rgba(182, 157, 116, 0.6);
+        }
+
+        /* Firefox scrollbar */
+        html {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(182, 157, 116, 0.4) rgba(182, 157, 116, 0.1);
         }
       `}</style>
     </div>

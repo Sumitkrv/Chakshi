@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { 
   BookOpen, 
@@ -13,16 +13,11 @@ import {
   Target,
   ArrowRight,
   Plus,
-  Bell,
-  Search,
-  User,
-  Menu,
-  X
+  Bell
 } from 'lucide-react';
 
 const StudentDashboard = () => {
   const { user } = useAuth();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Debug logging
   useEffect(() => {
@@ -148,7 +143,7 @@ const StudentDashboard = () => {
     { name: 'Case Win Streak', earned: true, count: '5 consecutive wins' },
     { name: 'Client Satisfaction', earned: true, count: '4.8/5 rating' },
     { name: 'Revenue Milestone', earned: true, count: '₹10L+ this year' },
-    { name: 'Court Excellence', earned: false, count: 'Supreme Court case' }
+    { name: 'Court Excellence', earned: true, count: 'Supreme Court case' }
   ];
 
   const getPriorityColor = (priority) => {
@@ -186,121 +181,6 @@ const StudentDashboard = () => {
 
   return (
     <div className="min-h-screen" style={{background: colors.cream}}>
-      {/* Header */}
-      <header className="border-b sticky top-0 z-30 h-16" style={{
-        background: `linear-gradient(135deg, rgba(255, 255, 255, 0.20), rgba(255, 255, 255, 0.10))`,
-        backdropFilter: 'blur(6px)',
-        borderColor: `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`
-      }}>
-        <div className="h-full px-4 flex items-center justify-between">
-          {/* Left Section */}
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2 rounded-md transition-colors"
-              style={{
-                background: `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.08)`,
-                color: colors.navy
-              }}
-              aria-label="Toggle menu"
-            >
-              {isMobileMenuOpen ? (
-                <X className="w-5 h-5" />
-              ) : (
-                <Menu className="w-5 h-5" />
-              )}
-            </button>
-            
-            {/* Logo/Brand */}
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{
-                background: `linear-gradient(135deg, ${colors.golden}, ${colors.golden}DD)`
-              }}>
-                <Award className="w-5 h-5" style={{color: 'white'}} />
-              </div>
-              <span className="font-bold text-lg hidden sm:block" style={{
-                background: `linear-gradient(135deg, ${colors.navy}, ${colors.golden})`,
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent'
-              }}>
-                LegalPro
-              </span>
-            </div>
-            
-            {/* Search Bar */}
-            <div className="relative hidden md:block">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2" style={{color: colors.golden}} />
-              <input
-                type="text"
-                placeholder="Search cases, clients..."
-                className="pl-10 pr-4 py-2 w-64 rounded-lg focus:outline-none transition-all"
-                style={{
-                  background: `rgba(255, 255, 255, 0.06)`,
-                  border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`,
-                  color: colors.navy,
-                  backdropFilter: 'blur(6px)'
-                }}
-                onFocus={(e) => e.target.style.borderColor = colors.golden}
-                onBlur={(e) => e.target.style.borderColor = `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`}
-              />
-            </div>
-          </div>
-
-          {/* Right Section */}
-          <div className="flex items-center space-x-4">
-            {/* Notifications */}
-            <button className="relative p-2 rounded-md transition-colors" style={{
-              background: `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.08)`,
-              color: colors.navy
-            }}>
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-1 right-1 w-2 h-2 rounded-full" style={{background: colors.amber}}></span>
-            </button>
-
-            {/* User Profile */}
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{
-                background: `linear-gradient(135deg, ${colors.golden}20, ${colors.golden}10)`
-              }}>
-                <User className="w-4 h-4" style={{color: colors.golden}} />
-              </div>
-              <div className="hidden sm:block text-right">
-                <p className="text-sm font-medium" style={{color: colors.navy}}>
-                  Adv. {user?.name || 'Legal Professional'}
-                </p>
-                <p className="text-xs" style={{color: colors.gray}}>Senior Advocate</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Mobile Menu */}
-      {isMobileMenuOpen && (
-        <div className="lg:hidden p-4" style={{
-          background: `linear-gradient(135deg, rgba(255, 255, 255, 0.20), rgba(255, 255, 255, 0.10))`,
-          backdropFilter: 'blur(6px)',
-          borderBottom: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`
-        }}>
-          <nav className="space-y-2">
-            {['Dashboard', 'Cases', 'Clients', 'Calendar', 'Documents', 'Reports', 'Settings'].map((item) => (
-              <button
-                key={item}
-                className="w-full text-left px-3 py-2 rounded-lg transition-colors font-medium"
-                style={{
-                  color: colors.navy,
-                  background: `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.05)`
-                }}
-                onMouseEnter={(e) => e.target.style.background = `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.12)`}
-                onMouseLeave={(e) => e.target.style.background = `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.05)`}
-              >
-                {item}
-              </button>
-            ))}
-          </nav>
-        </div>
-      )}
-
       {/* Main Content */}
       <main className="p-4 sm:p-6 lg:p-8">
         {/* Welcome Section */}
@@ -592,56 +472,6 @@ const StudentDashboard = () => {
                 </div>
               ))}
             </div>
-          </div>
-        </div>
-
-        {/* Performance Achievements */}
-        <div className="rounded-lg p-6 mb-8" style={{
-          background: `linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06))`,
-          backdropFilter: 'blur(6px)',
-          border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`
-        }}>
-          <h2 className="text-lg font-semibold mb-4" style={{color: colors.navy}}>Professional Achievements</h2>
-          
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {achievements.map((achievement, index) => (
-              <div 
-                key={index} 
-                className="p-3 rounded-lg transition-all duration-200 hover:scale-105"
-                style={{
-                  background: achievement.earned 
-                    ? `linear-gradient(135deg, ${colors.golden}15, ${colors.golden}08)`
-                    : `rgba(107, 114, 128, 0.05)`,
-                  border: achievement.earned 
-                    ? `1px solid ${colors.golden}40`
-                    : `1px solid rgba(107, 114, 128, 0.15)`
-                }}
-              >
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center mb-2" style={{
-                    background: achievement.earned 
-                      ? `linear-gradient(135deg, ${colors.golden}, ${colors.golden}DD)`
-                      : `rgba(107, 114, 128, 0.10)`,
-                    color: achievement.earned ? 'white' : colors.gray
-                  }}>
-                    <Award className="w-4 h-4" />
-                  </div>
-                  <span className="text-xs font-medium mb-1" style={{
-                    color: achievement.earned ? colors.navy : colors.gray
-                  }}>
-                    {achievement.name}
-                  </span>
-                  <span className="text-xs" style={{
-                    color: achievement.earned ? colors.golden : colors.gray
-                  }}>
-                    {achievement.count}
-                  </span>
-                  {achievement.earned && (
-                    <CheckCircle className="w-3 h-3 mt-1" style={{color: colors.green}} />
-                  )}
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </main>

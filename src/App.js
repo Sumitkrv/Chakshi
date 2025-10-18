@@ -15,7 +15,7 @@ import FreeTools from "./components/FreeTools";
 import RoleGateway from "./components/RoleGateway";
 import Pricing from "./components/Pricing";
 import Testimonials from "./components/Testimonials";
-// Footer removed per request
+import Footer from "./components/Footer";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import SearchResults from "./components/SearchResults";
@@ -33,13 +33,10 @@ import StudentDashboard from "./Student pages/Dashboard";
 import Courses from "./Student pages/Courses";
 import Assignments from "./Student pages/Assignments";
 import Library from "./Student pages/Library";
-import MootCourt from "./Student pages/MootCourt";
 import Calendar from "./Student pages/Calendar";
 import Career from "./Student pages/Career-simple";
-import ContentFeed from "./Student pages/ContentFeed-simple";
 import ExamPrep from "./Student pages/ExamPrep";
 import StudentResearch from "./Student pages/Research";
-import StudentSimulation from "./Student pages/Simulation";
 import StudentNotifications from "./Student pages/Notifications";
 import StudentAllFeatures from "./Student pages/AllFeatures";
 import StudentProfile from "./Student pages/Profile";
@@ -48,20 +45,25 @@ import StudentHelp from "./Student pages/Help";
 import ClerkDashboard from "./Clerk components/Dashboard";
 import CaseList from "./Clerk components/CaseList";
 import CaseDetails from "./Clerk components/CaseDetails";
-import FakeCaseChecker from "./Clerk components/FakeCaseChecker";
 import SmsLog from "./Clerk components/SmsLog";
 import QuickActions from "./Clerk components/QuickActions";
 import OfflineModeToggle from "./Clerk components/OfflineModeToggle";
 import ClerkIntegrations from "./Clerk components/Integrations";
 import ClerkSettings from "./Clerk components/Settings";
-// Admin components/pages imports: some projects keep admin pages in different locations.
-// Import only if they exist under src; otherwise comment out to avoid build errors.
-import AdminLayout from "./Admin/AdminLayout";
-import AdminDashboard from "./Admin/Dashboard";
-import AdminUsers from "./Admin/Users";
-import AdminSettings from "./Admin/Settings";
-// Note: other admin pages (Analytics, Payments, Content, Reports, Courses, Notifications)
-// are not present under src/Admin. If you have them elsewhere, I can wire them up.
+import ClerkCalendar from "./Clerk components/Calendar";
+import ClerkDocuments from "./Clerk components/Documents";
+import ClerkReports from "./Clerk components/Reports";
+import ClerkHelp from "./Clerk components/Help";
+import AdminLayout from "./Admin components/Layout";
+import AdminDashboard from "./Admin pages/Dashboard";
+import AdminUsers from "./Admin pages/Users";
+import AdminAnalytics from "./Admin pages/Analytics";
+import AdminPayments from "./Admin pages/Payments";
+import AdminContent from "./Admin pages/Content";
+import AdminSettings from "./Admin pages/Settings";
+import AdminReports from "./Admin pages/Reports";
+import AdminCourses from "./Admin pages/Courses";
+import AdminNotifications from "./Admin pages/Notifications";
 import ProtectedRoute from "./components/ProtectedRoute";
 import "./App.css";
 
@@ -202,6 +204,7 @@ function AppContent() {
             <div className="flex-grow">
               <Home />
             </div>
+            <Footer />
           </div>
         } />
         
@@ -212,6 +215,7 @@ function AppContent() {
             <div className="flex-grow">
               <SearchResults />
             </div>
+            <Footer />
           </div>
         } />
         
@@ -221,6 +225,7 @@ function AppContent() {
             <div className="flex-grow">
               <Login />
             </div>
+            <Footer />
           </div>
         } />
         <Route path="/register" element={
@@ -228,6 +233,7 @@ function AppContent() {
             <div className="flex-grow">
               <Register />
             </div>
+            <Footer />
           </div>
         } />
         
@@ -238,6 +244,7 @@ function AppContent() {
               <div className="flex-grow">
                 <Dashboard />
               </div>
+              <Footer />
             </div>
           </ProtectedRoute>
         } />
@@ -274,13 +281,10 @@ function AppContent() {
           <Route path="courses" element={<Courses />} />
           <Route path="assignments" element={<Assignments />} />
           <Route path="library" element={<Library />} />
-          <Route path="mootcourt" element={<MootCourt />} />
           <Route path="calendar" element={<Calendar />} />
           <Route path="career" element={<Career />} />
-          <Route path="content-feed" element={<ContentFeed />} />
           <Route path="examprep" element={<ExamPrep />} />
           <Route path="research" element={<StudentResearch />} />
-          <Route path="simulation" element={<StudentSimulation />} />
           <Route path="notifications" element={<StudentNotifications />} />
           <Route path="all-features" element={<StudentAllFeatures />} />
           <Route path="profile" element={<StudentProfile />} />
@@ -300,12 +304,16 @@ function AppContent() {
           <Route path="dashboard" element={<ClerkDashboard />} />
           <Route path="cases" element={<CaseList />} />
           <Route path="case/:id" element={<CaseDetails />} />
-          <Route path="fake-case-checker" element={<FakeCaseChecker />} />
+          <Route path="calendar" element={<ClerkCalendar />} />
+          <Route path="documents" element={<ClerkDocuments />} />
           <Route path="sms-log" element={<SmsLog />} />
           <Route path="quick-actions" element={<QuickActions />} />
-          <Route path="offline-mode" element={<OfflineModeToggle />} />
+          {/* FakeCaseChecker removed */}
+          <Route path="reports" element={<ClerkReports />} />
           <Route path="integrations" element={<ClerkIntegrations />} />
           <Route path="settings" element={<ClerkSettings />} />
+          <Route path="help" element={<ClerkHelp />} />
+          <Route path="offline-mode" element={<OfflineModeToggle />} />
           <Route index element={<Navigate to="dashboard" replace />} />
         </Route>
 
@@ -319,14 +327,13 @@ function AppContent() {
         }>
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="users" element={<AdminUsers />} />
-          {/* The following admin pages are not present in src/Admin; render dashboard as placeholder */}
-          <Route path="analytics" element={<AdminDashboard />} />
-          <Route path="payments" element={<AdminDashboard />} />
-          <Route path="content" element={<AdminDashboard />} />
-          <Route path="courses" element={<AdminDashboard />} />
-          <Route path="notifications" element={<AdminDashboard />} />
+          <Route path="analytics" element={<AdminAnalytics />} />
+          <Route path="payments" element={<AdminPayments />} />
+          <Route path="content" element={<AdminContent />} />
+          <Route path="courses" element={<AdminCourses />} />
+          <Route path="notifications" element={<AdminNotifications />} />
           <Route path="settings" element={<AdminSettings />} />
-          <Route path="reports" element={<AdminDashboard />} />
+          <Route path="reports" element={<AdminReports />} />
           <Route index element={<Navigate to="dashboard" replace />} />
         </Route>
         

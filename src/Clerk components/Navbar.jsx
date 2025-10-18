@@ -17,12 +17,11 @@ const Navbar = ({
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [showCaseManagementMenu, setShowCaseManagementMenu] = useState(false);
-  const [showToolsMenu, setShowToolsMenu] = useState(false);
-  const [showAnalyticsMenu, setShowAnalyticsMenu] = useState(false);
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [hoveredNav, setHoveredNav] = useState(null);
   
   const navigate = useNavigate();
   const location = useLocation();
@@ -31,12 +30,10 @@ const Navbar = ({
   const searchRef = useRef(null);
   const notificationRef = useRef(null);
   const userMenuRef = useRef(null);
-  const caseManagementRef = useRef(null);
-  const toolsRef = useRef(null);
-  const analyticsRef = useRef(null);
+  const moreMenuRef = useRef(null);
   const mobileMenuRef = useRef(null);
 
-  // Color palette from Hero component
+  // Enhanced color palette with gradients
   const colors = {
     cream: '#f5f5ef',
     navy: '#1f2839',
@@ -49,9 +46,24 @@ const Navbar = ({
     gold10: 'rgba(182, 157, 116, 0.10)',
     gold15: 'rgba(182, 157, 116, 0.15)',
     gold20: 'rgba(182, 157, 116, 0.20)',
+    gold40: 'rgba(182, 157, 116, 0.40)',
     navy05: 'rgba(31, 40, 57, 0.05)',
     navy10: 'rgba(31, 40, 57, 0.10)',
     navy15: 'rgba(31, 40, 57, 0.15)',
+    navy25: 'rgba(31, 40, 57, 0.25)',
+    white03: 'rgba(255, 255, 255, 0.03)',
+    white06: 'rgba(255, 255, 255, 0.06)',
+    white08: 'rgba(255, 255, 255, 0.08)',
+  };
+
+  // Enhanced shadows and glows
+  const shadows = {
+    subtle: `0 2px 12px ${colors.navy05}`,
+    medium: `0 4px 20px ${colors.navy10}`,
+    large: `0 8px 32px ${colors.navy15}`,
+    glow: `0 0 20px ${colors.gold20}`,
+    intenseGlow: `0 0 30px ${colors.gold40}`,
+    floating: `0 12px 40px ${colors.navy25}`,
   };
 
   // Mock notifications
@@ -61,81 +73,86 @@ const Navbar = ({
     { id: 3, text: 'Court date changed for Smith v. Jones', time: '2 hours ago', read: true }
   ];
 
-  // Search data
-  const searchableItems = [
-    { id: 1, title: 'Dashboard', type: 'dashboard', url: '/clerk/dashboard', category: 'Analytics' },
-    { id: 2, title: 'Case Management', type: 'module', url: '/clerk/cases', category: 'Cases' },
-    { id: 3, title: 'Court Calendar', type: 'scheduling', url: '/clerk/calendar', category: 'Cases' },
-    { id: 4, title: 'Document Manager', type: 'documents', url: '/clerk/documents', category: 'Cases' },
-    { id: 5, title: 'SMS Logs', type: 'communication', url: '/clerk/sms-log', category: 'Tools' },
-    { id: 6, title: 'Quick Actions', type: 'actions', url: '/clerk/quick-actions', category: 'Tools' },
-    { id: 7, title: 'Fraud Detection', type: 'security', url: '/clerk/fraud-detection', category: 'Analytics' },
-    { id: 8, title: 'Reports', type: 'reports', url: '/clerk/reports', category: 'Analytics' },
-    { id: 9, title: 'Integrations', type: 'integrations', url: '/clerk/integrations', category: 'Tools' },
-    { id: 10, title: 'Settings', type: 'settings', url: '/clerk/settings', category: 'System' },
-  ];
-
-  // Navigation items
-  const caseManagementItems = [
+  // Navigation structure with enhanced icons
+  const navItems = [
     { 
-      name: 'All Cases', 
-      path: '/clerk/cases', 
-      description: 'Manage complete case portfolio',
-      count: '12 Active'
+      name: 'Dashboard', 
+      path: '/clerk/dashboard', 
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        </svg>
+      )
     },
     { 
-      name: 'Court Calendar', 
+      name: 'Cases', 
+      path: '/clerk/cases', 
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+        </svg>
+      )
+    },
+    { 
+      name: 'Calendar', 
       path: '/clerk/calendar', 
-      description: 'Judicial schedules & hearings',
-      count: '3 Today'
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      )
     },
     { 
       name: 'Documents', 
       path: '/clerk/documents', 
-      description: 'Secure document repository',
-      count: '48 Files'
-    }
-  ];
-
-  const toolsItems = [
-    { 
-      name: 'Quick Actions', 
-      path: '/clerk/quick-actions', 
-      description: 'Frequent legal operations',
-      badge: 'Fast'
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      )
     },
-    { 
-      name: 'SMS Logs', 
-      path: '/clerk/sms-log', 
-      description: 'Client & court messaging',
-      count: '12 New'
-    },
-    { 
-      name: 'Integrations', 
-      path: '/clerk/integrations', 
-      description: 'Third-party legal services'
-    }
-  ];
-
-  const analyticsItems = [
-    { 
-      name: 'Dashboard', 
-      path: '/clerk/dashboard', 
-      description: 'Performance overview',
-      badge: 'Live'
-    },
-    { 
-      name: 'Fraud Detection', 
-      path: '/clerk/fraud-detection', 
-      description: 'AI-powered security analysis',
-      badge: 'AI'
-    },
+    // Fraud Detection (FakeCaseChecker) removed
     { 
       name: 'Reports', 
       path: '/clerk/reports', 
-      description: 'Case analytics & insights',
-      badge: 'Data'
-    }
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+      )
+    },
+  ];
+
+  const settingsItems = [
+    { 
+      name: 'Settings', 
+      path: '/clerk/settings', 
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+      )
+    },
+    { 
+      name: 'Offline Mode', 
+      path: '/clerk/offline-mode', 
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 2.829a4.978 4.978 0 01-1.414-2.83m-1.414 5.658a9 9 0 01-2.167-9.238m7.824 2.167a1 1 0 111.414 1.414m-1.414-1.414L3 3" />
+        </svg>
+      ),
+      badge: !isOnline ? 'Active' : null
+    },
+    { 
+      name: 'Help & Support', 
+      path: '/clerk/help', 
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      )
+    },
   ];
 
   // Effects
@@ -147,7 +164,7 @@ const Navbar = ({
 
   useEffect(() => {
     setUnreadCount(mockNotifications.filter(n => !n.read).length);
-  }, [mockNotifications]);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -155,9 +172,7 @@ const Navbar = ({
         { ref: searchRef, setter: setShowSearchResults },
         { ref: notificationRef, setter: setShowNotifications },
         { ref: userMenuRef, setter: setShowUserMenu },
-        { ref: caseManagementRef, setter: setShowCaseManagementMenu },
-        { ref: toolsRef, setter: setShowToolsMenu },
-        { ref: analyticsRef, setter: setShowAnalyticsMenu },
+        { ref: moreMenuRef, setter: setShowMoreMenu },
         { ref: mobileMenuRef, setter: setMobileMenuOpen }
       ];
       
@@ -175,20 +190,14 @@ const Navbar = ({
   const handleSearch = (query) => {
     setSearchQuery(query);
     if (query.length > 1) {
-      const results = searchableItems
-        .filter(item => item.title.toLowerCase().includes(query.toLowerCase()))
-        .slice(0, 6);
+      const results = navItems
+        .filter(item => item.name.toLowerCase().includes(query.toLowerCase()))
+        .slice(0, 8);
       setSearchResults(results);
       setShowSearchResults(true);
     } else {
       setShowSearchResults(false);
     }
-  };
-
-  const handleSearchNavigation = (item) => {
-    navigate(item.url);
-    setShowSearchResults(false);
-    setSearchQuery('');
   };
 
   const handleLogout = async () => {
@@ -204,332 +213,318 @@ const Navbar = ({
     return location.pathname === path || location.pathname.startsWith(path + '/');
   };
 
-  // Clean Professional Dropdown Component
-  const ProfessionalDropdown = ({ items, isOpen, onClose, title }) => (
+  // Enhanced Navigation Item Component with animations - Using Link for proper routing
+  const NavItem = ({ item, mobile = false }) => (
+    <Link
+      to={item.path}
+      onClick={() => {
+        if (mobile) {
+          setMobileMenuOpen(false);
+        }
+      }}
+      className={`flex items-center transition-all duration-300 transform ${
+        mobile 
+          ? 'w-full px-4 py-3 rounded-xl text-left border backdrop-blur-sm hover:scale-105' 
+          : 'px-4 py-2 rounded-xl text-sm font-medium border border-transparent hover:scale-105'
+      } ${
+        isActivePath(item.path) ? 'shadow-lg' : 'hover:shadow-md'
+      }`}
+      style={{
+        color: isActivePath(item.path) ? colors.white : colors.navy,
+        backgroundColor: isActivePath(item.path) 
+          ? `linear-gradient(135deg, ${colors.gold}, #9c835a)`
+          : 'transparent',
+        borderColor: mobile ? colors.gold10 : 'transparent',
+        background: isActivePath(item.path) 
+          ? `linear-gradient(135deg, ${colors.gold}, #9c835a)`
+          : 'transparent',
+        transform: isActivePath(item.path) ? 'translateY(-1px)' : 'none',
+        boxShadow: isActivePath(item.path) ? shadows.glow : 'none',
+      }}
+      onMouseEnter={(e) => {
+        if (!mobile && !isActivePath(item.path)) {
+          e.currentTarget.style.backgroundColor = colors.gold10;
+          e.currentTarget.style.borderColor = colors.gold20;
+          e.currentTarget.style.boxShadow = shadows.subtle;
+        }
+        setHoveredNav(item.path);
+      }}
+      onMouseLeave={(e) => {
+        if (!mobile && !isActivePath(item.path)) {
+          e.currentTarget.style.backgroundColor = 'transparent';
+          e.currentTarget.style.borderColor = 'transparent';
+          e.currentTarget.style.boxShadow = 'none';
+        }
+        setHoveredNav(null);
+      }}
+    >
+      <span 
+        className="mr-3 transition-transform duration-300"
+        style={{ 
+          color: isActivePath(item.path) ? colors.white : colors.gold,
+          transform: hoveredNav === item.path ? 'scale(1.1)' : 'scale(1)'
+        }}
+      >
+        {item.icon}
+      </span>
+      <span className="font-medium">{item.name}</span>
+      
+      {/* Active indicator removed for cleaner UI */}
+    </Link>
+  );
+
+  // Enhanced Dropdown Component - Fixed routing with better styling
+  const EnhancedDropdown = ({ items, isOpen, onClose, title, position = 'left-0' }) => (
     <div 
-      className={`absolute top-full left-0 mt-2 w-80 bg-white rounded-xl shadow-xl border transition-all duration-300 transform ${
+      className={`absolute ${position} top-full mt-3 w-72 bg-white rounded-2xl transition-all duration-300 transform backdrop-blur-xl ${
         isOpen 
           ? 'opacity-100 scale-100 translate-y-0' 
           : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'
       }`}
       style={{
-        borderColor: colors.gold20,
-        boxShadow: `0 20px 40px ${colors.navy10}`
+        border: `2px solid ${colors.gold20}`,
+        boxShadow: shadows.floating,
+        background: `linear-gradient(145deg, ${colors.white} 0%, ${colors.cream} 100%)`,
+        zIndex: 9999
       }}
     >
-      {/* Header */}
-      <div className="p-4 border-b" style={{ borderColor: colors.gold10 }}>
-        <h3 className="font-semibold text-gray-900 text-base">{title}</h3>
-        <p className="text-sm text-gray-500 mt-1">{items.length} specialized tools</p>
+      {/* Header with enhanced gradient */}
+      <div 
+        className="px-5 py-4 border-b rounded-t-2xl"
+        style={{ 
+          borderColor: colors.gold15,
+          background: `linear-gradient(135deg, ${colors.gold05}, ${colors.gold15})`
+        }}
+      >
+        <h3 className="font-bold text-base" style={{ color: colors.navy }}>{title}</h3>
+        <p className="text-xs mt-1 font-medium" style={{ color: colors.gray }}>
+          {items.length} option{items.length !== 1 ? 's' : ''} available
+        </p>
       </div>
       
-      {/* Items */}
-      <div className="p-2">
-        {items.map((item, index) => (
-          <Link
-            key={item.path}
-            to={item.path}
-            onClick={onClose}
-            className={`flex items-center p-3 rounded-lg transition-all duration-200 hover:bg-gray-50 group border ${
-              isActivePath(item.path) 
-                ? 'border-blue-200 bg-blue-50' 
-                : 'border-transparent hover:border-gray-200'
-            }`}
-          >
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between mb-1">
-                <span className={`font-medium text-sm ${
-                  isActivePath(item.path) ? 'text-blue-600' : 'text-gray-900'
-                }`}>
-                  {item.name}
+      {/* Items with enhanced spacing */}
+      <div className="p-3 max-h-96 overflow-y-auto custom-scrollbar">
+        {items.map((item, index) => {
+          // Check if this is a logout/sign out item
+          const isLogoutItem = item.name === 'Sign Out' || item.name === 'Logout';
+          
+          if (isLogoutItem) {
+            return (
+              <button
+                key={item.name}
+                onClick={() => {
+                  handleLogout();
+                  onClose();
+                }}
+                className="flex items-center w-full px-4 py-3.5 rounded-xl transition-all duration-300 transform hover:scale-[1.02] mb-2 border-2"
+                style={{
+                  color: '#ef4444',
+                  backgroundColor: 'transparent',
+                  borderColor: '#fee2e2',
+                  animationDelay: `${index * 50}ms`
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#fef2f2';
+                  e.currentTarget.style.borderColor = '#fecaca';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(239, 68, 68, 0.15)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.borderColor = '#fee2e2';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              >
+                <span 
+                  className="mr-3 transition-transform duration-300"
+                  style={{ color: '#ef4444' }}
+                >
+                  {item.icon}
                 </span>
-                {(item.count || item.badge) && (
-                  <span className={`text-xs px-2 py-1 rounded-full ${
-                    item.badge 
-                      ? 'bg-amber-100 text-amber-800' 
-                      : 'bg-green-100 text-green-800'
-                  }`}>
-                    {item.count || item.badge}
-                  </span>
-                )}
-              </div>
-              <p className="text-xs text-gray-600">{item.description}</p>
-            </div>
-            <div className={`opacity-0 group-hover:opacity-100 transition-opacity duration-200 ml-2 ${
-              isActivePath(item.path) ? 'text-blue-500' : 'text-gray-400'
-            }`}>
-              →
-            </div>
-          </Link>
-        ))}
+                <span className="text-sm font-semibold flex-1 text-left">{item.name}</span>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            );
+          }
+          
+          // Regular navigation item - use Link with badge support
+          const isActive = isActivePath(item.path);
+          return (
+            <Link
+              key={item.path || item.id}
+              to={item.path || '#'}
+              onClick={() => onClose()}
+              className={`flex items-center w-full px-4 py-3.5 rounded-xl transition-all duration-300 transform hover:scale-[1.02] mb-2 border-2 group ${
+                isActive ? 'shadow-lg' : 'hover:shadow-md'
+              }`}
+              style={{
+                color: isActive ? colors.gold : colors.navy,
+                backgroundColor: isActive ? colors.gold10 : 'transparent',
+                borderColor: isActive ? colors.gold : colors.gold10,
+                animationDelay: `${index * 50}ms`
+              }}
+              onMouseEnter={(e) => {
+                if (!isActive) {
+                  e.currentTarget.style.backgroundColor = colors.gold05;
+                  e.currentTarget.style.borderColor = colors.gold20;
+                  e.currentTarget.style.boxShadow = shadows.subtle;
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isActive) {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.borderColor = colors.gold10;
+                  e.currentTarget.style.boxShadow = 'none';
+                }
+              }}
+            >
+              <span 
+                className="mr-3 transition-transform duration-300 group-hover:scale-110"
+                style={{ color: isActive ? colors.gold : colors.gray }}
+              >
+                {item.icon}
+              </span>
+              <span className="text-sm font-semibold flex-1 text-left">{item.name}</span>
+              
+              {/* Badge for special items */}
+              {item.badge && (
+                <span 
+                  className="px-2 py-1 text-xs font-bold rounded-full mr-2"
+                  style={{
+                    backgroundColor: colors.green,
+                    color: 'white'
+                  }}
+                >
+                  {item.badge}
+                </span>
+              )}
+              
+              <svg 
+                className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" 
+                style={{ color: colors.gold }} 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          );
+        })}
       </div>
     </div>
-  );
-
-  // Navigation Button Component
-  const NavButton = ({ item, mobile = false }) => (
-    <button
-      onClick={() => mobile ? (navigate(item.path), setMobileMenuOpen(false)) : navigate(item.path)}
-      className={`transition-all duration-200 ${
-        mobile 
-          ? 'w-full px-4 py-3 rounded-lg text-left border backdrop-blur-sm' 
-          : 'px-3 py-2 rounded-md text-sm font-medium border border-transparent'
-      }`}
-      style={{
-        color: isActivePath(item.path) ? colors.gold : colors.navy,
-        backgroundColor: isActivePath(item.path) ? colors.gold10 : 'transparent',
-        borderColor: mobile ? colors.gold10 : 'transparent',
-        fontWeight: isActivePath(item.path) ? '600' : '500',
-      }}
-      onMouseEnter={(e) => {
-        if (!mobile && !isActivePath(item.path)) {
-          e.target.style.backgroundColor = colors.gold05;
-          e.target.style.borderColor = colors.gold10;
-        }
-      }}
-      onMouseLeave={(e) => {
-        if (!mobile && !isActivePath(item.path)) {
-          e.target.style.backgroundColor = 'transparent';
-          e.target.style.borderColor = 'transparent';
-        }
-      }}
-    >
-      <span>{item.name}</span>
-    </button>
   );
 
   return (
     <>
       <nav 
-        className="sticky top-0 z-50 border-b backdrop-blur-sm"
+        className="sticky top-0 z-50 border-b backdrop-blur-lg transition-all duration-500"
         style={{ 
-          backgroundColor: colors.cream,
-          borderColor: colors.gold10,
-          boxShadow: isScrolled ? `0 4px 20px ${colors.navy05}` : 'none'
+          backgroundColor: `rgba(245, 245, 239, 0.95)`,
+          borderColor: colors.gold15,
+          boxShadow: isScrolled ? shadows.medium : 'none',
+          background: isScrolled 
+            ? `linear-gradient(135deg, rgba(245, 245, 239, 0.98) 0%, rgba(245, 245, 239, 0.92) 100%)`
+            : colors.cream
         }}
       >
         <div className="flex items-center justify-between h-16 px-6">
-          {/* Left Section - Logo & Navigation */}
+          {/* Left Section - Logo with enhanced animation */}
           <div className="flex items-center space-x-8">
-            {/* Brand */}
-            <div 
-              className="flex items-center cursor-pointer"
-              onClick={() => navigate('/clerk/dashboard')}
+            <Link 
+              to="/clerk/dashboard"
+              className="flex items-center cursor-pointer group"
             >
               <div 
-                className="w-8 h-8 rounded-lg flex items-center justify-center mr-3"
+                className="w-8 h-8 rounded-xl flex items-center justify-center mr-3 transition-all duration-500 group-hover:scale-110 group-hover:shadow-lg"
                 style={{
-                  background: `linear-gradient(135deg, ${colors.gold}, #9c835a)`
+                  background: `linear-gradient(135deg, ${colors.gold}, #9c835a)`,
+                  boxShadow: `0 4px 15px ${colors.gold20}`
                 }}
               >
                 <span className="text-white font-bold text-sm">CL</span>
               </div>
-              <div>
+              <div className="transition-transform duration-300 group-hover:scale-105">
                 <h1 className="text-lg font-bold" style={{ color: colors.navy }}>
                   Chakshi Legal
                 </h1>
-                <p className="text-xs" style={{ color: colors.gray }}>
+                <p className="text-xs transition-colors duration-300 group-hover:text-gray-600" style={{ color: colors.gray }}>
                   Court Clerk System
                 </p>
               </div>
-            </div>
+            </Link>
 
             {/* Desktop Navigation */}
-            <div className="hidden xl:flex items-center space-x-1">
-              {/* Dashboard - Direct Link */}
-              <NavButton item={{ name: 'Dashboard', path: '/clerk/dashboard' }} />
-
-              {/* Case Management */}
-              <div className="relative" ref={caseManagementRef}>
+            <div className="hidden lg:flex items-center space-x-2">
+              {navItems.slice(0, 4).map(item => (
+                <NavItem key={item.path} item={item} />
+              ))}
+              
+              {/* More dropdown */}
+              <div className="relative" ref={moreMenuRef}>
                 <button
-                  onClick={() => setShowCaseManagementMenu(!showCaseManagementMenu)}
-                  className={`flex items-center px-3 py-2 rounded-md text-sm font-medium border border-transparent transition-all duration-200 ${
-                    isActivePath('/clerk/cases') || isActivePath('/clerk/calendar') || isActivePath('/clerk/documents')
-                      ? 'text-white'
-                      : 'text-gray-700'
-                  }`}
-                  style={{
-                    background: isActivePath('/clerk/cases') || isActivePath('/clerk/calendar') || isActivePath('/clerk/documents')
-                      ? `linear-gradient(135deg, ${colors.gold}, #9c835a)`
-                      : 'transparent',
+                  onClick={() => setShowMoreMenu(!showMoreMenu)}
+                  className="flex items-center px-4 py-2 rounded-xl text-sm font-medium border border-transparent transition-all duration-300 hover:scale-105"
+                  style={{ 
+                    color: colors.navy,
+                    backgroundColor: showMoreMenu ? colors.gold10 : 'transparent',
+                    borderColor: showMoreMenu ? colors.gold20 : 'transparent'
                   }}
                   onMouseEnter={(e) => {
-                    if (!isActivePath('/clerk/cases') && !isActivePath('/clerk/calendar') && !isActivePath('/clerk/documents')) {
+                    if (!showMoreMenu) {
                       e.target.style.backgroundColor = colors.gold05;
                       e.target.style.borderColor = colors.gold10;
                     }
                   }}
                   onMouseLeave={(e) => {
-                    if (!isActivePath('/clerk/cases') && !isActivePath('/clerk/calendar') && !isActivePath('/clerk/documents')) {
+                    if (!showMoreMenu) {
                       e.target.style.backgroundColor = 'transparent';
                       e.target.style.borderColor = 'transparent';
                     }
                   }}
                 >
-                  Case Management
-                  <svg className={`ml-2 w-4 h-4 transition-transform duration-200 ${
-                    showCaseManagementMenu ? 'rotate-180' : ''
-                  }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  More
+                  <svg 
+                    className={`ml-2 w-4 h-4 transition-transform duration-300 ${showMoreMenu ? 'rotate-180' : ''}`}
+                    style={{ color: colors.gold }}
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
-                <ProfessionalDropdown 
-                  items={caseManagementItems}
-                  isOpen={showCaseManagementMenu}
-                  onClose={() => setShowCaseManagementMenu(false)}
-                  title="Case Management"
-                />
-              </div>
-
-              {/* Legal Tools */}
-              <div className="relative" ref={toolsRef}>
-                <button
-                  onClick={() => setShowToolsMenu(!showToolsMenu)}
-                  className={`flex items-center px-3 py-2 rounded-md text-sm font-medium border border-transparent transition-all duration-200 ${
-                    isActivePath('/clerk/quick-actions') || isActivePath('/clerk/sms-log') || isActivePath('/clerk/integrations')
-                      ? 'text-white'
-                      : 'text-gray-700'
-                  }`}
-                  style={{
-                    background: isActivePath('/clerk/quick-actions') || isActivePath('/clerk/sms-log') || isActivePath('/clerk/integrations')
-                      ? `linear-gradient(135deg, ${colors.gold}, #9c835a)`
-                      : 'transparent',
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isActivePath('/clerk/quick-actions') && !isActivePath('/clerk/sms-log') && !isActivePath('/clerk/integrations')) {
-                      e.target.style.backgroundColor = colors.gold05;
-                      e.target.style.borderColor = colors.gold10;
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isActivePath('/clerk/quick-actions') && !isActivePath('/clerk/sms-log') && !isActivePath('/clerk/integrations')) {
-                      e.target.style.backgroundColor = 'transparent';
-                      e.target.style.borderColor = 'transparent';
-                    }
-                  }}
-                >
-                  Legal Tools
-                  <svg className={`ml-2 w-4 h-4 transition-transform duration-200 ${
-                    showToolsMenu ? 'rotate-180' : ''
-                  }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-                <ProfessionalDropdown 
-                  items={toolsItems}
-                  isOpen={showToolsMenu}
-                  onClose={() => setShowToolsMenu(false)}
-                  title="Legal Tools"
-                />
-              </div>
-
-              {/* Analytics */}
-              <div className="relative" ref={analyticsRef}>
-                <button
-                  onClick={() => setShowAnalyticsMenu(!showAnalyticsMenu)}
-                  className={`flex items-center px-3 py-2 rounded-md text-sm font-medium border border-transparent transition-all duration-200 ${
-                    isActivePath('/clerk/fraud-detection') || isActivePath('/clerk/reports')
-                      ? 'text-white'
-                      : 'text-gray-700'
-                  }`}
-                  style={{
-                    background: isActivePath('/clerk/fraud-detection') || isActivePath('/clerk/reports')
-                      ? `linear-gradient(135deg, ${colors.gold}, #9c835a)`
-                      : 'transparent',
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isActivePath('/clerk/fraud-detection') && !isActivePath('/clerk/reports')) {
-                      e.target.style.backgroundColor = colors.gold05;
-                      e.target.style.borderColor = colors.gold10;
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isActivePath('/clerk/fraud-detection') && !isActivePath('/clerk/reports')) {
-                      e.target.style.backgroundColor = 'transparent';
-                      e.target.style.borderColor = 'transparent';
-                    }
-                  }}
-                >
-                  Analytics
-                  <svg className={`ml-2 w-4 h-4 transition-transform duration-200 ${
-                    showAnalyticsMenu ? 'rotate-180' : ''
-                  }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-                <ProfessionalDropdown 
-                  items={analyticsItems}
-                  isOpen={showAnalyticsMenu}
-                  onClose={() => setShowAnalyticsMenu(false)}
-                  title="Analytics"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Center Section - Search */}
-          <div className="flex-1 max-w-xl mx-8" ref={searchRef}>
-            <div className="relative">
-              <div className="relative">
-                <input
-                  id="global-search"
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => handleSearch(e.target.value)}
-                  placeholder="Search cases, documents, tools..."
-                  className="w-full pl-10 pr-4 py-2 rounded-lg border transition-all duration-200 focus:ring-2 focus:ring-[#b69d74] focus:border-transparent"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.8)',
-                    borderColor: showSearchResults ? colors.gold : colors.gray,
-                    color: colors.navy
-                  }}
-                />
                 
-                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </div>
+                <EnhancedDropdown 
+                  items={navItems.slice(4)}
+                  isOpen={showMoreMenu}
+                  onClose={() => setShowMoreMenu(false)}
+                  title="More Options"
+                />
               </div>
-
-              {/* Search Results */}
-              {showSearchResults && (
-                <div className="absolute top-full mt-1 w-full bg-white rounded-lg shadow-xl border max-h-80 overflow-y-auto">
-                  <div className="p-3 border-b">
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium text-sm text-gray-900">Search Results</span>
-                      <span className="text-xs text-gray-500">{searchResults.length} found</span>
-                    </div>
-                  </div>
-                  <div className="py-1">
-                    {searchResults.map((item) => (
-                      <button
-                        key={item.id}
-                        onClick={() => handleSearchNavigation(item)}
-                        className="w-full px-3 py-2 text-left hover:bg-gray-50 transition-colors duration-150 flex items-center space-x-3"
-                      >
-                        <div className="w-2 h-2 rounded-full bg-[#b69d74] flex-shrink-0"></div>
-                        <div className="flex-1 min-w-0">
-                          <div className="font-medium text-sm text-gray-900 truncate">{item.title}</div>
-                          <div className="text-xs text-gray-500 flex items-center space-x-2">
-                            <span>{item.category}</span>
-                            <span>•</span>
-                            <span className="capitalize">{item.type}</span>
-                          </div>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           </div>
 
-          {/* Right Section */}
-          <div className="flex items-center space-x-4">
+          {/* Compact Search Button (professional minimal UI) */}
+          <div className="flex-1 flex justify-center mx-4">
+            <Link
+              to="/search"
+              className="p-2 rounded-lg border-2 transition-colors duration-200 hover:bg-white hover:shadow-sm"
+              style={{ borderColor: colors.gold10, color: colors.navy, backgroundColor: 'transparent' }}
+              aria-label="Open search"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </Link>
+          </div>
+
+          {/* Right Section - Cleaned up (Online button removed) */}
+          <div className="flex items-center space-x-3">
             {/* Mobile Menu Button */}
             <button 
-              className="xl:hidden p-2 rounded-md transition-colors text-sm font-medium border border-transparent"
+              className="lg:hidden p-2 rounded-xl transition-all duration-300 hover:scale-110 hover:shadow-lg border border-transparent"
               style={{ color: colors.navy }}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               onMouseEnter={(e) => {
@@ -541,35 +536,61 @@ const Navbar = ({
                 e.target.style.borderColor = 'transparent';
               }}
             >
-              Menu
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
             </button>
 
-            {/* Status */}
-            <div className="flex items-center space-x-2 px-3 py-1 rounded-full" style={{ backgroundColor: colors.gold05 }}>
-              <div className={`w-2 h-2 rounded-full ${isOnline ? 'bg-green-500' : 'bg-amber-500'}`}></div>
-              <span className="text-sm" style={{ color: colors.navy }}>{isOnline ? 'Online' : 'Offline'}</span>
-            </div>
-
-            {/* Notifications */}
-            <div className="relative" ref={notificationRef}>
-              <button 
-                className="relative p-2 rounded-md transition-colors text-sm font-medium border border-transparent"
-                style={{ color: colors.navy }}
-                onClick={() => setShowNotifications(!showNotifications)}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = colors.gold05;
-                  e.target.style.borderColor = colors.gold10;
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = 'transparent';
-                  e.target.style.borderColor = 'transparent';
+            {/* Connection Status Indicator (neutral text only) */}
+            <div className="hidden lg:flex items-center">
+              <div 
+                className="px-3 py-2 rounded-xl"
+                style={{
+                  backgroundColor: 'transparent'
                 }}
               >
-                Notifications
+                <span 
+                  className="text-xs font-semibold"
+                  style={{ color: isOnline ? colors.green : colors.gray }}
+                >
+                  {isOnline ? 'Online' : 'Offline'}
+                </span>
+              </div>
+            </div>
+
+            {/* Enhanced Notifications */}
+            <div className="relative" ref={notificationRef}>
+              <button 
+                className="relative p-2.5 rounded-xl transition-all duration-300 hover:scale-110 hover:shadow-lg border-2 group"
+                style={{ 
+                  color: colors.navy,
+                  borderColor: showNotifications ? colors.gold : colors.gold10,
+                  backgroundColor: showNotifications ? colors.gold05 : 'transparent'
+                }}
+                onClick={() => setShowNotifications(!showNotifications)}
+                onMouseEnter={(e) => {
+                  if (!showNotifications) {
+                    e.currentTarget.style.backgroundColor = colors.gold05;
+                    e.currentTarget.style.borderColor = colors.gold20;
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!showNotifications) {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.borderColor = colors.gold10;
+                  }
+                }}
+              >
+                <svg className="w-5 h-5 transition-transform duration-300 group-hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
                 {unreadCount > 0 && (
                   <span 
-                    className="absolute -top-1 -right-1 h-4 w-4 rounded-full text-xs flex items-center justify-center text-white font-semibold"
-                    style={{ backgroundColor: colors.amber }}
+                    className="absolute -top-1 -right-1 h-5 w-5 rounded-full text-xs flex items-center justify-center text-white font-bold animate-bounce"
+                    style={{ 
+                      backgroundColor: colors.amber,
+                      boxShadow: `0 4px 12px ${colors.amber}60`
+                    }}
                   >
                     {unreadCount}
                   </span>
@@ -577,40 +598,89 @@ const Navbar = ({
               </button>
 
               {showNotifications && (
-                <div className="absolute right-0 mt-2 w-80 border rounded-lg shadow-lg z-40 bg-white">
-                  <div className="p-4 border-b">
-                    <div className="flex justify-between items-center">
-                      <h3 className="text-sm font-semibold text-gray-900">
-                        Notifications
-                      </h3>
-                      <span className="text-xs text-gray-500">
-                        {unreadCount} unread
-                      </span>
+                <div 
+                  className={`absolute right-0 top-full mt-3 w-80 bg-white rounded-2xl transition-all duration-300 transform backdrop-blur-xl ${
+                    showNotifications 
+                      ? 'opacity-100 scale-100 translate-y-0' 
+                      : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'
+                  }`}
+                  style={{
+                    border: `2px solid ${colors.gold20}`,
+                    boxShadow: shadows.floating,
+                    background: `linear-gradient(145deg, ${colors.white} 0%, ${colors.cream} 100%)`,
+                    zIndex: 9999
+                  }}
+                >
+                  {/* Notifications Header */}
+                  <div 
+                    className="px-5 py-4 border-b rounded-t-2xl flex items-center justify-between"
+                    style={{ 
+                      borderColor: colors.gold15,
+                      background: `linear-gradient(135deg, ${colors.gold05}, ${colors.gold15})`
+                    }}
+                  >
+                    <div>
+                      <h3 className="font-bold text-base" style={{ color: colors.navy }}>Notifications</h3>
+                      <p className="text-xs mt-1 font-medium" style={{ color: colors.gray }}>
+                        {unreadCount} unread message{unreadCount !== 1 ? 's' : ''}
+                      </p>
                     </div>
-                  </div>
-                  
-                  <div className="max-h-96 overflow-y-auto">
-                    {mockNotifications.map(notification => (
-                      <div 
-                        key={notification.id}
-                        className="p-4 border-b cursor-pointer transition-colors"
+                    {unreadCount > 0 && (
+                      <button
+                        className="text-xs font-semibold px-3 py-1.5 rounded-lg transition-all duration-300 hover:scale-105"
                         style={{
-                          borderColor: colors.gold10,
-                          backgroundColor: notification.read ? 'transparent' : colors.gold05
+                          backgroundColor: colors.gold20,
+                          color: colors.gold
                         }}
-                        onMouseEnter={(e) => {
-                          e.target.style.backgroundColor = colors.gold05;
-                        }}
-                        onMouseLeave={(e) => {
-                          e.target.style.backgroundColor = notification.read ? 'transparent' : colors.gold05;
+                        onClick={() => {
+                          // Mark all as read logic here
+                          setUnreadCount(0);
                         }}
                       >
-                        <p className="text-sm mb-1 font-medium text-gray-900">
-                          {notification.text}
-                        </p>
-                        <span className="text-xs text-gray-500">
-                          {notification.time}
-                        </span>
+                        Mark all read
+                      </button>
+                    )}
+                  </div>
+                  
+                  {/* Notifications List */}
+                  <div className="p-3 max-h-96 overflow-y-auto custom-scrollbar">
+                    {mockNotifications.map((notif, index) => (
+                      <div
+                        key={notif.id}
+                        className="px-4 py-3 rounded-xl transition-all duration-300 hover:scale-[1.02] mb-2 border-2 cursor-pointer"
+                        style={{
+                          backgroundColor: notif.read ? 'transparent' : colors.gold05,
+                          borderColor: notif.read ? colors.gold10 : colors.gold20,
+                          animationDelay: `${index * 50}ms`
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = colors.gold10;
+                          e.currentTarget.style.borderColor = colors.gold20;
+                          e.currentTarget.style.boxShadow = shadows.subtle;
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = notif.read ? 'transparent' : colors.gold05;
+                          e.currentTarget.style.borderColor = notif.read ? colors.gold10 : colors.gold20;
+                          e.currentTarget.style.boxShadow = 'none';
+                        }}
+                      >
+                        <div className="flex items-start space-x-3">
+                          <div 
+                            className={`w-2.5 h-2.5 rounded-full mt-1 flex-shrink-0 ${!notif.read ? 'animate-pulse' : ''}`}
+                            style={{ 
+                              backgroundColor: notif.read ? colors.gray : colors.amber,
+                              boxShadow: !notif.read ? `0 0 8px ${colors.amber}` : 'none'
+                            }}
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium" style={{ color: colors.navy }}>
+                              {notif.text}
+                            </p>
+                            <p className="text-xs mt-1" style={{ color: colors.gray }}>
+                              {notif.time}
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -618,141 +688,193 @@ const Navbar = ({
               )}
             </div>
 
-            {/* User Profile */}
+            {/* Enhanced User Profile */}
             <div className="relative" ref={userMenuRef}>
               <button 
-                className="flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors border"
+                className="flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg border-2 group"
                 style={{
-                  borderColor: colors.gold10,
-                  color: colors.navy
+                  borderColor: showUserMenu ? colors.gold : colors.gold10,
+                  color: colors.navy,
+                  backgroundColor: showUserMenu ? colors.gold10 : 'transparent',
+                  boxShadow: showUserMenu ? shadows.subtle : 'none'
                 }}
                 onClick={() => setShowUserMenu(!showUserMenu)}
                 onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = colors.gold05;
-                  e.target.style.borderColor = colors.gold;
+                  if (!showUserMenu) {
+                    e.currentTarget.style.backgroundColor = colors.gold05;
+                    e.currentTarget.style.borderColor = colors.gold20;
+                    e.currentTarget.style.boxShadow = shadows.subtle;
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = 'transparent';
-                  e.target.style.borderColor = colors.gold10;
+                  if (!showUserMenu) {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.borderColor = colors.gold10;
+                    e.currentTarget.style.boxShadow = 'none';
+                  }
                 }}
               >
                 <div 
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-semibold"
+                  className="w-9 h-9 rounded-xl flex items-center justify-center text-white text-sm font-bold transition-all duration-300 group-hover:scale-110 group-hover:shadow-xl relative overflow-hidden"
                   style={{
-                    background: `linear-gradient(135deg, ${colors.gold}, #9c835a)`
+                    background: `linear-gradient(135deg, ${colors.gold}, #9c835a)`,
+                    boxShadow: `0 4px 15px ${colors.gold20}`
                   }}
                 >
-                  {user ? user.name?.charAt(0) || user.email?.charAt(0) : 'U'}
+                  {/* Animated glow effect */}
+                  <div 
+                    className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-300"
+                  />
+                  {user ? user.name?.charAt(0)?.toUpperCase() || user.email?.charAt(0)?.toUpperCase() : 'U'}
                 </div>
                 <div className="hidden lg:block text-left">
-                  <p className="text-sm font-semibold" style={{ color: colors.navy }}>
+                  <p className="text-sm font-bold transition-colors duration-300 group-hover:text-gray-900" style={{ color: colors.navy }}>
                     {user ? user.name?.split(' ')[0] : 'User'}
                   </p>
-                  <p className="text-xs" style={{ color: colors.gray }}>
+                  <p className="text-xs font-medium transition-colors duration-300 group-hover:text-gray-600" style={{ color: colors.gray }}>
                     {user?.role || 'Court Clerk'}
                   </p>
                 </div>
-                <span 
-                  className={`text-xs transition-transform ${showUserMenu ? 'rotate-180' : ''}`}
+                <svg 
+                  className={`w-4 h-4 transition-all duration-300 ${showUserMenu ? 'rotate-180' : ''} group-hover:scale-110`}
                   style={{ color: colors.gold }}
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
                 >
-                  ▼
-                </span>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
               </button>
 
               {showUserMenu && (
-                <div className="absolute right-0 mt-2 w-56 border rounded-lg shadow-lg z-40 bg-white">
-                  <div className="p-4 border-b">
-                    <p className="text-sm font-medium text-gray-900">
-                      {user?.name || 'User'}
-                    </p>
-                    <p className="text-xs truncate text-gray-600">
-                      {user?.email || 'user@example.com'}
-                    </p>
-                  </div>
-                  
-                  <div className="py-2">
-                    <button 
-                      onClick={() => navigate('/clerk/settings')}
-                      className="flex items-center w-full px-4 py-2 text-sm transition-colors text-left hover:bg-gray-100"
-                      style={{ color: colors.navy }}
-                    >
-                      Settings
-                    </button>
-                    <button 
-                      onClick={() => navigate('/clerk/help')}
-                      className="flex items-center w-full px-4 py-2 text-sm transition-colors text-left hover:bg-gray-100"
-                      style={{ color: colors.navy }}
-                    >
-                      Help & Support
-                    </button>
-                  </div>
-
-                  <div className="border-t py-2">
-                    <button 
-                      onClick={handleLogout}
-                      className="flex items-center w-full px-4 py-2 text-sm transition-colors text-left hover:bg-red-50"
-                      style={{ color: colors.amber }}
-                    >
-                      Sign Out
-                    </button>
-                  </div>
-                </div>
+                <EnhancedDropdown 
+                  items={[
+                    ...settingsItems,
+                    { 
+                      name: 'Sign Out', 
+                      path: '#', 
+                      icon: (
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                      )
+                    }
+                  ]}
+                  isOpen={showUserMenu}
+                  onClose={() => setShowUserMenu(false)}
+                  title="Account Menu"
+                  position="right-0"
+                />
               )}
             </div>
           </div>
         </div>
       </nav>
 
-      {/* Mobile Navigation Menu */}
+      {/* Enhanced Mobile Navigation Menu */}
       {mobileMenuOpen && (
         <div 
           ref={mobileMenuRef}
-          className="xl:hidden absolute top-16 left-0 right-0 z-40 border-b shadow-lg bg-white"
+          className="lg:hidden fixed top-16 left-0 right-0 bottom-0 z-40 backdrop-blur-lg"
           style={{
-            borderColor: colors.gold10,
+            backgroundColor: `rgba(245, 245, 239, 0.95)`,
           }}
         >
-          <div className="px-6 py-4 space-y-1">
-            {/* Core Navigation */}
-            <div className="mb-4">
-              <h3 className="text-xs font-semibold uppercase tracking-wider mb-2 text-gray-500">
-                Core
-              </h3>
-              <div className="space-y-1">
-                <NavButton item={{ name: 'Dashboard', path: '/clerk/dashboard' }} mobile />
-                {caseManagementItems.map(item => (
-                  <NavButton key={item.path} item={item} mobile />
+          <div 
+            className="border-b mx-6 mt-4 rounded-2xl shadow-xl overflow-hidden"
+            style={{
+              borderColor: colors.gold20,
+              boxShadow: shadows.floating,
+              background: `linear-gradient(135deg, ${colors.white} 0%, ${colors.cream} 100%)`
+            }}
+          >
+            <div className="px-6 py-4 space-y-1 max-h-[calc(100vh-8rem)] overflow-y-auto">
+              {/* Navigation Items */}
+              <div className="space-y-2">
+                {navItems.map(item => (
+                  <NavItem key={item.path} item={item} mobile />
                 ))}
               </div>
-            </div>
 
-            {/* Tools */}
-            <div className="mb-4">
-              <h3 className="text-xs font-semibold uppercase tracking-wider mb-2 text-gray-500">
-                Tools
-              </h3>
-              <div className="space-y-1">
-                {toolsItems.map(item => (
-                  <NavButton key={item.path} item={item} mobile />
-                ))}
-              </div>
-            </div>
-
-            {/* Analytics */}
-            <div className="mb-4">
-              <h3 className="text-xs font-semibold uppercase tracking-wider mb-2 text-gray-500">
-                Analytics
-              </h3>
-              <div className="space-y-1">
-                {analyticsItems.map(item => (
-                  <NavButton key={item.path} item={item} mobile />
-                ))}
+              {/* Settings Section */}
+              <div className="pt-4 mt-4 border-t" style={{ borderColor: colors.gold10 }}>
+                <div className="space-y-2">
+                  {settingsItems.map(item => (
+                    <NavItem key={item.path} item={item} mobile />
+                  ))}
+                </div>
               </div>
             </div>
           </div>
         </div>
       )}
+
+      {/* Enhanced custom styles */}
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { transform: scale(1); opacity: 1; }
+          50% { transform: scale(1.05); opacity: 0.8; }
+        }
+        
+        @keyframes slideIn {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        
+        .animate-slide-in {
+          animation: slideIn 0.3s ease-out;
+        }
+        
+        .animate-fade-in {
+          animation: fadeIn 0.3s ease-out;
+        }
+        
+        /* Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: ${colors.gold05};
+          border-radius: 10px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: ${colors.gold};
+          border-radius: 10px;
+          transition: all 0.3s ease;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #9c835a;
+        }
+        
+        /* Smooth transitions for all interactive elements */
+        button, a, input {
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* Focus styles for accessibility */
+        button:focus-visible, a:focus-visible {
+          outline: 2px solid ${colors.gold};
+          outline-offset: 2px;
+        }
+        
+        /* Enhanced hover effects */
+        .hover-lift {
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .hover-lift:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+      `}</style>
     </>
   );
 };

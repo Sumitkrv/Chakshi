@@ -18,7 +18,6 @@ const CaseDetails = () => {
   const [formData, setFormData] = useState({});
   const [documents, setDocuments] = useState([]);
   const [uploadProgress, setUploadProgress] = useState({});
-  const [auditLog, setAuditLog] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [websocketConnected, setWebsocketConnected] = useState(false);
   const [permissions, setPermissions] = useState({
@@ -28,67 +27,325 @@ const CaseDetails = () => {
     canNotify: true
   });
 
-  // Mock case data
-  const mockCaseData = {
-    id: parseInt(id),
-    number: '2023/CRL/001',
-    title: 'State vs John Doe',
-    status: 'Active',
-    priority: 'High',
-    court: 'District Court I',
-    caseType: 'Criminal',
-    filingDate: '2023-01-15',
-    nextHearing: '2023-12-25',
-    hearingTime: '10:00 AM',
-    judge: 'Hon. Justice Smith',
-    parties: [
-      { id: 1, name: 'State', type: 'Petitioner', advocate: 'Public Prosecutor', contact: '+91-9876543210' },
-      { id: 2, name: 'John Doe', type: 'Respondent', advocate: 'Adv. Kumar', contact: '+91-9876543211' }
-    ],
-    description: 'Criminal case involving theft charges against the accused John Doe.',
-    caseHistory: [
-      { date: '2023-01-15', event: 'Case filed', details: 'FIR filed at Station House', by: 'Police' },
-      { date: '2023-01-20', event: 'First hearing', details: 'Case admitted for hearing', by: 'Court' },
-      { date: '2023-02-15', event: 'Evidence submitted', details: 'CCTV footage submitted', by: 'Prosecution' },
-      { date: '2023-03-10', event: 'Witness statement', details: 'Key witness testimony recorded', by: 'Court' }
-    ],
-    acts: ['IPC Section 378', 'IPC Section 380'],
-    attachments: [
-      { id: 1, name: 'FIR Copy.pdf', type: 'application/pdf', size: '2.5 MB', uploadedBy: 'Police', uploadedAt: '2023-01-15' },
-      { id: 2, name: 'CCTV Evidence.mp4', type: 'video/mp4', size: '45.2 MB', uploadedBy: 'Prosecution', uploadedAt: '2023-02-15' }
-    ]
+  // Mock cases database - matching CaseList data
+  const mockCasesDatabase = {
+    1: {
+      id: 1,
+      number: '2023/CRL/001',
+      title: 'State vs John Doe',
+      status: 'Active',
+      priority: 'High',
+      court: 'District Court I',
+      caseType: 'Criminal',
+      filingDate: '2023-01-15',
+      nextHearing: '2023-12-25',
+      hearingTime: '10:00 AM',
+      judge: 'Hon. Justice Smith',
+      parties: [
+        { id: 1, name: 'State', type: 'Petitioner', advocate: 'Public Prosecutor', contact: '+91-9876543210' },
+        { id: 2, name: 'John Doe', type: 'Respondent', advocate: 'Adv. Kumar', contact: '+91-9876543211' }
+      ],
+      description: 'Criminal case involving theft charges against the accused John Doe.',
+      caseHistory: [
+        { date: '2023-01-15', event: 'Case filed', details: 'FIR filed at Station House', by: 'Police' },
+        { date: '2023-01-20', event: 'First hearing', details: 'Case admitted for hearing', by: 'Court' },
+        { date: '2023-02-15', event: 'Evidence submitted', details: 'CCTV footage submitted', by: 'Prosecution' },
+        { date: '2023-03-10', event: 'Witness statement', details: 'Key witness testimony recorded', by: 'Court' }
+      ],
+      acts: ['IPC Section 378', 'IPC Section 380'],
+      attachments: [
+        { id: 1, name: 'FIR Copy.pdf', type: 'application/pdf', size: '2.5 MB', uploadedBy: 'Police', uploadedAt: '2023-01-15' },
+        { id: 2, name: 'CCTV Evidence.mp4', type: 'video/mp4', size: '45.2 MB', uploadedBy: 'Prosecution', uploadedAt: '2023-02-15' }
+      ]
+    },
+    2: {
+      id: 2,
+      number: '2023/CIV/045',
+      title: 'Smith vs ABC Corp',
+      status: 'Pending',
+      priority: 'Medium',
+      court: 'District Court II',
+      caseType: 'Civil',
+      filingDate: '2023-03-10',
+      nextHearing: '2023-12-26',
+      hearingTime: '2:30 PM',
+      judge: 'Hon. Justice Brown',
+      parties: [
+        { id: 1, name: 'Smith', type: 'Plaintiff', advocate: 'Adv. Sharma', contact: '+91-9876543212' },
+        { id: 2, name: 'ABC Corp', type: 'Defendant', advocate: 'Adv. Reddy', contact: '+91-9876543213' }
+      ],
+      description: 'Civil dispute over contract violation between Smith and ABC Corporation.',
+      caseHistory: [
+        { date: '2023-03-10', event: 'Case filed', details: 'Civil suit filed for contract breach', by: 'Plaintiff' },
+        { date: '2023-03-25', event: 'Notice served', details: 'Legal notice served to defendant', by: 'Court' },
+        { date: '2023-04-15', event: 'Response filed', details: 'Defendant filed counter-statement', by: 'Defendant' }
+      ],
+      acts: ['Contract Act Section 73', 'Specific Relief Act'],
+      attachments: [
+        { id: 1, name: 'Contract Agreement.pdf', type: 'application/pdf', size: '1.8 MB', uploadedBy: 'Plaintiff', uploadedAt: '2023-03-10' },
+        { id: 2, name: 'Email Evidence.pdf', type: 'application/pdf', size: '850 KB', uploadedBy: 'Plaintiff', uploadedAt: '2023-03-12' }
+      ]
+    },
+    3: {
+      id: 3,
+      number: '2023/FAM/012',
+      title: 'Divorce - Jane vs Mark',
+      status: 'Active',
+      priority: 'Low',
+      court: 'Family Court',
+      caseType: 'Family',
+      filingDate: '2023-05-20',
+      nextHearing: '2023-12-27',
+      hearingTime: '9:00 AM',
+      judge: 'Hon. Justice Wilson',
+      parties: [
+        { id: 1, name: 'Jane Doe', type: 'Petitioner', advocate: 'Adv. Patel', contact: '+91-9876543214' },
+        { id: 2, name: 'Mark Doe', type: 'Respondent', advocate: 'Adv. Malhotra', contact: '+91-9876543215' }
+      ],
+      description: 'Divorce proceedings with custody dispute over two minor children.',
+      caseHistory: [
+        { date: '2023-05-20', event: 'Petition filed', details: 'Divorce petition filed with custody claim', by: 'Petitioner' },
+        { date: '2023-06-10', event: 'Counseling ordered', details: 'Court ordered mandatory counseling', by: 'Court' },
+        { date: '2023-07-15', event: 'Custody hearing', details: 'First custody hearing conducted', by: 'Court' }
+      ],
+      acts: ['Hindu Marriage Act Section 13', 'Guardians and Wards Act'],
+      attachments: [
+        { id: 1, name: 'Marriage Certificate.pdf', type: 'application/pdf', size: '450 KB', uploadedBy: 'Petitioner', uploadedAt: '2023-05-20' },
+        { id: 2, name: 'Child Welfare Report.pdf', type: 'application/pdf', size: '2.1 MB', uploadedBy: 'Court', uploadedAt: '2023-07-15' }
+      ]
+    },
+    4: {
+      id: 4,
+      number: '2023/CRL/002',
+      title: 'State vs Crime Syndicate',
+      status: 'Active',
+      priority: 'Critical',
+      court: 'Sessions Court',
+      caseType: 'Criminal',
+      filingDate: '2023-02-28',
+      nextHearing: '2023-12-28',
+      hearingTime: '11:00 AM',
+      judge: 'Hon. Justice Davis',
+      parties: [
+        { id: 1, name: 'State', type: 'Prosecutor', advocate: 'Public Prosecutor', contact: '+91-9876543216' },
+        { id: 2, name: 'Multiple Accused', type: 'Defendants', advocate: 'Adv. Consortium', contact: '+91-9876543217' }
+      ],
+      description: 'Organized crime and racketeering case involving multiple accused persons.',
+      caseHistory: [
+        { date: '2023-02-28', event: 'FIR filed', details: 'Multiple FIRs consolidated', by: 'Police' },
+        { date: '2023-03-15', event: 'Arrests made', details: 'Seven accused persons arrested', by: 'Police' },
+        { date: '2023-04-10', event: 'Charge sheet filed', details: 'Comprehensive charge sheet submitted', by: 'Prosecution' }
+      ],
+      acts: ['IPC Section 120B', 'IPC Section 420', 'MCOCA'],
+      attachments: [
+        { id: 1, name: 'Charge Sheet.pdf', type: 'application/pdf', size: '15.4 MB', uploadedBy: 'Prosecution', uploadedAt: '2023-04-10' },
+        { id: 2, name: 'Financial Records.xlsx', type: 'application/vnd.ms-excel', size: '8.2 MB', uploadedBy: 'Investigation Team', uploadedAt: '2023-04-15' }
+      ]
+    },
+    5: {
+      id: 5,
+      number: '2023/CIV/067',
+      title: 'Property Dispute - Kumar vs Singh',
+      status: 'Closed',
+      priority: 'Medium',
+      court: 'District Court I',
+      caseType: 'Civil',
+      filingDate: '2023-04-12',
+      nextHearing: null,
+      hearingTime: null,
+      judge: 'Hon. Justice Smith',
+      parties: [
+        { id: 1, name: 'Kumar', type: 'Plaintiff', advocate: 'Adv. Gupta', contact: '+91-9876543218' },
+        { id: 2, name: 'Singh', type: 'Defendant', advocate: 'Adv. Chopra', contact: '+91-9876543219' }
+      ],
+      description: 'Land boundary dispute resolved through mediation and settlement.',
+      caseHistory: [
+        { date: '2023-04-12', event: 'Case filed', details: 'Property dispute filed', by: 'Plaintiff' },
+        { date: '2023-05-20', event: 'Survey ordered', details: 'Land survey ordered by court', by: 'Court' },
+        { date: '2023-08-15', event: 'Mediation successful', details: 'Parties reached settlement', by: 'Mediator' },
+        { date: '2023-12-15', event: 'Case closed', details: 'Settlement decree issued', by: 'Court' }
+      ],
+      acts: ['Transfer of Property Act', 'Specific Relief Act'],
+      attachments: [
+        { id: 1, name: 'Property Documents.pdf', type: 'application/pdf', size: '3.2 MB', uploadedBy: 'Plaintiff', uploadedAt: '2023-04-12' },
+        { id: 2, name: 'Survey Report.pdf', type: 'application/pdf', size: '5.1 MB', uploadedBy: 'Court', uploadedAt: '2023-05-25' },
+        { id: 3, name: 'Settlement Agreement.pdf', type: 'application/pdf', size: '1.1 MB', uploadedBy: 'Mediator', uploadedAt: '2023-08-15' }
+      ]
+    },
+    6: {
+      id: 6,
+      number: '2023/CRL/003',
+      title: 'State vs Robert Wilson',
+      status: 'Active',
+      priority: 'High',
+      court: 'District Court I',
+      caseType: 'Criminal',
+      filingDate: '2023-06-10',
+      nextHearing: '2023-12-29',
+      hearingTime: '3:00 PM',
+      judge: 'Hon. Justice Smith',
+      parties: [
+        { id: 1, name: 'State', type: 'Prosecutor', advocate: 'Public Prosecutor', contact: '+91-9876543220' },
+        { id: 2, name: 'Robert Wilson', type: 'Accused', advocate: 'Adv. Singh', contact: '+91-9876543221' }
+      ],
+      description: 'Fraud and embezzlement case involving misappropriation of company funds.',
+      caseHistory: [
+        { date: '2023-06-10', event: 'Complaint filed', details: 'Corporate fraud complaint registered', by: 'Company' },
+        { date: '2023-06-25', event: 'Investigation started', details: 'Economic Offenses Wing investigation', by: 'Police' },
+        { date: '2023-08-20', event: 'Evidence collected', details: 'Financial audit reports submitted', by: 'Investigation' }
+      ],
+      acts: ['IPC Section 420', 'IPC Section 408', 'Companies Act'],
+      attachments: [
+        { id: 1, name: 'Audit Report.pdf', type: 'application/pdf', size: '12.5 MB', uploadedBy: 'Company', uploadedAt: '2023-06-10' },
+        { id: 2, name: 'Bank Statements.pdf', type: 'application/pdf', size: '8.7 MB', uploadedBy: 'Investigation', uploadedAt: '2023-08-20' }
+      ]
+    },
+    7: {
+      id: 7,
+      number: '2023/CIV/089',
+      title: 'Contract Breach - TechCorp vs Solutions Inc',
+      status: 'Pending',
+      priority: 'Medium',
+      court: 'District Court II',
+      caseType: 'Civil',
+      filingDate: '2023-07-22',
+      nextHearing: '2023-12-30',
+      hearingTime: '10:30 AM',
+      judge: 'Hon. Justice Brown',
+      parties: [
+        { id: 1, name: 'TechCorp', type: 'Plaintiff', advocate: 'Adv. Verma', contact: '+91-9876543222' },
+        { id: 2, name: 'Solutions Inc', type: 'Defendant', advocate: 'Adv. Kapoor', contact: '+91-9876543223' }
+      ],
+      description: 'Software development contract dispute over delayed delivery and quality issues.',
+      caseHistory: [
+        { date: '2023-07-22', event: 'Suit filed', details: 'Contract breach suit filed', by: 'Plaintiff' },
+        { date: '2023-08-10', event: 'Defense filed', details: 'Written statement submitted', by: 'Defendant' },
+        { date: '2023-09-15', event: 'Technical expert appointed', details: 'Court appointed software expert', by: 'Court' }
+      ],
+      acts: ['Contract Act', 'Information Technology Act'],
+      attachments: [
+        { id: 1, name: 'Service Agreement.pdf', type: 'application/pdf', size: '2.8 MB', uploadedBy: 'Plaintiff', uploadedAt: '2023-07-22' },
+        { id: 2, name: 'Project Documentation.pdf', type: 'application/pdf', size: '15.3 MB', uploadedBy: 'Plaintiff', uploadedAt: '2023-07-25' }
+      ]
+    },
+    8: {
+      id: 8,
+      number: '2023/FAM/025',
+      title: 'Child Custody - Johnson Case',
+      status: 'Active',
+      priority: 'High',
+      court: 'Family Court',
+      caseType: 'Family',
+      filingDate: '2023-08-15',
+      nextHearing: '2024-01-05',
+      hearingTime: '11:00 AM',
+      judge: 'Hon. Justice Wilson',
+      parties: [
+        { id: 1, name: 'Lisa Johnson', type: 'Petitioner', advocate: 'Adv. Kapoor', contact: '+91-9876543224' },
+        { id: 2, name: 'Michael Johnson', type: 'Respondent', advocate: 'Adv. Saxena', contact: '+91-9876543225' }
+      ],
+      description: 'Child custody and visitation rights dispute between divorced parents.',
+      caseHistory: [
+        { date: '2023-08-15', event: 'Petition filed', details: 'Custody modification petition', by: 'Petitioner' },
+        { date: '2023-09-10', event: 'Social worker appointed', details: 'Child welfare assessment ordered', by: 'Court' },
+        { date: '2023-10-20', event: 'Assessment completed', details: 'Home study reports submitted', by: 'Social Worker' }
+      ],
+      acts: ['Guardians and Wards Act', 'Hindu Minority and Guardianship Act'],
+      attachments: [
+        { id: 1, name: 'Previous Custody Order.pdf', type: 'application/pdf', size: '950 KB', uploadedBy: 'Petitioner', uploadedAt: '2023-08-15' },
+        { id: 2, name: 'Child Welfare Assessment.pdf', type: 'application/pdf', size: '4.2 MB', uploadedBy: 'Social Worker', uploadedAt: '2023-10-20' }
+      ]
+    },
+    9: {
+      id: 9,
+      number: '2023/CRL/004',
+      title: 'State vs Drug Cartel',
+      status: 'Active',
+      priority: 'Critical',
+      court: 'Sessions Court',
+      caseType: 'Criminal',
+      filingDate: '2023-09-01',
+      nextHearing: '2024-01-08',
+      hearingTime: '2:00 PM',
+      judge: 'Hon. Justice Davis',
+      parties: [
+        { id: 1, name: 'State', type: 'Prosecutor', advocate: 'Public Prosecutor', contact: '+91-9876543226' },
+        { id: 2, name: 'Multiple Accused', type: 'Defendants', advocate: 'Adv. Defense Team', contact: '+91-9876543227' }
+      ],
+      description: 'Narcotics trafficking case involving interstate drug cartel operations.',
+      caseHistory: [
+        { date: '2023-09-01', event: 'FIR registered', details: 'NDPS case registered', by: 'Narcotics Bureau' },
+        { date: '2023-09-15', event: 'Raids conducted', details: 'Multiple locations raided', by: 'Police' },
+        { date: '2023-10-10', event: 'Seizure report', details: 'Large quantity of drugs seized', by: 'Forensic Lab' }
+      ],
+      acts: ['NDPS Act', 'IPC Section 120B'],
+      attachments: [
+        { id: 1, name: 'Seizure Report.pdf', type: 'application/pdf', size: '18.5 MB', uploadedBy: 'Narcotics Bureau', uploadedAt: '2023-09-15' },
+        { id: 2, name: 'Forensic Analysis.pdf', type: 'application/pdf', size: '6.8 MB', uploadedBy: 'Forensic Lab', uploadedAt: '2023-10-10' }
+      ]
+    },
+    10: {
+      id: 10,
+      number: '2023/CIV/101',
+      title: 'Intellectual Property - Innovate Inc',
+      status: 'Pending',
+      priority: 'Medium',
+      court: 'District Court I',
+      caseType: 'Civil',
+      filingDate: '2023-10-10',
+      nextHearing: '2024-01-12',
+      hearingTime: '9:30 AM',
+      judge: 'Hon. Justice Smith',
+      parties: [
+        { id: 1, name: 'Innovate Inc', type: 'Plaintiff', advocate: 'Adv. Joshi', contact: '+91-9876543228' },
+        { id: 2, name: 'CopyCat Corp', type: 'Defendant', advocate: 'Adv. Bhatia', contact: '+91-9876543229' }
+      ],
+      description: 'Patent infringement lawsuit involving proprietary technology.',
+      caseHistory: [
+        { date: '2023-10-10', event: 'Suit filed', details: 'Patent infringement suit filed', by: 'Plaintiff' },
+        { date: '2023-11-05', event: 'Interim injunction', details: 'Temporary injunction granted', by: 'Court' },
+        { date: '2023-11-20', event: 'Technical evidence', details: 'Patent comparison report submitted', by: 'Expert' }
+      ],
+      acts: ['Patents Act', 'Copyright Act'],
+      attachments: [
+        { id: 1, name: 'Patent Documents.pdf', type: 'application/pdf', size: '7.5 MB', uploadedBy: 'Plaintiff', uploadedAt: '2023-10-10' },
+        { id: 2, name: 'Comparison Analysis.pdf', type: 'application/pdf', size: '11.2 MB', uploadedBy: 'Expert', uploadedAt: '2023-11-20' }
+      ]
+    }
   };
-
-  // Track if data has been loaded to prevent duplicate notifications
-  const [dataLoaded, setDataLoaded] = useState(false);
 
   // Load case data
   useEffect(() => {
     const loadCaseData = async () => {
-      // Prevent multiple loads
-      if (dataLoaded || loading) return;
-      
       setLoading(true);
       try {
-        // Simulate API call
+        // Simulate API call - fetch the specific case by ID
         setTimeout(() => {
+          const caseId = parseInt(id);
+          const mockCaseData = mockCasesDatabase[caseId];
+          
+          if (!mockCaseData) {
+            addNotification?.({
+              type: 'error',
+              message: `Case with ID ${caseId} not found`
+            });
+            setLoading(false);
+            return;
+          }
+          
           setCaseData(mockCaseData);
           setFormData(mockCaseData);
           setDocuments(mockCaseData.attachments);
           setLoading(false);
-          setDataLoaded(true);
           
           // Simulate websocket connection
           setWebsocketConnected(isOnline);
           
-          // Only show notification on initial load
-          if (!dataLoaded) {
-            addNotification?.({
-              type: 'success',
-              message: `Case ${mockCaseData.number} loaded successfully`
-            });
-          }
-        }, 1000);
+          addNotification?.({
+            type: 'success',
+            message: `Case ${mockCaseData.number} loaded successfully`
+          });
+        }, 800);
       } catch (error) {
         console.error('Error loading case data:', error);
         setLoading(false);
@@ -99,14 +356,15 @@ const CaseDetails = () => {
       }
     };
 
-    if (id && !dataLoaded) {
+    if (id) {
       loadCaseData();
     }
-  }, [id, isOnline, addNotification, dataLoaded, loading]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]); // Only depend on id to reload when route param changes
 
   // Real-time updates via WebSocket simulation
   useEffect(() => {
-    if (!websocketConnected || !dataLoaded) return;
+    if (!websocketConnected || !caseData) return;
 
     const interval = setInterval(() => {
       // Simulate real-time case updates
@@ -123,8 +381,7 @@ const CaseDetails = () => {
           ip: '192.168.1.1'
         };
         
-        setAuditLog(prev => [newLogEntry, ...prev].slice(0, 50));
-        
+        // Notifications only; audit log removed per request
         addNotification?.({
           type: 'info',
           message: `Case updated: ${randomUpdate.replace('_', ' ')}`
@@ -133,7 +390,8 @@ const CaseDetails = () => {
     }, 10000); // Check every 10 seconds
 
     return () => clearInterval(interval);
-  }, [websocketConnected, addNotification, dataLoaded]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [websocketConnected, caseData]); // Removed addNotification from dependencies
 
   // Handle form submission
   const handleSave = async () => {
@@ -150,16 +408,7 @@ const CaseDetails = () => {
       setCaseData({ ...caseData, ...formData });
       setEditMode(false);
       
-      // Add to audit log
-      const logEntry = {
-        id: Date.now(),
-        timestamp: new Date().toISOString(),
-        action: 'case_updated',
-        user: user?.name || 'Unknown User',
-        details: `Case details updated`,
-        ip: '192.168.1.100'
-      };
-      setAuditLog(prev => [logEntry, ...prev]);
+      // Case update notification only; audit log removed per request
       
       addNotification?.({
         type: 'success',
@@ -212,16 +461,7 @@ const CaseDetails = () => {
           return newProgress;
         });
         
-        // Add to audit log
-        const logEntry = {
-          id: Date.now(),
-          timestamp: new Date().toISOString(),
-          action: 'document_uploaded',
-          user: user?.name || 'Unknown User',
-          details: `Document "${file.name}" uploaded`,
-          ip: '192.168.1.100'
-        };
-        setAuditLog(prev => [logEntry, ...prev]);
+        // Document upload notification only; audit log removed per request
         
         addNotification?.({
           type: 'success',
@@ -240,7 +480,8 @@ const CaseDetails = () => {
         });
       }
     }
-  }, [user, addNotification]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]); // Removed addNotification from dependencies
 
   // Handle file drop
   const handleFileDrop = useCallback((e) => {
@@ -281,16 +522,7 @@ const CaseDetails = () => {
       
       setNotifications(prev => [notification, ...prev]);
       
-      // Add to audit log
-      const logEntry = {
-        id: Date.now(),
-        timestamp: new Date().toISOString(),
-        action: 'notification_sent',
-        user: user?.name || 'Unknown User',
-        details: `${type} notification sent: ${message}`,
-        ip: '192.168.1.100'
-      };
-      setAuditLog(prev => [logEntry, ...prev]);
+      // Notification send tracking only; audit log removed per request
       
       addNotification?.({
         type: 'success',
@@ -307,7 +539,6 @@ const CaseDetails = () => {
   // Reset data when component unmounts or id changes
   useEffect(() => {
     return () => {
-      setDataLoaded(false);
       setCaseData(null);
       setLoading(true);
     };
@@ -493,7 +724,7 @@ const CaseDetails = () => {
                 { key: 'history', label: language === 'ta' ? 'इतिहास' : 'History', icon: '🕒' },
                 { key: 'parties', label: language === 'ta' ? 'पार्टियां' : 'Parties', icon: '👥' },
                 { key: 'hearings', label: language === 'ta' ? 'सुनवाई' : 'Hearings', icon: '⚖️' },
-                { key: 'audit', label: language === 'ta' ? 'ऑडिट लॉग' : 'Audit Log', icon: '📊' }
+                // Audit Log tab removed per request
               ].map((tab) => (
                 <button
                   key={tab.key}
@@ -862,50 +1093,7 @@ const CaseDetails = () => {
               </div>
             )}
 
-            {/* Audit Log Tab */}
-            {activeTab === 'audit' && (
-              <div className="space-y-6">
-                <h3 className="text-xl font-semibold text-[#1f2839] flex items-center">
-                  <svg className="w-6 h-6 mr-3 text-[#b69d74]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  {language === 'ta' ? 'ऑडिट लॉग' : 'Audit Log'}
-                </h3>
-                <div className="space-y-3">
-                  {auditLog.length > 0 ? auditLog.map((entry) => (
-                    <div key={entry.id} className="bg-gradient-to-br from-white to-[#b69d7403] p-4 rounded-xl border border-[#b69d7410] hover:shadow-sm transition-all duration-300">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-semibold text-[#1f2839] bg-[#b69d7410] px-3 py-1 rounded-full">
-                          {entry.action.replace('_', ' ').toUpperCase()}
-                        </span>
-                        <span className="text-xs text-[#6b7280]">
-                          {new Date(entry.timestamp).toLocaleString()}
-                        </span>
-                      </div>
-                      <p className="text-[#6b7280] text-sm mb-2">{entry.details}</p>
-                      <div className="flex items-center justify-between text-xs text-[#b69d74]">
-                        <span><strong>{language === 'ta' ? 'उपयोगकर्ता:' : 'User:'}</strong> {entry.user}</span>
-                        <span><strong>IP:</strong> {entry.ip}</span>
-                      </div>
-                    </div>
-                  )) : (
-                    <div className="text-center py-12">
-                      <div className="w-16 h-16 mx-auto mb-4 bg-[#b69d7410] rounded-full flex items-center justify-center">
-                        <svg className="w-8 h-8 text-[#b69d74]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                      </div>
-                      <p className="text-[#6b7280] text-lg">
-                        {language === 'ta' ? 'कोई ऑडिट लॉग उपलब्ध नहीं है' : 'No audit logs available'}
-                      </p>
-                      <p className="text-[#6b7280] text-sm mt-2">
-                        {language === 'ta' ? 'सिस्टम गतिविधियाँ यहाँ दिखाई देंगी' : 'System activities will appear here'}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
+            {/* Audit Log removed */}
           </div>
         </div>
       </div>

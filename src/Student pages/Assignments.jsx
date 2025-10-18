@@ -415,35 +415,10 @@ const Assignments = () => {
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="text-2xl font-bold" style={{ color: colors.text.primary }}>Legal Assignments Hub</h1>
+              <h1 className="text-2xl font-bold" style={{ color: colors.text.primary }}>Chakshi</h1>
               <p className="mt-1" style={{ color: colors.text.secondary }}>
                 Built on Bloom's Taxonomy & Scaffolded Learning Theory
               </p>
-            </div>
-            <div className="mt-4 sm:mt-0 flex items-center space-x-3">
-              <button 
-                className="px-4 py-2 rounded-lg text-sm font-medium flex items-center space-x-2 transition-all duration-200 hover:shadow-md"
-                style={{ 
-                  backgroundColor: colors.overlay.light,
-                  border: `1px solid ${colors.border.navy}`,
-                  color: colors.text.primary
-                }}
-              >
-                <FiDownload className="w-4 h-4" />
-                <span>Export</span>
-              </button>
-              <button 
-                onClick={addNewAssignment}
-                className="px-4 py-2 rounded-lg text-sm font-medium flex items-center space-x-2 transition-all duration-200 hover:shadow-lg"
-                style={{ 
-                  background: 'linear-gradient(135deg, #b69d74, #b69d74DD, #b69d74BB)',
-                  color: colors.text.primary,
-                  border: 'none'
-                }}
-              >
-                <FiPlus className="w-4 h-4" />
-                <span>New Assignment</span>
-              </button>
             </div>
           </div>
         </div>

@@ -65,17 +65,13 @@ const Cases = () => {
   const [sortBy, setSortBy] = useState('hearing_date');
   const [showNewCaseModal, setShowNewCaseModal] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
-  const [showBulkUpload, setShowBulkUpload] = useState(false);
   const [editingCase, setEditingCase] = useState(null);
   const [showDocumentModal, setShowDocumentModal] = useState(false);
   const [caseNotes, setCaseNotes] = useState({});
   const [notifications, setNotifications] = useState([]);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
-  const fileUploadRef = useRef();
-
-  // Mock case data with comprehensive information
-  const cases = [
+  const [cases, setCases] = useState([
     {
       id: 'CIV/2024/001',
       title: 'Property Dispute - Residential Complex',
@@ -178,7 +174,10 @@ const Cases = () => {
       ],
       expenses: { total: 45000 }
     }
-  ];
+  ]);
+  const fileUploadRef = useRef();
+
+  // Mock case data with comprehensive information - removed, now using state above
 
   // Filter and search functions
   const filteredCases = cases.filter(caseItem => {
@@ -333,13 +332,69 @@ const Cases = () => {
     }]);
   };
 
-  const handleBulkUpload = () => {
-    setShowBulkUpload(true);
-  };
-
   const handleNewCase = () => {
     setEditingCase(null);
     setShowNewCaseModal(true);
+  };
+
+  const handleSubmitCase = (e, formData) => {
+    e.preventDefault();
+    
+    const newCase = {
+      id: formData.caseNumber,
+      title: formData.caseTitle,
+      court: formData.court,
+      stage: 'Initial Filing',
+      status: 'active',
+      client: formData.clientName,
+      oppositeParty: formData.oppositeParty,
+      nextHearing: 'TBD',
+      caseStrength: 70,
+      priority: 'medium',
+      createdDate: new Date().toISOString().split('T')[0],
+      lastUpdated: new Date().toISOString().split('T')[0],
+      caseValue: 'TBD',
+      judge: 'TBD',
+      courtNumber: 'TBD',
+      advocate: 'Current User',
+      juniorAdvocates: [],
+      description: formData.caseTitle,
+      timeline: [
+        { stage: 'Case Filed', date: new Date().toISOString().split('T')[0], status: 'completed', description: 'Initial case filing' }
+      ],
+      documents: [],
+      hearings: [],
+      expenses: { total: 0 },
+      relatedCases: [],
+      aiInsights: {
+        strengthFactors: ['Case under review'],
+        riskFactors: ['Initial assessment pending'],
+        recommendedStrategy: 'Gather all relevant documents and evidence'
+      }
+    };
+
+    if (editingCase) {
+      // Update existing case
+      setCases(prev => prev.map(c => c.id === editingCase.id ? { ...c, ...newCase } : c));
+      setNotifications(prev => [...prev, {
+        id: Date.now(),
+        message: 'Case updated successfully',
+        type: 'success',
+        timestamp: new Date()
+      }]);
+    } else {
+      // Add new case
+      setCases(prev => [newCase, ...prev]);
+      setNotifications(prev => [...prev, {
+        id: Date.now(),
+        message: 'New case created successfully',
+        type: 'success',
+        timestamp: new Date()
+      }]);
+    }
+    
+    setShowNewCaseModal(false);
+    setEditingCase(null);
   };
 
   const updateCaseNotes = (caseId, notes) => {
@@ -494,9 +549,10 @@ const Cases = () => {
   };
 
   const CaseTimeline = ({ timeline }) => {
+    const safeTimeline = timeline || [];
     return (
       <div className="space-y-4">
-        {timeline.map((item, index) => (
+        {safeTimeline.map((item, index) => (
           <div key={index} className="flex items-start gap-4">
             <div className="flex flex-col items-center">
               <div 
@@ -517,7 +573,7 @@ const Cases = () => {
                   <div className="w-2 h-2 rounded-full" style={{background: colors.gray}}></div>
                 )}
               </div>
-              {index < timeline.length - 1 && (
+              {index < safeTimeline.length - 1 && (
                 <div 
                   className="w-0.5 h-8 mt-2"
                   style={{
@@ -577,26 +633,7 @@ const Cases = () => {
               </div>
             </div>
             
-            <div className="flex items-center gap-3">
-              <button 
-                className="px-4 py-2 rounded-lg font-medium transition-colors"
-                style={{
-                  background: `linear-gradient(135deg, ${colors.golden}, ${colors.golden}DD)`,
-                  color: 'white'
-                }}
-              >
-                Generate Report
-              </button>
-              <button 
-                className="p-2 rounded-lg transition-colors"
-                style={{
-                  background: `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.10)`,
-                  color: colors.golden
-                }}
-              >
-                <MoreVertical className="w-5 h-5" />
-              </button>
-            </div>
+
           </div>
 
           {/* Tabs */}
@@ -701,7 +738,7 @@ const Cases = () => {
                       <div>
                         <p className="text-sm font-medium mb-2" style={{color: colors.gray}}>Junior Advocates</p>
                         <div className="space-y-1">
-                          {selectedCase.juniorAdvocates.map((advocate, index) => (
+                          {(selectedCase.juniorAdvocates || []).map((advocate, index) => (
                             <p key={index} style={{color: colors.navy}}>{advocate}</p>
                           ))}
                         </div>
@@ -751,7 +788,7 @@ const Cases = () => {
                           Strength Factors
                         </p>
                         <ul className="text-xs space-y-1" style={{color: colors.gray}}>
-                          {selectedCase.aiInsights.strengthFactors.map((factor, index) => (
+                          {(selectedCase.aiInsights && selectedCase.aiInsights.strengthFactors || []).map((factor, index) => (
                             <li key={index}>• {factor}</li>
                           ))}
                         </ul>
@@ -761,46 +798,13 @@ const Cases = () => {
                           Risk Factors
                         </p>
                         <ul className="text-xs space-y-1" style={{color: colors.gray}}>
-                          {selectedCase.aiInsights.riskFactors.map((factor, index) => (
+                          {(selectedCase.aiInsights && selectedCase.aiInsights.riskFactors || []).map((factor, index) => (
                             <li key={index}>• {factor}</li>
                           ))}
                         </ul>
                       </div>
                     </div>
                   )}
-                </div>
-
-                {/* Quick Actions */}
-                <div className="rounded-lg p-6" style={{
-                  background: `linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06))`,
-                  backdropFilter: 'blur(6px)',
-                  border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`
-                }}>
-                  <h3 className="text-lg font-semibold mb-4" style={{color: colors.navy}}>
-                    Quick Actions
-                  </h3>
-                  
-                  <div className="space-y-2">
-                    {[
-                      { icon: Upload, label: 'Upload Document', color: colors.blue, action: () => fileUploadRef.current?.click() },
-                      { icon: Bell, label: 'Set Reminder', color: colors.amber, action: () => handleSetReminder(selectedCase) },
-                      { icon: Share2, label: 'Share with Client', color: colors.green, action: () => handleShareWithClient(selectedCase) },
-                      { icon: Download, label: 'Export Case File', color: colors.golden, action: () => handleExportCase(selectedCase) }
-                    ].map((action, index) => (
-                      <button
-                        key={index}
-                        className="w-full flex items-center gap-3 p-3 rounded-lg transition-colors text-left"
-                        style={{
-                          background: `rgba(${parseInt(action.color.slice(1, 3), 16)}, ${parseInt(action.color.slice(3, 5), 16)}, ${parseInt(action.color.slice(5, 7), 16)}, 0.10)`,
-                          color: colors.navy
-                        }}
-                        onClick={action.action}
-                      >
-                        <action.icon className="w-4 h-4" style={{color: action.color}} />
-                        <span className="text-sm font-medium">{action.label}</span>
-                      </button>
-                    ))}
-                  </div>
                 </div>
               </div>
             </div>
@@ -816,7 +820,7 @@ const Cases = () => {
                 <h3 className="text-lg font-semibold mb-6" style={{color: colors.navy}}>
                   Case Timeline
                 </h3>
-                <CaseTimeline timeline={selectedCase.timeline} />
+                <CaseTimeline timeline={selectedCase.timeline || []} />
               </div>
             </div>
           )}
@@ -847,7 +851,7 @@ const Cases = () => {
               </div>
 
               <div className="grid gap-4">
-                {selectedCase.documents.map((doc, index) => (
+                {(selectedCase.documents || []).map((doc, index) => (
                   <div 
                     key={index}
                     className="flex items-center justify-between p-4 rounded-lg"
@@ -915,7 +919,7 @@ const Cases = () => {
               </h3>
               
               <div className="space-y-4">
-                {selectedCase.hearings.map((hearing, index) => (
+                {(selectedCase.hearings || []).map((hearing, index) => (
                   <div 
                     key={index}
                     className="p-6 rounded-lg"
@@ -1050,7 +1054,7 @@ const Cases = () => {
               </h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {Object.entries(selectedCase.expenses).map(([key, value]) => {
+                {Object.entries(selectedCase.expenses || {}).map(([key, value]) => {
                   if (key === 'total') return null;
                   return (
                     <div 
@@ -1115,18 +1119,6 @@ const Cases = () => {
           </div>
           
           <div className="flex items-center gap-3">
-            <button 
-              className="px-4 py-2 rounded-lg font-medium transition-colors"
-              style={{
-                background: `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.10)`,
-                color: colors.golden,
-                border: `1px solid ${colors.golden}40`
-              }}
-              onClick={handleBulkUpload}
-            >
-              <Upload className="w-4 h-4 mr-2" />
-              Bulk Upload
-            </button>
             <button 
               className="px-4 py-2 rounded-lg font-medium transition-colors"
               style={{
@@ -1204,7 +1196,7 @@ const Cases = () => {
       {/* Cases Grid */}
       <div className="p-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-          {sortedCases.map((caseItem) => (
+          {(sortedCases || []).map((caseItem) => (
             <CaseCard key={caseItem.id} caseItem={caseItem} />
           ))}
         </div>
@@ -1302,13 +1294,23 @@ const Cases = () => {
               </button>
             </div>
 
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={(e) => {
+              const formData = {
+                caseNumber: e.target.caseNumber.value,
+                court: e.target.court.value,
+                caseTitle: e.target.caseTitle.value,
+                clientName: e.target.clientName.value,
+                oppositeParty: e.target.oppositeParty.value
+              };
+              handleSubmitCase(e, formData);
+            }}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-2" style={{color: colors.navy}}>
                     Case Number
                   </label>
                   <input
+                    name="caseNumber"
                     type="text"
                     className="w-full p-3 rounded-lg border focus:outline-none transition-all"
                     style={{
@@ -1318,6 +1320,7 @@ const Cases = () => {
                     }}
                     placeholder="e.g., CIV/2024/001"
                     defaultValue={editingCase?.id || ''}
+                    required
                   />
                 </div>
                 <div>
@@ -1325,6 +1328,7 @@ const Cases = () => {
                     Court
                   </label>
                   <select
+                    name="court"
                     className="w-full p-3 rounded-lg border focus:outline-none transition-all"
                     style={{
                       background: `rgba(255, 255, 255, 0.03)`,
@@ -1332,6 +1336,7 @@ const Cases = () => {
                       color: colors.navy
                     }}
                     defaultValue={editingCase?.court || ''}
+                    required
                   >
                     <option value="">Select Court</option>
                     <option value="High Court of Madras">High Court of Madras</option>
@@ -1347,6 +1352,7 @@ const Cases = () => {
                   Case Title
                 </label>
                 <input
+                  name="caseTitle"
                   type="text"
                   className="w-full p-3 rounded-lg border focus:outline-none transition-all"
                   style={{
@@ -1356,6 +1362,7 @@ const Cases = () => {
                   }}
                   placeholder="Brief description of the case"
                   defaultValue={editingCase?.title || ''}
+                  required
                 />
               </div>
 
@@ -1365,6 +1372,7 @@ const Cases = () => {
                     Client Name
                   </label>
                   <input
+                    name="clientName"
                     type="text"
                     className="w-full p-3 rounded-lg border focus:outline-none transition-all"
                     style={{
@@ -1374,6 +1382,7 @@ const Cases = () => {
                     }}
                     placeholder="Client or petitioner name"
                     defaultValue={editingCase?.client || ''}
+                    required
                   />
                 </div>
                 <div>
@@ -1381,6 +1390,7 @@ const Cases = () => {
                     Opposite Party
                   </label>
                   <input
+                    name="oppositeParty"
                     type="text"
                     className="w-full p-3 rounded-lg border focus:outline-none transition-all"
                     style={{
@@ -1390,6 +1400,7 @@ const Cases = () => {
                     }}
                     placeholder="Respondent or defendant name"
                     defaultValue={editingCase?.oppositeParty || ''}
+                    required
                   />
                 </div>
               </div>
@@ -1413,118 +1424,11 @@ const Cases = () => {
                     background: `linear-gradient(135deg, ${colors.golden}, ${colors.golden}DD)`,
                     color: 'white'
                   }}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setNotifications(prev => [...prev, {
-                      id: Date.now(),
-                      message: editingCase ? 'Case updated successfully' : 'New case created successfully',
-                      type: 'success',
-                      timestamp: new Date()
-                    }]);
-                    setShowNewCaseModal(false);
-                  }}
                 >
                   {editingCase ? 'Update Case' : 'Create Case'}
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
-
-      {/* Bulk Upload Modal */}
-      {showBulkUpload && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{background: 'rgba(0, 0, 0, 0.5)'}}>
-          <div className="w-full max-w-lg rounded-lg p-6" style={{
-            background: colors.cream,
-            border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`
-          }}>
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold" style={{color: colors.navy}}>
-                Bulk Upload Cases
-              </h2>
-              <button
-                onClick={() => setShowBulkUpload(false)}
-                className="p-2 rounded-lg transition-colors"
-                style={{
-                  background: `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.10)`,
-                  color: colors.golden
-                }}
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              <div className="text-center p-8 border-2 border-dashed rounded-lg transition-colors" style={{
-                borderColor: `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.30)`,
-                background: `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.05)`
-              }}>
-                <Upload className="w-12 h-12 mx-auto mb-4" style={{color: colors.golden}} />
-                <p className="text-lg font-medium mb-2" style={{color: colors.navy}}>
-                  Drop your case files here
-                </p>
-                <p className="text-sm" style={{color: colors.gray}}>
-                  or click to browse files
-                </p>
-                <p className="text-xs mt-2" style={{color: colors.gray}}>
-                  Supports: PDF, DOC, DOCX, ZIP
-                </p>
-              </div>
-
-              {isUploading && (
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium" style={{color: colors.navy}}>
-                      Uploading...
-                    </span>
-                    <span className="text-sm" style={{color: colors.gray}}>
-                      {uploadProgress}%
-                    </span>
-                  </div>
-                  <div className="w-full rounded-full h-2" style={{background: `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`}}>
-                    <div 
-                      className="h-full rounded-full transition-all duration-300"
-                      style={{
-                        width: `${uploadProgress}%`,
-                        background: `linear-gradient(90deg, ${colors.golden}, ${colors.golden}CC)`
-                      }}
-                    ></div>
-                  </div>
-                </div>
-              )}
-
-              <div className="flex justify-end gap-3">
-                <button
-                  onClick={() => setShowBulkUpload(false)}
-                  className="px-4 py-2 rounded-lg font-medium transition-colors"
-                  style={{
-                    background: `rgba(${parseInt(colors.gray.slice(1, 3), 16)}, ${parseInt(colors.gray.slice(3, 5), 16)}, ${parseInt(colors.gray.slice(5, 7), 16)}, 0.10)`,
-                    color: colors.gray
-                  }}
-                >
-                  Cancel
-                </button>
-                <button
-                  className="px-4 py-2 rounded-lg font-medium transition-colors"
-                  style={{
-                    background: `linear-gradient(135deg, ${colors.golden}, ${colors.golden}DD)`,
-                    color: 'white'
-                  }}
-                  onClick={() => {
-                    setNotifications(prev => [...prev, {
-                      id: Date.now(),
-                      message: 'Bulk upload initiated - processing files...',
-                      type: 'info',
-                      timestamp: new Date()
-                    }]);
-                    setShowBulkUpload(false);
-                  }}
-                >
-                  Start Upload
-                </button>
-              </div>
-            </div>
           </div>
         </div>
       )}

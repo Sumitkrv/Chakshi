@@ -314,18 +314,6 @@ const ClientsPage = () => {
               Analytics
             </button>
             <button 
-              className="flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-              style={{
-                background: `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.10)`,
-                color: colors.golden,
-                border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.20)`
-              }}
-              onClick={() => setShowCommunicationHub(true)}
-            >
-              <MessageSquare className="w-4 h-4 inline mr-2" />
-              Client Communications Center
-            </button>
-            <button 
               className="flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-medium transition-colors text-white"
               style={{
                 background: `linear-gradient(135deg, ${colors.golden}, ${colors.golden}DD)`
@@ -985,111 +973,6 @@ const ClientsPage = () => {
                   </div>
                 </div>
               )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Client Communications Center Modal */}
-      {showCommunicationHub && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0, 0, 0, 0.5)' }}>
-          <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-lg" style={{
-            background: colors.cream,
-            border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`
-          }}>
-            <div className="flex justify-between items-center p-6 border-b" style={{
-              borderColor: `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`
-            }}>
-              <h2 className="text-xl font-bold" style={{ color: colors.navy }}>Client Communications Center</h2>
-              <button
-                onClick={() => setShowCommunicationHub(false)}
-                className="p-2 rounded-lg transition-colors"
-                style={{
-                  background: `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.10)`,
-                  color: colors.golden
-                }}
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="p-6 space-y-6">
-              {/* Quick Actions */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <button className="flex flex-col items-center gap-2 p-4 rounded-lg transition-colors" style={{
-                  background: `rgba(${parseInt(colors.blue.slice(1, 3), 16)}, ${parseInt(colors.blue.slice(3, 5), 16)}, ${parseInt(colors.blue.slice(5, 7), 16)}, 0.10)`,
-                  color: colors.blue
-                }}>
-                  <MessageSquare className="w-6 h-6" />
-                  <span className="text-sm font-medium">Secure Message</span>
-                </button>
-                
-                <button className="flex flex-col items-center gap-2 p-4 rounded-lg transition-colors" style={{
-                  background: `rgba(${parseInt(colors.green.slice(1, 3), 16)}, ${parseInt(colors.green.slice(3, 5), 16)}, ${parseInt(colors.green.slice(5, 7), 16)}, 0.10)`,
-                  color: colors.green
-                }}>
-                  <Video className="w-6 h-6" />
-                  <span className="text-sm font-medium">Video Update</span>
-                </button>
-                
-                <button 
-                  className="flex flex-col items-center gap-2 p-4 rounded-lg transition-colors" 
-                  style={{
-                    background: `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.10)`,
-                    color: colors.golden
-                  }}
-                  onClick={() => fileUploadRef.current?.click()}
-                >
-                  <Upload className="w-6 h-6" />
-                  <span className="text-sm font-medium">Share Document</span>
-                </button>
-                
-                <button className="flex flex-col items-center gap-2 p-4 rounded-lg transition-colors" style={{
-                  background: `rgba(${parseInt(colors.amber.slice(1, 3), 16)}, ${parseInt(colors.amber.slice(3, 5), 16)}, ${parseInt(colors.amber.slice(5, 7), 16)}, 0.10)`,
-                  color: colors.amber
-                }}>
-                  <CreditCard className="w-6 h-6" />
-                  <span className="text-sm font-medium">Request Payment</span>
-                </button>
-              </div>
-
-              {/* Message Composer */}
-              <div className="space-y-3">
-                <h3 className="font-medium" style={{ color: colors.navy }}>Client Communication</h3>
-                <div className="space-y-3">
-                  <textarea
-                    value={messageText}
-                    onChange={(e) => setMessageText(e.target.value)}
-                    placeholder="Compose professional communication..."
-                    className="w-full p-3 rounded-lg resize-none focus:outline-none transition-all"
-                    style={{
-                      background: `rgba(255, 255, 255, 0.03)`,
-                      border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`,
-                      color: colors.navy,
-                      minHeight: '100px'
-                    }}
-                  />
-                  <div className="flex justify-between items-center">
-                    <button className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors" style={{
-                      background: `rgba(${parseInt(colors.gray.slice(1, 3), 16)}, ${parseInt(colors.gray.slice(3, 5), 16)}, ${parseInt(colors.gray.slice(5, 7), 16)}, 0.10)`,
-                      color: colors.gray
-                    }}>
-                      <Paperclip className="w-4 h-4" />
-                      Attach
-                    </button>
-                    <button 
-                      onClick={handleSendMessage}
-                      className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors text-white"
-                      style={{
-                        background: `linear-gradient(135deg, ${colors.golden}, ${colors.golden}DD)`
-                      }}
-                    >
-                      <Send className="w-4 h-4" />
-                      Send Communication
-                    </button>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>

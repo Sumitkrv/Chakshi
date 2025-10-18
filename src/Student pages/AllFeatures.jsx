@@ -3,7 +3,7 @@ import React from 'react';
 const StudentAllFeatures = () => {
   const features = [
     'Dashboard', 'Courses', 'Assignments', 'Calendar', 'Career',
-    'Content Feed', 'Exam Prep', 'Library', 'Moot Court', 'Research', 'Simulation'
+    'Content Feed', 'Exam Prep', 'Library', 'Research'
   ];
 
   return (
