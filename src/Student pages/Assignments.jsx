@@ -22,6 +22,14 @@ import {
   FiMic,
   FiAward
 } from 'react-icons/fi';
+import { useAuth } from '../contexts/AuthContext';
+import { 
+  getStudentAssignments, 
+  getCoursesForFilters, 
+  getAssignmentTypes, 
+  getBloomLevels, 
+  getStudentAIFeatures 
+} from '../lib/api';
 
 // Legal-themed color palette based on Hero.js
 const colors = {
@@ -59,104 +67,16 @@ const colors = {
 };
 
 const Assignments = () => {
-  const [assignments, setAssignments] = useState([
-    {
-      id: 1,
-      title: 'Legal Case Analysis: Brown v. Board of Education',
-      course: 'Constitutional Law',
-      professor: 'Dr. Sarah Wilson',
-      dueDate: '2025-09-25T23:59:00',
-      status: 'pending',
-      priority: 'high',
-      progress: 0,
-      points: 100,
-      description: 'Analyze the landmark Supreme Court case and its impact on civil rights legislation.',
-      tags: ['constitutional-law', 'civil-rights'],
-      estimatedTime: '8 hours',
-      isStarred: true,
-      assignmentType: 'case-analysis',
-      bloomLevel: 'analysis',
-      submissionType: 'document',
-      aiFeedback: true
-    },
-    {
-      id: 2,
-      title: 'Research Paper: Modern Contract Law',
-      course: 'Contract Law',
-      professor: 'Prof. Michael Johnson',
-      dueDate: '2025-09-30T23:59:00',
-      status: 'in-progress',
-      priority: 'medium',
-      progress: 65,
-      points: 150,
-      description: 'Comprehensive research paper on evolving contract law principles in digital age.',
-      tags: ['contract-law', 'research'],
-      estimatedTime: '12 hours',
-      isStarred: false,
-      assignmentType: 'comparative-research',
-      bloomLevel: 'synthesis',
-      submissionType: 'document',
-      aiFeedback: true
-    },
-    {
-      id: 3,
-      title: 'Mock Trial Preparation - Oral Arguments',
-      course: 'Trial Advocacy',
-      professor: 'Judge Rebecca Smith',
-      dueDate: '2025-10-05T14:00:00',
-      status: 'completed',
-      priority: 'high',
-      progress: 100,
-      points: 200,
-      description: 'Prepare opening statement and cross-examination for mock trial exercise.',
-      tags: ['trial-advocacy', 'mock-trial'],
-      estimatedTime: '15 hours',
-      isStarred: true,
-      assignmentType: 'video-submission',
-      bloomLevel: 'evaluation',
-      submissionType: 'video',
-      grade: 'A+',
-      aiFeedback: true
-    },
-    {
-      id: 4,
-      title: 'Criminal Procedure Quiz',
-      course: 'Criminal Law',
-      professor: 'Dr. David Chen',
-      dueDate: '2025-09-28T15:30:00',
-      status: 'pending',
-      priority: 'medium',
-      progress: 0,
-      points: 50,
-      description: 'Online quiz covering Fourth Amendment protections and search warrants.',
-      tags: ['criminal-law', 'quiz'],
-      estimatedTime: '2 hours',
-      isStarred: false,
-      assignmentType: 'knowledge-check',
-      bloomLevel: 'knowledge',
-      submissionType: 'quiz'
-    },
-    {
-      id: 5,
-      title: 'Drafting Exercise: Writ Petition',
-      course: 'Civil Procedure',
-      professor: 'Prof. Emily Rodriguez',
-      dueDate: '2025-10-10T23:59:00',
-      status: 'draft',
-      priority: 'medium',
-      progress: 30,
-      points: 120,
-      description: 'Draft a writ petition using provided case materials and templates.',
-      tags: ['civil-procedure', 'drafting'],
-      estimatedTime: '6 hours',
-      isStarred: false,
-      assignmentType: 'drafting-exercise',
-      bloomLevel: 'application',
-      submissionType: 'document',
-      aiFeedback: true
-    }
-  ]);
+  const { isAuthenticated, backendToken } = useAuth();
+  const [assignments, setAssignments] = useState([]);
+  const [loadingAssignments, setLoadingAssignments] = useState(true);
+  const [error, setError] = useState(null);
 
+  const [availableCourses, setAvailableCourses] = useState([]);
+  const [availableAssignmentTypes, setAvailableAssignmentTypes] = useState([]);
+  const [availableBloomLevels, setAvailableBloomLevels] = useState([]);
+  const [availableAIFeatures, setAvailableAIFeatures] = useState([]);
+  
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
@@ -170,18 +90,64 @@ const Assignments = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [activeTab, setActiveTab] = useState('active'); // active, completed, drafts
 
-  // Get unique courses and assignment types
-  const courses = useMemo(() => {
-    return [...new Set(assignments.map(a => a.course))];
-  }, [assignments]);
+  useEffect(() => {
+    const fetchAllAssignmentData = async () => {
+      if (!isAuthenticated() || !backendToken) {
+        setLoadingAssignments(false);
+        return;
+      }
+      setLoadingAssignments(true);
+      setError(null);
+      try {
+        const [
+          assignmentsData, 
+          coursesData, 
+          assignmentTypesData, 
+          bloomLevelsData, 
+          aiFeaturesData
+        ] = await Promise.all([
+          getStudentAssignments(backendToken),
+          getCoursesForFilters(backendToken),
+          getAssignmentTypes(backendToken),
+          getBloomLevels(backendToken),
+          getStudentAIFeatures(backendToken)
+        ]);
 
-  const assignmentTypes = useMemo(() => {
-    return [...new Set(assignments.map(a => a.assignmentType))];
-  }, [assignments]);
+        if (assignmentsData.success) {
+          setAssignments(assignmentsData.data);
+        } else {
+          setError(assignmentsData.message || 'Failed to fetch assignments.');
+        }
+        
+        if (coursesData.success) {
+          setAvailableCourses(coursesData.data.map(c => c.name)); // Assuming API returns { id, name }
+        }
+        if (assignmentTypesData.success) {
+          setAvailableAssignmentTypes(assignmentTypesData.data.map(t => t.name)); // Assuming API returns { id, name }
+        }
+        if (bloomLevelsData.success) {
+          setAvailableBloomLevels(bloomLevelsData.data.map(b => b.name)); // Assuming API returns { id, name }
+        }
+        if (aiFeaturesData.success) {
+          setAvailableAIFeatures(aiFeaturesData.data);
+        }
 
-  const bloomLevels = [
-    'knowledge', 'comprehension', 'application', 'analysis', 'synthesis', 'evaluation'
-  ];
+      } catch (err) {
+        console.error('Failed to fetch assignment data:', err);
+        setError(err.message || 'An unexpected error occurred while fetching assignments.');
+      } finally {
+        setLoadingAssignments(false);
+      }
+    };
+
+    fetchAllAssignmentData();
+  }, [isAuthenticated, backendToken]);
+
+  // Get unique courses and assignment types from fetched data
+  const courses = useMemo(() => availableCourses, [availableCourses]);
+  const assignmentTypes = useMemo(() => availableAssignmentTypes, [availableAssignmentTypes]);
+  const bloomLevels = useMemo(() => availableBloomLevels, [availableBloomLevels]);
+  const aiFeatures = useMemo(() => availableAIFeatures, [availableAIFeatures]);
 
   // Filter assignments based on active tab
   const getTabAssignments = useCallback(() => {
@@ -375,15 +341,18 @@ const Assignments = () => {
     });
   };
 
-  // Add new assignment
+  // Add new assignment (this would ideally call a POST API)
   const addNewAssignment = useCallback(() => {
+    // This is a placeholder for adding a new assignment.
+    // In a real application, this would involve calling a POST API to create a new assignment on the backend.
+    // For now, we'll just add a dummy assignment to the local state.
     const newAssignment = {
-      id: Math.max(...assignments.map(a => a.id)) + 1,
-      title: 'New Assignment',
-      course: courses[0] || 'General',
+      id: assignments.length > 0 ? Math.max(...assignments.map(a => a.id)) + 1 : 1,
+      title: 'New Assignment (Draft)',
+      course: availableCourses[0] || 'General',
       professor: 'Professor',
       dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-      status: 'pending',
+      status: 'draft',
       priority: 'medium',
       progress: 0,
       points: 100,
@@ -391,21 +360,38 @@ const Assignments = () => {
       tags: [],
       estimatedTime: '2 hours',
       isStarred: false,
-      assignmentType: 'case-analysis',
-      bloomLevel: 'knowledge',
+      assignmentType: availableAssignmentTypes[0] || 'case-analysis',
+      bloomLevel: availableBloomLevels[0] || 'knowledge',
       submissionType: 'document',
       aiFeedback: false
     };
     setAssignments(prev => [...prev, newAssignment]);
-  }, [assignments, courses]);
+  }, [assignments, availableCourses, availableAssignmentTypes, availableBloomLevels]);
 
-  // AI Assistant Features
-  const aiFeatures = [
-    { name: 'Structure Suggester', icon: FiTarget, description: 'Outlines for legal research papers' },
-    { name: 'Citation Checker', icon: FiFileText, description: 'Bluebook/ILI compliance verification' },
-    { name: 'Plagiarism Scanner', icon: FiSearch, description: 'Integrated originality detection' },
-    { name: 'Argument Strength', icon: FiTrendingUp, description: 'Logical fallacy detection' }
-  ];
+  if (loadingAssignments) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: colors.background }}>
+        <div className="w-12 h-12 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin"></div>
+        <p className="ml-4 text-lg text-gray-700">Loading assignments...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: colors.background }}>
+        <div className="text-center p-6 bg-white rounded-lg shadow-md">
+          <p className="text-red-600 text-lg mb-4">Error: {error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: colors.background }}>
@@ -464,7 +450,7 @@ const Assignments = () => {
             </span>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {aiFeatures.map((feature, index) => (
+            {availableAIFeatures.map((feature, index) => (
               <div 
                 key={index}
                 className="p-3 rounded-lg transition-all duration-200 hover:shadow-md cursor-pointer"
@@ -478,7 +464,12 @@ const Assignments = () => {
                     className="p-2 rounded-lg"
                     style={{ backgroundColor: colors.overlay.golden.light }}
                   >
-                    <feature.icon className="w-4 h-4" style={{ color: colors.text.accent }} />
+                    {/* Assuming feature.icon is a string name of an icon component */}
+                    {feature.icon === 'FiTarget' && <FiTarget className="w-4 h-4" style={{ color: colors.text.accent }} />}
+                    {feature.icon === 'FiFileText' && <FiFileText className="w-4 h-4" style={{ color: colors.text.accent }} />}
+                    {feature.icon === 'FiSearch' && <FiSearch className="w-4 h-4" style={{ color: colors.text.accent }} />}
+                    {feature.icon === 'FiTrendingUp' && <FiTrendingUp className="w-4 h-4" style={{ color: colors.text.accent }} />}
+                    {/* Add more icon mappings as needed */}
                   </div>
                   <div>
                     <h3 className="text-sm font-medium" style={{ color: colors.text.primary }}>{feature.name}</h3>

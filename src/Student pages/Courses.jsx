@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   BookOpen, 
   Play, 
@@ -27,184 +27,65 @@ import {
   Zap,
   TargetIcon
 } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { getStudentCourses, getCourseCategories, getCurriculumStructure } from '../lib/api';
 
 const Courses = () => {
+  const { isAuthenticated, backendToken } = useAuth();
   const [viewMode, setViewMode] = useState('grid');
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('my-courses');
 
-  const [courses] = useState([
-    {
-      id: 1,
-      title: 'Contract Law I & II',
-      progress: 75,
-      instructor: 'Dr. Sarah Johnson',
-      totalModules: 12,
-      completedModules: 9,
-      nextLesson: 'Formation of Contracts',
-      duration: '8 weeks',
-      rating: 4.8,
-      students: 1243,
-      category: 'first-year',
-      difficulty: 'Beginner',
-      description: 'Master the fundamentals of contract formation, performance, and remedies',
-      lastAccessed: '2 hours ago',
-      certificate: true,
-      deadline: '2024-03-15',
-      year: 'First Year',
-      theory: 'Constructivist Approach'
-    },
-    {
-      id: 2,
-      title: 'Constitutional Law I',
-      progress: 45,
-      instructor: 'Prof. Michael Chen',
-      totalModules: 15,
-      completedModules: 7,
-      nextLesson: 'Fundamental Rights Analysis',
-      duration: '12 weeks',
-      rating: 4.9,
-      students: 987,
-      category: 'first-year',
-      difficulty: 'Intermediate',
-      description: 'Deep dive into constitutional principles and landmark case law',
-      lastAccessed: '1 day ago',
-      certificate: true,
-      deadline: '2024-04-20',
-      year: 'First Year',
-      theory: 'Competency-Based Learning'
-    },
-    {
-      id: 3,
-      title: 'Criminal Law (IPC, CrPC, Evidence)',
-      progress: 30,
-      instructor: 'Dr. Amanda Williams',
-      totalModules: 10,
-      completedModules: 3,
-      nextLesson: 'Elements of Crime',
-      duration: '10 weeks',
-      rating: 4.7,
-      students: 756,
-      category: 'first-year',
-      difficulty: 'Intermediate',
-      description: 'Comprehensive study of criminal law principles and procedural codes',
-      lastAccessed: '3 days ago',
-      certificate: true,
-      deadline: '2024-05-10',
-      year: 'First Year',
-      theory: 'Case-Based Learning'
-    },
-    {
-      id: 4,
-      title: 'Property Law',
-      progress: 85,
-      instructor: 'Prof. James Miller',
-      totalModules: 8,
-      completedModules: 7,
-      nextLesson: 'Transfer of Property',
-      duration: '6 weeks',
-      rating: 4.6,
-      students: 1156,
-      category: 'second-year',
-      difficulty: 'Advanced',
-      description: 'Master property rights, transfers, and easements',
-      lastAccessed: '5 hours ago',
-      certificate: true,
-      deadline: '2024-02-28',
-      year: 'Second Year',
-      theory: 'Applied Learning'
-    },
-    {
-      id: 5,
-      title: 'Intellectual Property Rights',
-      progress: 20,
-      instructor: 'Dr. Priya Sharma',
-      totalModules: 14,
-      completedModules: 3,
-      nextLesson: 'Patent Law Fundamentals',
-      duration: '10 weeks',
-      rating: 4.8,
-      students: 892,
-      category: 'third-year',
-      difficulty: 'Advanced',
-      description: 'Comprehensive coverage of IP laws and emerging technologies',
-      lastAccessed: '1 week ago',
-      certificate: true,
-      deadline: '2024-06-15',
-      year: 'Third Year',
-      theory: 'Innovation-Focused'
-    },
-    {
-      id: 6,
-      title: 'Cyber Law & Data Protection',
-      progress: 10,
-      instructor: 'Prof. Alex Rodriguez',
-      totalModules: 16,
-      completedModules: 2,
-      nextLesson: 'Data Privacy Regulations',
-      duration: '12 weeks',
-      rating: 4.9,
-      students: 678,
-      category: 'fourth-year',
-      difficulty: 'Advanced',
-      description: 'Cutting-edge course on digital laws and data protection frameworks',
-      lastAccessed: '2 weeks ago',
-      certificate: true,
-      deadline: '2024-07-20',
-      year: 'Fourth Year',
-      theory: 'Future-Ready Skills'
-    }
-  ]);
+  const [courses, setCourses] = useState([]);
+  const [courseCategories, setCourseCategories] = useState([]);
+  const [curriculumData, setCurriculumData] = useState({});
+  const [loadingCourses, setLoadingCourses] = useState(true);
+  const [error, setError] = useState(null);
 
-  const categories = [
-    { value: 'all', label: 'All Courses' },
-    { value: 'first-year', label: 'First Year' },
-    { value: 'second-year', label: 'Second Year' },
-    { value: 'third-year', label: 'Third Year' },
-    { value: 'fourth-year', label: 'Fourth Year' },
-    { value: 'fifth-year', label: 'Fifth Year' }
-  ];
+  useEffect(() => {
+    const fetchCourseData = async () => {
+      if (!isAuthenticated() || !backendToken) {
+        setLoadingCourses(false);
+        return;
+      }
+      setLoadingCourses(true);
+      setError(null);
+      try {
+        const [coursesResponse, categoriesResponse, curriculumResponse] = await Promise.all([
+          getStudentCourses(backendToken),
+          getCourseCategories(backendToken),
+          getCurriculumStructure(backendToken)
+        ]);
 
-  const curriculumStructure = {
-    'First Year': [
-      'Contract Law I & II',
-      'Torts & Consumer Protection',
-      'Criminal Law (IPC, CrPC, Evidence)',
-      'Constitutional Law I (Fundamental Rights)',
-      'Legal Methods & Research',
-      'English for Lawyers'
-    ],
-    'Second Year': [
-      'Property Law (Transfer, Easements)',
-      'Family Law (Hindu, Muslim, Christian, Special Marriage)',
-      'Company Law & Corporate Governance',
-      'Public International Law',
-      'Environmental Law',
-      'Jurisprudence I'
-    ],
-    'Third Year': [
-      'Administrative Law & Tribunals',
-      'Intellectual Property Rights',
-      'Taxation Law (Income Tax, GST)',
-      'Labor & Industrial Law',
-      'Banking & Insurance Law',
-      'Clinical Legal Education'
-    ],
-    'Fourth Year': [
-      'Alternate Dispute Resolution',
-      'Cyber Law & Data Protection',
-      'Competition Law & Economics',
-      'Human Rights & Refugee Law',
-      'Electives (based on university offerings)'
-    ],
-    'Fifth Year': [
-      'Drafting, Pleading & Conveyancing',
-      'Professional Ethics & Bar Bench Relations',
-      'Moot Court & Advocacy Training',
-      'Internship Practicum'
-    ]
-  };
+        if (coursesResponse.success) {
+          setCourses(coursesResponse.data);
+        } else {
+          setError(coursesResponse.message || 'Failed to fetch courses.');
+        }
+
+        if (categoriesResponse.success) {
+          // Assuming categoriesResponse.data is an array of { value: '...', label: '...' }
+          setCourseCategories([{ value: 'all', label: 'All Courses' }, ...categoriesResponse.data]);
+        }
+
+        if (curriculumResponse.success) {
+          setCurriculumData(curriculumResponse.data);
+        }
+
+      } catch (err) {
+        console.error('Error fetching course data:', err);
+        setError(err.message || 'An unexpected error occurred while fetching course data.');
+      } finally {
+        setLoadingCourses(false);
+      }
+    };
+
+    fetchCourseData();
+  }, [isAuthenticated, backendToken]);
+
+  const categories = useMemo(() => courseCategories, [courseCategories]);
+  const curriculumStructure = useMemo(() => curriculumData, [curriculumData]);
 
   const getDifficultyColor = (difficulty) => {
     switch (difficulty) {
@@ -278,6 +159,31 @@ const Courses = () => {
       borderColor: 'border-[#3b82f620]'
     }
   ];
+
+  if (loadingCourses) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#f5f5ef]">
+        <div className="w-12 h-12 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin"></div>
+        <p className="ml-4 text-lg text-gray-700">Loading courses...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#f5f5ef]">
+        <div className="text-center p-6 bg-white rounded-lg shadow-md">
+          <p className="text-red-600 text-lg mb-4">Error: {error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const StatCard = ({ stat }) => (
     <div className={`bg-white rounded-lg border ${stat.borderColor} p-6 shadow-sm hover:shadow-md transition-all duration-300 backdrop-blur-sm bg-opacity-90`}>

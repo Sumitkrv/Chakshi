@@ -137,7 +137,7 @@ const LoginModal = ({ isOpen, onClose, onOpenRegister }) => {
         throw new Error(backendResponse.message || 'Backend login failed.');
       }
 
-      const backendToken = backendResponse.data.user.token;
+      const backendToken = backendResponse.data.backendToken;
       // The role is now expected to come directly from the backend response
       const userProfile = backendResponse.data.user; 
       

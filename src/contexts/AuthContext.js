@@ -7,6 +7,7 @@ const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [backendToken, setBackendToken] = useState(null); // New state for backend token
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate(); // Initialize useNavigate
   const [logoutEvent, setLogoutEvent] = useState(0); // Track logout events
@@ -14,15 +15,16 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkAuthStatus = async () => {
       setLoading(true);
-      const backendToken = localStorage.getItem('backend_token'); // Retrieve backend JWT
+      const storedBackendToken = localStorage.getItem('backend_token'); // Retrieve backend JWT
       
-      if (backendToken) {
+      if (storedBackendToken) {
         try {
           // Use backend JWT to get current user profile from backend
-          const userProfileResponse = await getCurrentUserProfile(backendToken);
+          const userProfileResponse = await getCurrentUserProfile(storedBackendToken);
           
           if (userProfileResponse.success) {
             setUser(userProfileResponse.data.user);
+            setBackendToken(storedBackendToken); // Set backend token state
           } else {
             console.error('Failed to fetch user profile:', userProfileResponse.message);
             await logout(); // Clear session if profile fetch fails
@@ -38,6 +40,7 @@ export const AuthProvider = ({ children }) => {
       } else {
         // If no backendToken, simply set loading to false and user to null
         setUser(null);
+        setBackendToken(null); // Clear backend token state
         setLoading(false);
       }
     };
@@ -57,9 +60,9 @@ export const AuthProvider = ({ children }) => {
             // Call backend login with Supabase JWT to get backend JWT and user profile
             const backendResponse = await exchangeSupabaseTokenForBackendToken(session.access_token); // Using exchangeSupabaseTokenForBackendToken as it maps to /auth/login
             if (backendResponse.success) {
-              const backendToken = backendResponse.data.user.token; // Assuming backend returns token in user object
+              const newBackendToken = backendResponse.data.user.token; // Assuming backend returns token in user object
               const userProfile = backendResponse.data.user;
-              login(userProfile, backendToken); // Store backend token and user profile
+              login(userProfile, newBackendToken); // Store backend token and user profile
             } else {
               console.error('Backend login/verification failed after Supabase event:', backendResponse.message);
               await logout();
@@ -82,15 +85,17 @@ export const AuthProvider = ({ children }) => {
     };
   }, []); // Empty dependency array to run once on mount
 
-  const login = (userProfile, backendToken) => {
+  const login = (userProfile, token) => {
     setUser(userProfile);
+    setBackendToken(token); // Set backend token state
     localStorage.setItem('user', JSON.stringify(userProfile));
-    localStorage.setItem('backend_token', backendToken); // Store backend JWT
+    localStorage.setItem('backend_token', token); // Store backend JWT
   };
 
   const logout = async () => {
     await supabase.auth.signOut(); // Sign out from Supabase
     setUser(null);
+    setBackendToken(null); // Clear backend token state
     localStorage.removeItem('user');
     localStorage.removeItem('backend_token'); // Remove backend JWT
     // Increment logout event counter to trigger cleanup in components
@@ -98,7 +103,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const isAuthenticated = () => {
-    return !!user && !!localStorage.getItem('backend_token');
+    return !!user && !!backendToken; // Use backendToken state
   };
 
   const value = {
@@ -107,6 +112,7 @@ export const AuthProvider = ({ children }) => {
     logout,
     loading,
     isAuthenticated,
+    backendToken, // Expose backendToken
     logoutEvent // Components can listen to this for cleanup
   };
 

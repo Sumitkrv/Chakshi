@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { 
-  BookOpen, 
-  FileText, 
-  Clock, 
+import {
+  BookOpen,
+  FileText,
+  Clock,
   TrendingUp,
   Calendar,
   Award,
@@ -19,15 +19,14 @@ import {
   Menu,
   X
 } from 'lucide-react';
+import { getStudentDashboardData } from '../lib/api'; // Import the new API function
 
 const StudentDashboard = () => {
-  const { user } = useAuth();
+  const { user, isAuthenticated, backendToken } = useAuth(); // Get backendToken from AuthContext
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  // Debug logging
-  useEffect(() => {
-    console.log('✅ Student Dashboard component rendered!', { user: user?.email, timestamp: new Date().toISOString() });
-  }, [user]);
+  const [dashboardData, setDashboardData] = useState(null);
+  const [loadingData, setLoadingData] = useState(true);
+  const [error, setError] = useState(null);
 
   // Hero.js Color Palette
   const colors = {
@@ -40,131 +39,134 @@ const StudentDashboard = () => {
     blue: '#3b82f6'
   };
 
-  const stats = [
-    { 
-      title: 'Active Courses', 
-      value: '8', 
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      if (!isAuthenticated() || !backendToken) { // Check for backendToken
+        setLoadingData(false);
+        return;
+      }
+      setLoadingData(true);
+      setError(null);
+      try {
+        console.log('Dashboard.jsx: Using backendToken from AuthContext:', backendToken); // Debug log
+        const data = await getStudentDashboardData(backendToken); // Use backendToken from context
+        if (data.success) {
+          setDashboardData(data.data);
+        } else {
+          setError(data.message || 'Failed to fetch dashboard data.');
+        }
+      } catch (err) {
+        console.error('Failed to fetch dashboard data:', err);
+        setError(err.message || 'An unexpected error occurred.');
+      } finally {
+        setLoadingData(false);
+      }
+    };
+
+    fetchDashboardData();
+    // Debug logging
+    console.log('✅ Student Dashboard component rendered!', { user: user?.email, timestamp: new Date().toISOString() });
+  }, [user, isAuthenticated, backendToken]); // Re-fetch if user, auth status, or backendToken changes
+
+  // Placeholder data (will be replaced by dashboardData)
+  const defaultStats = [
+    {
+      title: 'Active Courses',
+      value: '0',
       icon: FileText,
-      change: '+2 this semester',
-      trend: 'up',
-      breakdown: '6 ongoing, 2 new'
-    },
-    { 
-      title: 'Assignments Due', 
-      value: '5', 
-      icon: Calendar,
-      change: '2 this week',
+      change: 'N/A',
       trend: 'neutral',
-      breakdown: 'Next 7 days'
+      breakdown: 'N/A'
     },
-    { 
-      title: 'Study Hours', 
-      value: '32', 
+    {
+      title: 'Assignments Due',
+      value: '0',
+      icon: Calendar,
+      change: 'N/A',
+      trend: 'neutral',
+      breakdown: 'N/A'
+    },
+    {
+      title: 'Study Hours',
+      value: '0',
       icon: Users,
-      change: '+8 this week',
-      trend: 'up',
-      breakdown: 'Weekly average'
+      change: 'N/A',
+      trend: 'neutral',
+      breakdown: 'N/A'
     },
-    { 
-      title: 'Grade Average', 
-      value: '85%', 
+    {
+      title: 'Grade Average',
+      value: '0%',
       icon: TrendingUp,
-      change: '+3% this month',
-      trend: 'up',
-      breakdown: 'Current GPA: 3.4'
+      change: 'N/A',
+      trend: 'neutral',
+      breakdown: 'N/A'
     }
   ];
 
-  const recentActivities = [
-    { 
-      activity: 'Court Order received in Civil Suit No. 245/2024', 
-      time: '2 hours ago',
-      type: 'court_order',
-      status: 'new',
-      priority: 'high'
-    },
-    { 
-      activity: 'Client consultation completed - Property Dispute', 
-      time: '4 hours ago',
-      type: 'meeting',
-      status: 'completed',
-      priority: 'medium'
-    },
-    { 
-      activity: 'Counter-affidavit filed in High Court', 
-      time: '1 day ago',
-      type: 'filing',
-      status: 'filed',
-      priority: 'high'
-    },
-    { 
-      activity: 'New client message - Contract Review', 
-      time: '1 day ago',
-      type: 'message',
-      status: 'unread',
-      priority: 'medium'
-    },
-    { 
-      activity: 'Cause list updated - 3 cases scheduled', 
-      time: '2 days ago',
-      type: 'notification',
-      status: 'info',
-      priority: 'low'
-    }
-  ];
+  const defaultRecentActivities = [];
+  const defaultUpcomingTasks = [];
+  const defaultAchievements = [];
+  const defaultCourseProgressBreakdown = { monthlyTarget: 0, byCourse: [] };
 
-  const upcomingTasks = [
-    { 
-      task: 'High Court Hearing - Writ Petition', 
-      dueDate: 'Today 2:30 PM',
-      priority: 'high',
-      details: 'Court No. 15, Justice Sharma',
-      type: 'hearing'
+  // Use actual data if available, otherwise use defaults
+  const currentStats = dashboardData?.dashboardStats ? [
+    {
+      title: 'Active Courses',
+      value: dashboardData.dashboardStats.activeCourses.value,
+      icon: FileText,
+      change: dashboardData.dashboardStats.activeCourses.change,
+      trend: dashboardData.dashboardStats.activeCourses.trend,
+      breakdown: dashboardData.dashboardStats.activeCourses.breakdown
     },
-    { 
-      task: 'Client Meeting - M/s ABC Industries', 
-      dueDate: 'Tomorrow 11:00 AM',
-      priority: 'medium',
-      details: 'Contract negotiation discussion',
-      type: 'meeting'
+    {
+      title: 'Assignments Due',
+      value: dashboardData.dashboardStats.assignmentsDue.value,
+      icon: Calendar,
+      change: dashboardData.dashboardStats.assignmentsDue.change,
+      trend: dashboardData.dashboardStats.assignmentsDue.trend,
+      breakdown: dashboardData.dashboardStats.assignmentsDue.breakdown
     },
-    { 
-      task: 'File Reply in Sessions Court', 
-      dueDate: 'Friday',
-      priority: 'high',
-      details: 'Criminal Case No. 156/2024',
-      type: 'filing'
+    {
+      title: 'Study Hours',
+      value: dashboardData.dashboardStats.studyHours.value,
+      icon: Users,
+      change: dashboardData.dashboardStats.studyHours.change,
+      trend: dashboardData.dashboardStats.studyHours.trend,
+      breakdown: dashboardData.dashboardStats.studyHours.breakdown
     },
-    { 
-      task: 'Evidence Collection - Property Case', 
-      dueDate: 'Next Week',
-      priority: 'medium',
-      details: 'Site inspection and documentation',
-      type: 'task'
+    {
+      title: 'Grade Average',
+      value: `${dashboardData.dashboardStats.gradeAverage.value}%`,
+      icon: TrendingUp,
+      change: dashboardData.dashboardStats.gradeAverage.change,
+      trend: dashboardData.dashboardStats.gradeAverage.trend,
+      breakdown: dashboardData.dashboardStats.gradeAverage.breakdown
     }
-  ];
+  ] : defaultStats;
 
-  const achievements = [
-    { name: 'Case Win Streak', earned: true, count: '5 consecutive wins' },
-    { name: 'Client Satisfaction', earned: true, count: '4.8/5 rating' },
-    { name: 'Revenue Milestone', earned: true, count: '₹10L+ this year' },
-    { name: 'Court Excellence', earned: false, count: 'Supreme Court case' }
-  ];
+  const currentRecentActivities = dashboardData?.recentActivities || defaultRecentActivities;
+  const currentUpcomingTasks = dashboardData?.upcomingTasks || defaultUpcomingTasks;
+  const currentAchievements = dashboardData?.achievements || defaultAchievements;
+  const currentCourseProgressBreakdown = dashboardData?.courseProgressBreakdown || defaultCourseProgressBreakdown;
+
 
   const getPriorityColor = (priority) => {
     switch (priority) {
-      case 'high': return `bg-red-50 text-red-700 border border-red-200`;
-      case 'medium': return `bg-yellow-50 text-yellow-700 border border-yellow-200`;
-      case 'low': return `bg-green-50 text-green-700 border border-green-200`;
+      case 'HIGH': return `bg-red-50 text-red-700 border border-red-200`;
+      case 'CRITICAL': return `bg-red-50 text-red-700 border border-red-200`; // Added CRITICAL
+      case 'MEDIUM': return `bg-yellow-50 text-yellow-700 border border-yellow-200`;
+      case 'LOW': return `bg-green-50 text-green-700 border border-green-200`;
       default: return `bg-blue-50 text-blue-700 border border-blue-200`;
     }
   };
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'completed': 
+      case 'completed':
+      case 'submitted':
       case 'filed': return `bg-green-50 text-green-700 border border-green-200`;
-      case 'new': 
+      case 'new':
       case 'unread': return `background: linear-gradient(135deg, ${colors.golden}20, ${colors.golden}10); color: ${colors.navy}; border: 1px solid ${colors.golden}40`;
       case 'info': return `bg-blue-50 text-blue-700 border border-blue-200`;
       default: return `background: rgba(107, 114, 128, 0.1); color: ${colors.gray}; border: 1px solid rgba(107, 114, 128, 0.2)`;
@@ -173,7 +175,11 @@ const StudentDashboard = () => {
 
   const getTypeIcon = (type) => {
     switch (type) {
-      case 'court_order': return <FileText className="w-4 h-4" style={{color: colors.amber}} />;
+      case 'quiz_completion': return <CheckCircle className="w-4 h-4" style={{color: colors.green}} />;
+      case 'assignment_submission': return <FileText className="w-4 h-4" style={{color: colors.amber}} />;
+      case 'content_update': return <BookOpen className="w-4 h-4" style={{color: colors.blue}} />;
+      case 'ASSIGNMENT_DEADLINE': return <FileText className="w-4 h-4" style={{color: colors.amber}} />;
+      case 'COURSE_DEADLINE': return <Calendar className="w-4 h-4" style={{color: colors.amber}} />;
       case 'meeting': return <Users className="w-4 h-4" style={{color: colors.blue}} />;
       case 'filing': return <CheckCircle className="w-4 h-4" style={{color: colors.green}} />;
       case 'message': return <Bell className="w-4 h-4" style={{color: colors.golden}} />;
@@ -183,6 +189,47 @@ const StudentDashboard = () => {
       default: return <FileText className="w-4 h-4" style={{color: colors.gray}} />;
     }
   };
+
+  // Function to format date for display (e.g., "Today 2:30 PM", "Tomorrow", "Friday")
+  const formatTaskDueDate = (isoDateString) => {
+    const date = new Date(isoDateString);
+    const today = new Date();
+    const tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
+
+    if (date.toDateString() === today.toDateString()) {
+      return `Today ${date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}`;
+    } else if (date.toDateString() === tomorrow.toDateString()) {
+      return `Tomorrow ${date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}`;
+    } else {
+      return date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+    }
+  };
+
+  if (loadingData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: colors.cream }}>
+        <div className="w-12 h-12 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin"></div>
+        <p className="ml-4 text-lg text-gray-700">Loading dashboard...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: colors.cream }}>
+        <div className="text-center p-6 bg-white rounded-lg shadow-md">
+          <p className="text-red-600 text-lg mb-4">Error: {error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen" style={{background: colors.cream}}>
@@ -210,7 +257,7 @@ const StudentDashboard = () => {
                 <Menu className="w-5 h-5" />
               )}
             </button>
-            
+
             {/* Logo/Brand */}
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{
@@ -226,7 +273,7 @@ const StudentDashboard = () => {
                 LegalPro
               </span>
             </div>
-            
+
             {/* Search Bar */}
             <div className="relative hidden md:block">
               <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2" style={{color: colors.golden}} />
@@ -266,9 +313,11 @@ const StudentDashboard = () => {
               </div>
               <div className="hidden sm:block text-right">
                 <p className="text-sm font-medium" style={{color: colors.navy}}>
-                  Adv. {user?.name || 'Legal Professional'}
+                  {dashboardData?.userProfile?.name || user?.name || user?.email?.split('@')[0] || 'Student'}
                 </p>
-                <p className="text-xs" style={{color: colors.gray}}>Senior Advocate</p>
+                <p className="text-xs" style={{color: colors.gray}}>
+                  {dashboardData?.userProfile?.academicYear || 'Law Student'}
+                </p>
               </div>
             </div>
           </div>
@@ -283,7 +332,7 @@ const StudentDashboard = () => {
           borderBottom: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`
         }}>
           <nav className="space-y-2">
-            {['Dashboard', 'Cases', 'Clients', 'Calendar', 'Documents', 'Reports', 'Settings'].map((item) => (
+            {['Dashboard', 'Courses', 'Assignments', 'Calendar', 'Library', 'Exam Prep', 'Research', 'Moot Court', 'Career', 'Simulation', 'Help', 'Settings'].map((item) => (
               <button
                 key={item}
                 className="w-full text-left px-3 py-2 rounded-lg transition-colors font-medium"
@@ -306,26 +355,26 @@ const StudentDashboard = () => {
         {/* Welcome Section */}
         <div className="mb-8">
           <h1 className="text-2xl font-bold mb-2" style={{color: colors.navy}}>
-            Welcome back, {user ? user.name || user.email.split('@')[0] : 'Student'}
+            Welcome back, {dashboardData?.userProfile?.name || user?.name || user?.email?.split('@')[0] || 'Student'}
           </h1>
           <p style={{color: colors.gray}}>
             Your student dashboard - track courses, assignments, and academic progress
           </p>
           <div className="flex items-center gap-2 text-sm mt-2" style={{color: colors.gray}}>
             <Calendar className="w-4 h-4" />
-            <span>{new Date().toLocaleDateString('en-US', { 
-              weekday: 'long', 
-              month: 'long', 
-              day: 'numeric' 
+            <span>{new Date().toLocaleDateString('en-US', {
+              weekday: 'long',
+              month: 'long',
+              day: 'numeric'
             })}</span>
           </div>
         </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          {stats.map((stat, index) => (
-            <div 
-              key={index} 
+          {currentStats.map((stat, index) => (
+            <div
+              key={index}
               className="rounded-lg p-4 transition-all duration-200 hover:scale-105"
               style={{
                 background: `linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06))`,
@@ -344,7 +393,7 @@ const StudentDashboard = () => {
                   <span>{stat.change}</span>
                 </div>
               </div>
-              
+
               <div>
                 <h3 className="text-2xl font-bold mb-1" style={{color: colors.navy}}>
                   {stat.value}
@@ -362,7 +411,7 @@ const StudentDashboard = () => {
 
         {/* Main Content Grid */}
         <div className="grid lg:grid-cols-3 gap-6 mb-8">
-          
+
           {/* Today's Priorities */}
           <div className="lg:col-span-2">
             <div className="rounded-lg p-6" style={{
@@ -377,42 +426,46 @@ const StudentDashboard = () => {
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
-              
+
               <div className="space-y-3">
-                {upcomingTasks.map((item, index) => (
-                  <div 
-                    key={index} 
-                    className="flex items-center gap-3 p-3 rounded-lg transition-all duration-200 hover:scale-[1.02]"
-                    style={{
-                      background: `rgba(255, 255, 255, 0.03)`,
-                      border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.10)`
-                    }}
-                  >
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{
-                      background: `linear-gradient(135deg, ${colors.golden}15, ${colors.golden}08)`
-                    }}>
-                      {getTypeIcon(item.type)}
+                {currentUpcomingTasks.length > 0 ? (
+                  currentUpcomingTasks.map((item, index) => (
+                    <div
+                      key={item.id || index}
+                      className="flex items-center gap-3 p-3 rounded-lg transition-all duration-200 hover:scale-[1.02]"
+                      style={{
+                        background: `rgba(255, 255, 255, 0.03)`,
+                        border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.10)`
+                      }}
+                    >
+                      <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{
+                        background: `linear-gradient(135deg, ${colors.golden}15, ${colors.golden}08)`
+                      }}>
+                        {getTypeIcon(item.type)}
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate" style={{color: colors.navy}}>
+                          {item.title}
+                        </p>
+                        <p className="text-xs" style={{color: colors.gray}}>
+                          {item.description}
+                        </p>
+                      </div>
+
+                      <div className="text-right">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(item.priority)}`}>
+                          {item.priority}
+                        </span>
+                        <p className="text-xs mt-1" style={{color: colors.gray}}>
+                          {formatTaskDueDate(item.scheduledAt)}
+                        </p>
+                      </div>
                     </div>
-                    
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate" style={{color: colors.navy}}>
-                        {item.task}
-                      </p>
-                      <p className="text-xs" style={{color: colors.gray}}>
-                        {item.details}
-                      </p>
-                    </div>
-                    
-                    <div className="text-right">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(item.priority)}`}>
-                        {item.priority}
-                      </span>
-                      <p className="text-xs mt-1" style={{color: colors.gray}}>
-                        {item.dueDate}
-                      </p>
-                    </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <div className="text-center py-4 text-gray-600">No upcoming tasks.</div>
+                )}
               </div>
             </div>
           </div>
@@ -428,15 +481,15 @@ const StudentDashboard = () => {
                 <h2 className="text-lg font-semibold" style={{color: colors.navy}}>Quick Actions</h2>
                 <Plus className="w-5 h-5" style={{color: colors.golden}} />
               </div>
-              
+
               <div className="space-y-3">
                 {[
-                  { title: 'Add New Case', icon: FileText, description: 'Register new case' },
-                  { title: 'Upload Document', icon: Award, description: 'OCR scan & file' },
-                  { title: 'Schedule Meeting', icon: Calendar, description: 'Client consultation' },
-                  { title: 'Generate Draft', icon: BookOpen, description: 'Legal document' }
+                  { title: 'Add New Assignment', icon: FileText, description: 'Create a new assignment entry' },
+                  { title: 'View Courses', icon: BookOpen, description: 'Browse all your courses' },
+                  { title: 'Check Calendar', icon: Calendar, description: 'See upcoming events' },
+                  { title: 'Start Quiz', icon: Award, description: 'Begin a daily quiz' }
                 ].map((action, index) => (
-                  <button 
+                  <button
                     key={index}
                     className="w-full p-3 rounded-lg transition-all duration-200 hover:scale-[1.02] text-left"
                     style={{
@@ -476,7 +529,7 @@ const StudentDashboard = () => {
 
         {/* Progress and Recent Activity */}
         <div className="grid lg:grid-cols-2 gap-6 mb-8">
-          
+
           {/* Recent Activity Feed */}
           <div className="rounded-lg p-6" style={{
             background: `linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06))`,
@@ -487,110 +540,113 @@ const StudentDashboard = () => {
               <h2 className="text-lg font-semibold" style={{color: colors.navy}}>Recent Activity Feed</h2>
               <BarChart3 className="w-5 h-5" style={{color: colors.golden}} />
             </div>
-            
+
             <div className="space-y-4">
-              {recentActivities.map((item, index) => (
-                <div 
-                  key={index}
-                  className="flex items-center gap-3 p-3 rounded-lg transition-all duration-200 hover:scale-[1.01]"
-                  style={{
-                    background: `rgba(255, 255, 255, 0.03)`,
-                    border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.10)`
-                  }}
-                >
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{
-                    background: `linear-gradient(135deg, ${colors.golden}15, ${colors.golden}08)`
-                  }}>
-                    {getTypeIcon(item.type)}
+              {currentRecentActivities.length > 0 ? (
+                currentRecentActivities.map((item, index) => (
+                  <div
+                    key={item.id || index}
+                    className="flex items-center gap-3 p-3 rounded-lg transition-all duration-200 hover:scale-[1.01]"
+                    style={{
+                      background: `rgba(255, 255, 255, 0.03)`,
+                      border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.10)`
+                    }}
+                  >
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{
+                      background: `linear-gradient(135deg, ${colors.golden}15, ${colors.golden}08)`
+                    }}>
+                      {getTypeIcon(item.type)}
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate" style={{color: colors.navy}}>
+                        {item.message}
+                      </p>
+                      <p className="text-xs" style={{color: colors.gray}}>
+                        {item.createdAt ? new Date(item.createdAt).toLocaleString() : 'N/A'} {/* Format date */}
+                      </p>
+                    </div>
+
+                    <div>
+                      <span
+                        className="px-2 py-1 rounded-full text-xs font-medium"
+                        style={{
+                          ...(item.status === 'new' || item.status === 'unread'
+                            ? {
+                                background: `linear-gradient(135deg, ${colors.golden}20, ${colors.golden}10)`,
+                                color: colors.navy,
+                                border: `1px solid ${colors.golden}40`
+                              }
+                            : {
+                                background: `rgba(16, 185, 129, 0.1)`,
+                                color: colors.green,
+                                border: `1px solid rgba(16, 185, 129, 0.2)`
+                              }
+                          )
+                        }}
+                      >
+                        {item.status || 'N/A'}
+                      </span>
+                    </div>
                   </div>
-                  
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate" style={{color: colors.navy}}>
-                      {item.activity}
-                    </p>
-                    <p className="text-xs" style={{color: colors.gray}}>
-                      {item.time}
-                    </p>
-                  </div>
-                  
-                  <div>
-                    <span 
-                      className="px-2 py-1 rounded-full text-xs font-medium"
-                      style={{
-                        ...(item.status === 'new' || item.status === 'unread' 
-                          ? {
-                              background: `linear-gradient(135deg, ${colors.golden}20, ${colors.golden}10)`,
-                              color: colors.navy,
-                              border: `1px solid ${colors.golden}40`
-                            }
-                          : {
-                              background: `rgba(16, 185, 129, 0.1)`,
-                              color: colors.green,
-                              border: `1px solid rgba(16, 185, 129, 0.2)`
-                            }
-                        )
-                      }}
-                    >
-                      {item.status}
-                    </span>
-                  </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <div className="text-center py-4 text-gray-600">No recent activities.</div>
+              )}
             </div>
           </div>
 
-          {/* Case Progress Tracker */}
+          {/* Course Progress Tracker */}
           <div className="rounded-lg p-6" style={{
             background: `linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06))`,
             backdropFilter: 'blur(6px)',
             border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`
           }}>
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-lg font-semibold" style={{color: colors.navy}}>Case Progress</h2>
+              <h2 className="text-lg font-semibold" style={{color: colors.navy}}>Course Progress</h2>
               <Target className="w-5 h-5" style={{color: colors.golden}} />
             </div>
-            
+
             <div className="space-y-4">
               {/* Overall Progress */}
               <div>
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-sm font-medium" style={{color: colors.navy}}>Monthly Target</span>
-                  <span className="text-sm font-semibold" style={{color: colors.navy}}>85%</span>
+                  <span className="text-sm font-semibold" style={{color: colors.navy}}>{currentCourseProgressBreakdown.monthlyTarget}%</span>
                 </div>
                 <div className="w-full rounded-full h-2 overflow-hidden" style={{background: `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`}}>
-                  <div 
+                  <div
                     className="h-full rounded-full transition-all duration-300"
                     style={{
-                      width: '85%',
+                      width: `${currentCourseProgressBreakdown.monthlyTarget}%`,
                       background: `linear-gradient(90deg, ${colors.golden}, ${colors.golden}CC)`
                     }}
                   ></div>
                 </div>
               </div>
 
-              {/* Case Type Progress */}
-              {[
-                { type: 'Civil Cases', progress: 90, color: colors.golden },
-                { type: 'Criminal Cases', progress: 75, color: colors.amber },
-                { type: 'Corporate Law', progress: 85, color: colors.blue },
-                { type: 'Family Law', progress: 65, color: colors.green }
-              ].map((item, index) => (
-                <div key={index}>
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-xs font-medium" style={{color: colors.gray}}>{item.type}</span>
-                    <span className="text-xs font-semibold" style={{color: colors.navy}}>{item.progress}%</span>
+              {/* Course Type Progress */}
+              {currentCourseProgressBreakdown.byCourse.length > 0 ? (
+                currentCourseProgressBreakdown.byCourse.map((item, index) => (
+                  <div key={item.courseId || index}>
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-xs font-medium" style={{color: colors.gray}}>{item.title}</span>
+                      <span className="text-xs font-semibold" style={{color: colors.navy}}>{item.progress}%</span>
+                    </div>
+                    <div className="w-full rounded-full h-1.5 overflow-hidden" style={{background: `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.10)`}}>
+                      <div
+                        className="h-full rounded-full transition-all duration-300"
+                        style={{
+                          width: `${item.progress}%`,
+                          background: item.color || colors.blue // Use item.color if available, else default
+                        }}
+                      ></div>
+                    </div>
                   </div>
-                  <div className="w-full rounded-full h-1.5 overflow-hidden" style={{background: `rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.10)`}}>
-                    <div 
-                      className="h-full rounded-full transition-all duration-300"
-                      style={{
-                        width: `${item.progress}%`,
-                        background: item.color
-                      }}
-                    ></div>
-                  </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <div className="text-center py-4 text-gray-600">No course progress data.</div>
+              )}
             </div>
           </div>
         </div>
@@ -602,46 +658,50 @@ const StudentDashboard = () => {
           border: `1px solid rgba(${parseInt(colors.golden.slice(1, 3), 16)}, ${parseInt(colors.golden.slice(3, 5), 16)}, ${parseInt(colors.golden.slice(5, 7), 16)}, 0.15)`
         }}>
           <h2 className="text-lg font-semibold mb-4" style={{color: colors.navy}}>Professional Achievements</h2>
-          
+
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {achievements.map((achievement, index) => (
-              <div 
-                key={index} 
-                className="p-3 rounded-lg transition-all duration-200 hover:scale-105"
-                style={{
-                  background: achievement.earned 
-                    ? `linear-gradient(135deg, ${colors.golden}15, ${colors.golden}08)`
-                    : `rgba(107, 114, 128, 0.05)`,
-                  border: achievement.earned 
-                    ? `1px solid ${colors.golden}40`
-                    : `1px solid rgba(107, 114, 128, 0.15)`
-                }}
-              >
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center mb-2" style={{
-                    background: achievement.earned 
-                      ? `linear-gradient(135deg, ${colors.golden}, ${colors.golden}DD)`
-                      : `rgba(107, 114, 128, 0.10)`,
-                    color: achievement.earned ? 'white' : colors.gray
-                  }}>
-                    <Award className="w-4 h-4" />
+            {currentAchievements.length > 0 ? (
+              currentAchievements.map((achievement, index) => (
+                <div
+                  key={achievement.id || index}
+                  className="p-3 rounded-lg transition-all duration-200 hover:scale-105"
+                  style={{
+                    background: achievement.earned
+                      ? `linear-gradient(135deg, ${colors.golden}15, ${colors.golden}08)`
+                      : `rgba(107, 114, 128, 0.05)`,
+                    border: achievement.earned
+                      ? `1px solid ${colors.golden}40`
+                      : `1px solid rgba(107, 114, 128, 0.15)`
+                  }}
+                >
+                  <div className="flex flex-col items-center text-center">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center mb-2" style={{
+                      background: achievement.earned
+                        ? `linear-gradient(135deg, ${colors.golden}, ${colors.golden}DD)`
+                        : `rgba(107, 114, 128, 0.10)`,
+                      color: achievement.earned ? 'white' : colors.gray
+                    }}>
+                      <Award className="w-4 h-4" />
+                    </div>
+                    <span className="text-xs font-medium mb-1" style={{
+                      color: achievement.earned ? colors.navy : colors.gray
+                    }}>
+                      {achievement.name}
+                    </span>
+                    <span className="text-xs" style={{
+                      color: achievement.earned ? colors.golden : colors.gray
+                    }}>
+                      {achievement.count}
+                    </span>
+                    {achievement.earned && (
+                      <CheckCircle className="w-3 h-3 mt-1" style={{color: colors.green}} />
+                    )}
                   </div>
-                  <span className="text-xs font-medium mb-1" style={{
-                    color: achievement.earned ? colors.navy : colors.gray
-                  }}>
-                    {achievement.name}
-                  </span>
-                  <span className="text-xs" style={{
-                    color: achievement.earned ? colors.golden : colors.gray
-                  }}>
-                    {achievement.count}
-                  </span>
-                  {achievement.earned && (
-                    <CheckCircle className="w-3 h-3 mt-1" style={{color: colors.green}} />
-                  )}
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <div className="col-span-full text-center py-4 text-gray-600">No achievements yet.</div>
+            )}
           </div>
         </div>
       </main>

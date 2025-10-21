@@ -1,24 +1,46 @@
 import React, { useState, useEffect } from 'react';
 import { FiChevronLeft, FiChevronRight, FiDownload, FiRefreshCw, FiCheck, FiCalendar } from 'react-icons/fi';
+import { useAuth } from '../contexts/AuthContext';
+import { getStudentCalendarEvents, addStudentCalendarEvent, updateStudentCalendarEvent, deleteStudentCalendarEvent } from '../lib/api';
 
 const Calendar = () => {
+  const { isAuthenticated, backendToken } = useAuth();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [events, setEvents] = useState([]);
+  const [loadingEvents, setLoadingEvents] = useState(true);
+  const [error, setError] = useState(null);
   const [syncStatus, setSyncStatus] = useState('idle');
   const [isMobile, setIsMobile] = useState(false);
 
-  const events = [
-    { id: 1, title: 'Moot Court Practice', date: new Date(2024, 0, 15), type: 'academic', priority: 'high' },
-    { id: 2, title: 'Internship Application Deadline', date: new Date(2024, 0, 20), type: 'career', priority: 'medium' },
-    { id: 3, title: 'Contract Law Exam', date: new Date(2024, 0, 25), type: 'exam', priority: 'high' },
-    { id: 4, title: 'Legal Research Workshop', date: new Date(2024, 0, 18), type: 'academic', priority: 'low' },
-    { id: 5, title: 'Legal Writing Submission', date: new Date(2024, 0, 22), type: 'academic', priority: 'medium' },
-    { id: 6, title: 'Career Fair', date: new Date(2024, 0, 28), type: 'career', priority: 'medium' },
-    { id: 7, title: 'Supreme Court Hearing Observation', date: new Date(2024, 0, 16), type: 'court', priority: 'high' },
-    { id: 8, title: 'Bar Council Meeting', date: new Date(2024, 0, 19), type: 'professional', priority: 'low' },
-  ];
+  const fetchEvents = async () => {
+    if (!isAuthenticated() || !backendToken) {
+      setLoadingEvents(false);
+      return;
+    }
+    setLoadingEvents(true);
+    setError(null);
+    try {
+      const response = await getStudentCalendarEvents(backendToken);
+      if (response.success) {
+        // Convert date strings back to Date objects
+        setEvents(response.data.map(event => ({
+          ...event,
+          date: new Date(event.date)
+        })));
+      } else {
+        setError(response.message || 'Failed to fetch calendar events.');
+      }
+    } catch (err) {
+      console.error('Error fetching calendar events:', err);
+      setError(err.message || 'An unexpected error occurred while fetching events.');
+    } finally {
+      setLoadingEvents(false);
+    }
+  };
 
   useEffect(() => {
+    fetchEvents();
     const checkScreenSize = () => {
       setIsMobile(window.innerWidth < 1024);
     };
@@ -26,14 +48,18 @@ const Calendar = () => {
     checkScreenSize();
     window.addEventListener('resize', checkScreenSize);
     return () => window.removeEventListener('resize', checkScreenSize);
-  }, []);
+  }, [isAuthenticated, backendToken]);
 
-  const handleSync = () => {
+  const handleSync = async () => {
     setSyncStatus('syncing');
-    setTimeout(() => {
+    try {
+      await fetchEvents(); // Re-fetch events
       setSyncStatus('synced');
       setTimeout(() => setSyncStatus('idle'), 2000);
-    }, 1500);
+    } catch (err) {
+      setSyncStatus('idle');
+      setError(err.message || 'Failed to sync calendar.');
+    }
   };
 
   const handleExport = () => {
@@ -199,9 +225,34 @@ const Calendar = () => {
     
     return events
       .filter(event => event.date >= today)
-      .sort((a, b) => a.date - b.date)
+      .sort((a, b) => a.date.getTime() - b.date.getTime()) // Ensure proper date comparison
       .slice(0, 5);
   };
+
+  if (loadingEvents) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#f5f5ef]">
+        <div className="w-12 h-12 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin"></div>
+        <p className="ml-4 text-lg text-gray-700">Loading calendar...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#f5f5ef]">
+        <div className="text-center p-6 bg-white rounded-lg shadow-md">
+          <p className="text-red-600 text-lg mb-4">Error: {error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const getEventTypeColor = (type) => {
     switch (type) {
